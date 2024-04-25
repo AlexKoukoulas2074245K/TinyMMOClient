@@ -87,6 +87,14 @@ void Game::ApplicationMovedToBackground()
 
 void Game::OnOneSecondElapsed()
 {
+#if defined(MACOS) || defined(MOBILE_FLOW)
+    static bool shouldSend = true;
+    if (shouldSend)
+    {
+        apple_utils::SendPlayMessage();
+        shouldSend = false;
+    }
+#endif
 }
 
 ///------------------------------------------------------------------------------------------------

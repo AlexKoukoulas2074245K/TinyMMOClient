@@ -426,50 +426,88 @@ void RequestReview()
 
 ///-----------------------------------------------------------------------------------------------
 
-void SendPlayMessage(nlohmann::json& json)
+void SendPlayMessage()
 {
-    auto filePathToLastToken = GetPersistentDataDirectoryPath() + "last_notifications_token.txt";
-    std::ifstream tokenFile(filePathToLastToken);
-    
-    if (tokenFile.is_open())
-    {
-        json["token"] = std::string((std::istreambuf_iterator<char>(tokenFile)), std::istreambuf_iterator<char>());
-    }
-    
-    auto jsonStringToSend = json.dump(4);
-    
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        int client_socket;
-        struct sockaddr_in server_addr;
+        int clientSocket;
+        struct sockaddr_in serverAddr;
         
         // Create socket
-        if ((client_socket = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+        if ((clientSocket = socket(AF_INET, SOCK_STREAM, 0)) == -1)
         {
             NSLog(@"Error: Socket creation failed");
+            close(clientSocket);
             return;
         }
         
         // Specify server address
-        server_addr.sin_family = AF_INET;
-        server_addr.sin_port = htons(8080); // Use the same port as the server
-        server_addr.sin_addr.s_addr = inet_addr("178.16.131.241");
+        serverAddr.sin_family = AF_INET;
+        serverAddr.sin_port = htons(8070); // Use the same port as the server
+        //server_addr.sin_addr.s_addr = inet_addr("178.16.131.241");
+        serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
         
         // Connect to server
-        if (connect(client_socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1)
+        if (connect(clientSocket, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) == -1)
         {
             NSLog(@"Error: Connection failed");
+            close(clientSocket);
             return;
         }
         
         // Dummy JSON string
-        if (send(client_socket, jsonStringToSend.c_str(), jsonStringToSend.size(), 0) == -1)
+        std::string messageToSend = "{ \"message\": \"hello server\", \"client_name\": \"alex\"}";
+        
+        if (send(clientSocket, messageToSend.c_str(), messageToSend.size(), 0) == -1)
         {
             NSLog(@"Error: Send failed");
+            close(clientSocket);
             return;
         }
         
+        // Send null character to indicate end of message
+        char nullTerminator = '\0';
+        if (send(clientSocket, &nullTerminator, sizeof(nullTerminator), 0) == -1)
+        {
+            NSLog(@"Error: Send failed");
+            close(clientSocket);
+            return;
+        }
+        
+        std::string responseMessage;
+        while (true)
+        {
+            char buffer[4096];
+            ssize_t bytesReceived = recv(clientSocket, buffer, sizeof(buffer), 0);
+            if (bytesReceived == -1)
+            {
+                NSLog(@"Error: recv() failed, Message too large");
+                close(clientSocket);
+                break;
+            }
+            else if (bytesReceived == 0)
+            {
+                // Connection closed by server
+                break;
+            }
+            else
+            {
+                responseMessage.append(buffer, bytesReceived);
+                if (responseMessage.find('\0') != std::string::npos)
+                {
+                    // Null character found, indicating end of JSON message
+                    break;
+                }
+            }
+        }
+        
+        if (!responseMessage.empty())
+        {
+            NSString* response = [NSString stringWithUTF8String:responseMessage.c_str()];
+            NSLog(@"Server says: \"%@\"", response);
+        }
+        
         // Close socket
-        close(client_socket);
+        close(clientSocket);
     });
 }
 

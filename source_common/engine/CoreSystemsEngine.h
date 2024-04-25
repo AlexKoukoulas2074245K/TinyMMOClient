@@ -65,10 +65,7 @@ public:
 private:
     CoreSystemsEngine() = default;
     void Initialize();
-    
-#if defined(USE_IMGUI)
     void CreateEngineDebugWidgets();
-#endif
 
 private:
     static bool mInitialized;
