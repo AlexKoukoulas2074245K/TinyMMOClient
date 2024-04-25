@@ -49,7 +49,7 @@ static float sLastGameLogicDtMillis = 0.0f;
 static bool sPrintFPS = false;
 static bool sShuttingDown = false;
 
-#if (!defined(NDEBUG)) || defined(IMGUI_IN_RELEASE)
+#if defined(USE_IMGUI)
 static const int PROFILLING_SAMPLE_COUNT = 300;
 static float sUpdateLogicMillisSamples[PROFILLING_SAMPLE_COUNT];
 static float sRenderingMillisSamples[PROFILLING_SAMPLE_COUNT];
@@ -160,7 +160,7 @@ void CoreSystemsEngine::Initialize()
     logging::Log(logging::LogType::INFO, "Version      : %s", GL_NO_CHECK_CALL(glGetString(GL_SHADING_LANGUAGE_VERSION)));
     logging::Log(logging::LogType::INFO, "Max Tex Size : %d", maxTextureSize);
 
-#if (!defined(NDEBUG)) || defined(IMGUI_IN_RELEASE)
+#if defined(USE_IMGUI)
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -231,14 +231,14 @@ void CoreSystemsEngine::Start(std::function<void()> clientInitFunction, std::fun
         
         if (mSystems->mInputStateManager.VButtonTapped(input::Button::SECONDARY_BUTTON))
         {
-#if (!defined(NDEBUG)) || defined(IMGUI_IN_RELEASE)
+#if defined(USE_IMGUI)
             freezeGame = !freezeGame;
 #endif
         }
             
         if (mSystems->mInputStateManager.VButtonTapped(input::Button::MIDDLE_BUTTON))
         {
-#if (!defined(NDEBUG)) || defined(IMGUI_IN_RELEASE)
+#if defined(USE_IMGUI)
             GLOBAL_IMGUI_WINDOW_FLAGS = GLOBAL_IMGUI_WINDOW_FLAGS == ImGuiWindowFlags_NoMove ? ImGuiWindowFlags_None : ImGuiWindowFlags_NoMove;
 #endif
         }
@@ -275,7 +275,7 @@ void CoreSystemsEngine::Start(std::function<void()> clientInitFunction, std::fun
         float gameLogicMillis = math::Max(16.0f, math::Min(32.0f, dtMillis)) * sGameSpeed * targetFpsMillis/DEFAULT_FRAME_MILLIS;
 
         // Update logic
-#if (!defined(NDEBUG)) || defined(IMGUI_IN_RELEASE)
+#if defined(USE_IMGUI)
         sLastGameLogicDtMillis = gameLogicMillis;
         const auto logicUpdateTimeStart = std::chrono::system_clock::now();
 #else
@@ -307,7 +307,7 @@ void CoreSystemsEngine::Start(std::function<void()> clientInitFunction, std::fun
             }
         }
         
-#if (!defined(NDEBUG)) || defined(IMGUI_IN_RELEASE)
+#if defined(USE_IMGUI)
         const auto logicUpdateTimeEnd = std::chrono::system_clock::now();
         sUpdateLogicMillisSamples[PROFILLING_SAMPLE_COUNT - 1] = std::chrono::duration_cast<std::chrono::milliseconds>(logicUpdateTimeEnd - logicUpdateTimeStart).count();
 #endif
@@ -315,7 +315,7 @@ void CoreSystemsEngine::Start(std::function<void()> clientInitFunction, std::fun
         // Rendering Logic
         mSystems->mRenderer.VBeginRenderPass();
         
-#if (!defined(NDEBUG)) || defined(IMGUI_IN_RELEASE)
+#if defined(USE_IMGUI)
         clientCreateDebugWidgetsFunction();
         CreateEngineDebugWidgets();
         
@@ -330,7 +330,7 @@ void CoreSystemsEngine::Start(std::function<void()> clientInitFunction, std::fun
             }
         }
         
-#if (!defined(NDEBUG)) || defined(IMGUI_IN_RELEASE)
+#if defined(USE_IMGUI)
         const auto renderingTimeEnd = std::chrono::system_clock::now();
         sRenderingMillisSamples[PROFILLING_SAMPLE_COUNT - 1] = std::chrono::duration_cast<std::chrono::milliseconds>(renderingTimeEnd - renderingTimeStart).count();
         
@@ -441,7 +441,7 @@ glm::vec2 CoreSystemsEngine::GetContextRenderableDimensions() const
 
 void CoreSystemsEngine::SpecialEventHandling(SDL_Event& event)
 {
-#if (!defined(NDEBUG)) || defined(IMGUI_IN_RELEASE)
+#if defined(USE_IMGUI)
     ImGui_ImplSDL2_ProcessEvent(&event);
 #else
     (void)event;
@@ -452,7 +452,7 @@ void CoreSystemsEngine::SpecialEventHandling(SDL_Event& event)
 
 void CreateEngineDebugWidgets()
 {
-#if (!defined(NDEBUG) || defined(IMGUI_IN_RELEASE))
+#if defined(USE_IMGUI)
     static float pitch = 1.0f;
     static float gain = 1.0f;
     static size_t sfxIndex = 0;

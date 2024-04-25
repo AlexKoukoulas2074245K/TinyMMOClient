@@ -97,20 +97,7 @@ void Game::WindowResize()
 
 ///------------------------------------------------------------------------------------------------
 
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
-    #include <imgui/backends/imgui_impl_sdl2.h>
-    #define CREATE_DEBUG_WIDGETS
-#elif __APPLE__
-    #include <TargetConditionals.h>
-    #if TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
-        #undef CREATE_DEBUG_WIDGETS
-    #else
-        #include <imgui/backends/imgui_impl_sdl2.h>
-        #define CREATE_DEBUG_WIDGETS
-    #endif
-#endif
-
-#if ((!defined(NDEBUG)) || defined(IMGUI_IN_RELEASE)) && (defined(CREATE_DEBUG_WIDGETS))
+#if defined(USE_IMGUI)
 void Game::CreateDebugWidgets()
 {
 }

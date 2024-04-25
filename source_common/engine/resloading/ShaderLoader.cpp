@@ -153,7 +153,7 @@ std::string ShaderLoader::ReadFileContents(const std::string& filePath) const
     if (!file.good())
     {
         ospopups::ShowMessageBox(ospopups::MessageBoxType::ERROR, "File could not be found", filePath.c_str());
-        return nullptr;
+        return "";
     }
     
     std::string contents;

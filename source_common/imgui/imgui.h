@@ -26,7 +26,6 @@
 #define IMGUI_VERSION       "1.90 WIP"
 #define IMGUI_VERSION_NUM   18993
 #define IMGUI_HAS_TABLE
-//#define IMGUI_IN_RELEASE
 
 /*
 

@@ -333,7 +333,7 @@ void RendererPlatformImpl::VBeginRenderPass()
     
     GL_CALL(glDisable(GL_CULL_FACE));
     
-#if (!defined(NDEBUG)) || defined(IMGUI_IN_RELEASE)
+#if defined(USE_IMGUI)
     // Imgui start-of-frame calls
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame();
@@ -407,7 +407,7 @@ void RendererPlatformImpl::VEndRenderPass()
         std::visit(SceneObjectTypeRendererVisitor(*sceneObjectEntry.second, *sceneObjectEntry.first), sceneObjectEntry.second->mSceneObjectTypeData);
     }
     
-#if (!defined(NDEBUG)) || defined(IMGUI_IN_RELEASE)
+#if defined(USE_IMGUI)
     // Create all custom GUIs
     CreateIMGuiWidgets();
     mCachedScenes.clear();
@@ -424,7 +424,7 @@ void RendererPlatformImpl::VEndRenderPass()
 
 ///------------------------------------------------------------------------------------------------
 
-#if (!defined(NDEBUG)) || defined(IMGUI_IN_RELEASE)
+#if defined(USE_IMGUI)
 static std::unordered_map<strutils::StringId, glm::vec2, strutils::StringIdHasher> sUniformMinMaxValues;
 
 class SceneObjectDataIMGuiVisitor
