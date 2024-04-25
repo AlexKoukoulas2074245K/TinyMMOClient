@@ -12,6 +12,7 @@
 #define PLATFORM_CALL(func) (sound_utils::func)
 #elif defined(WINDOWS)
 #include <platform_utilities/WindowsUtils.h>
+#define PLATFORM_CALL(func)
 #endif
 
 ///------------------------------------------------------------------------------------------------

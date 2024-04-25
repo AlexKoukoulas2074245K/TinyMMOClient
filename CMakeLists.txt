@@ -70,6 +70,9 @@ add_subdirectory(source_test)
 
 # Enable highest warning levels + treated as errors
 if(WIN32)
+  target_compile_definitions(${PROJECT_NAME} PRIVATE USE_IMGUI=1)
+  target_compile_definitions(${PROJECT_NAME}_platform_utilities PRIVATE USE_IMGUI=1)
+  target_compile_definitions(${PROJECT_NAME}_platform PRIVATE USE_IMGUI=1)
   target_compile_options(${PROJECT_NAME} PRIVATE /W4)
   target_compile_options(${PROJECT_NAME}_platform PRIVATE /W4)
   target_compile_options(${PROJECT_NAME}_platform_utilities PRIVATE /W4)

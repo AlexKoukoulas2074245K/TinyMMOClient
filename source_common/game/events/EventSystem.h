@@ -18,6 +18,7 @@
 #include <unordered_set>
 #include <set>
 #include <vector>
+#include <memory>
 
 ///------------------------------------------------------------------------------------------------
 

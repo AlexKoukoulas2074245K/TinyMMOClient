@@ -9,12 +9,7 @@
 
 ///------------------------------------------------------------------------------------------------
 
-extern int BATTLE_SIMULATION_ITERATIONS;
-
-///------------------------------------------------------------------------------------------------
-
 int main(int argc, char** argv) {
-    if (argc > 1) BATTLE_SIMULATION_ITERATIONS = std::stoi(argv[1]);
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
