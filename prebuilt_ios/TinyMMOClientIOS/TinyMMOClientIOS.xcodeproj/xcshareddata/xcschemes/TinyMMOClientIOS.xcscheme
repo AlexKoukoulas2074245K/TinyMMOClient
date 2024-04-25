@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "92C851552969A7CA0021923F"
-               BuildableName = "Realm of Beasts.app"
+               BuildableName = "TinyMMOClient.app"
                BlueprintName = "TinyMMOClientIOS"
                ReferencedContainer = "container:TinyMMOClientIOS.xcodeproj">
             </BuildableReference>
@@ -73,7 +73,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "92C851552969A7CA0021923F"
-            BuildableName = "Realm of Beasts.app"
+            BuildableName = "TinyMMOClient.app"
             BlueprintName = "TinyMMOClientIOS"
             ReferencedContainer = "container:TinyMMOClientIOS.xcodeproj">
          </BuildableReference>
@@ -90,7 +90,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "92C851552969A7CA0021923F"
-            BuildableName = "Realm of Beasts.app"
+            BuildableName = "TinyMMOClient.app"
             BlueprintName = "TinyMMOClientIOS"
             ReferencedContainer = "container:TinyMMOClientIOS.xcodeproj">
          </BuildableReference>

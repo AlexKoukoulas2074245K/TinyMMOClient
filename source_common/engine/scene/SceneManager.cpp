@@ -1,6 +1,6 @@
 ///------------------------------------------------------------------------------------------------
 ///  SceneManager.cpp
-///  Predators                                                                                            
+///  TinyMMOClient                                                                                            
 ///                                                                                                
 ///  Created by Alex Koukoulas on 03/10/2023                                                       
 ///------------------------------------------------------------------------------------------------
@@ -170,7 +170,7 @@ void SceneManager::LoadPredefinedObjectsFromDescriptorForScene(std::shared_ptr<S
         
         if (sceneObjectJson.count("alpha"))
         {
-            sceneObject->mShaderFloatUniformValues[game_constants::CUSTOM_ALPHA_UNIFORM_NAME] = sceneObjectJson["alpha"].get<float>();
+            sceneObject->mShaderFloatUniformValues[strutils::StringId("custom_color")] = sceneObjectJson["alpha"].get<float>();
         }
         
         if (sceneObjectJson.count("invisible"))
@@ -203,9 +203,9 @@ void SceneManager::LoadPredefinedObjectsFromDescriptorForScene(std::shared_ptr<S
             
             if (sceneObjectJson.count("color"))
             {
-                sceneObject->mShaderVec3UniformValues[game_constants::CUSTOM_COLOR_UNIFORM_NAME].r = sceneObjectJson["color"]["r"].get<float>();
-                sceneObject->mShaderVec3UniformValues[game_constants::CUSTOM_COLOR_UNIFORM_NAME].g = sceneObjectJson["color"]["g"].get<float>();
-                sceneObject->mShaderVec3UniformValues[game_constants::CUSTOM_COLOR_UNIFORM_NAME].b = sceneObjectJson["color"]["b"].get<float>();
+                sceneObject->mShaderVec3UniformValues[strutils::StringId("custom_color")].r = sceneObjectJson["color"]["r"].get<float>();
+                sceneObject->mShaderVec3UniformValues[strutils::StringId("custom_color")].g = sceneObjectJson["color"]["g"].get<float>();
+                sceneObject->mShaderVec3UniformValues[strutils::StringId("custom_color")].b = sceneObjectJson["color"]["b"].get<float>();
             }
         }
         if (sceneObjectJson.count("text"))

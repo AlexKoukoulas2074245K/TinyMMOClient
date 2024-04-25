@@ -1,61 +1,61 @@
 {
   "images" : [
     {
-      "filename" : "mighty_roar_macos_icon_16x16.png",
+      "filename" : "tiny_mmo_logo_16x16.png",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "16x16"
     },
     {
-      "filename" : "mighty_roar_macos_icon_32x32 1.png",
+      "filename" : "tiny_mmo_logo_32x32 1.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "16x16"
     },
     {
-      "filename" : "mighty_roar_macos_icon_32x32.png",
+      "filename" : "tiny_mmo_logo_32x32.png",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "32x32"
     },
     {
-      "filename" : "mighty_roar_macos_icon_64x64.png",
+      "filename" : "tiny_mmo_logo_64x64.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "32x32"
     },
     {
-      "filename" : "mighty_roar_macos_icon_128x128.png",
+      "filename" : "tiny_mmo_logo_128x128.png",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "128x128"
     },
     {
-      "filename" : "mighty_roar_macos_icon_256x256 1.png",
+      "filename" : "tiny_mmo_logo_256x256 1.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "128x128"
     },
     {
-      "filename" : "mighty_roar_macos_icon_256x256.png",
+      "filename" : "tiny_mmo_logo_256x256.png",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "256x256"
     },
     {
-      "filename" : "mighty_roar_macos_icon_512x512 1.png",
+      "filename" : "tiny_mmo_logo_512x512 1.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "256x256"
     },
     {
-      "filename" : "mighty_roar_macos_icon_512x512.png",
+      "filename" : "tiny_mmo_logo_512x512.png",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "512x512"
     },
     {
-      "filename" : "mighty_roar_macos_icon.png",
+      "filename" : "tiny_mmo_logo_1024x1024.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "512x512"

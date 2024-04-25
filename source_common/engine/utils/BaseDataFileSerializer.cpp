@@ -1,6 +1,6 @@
 ///------------------------------------------------------------------------------------------------
 ///  BaseDataFileSerializer.cpp
-///  Predators
+///  TinyMMOClient
 ///
 ///  Created by Alex Koukoulas on 16/12/2023
 ///------------------------------------------------------------------------------------------------
@@ -13,7 +13,6 @@
 #include <engine/utils/StringUtils.h>
 #if defined(MACOS) || defined(MOBILE_FLOW)
 #include <platform_utilities/AppleUtils.h>
-#include <platform_utilities/CloudKitUtils.h>
 #elif defined(WINDOWS)
 #include <platform_utilities/WindowsUtils.h>
 #endif
@@ -64,14 +63,6 @@ void BaseDataFileSerializer::FlushStateToFile()
         
         mFile.close();
     }
-    
-#if defined(MACOS) || defined(MOBILE_FLOW)
-    if (mDataFileType == DataFileType::PERSISTENCE_FILE_TYPE)
-    {
-        cloudkit_utils::SavePlayerProgress();
-    }
-#elif defined(WINDOWS)
-#endif
 }
 
 ///------------------------------------------------------------------------------------------------

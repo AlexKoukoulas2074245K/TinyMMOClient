@@ -1,6 +1,6 @@
 ///------------------------------------------------------------------------------------------------
 ///  EventSystem.h                                                                                          
-///  Predators                                                                                            
+///  TinyMMOClient                                                                                            
 ///                                                                                                
 ///  Created by Alex Koukoulas on 01/11/2023                                                       
 ///------------------------------------------------------------------------------------------------
@@ -15,6 +15,7 @@
 #include <functional>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <set>
 #include <vector>
 

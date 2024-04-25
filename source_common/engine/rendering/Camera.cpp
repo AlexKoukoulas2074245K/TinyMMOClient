@@ -1,6 +1,6 @@
 ///------------------------------------------------------------------------------------------------
 ///  Camera.cpp                                                                                        
-///  Predators
+///  TinyMMOClient
 ///                                                                                                
 ///  Created by Alex Koukoulas on 20/09/2023
 ///------------------------------------------------------------------------------------------------
@@ -12,13 +12,6 @@
 
 #if defined(MOBILE_FLOW)
 #include <platform_specific/IOSUtils.h>
-#endif
-
-#if defined(MACOS) || defined(MOBILE_FLOW)
-#include <platform_utilities/AppleUtils.h>
-#include <platform_utilities/CloudKitUtils.h>
-#elif defined(WINDOWS)
-#include <platform_utilities/WindowsUtils.h>
 #endif
 
 ///------------------------------------------------------------------------------------------------

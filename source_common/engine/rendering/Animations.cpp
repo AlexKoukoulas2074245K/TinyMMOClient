@@ -201,34 +201,6 @@ std::shared_ptr<scene::SceneObject> TweenRotationAnimation::VGetSceneObject()
 
 ///------------------------------------------------------------------------------------------------
 
-TweenAlphaAnimation::TweenAlphaAnimation(std::shared_ptr<scene::SceneObject> sceneObjectTarget, const float targetAlpha, const float secsDuration, const uint8_t animationFlags /* = animation_flags::NONE */, const float secsDelay /* = 0.0f */, const std::function<float(const float)> tweeningFunc /* = math::LinearFunction */, const math::TweeningMode tweeningMode /* = math::TweeningMode::EASE_IN */)
-    : BaseAnimation(animationFlags, secsDuration, secsDelay)
-    , mSceneObjectTarget(sceneObjectTarget)
-    , mInitAlpha(sceneObjectTarget->mShaderFloatUniformValues.at(game_constants::CUSTOM_ALPHA_UNIFORM_NAME))
-    , mTargetAlpha(targetAlpha)
-    , mTweeningFunc(tweeningFunc)
-    , mTweeningMode(tweeningMode)
-{
-    assert(!IS_FLAG_SET(animation_flags::ANIMATE_CONTINUOUSLY));
-    assert(!IS_FLAG_SET(animation_flags::IGNORE_X_COMPONENT));
-    assert(!IS_FLAG_SET(animation_flags::IGNORE_Y_COMPONENT));
-    assert(!IS_FLAG_SET(animation_flags::IGNORE_Z_COMPONENT));
-}
-
-AnimationUpdateResult TweenAlphaAnimation::VUpdate(const float dtMillis)
-{
-    auto animationUpdateResult = BaseAnimation::VUpdate(dtMillis);
-    mSceneObjectTarget->mShaderFloatUniformValues[game_constants::CUSTOM_ALPHA_UNIFORM_NAME] = math::Lerp(mInitAlpha, mTargetAlpha, math::TweenValue(mAnimationT, mTweeningFunc, mTweeningMode));
-    return animationUpdateResult;
-}
-
-std::shared_ptr<scene::SceneObject> TweenAlphaAnimation::VGetSceneObject()
-{
-    return mSceneObjectTarget;
-}
-
-///------------------------------------------------------------------------------------------------
-
 TweenValueAnimation::TweenValueAnimation(float& value, const float targetValue, const float secsDuration, const uint8_t animationFlags /* = animation_flags::NONE */, const float secsDelay /* = 0.0f */, const std::function<float(const float)> tweeningFunc /* = math::LinearFunction */, const math::TweeningMode tweeningMode /* = math::TweeningMode::EASE_IN */)
     : BaseAnimation(animationFlags, secsDuration, secsDelay)
     , mValue(value)

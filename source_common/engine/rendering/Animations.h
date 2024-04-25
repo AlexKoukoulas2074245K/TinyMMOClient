@@ -139,24 +139,6 @@ private:
 
 ///------------------------------------------------------------------------------------------------
 
-// Expects the custom_alpha float uniform to have been set prior to the creation of this animation type
-class TweenAlphaAnimation final: public BaseAnimation
-{
-public:
-    TweenAlphaAnimation(std::shared_ptr<scene::SceneObject> sceneObjectTarget, const float targetAlpha, const float secsDuration, const uint8_t animationFlags = animation_flags::NONE, const float secsDelay = 0.0f, const std::function<float(const float)> tweeningFunc = math::LinearFunction, const math::TweeningMode tweeningMode = math::TweeningMode::EASE_IN);
-    AnimationUpdateResult VUpdate(const float dtMillis) override;
-    std::shared_ptr<scene::SceneObject> VGetSceneObject() override;
-    
-private:
-    std::shared_ptr<scene::SceneObject> mSceneObjectTarget;
-    const float mInitAlpha;
-    const float mTargetAlpha;
-    const std::function<float(const float)> mTweeningFunc;
-    const math::TweeningMode mTweeningMode;
-};
-
-///------------------------------------------------------------------------------------------------
-
 class TweenValueAnimation final: public BaseAnimation
 {
 public:

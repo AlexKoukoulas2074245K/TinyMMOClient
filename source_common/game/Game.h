@@ -1,6 +1,6 @@
 ///------------------------------------------------------------------------------------------------
 ///  Game.h                                                                                          
-///  Predators
+///  TinyMMOClient
 ///                                                                                                
 ///  Created by Alex Koukoulas on 19/09/2023
 ///------------------------------------------------------------------------------------------------
@@ -29,14 +29,6 @@ public:
     void WindowResize();
     void OnOneSecondElapsed();
     void CreateDebugWidgets();
-    
-private:
-    std::unique_ptr<GameSceneTransitionManager> mGameSceneTransitionManager;
-    std::unique_ptr<TutorialManager> mTutorialManager;
-    std::unique_ptr<events::IListener> mSceneChangeEventListener;
-    std::unique_ptr<events::IListener> mPopModalSceneEventListener;
-    std::unique_ptr<events::IListener> mRequestReviewEventListener;
-    std::unique_ptr<events::IListener> mSendPlayMessageEventListener;
 };
 
 ///------------------------------------------------------------------------------------------------
