@@ -127,6 +127,13 @@ void ParticleManager::UpdateSceneParticles(const float dtMillis, scene::Scene& s
 
 ///------------------------------------------------------------------------------------------------
 
+const std::unordered_map<strutils::StringId, scene::ParticleEmitterObjectData, strutils::StringIdHasher> ParticleManager::GetLoadedParticleNamesToData() const
+{
+    return mParticleNamesToData;
+}
+
+///------------------------------------------------------------------------------------------------
+
 std::shared_ptr<scene::SceneObject> ParticleManager::CreateParticleEmitterAtPosition
 (
     const strutils::StringId particleEmitterDefinitionName,

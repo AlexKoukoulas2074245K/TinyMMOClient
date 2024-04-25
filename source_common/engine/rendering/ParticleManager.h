@@ -54,6 +54,7 @@ class ParticleManager final
 public:
     void UpdateSceneParticles(const float dtMilis, scene::Scene& scene);
 
+    const std::unordered_map<strutils::StringId, scene::ParticleEmitterObjectData, strutils::StringIdHasher> GetLoadedParticleNamesToData() const;
     std::shared_ptr<scene::SceneObject> CreateParticleEmitterAtPosition(const strutils::StringId particleEmitterDefinitionName, const glm::vec3& pos, scene::Scene& scene, const strutils::StringId particleEmitterSceneObjectName = strutils::StringId(), std::function<void(float, scene::ParticleEmitterObjectData&)> customUpdateFunction = nullptr);
     int SpawnParticleAtFirstAvailableSlot(scene::SceneObject& particleEmitterSceneObject);
     
@@ -68,7 +69,7 @@ private:
     ParticleManager() = default;
     void SpawnParticleAtIndex(const size_t index, const glm::vec3& sceneObjectPosition, scene::ParticleEmitterObjectData& particleEmitterObjectData);
     void SpawnParticleAtIndex(const size_t index, scene::SceneObject& particleEmitterSceneObject);
-
+    
 private:
     std::vector<std::shared_ptr<scene::SceneObject>> mParticleEmittersToDelete;
     std::unordered_map<strutils::StringId, scene::ParticleEmitterObjectData, strutils::StringIdHasher> mParticleNamesToData;

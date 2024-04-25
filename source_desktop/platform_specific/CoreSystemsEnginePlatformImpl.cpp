@@ -50,10 +50,17 @@ static bool sPrintFPS = false;
 static bool sShuttingDown = false;
 
 #if defined(USE_IMGUI)
+static const strutils::StringId PLAYGROUND_SCENE_NAME = strutils::StringId("playground_scene");
 static const int PROFILLING_SAMPLE_COUNT = 300;
+static bool sParticlePaintEnabled = false;
+static float sPitch = 1.0f;
+static float sGain = 1.0f;
+static size_t sSfxIndex = 0;
+static size_t sParticleIndex = 0;
+static std::vector<std::string> sAvailableSfx;
+static std::vector<std::string> sAvailableParticleNames;
 static float sUpdateLogicMillisSamples[PROFILLING_SAMPLE_COUNT];
 static float sRenderingMillisSamples[PROFILLING_SAMPLE_COUNT];
-static void CreateEngineDebugWidgets();
 #endif
 
 ///------------------------------------------------------------------------------------------------
@@ -181,6 +188,7 @@ void CoreSystemsEngine::Initialize()
 void CoreSystemsEngine::Start(std::function<void()> clientInitFunction, std::function<void(const float)> clientUpdateFunction, std::function<void()> clientApplicationMovingToBackgroundFunction, std::function<void()> clientApplicationWindowResizeFunction, std::function<void()> clientCreateDebugWidgetsFunction, std::function<void()> clientOnOneSecondElapsedFunction)
 {
     mSystems->mParticleManager.LoadParticleData();
+
     clientInitFunction();
     
     //While application is running
@@ -288,8 +296,6 @@ void CoreSystemsEngine::Start(std::function<void()> clientInitFunction, std::fun
             clientUpdateFunction(gameLogicMillis);
         }
         
-        mSystems->mInputStateManager.VUpdate();
-        
         if (!freezeGame)
         {
             for (auto& scene: mSystems->mSceneManager.GetScenes())
@@ -348,6 +354,7 @@ void CoreSystemsEngine::Start(std::function<void()> clientInitFunction, std::fun
 #endif
         
         mSystems->mRenderer.VEndRenderPass();
+        mSystems->mInputStateManager.VUpdate();
     }
     
     clientApplicationMovingToBackgroundFunction();
@@ -450,14 +457,16 @@ void CoreSystemsEngine::SpecialEventHandling(SDL_Event& event)
 
 ///------------------------------------------------------------------------------------------------
 
-void CreateEngineDebugWidgets()
+void CoreSystemsEngine::CreateEngineDebugWidgets()
 {
 #if defined(USE_IMGUI)
-    static float pitch = 1.0f;
-    static float gain = 1.0f;
-    static size_t sfxIndex = 0;
-    static std::vector<std::string> availableSfx;
-    if (availableSfx.empty())
+    if (!mSystems->mSceneManager.FindScene(PLAYGROUND_SCENE_NAME))
+    {
+        auto scene = mSystems->mSceneManager.CreateScene(PLAYGROUND_SCENE_NAME);
+        scene->SetLoaded(true);
+    }
+    
+    if (sAvailableSfx.empty())
     {
         auto soundFiles = fileutils::GetAllFilenamesInDirectory(resources::ResourceLoadingService::RES_MUSIC_ROOT);
         for (const auto& soundFile: soundFiles)
@@ -468,19 +477,29 @@ void CreateEngineDebugWidgets()
                 continue;
             }
             
-            availableSfx.emplace_back(strutils::StringSplit(fileName, '.').front());
+            sAvailableSfx.emplace_back(strutils::StringSplit(fileName, '.').front());
         }
     }
     
-    ImGui::Begin("Sound Effects", nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
-    if (ImGui::BeginCombo(" ", availableSfx.at(sfxIndex).c_str()))
+    if (sAvailableParticleNames.empty())
     {
-        for (size_t n = 0U; n < availableSfx.size(); n++)
+        for (const auto& particleEntry: mSystems->mParticleManager.GetLoadedParticleNamesToData())
         {
-            const bool isSelected = (sfxIndex == n);
-            if (ImGui::Selectable(availableSfx.at(n).c_str(), isSelected))
+            sAvailableParticleNames.push_back(particleEntry.first.GetString());
+        }
+    }
+    
+    // Particle effects
+    ImGui::Begin("Particle Effects", nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
+    ImGui::Checkbox("Particle Test Mode", &sParticlePaintEnabled);
+    if (ImGui::BeginCombo(" ", sAvailableParticleNames.at(sParticleIndex).c_str()))
+    {
+        for (size_t n = 0U; n < sAvailableParticleNames.size(); n++)
+        {
+            const bool isSelected = (sParticleIndex == n);
+            if (ImGui::Selectable(sAvailableParticleNames.at(n).c_str(), isSelected))
             {
-                sfxIndex = n;
+                sParticleIndex = n;
             }
             if (isSelected)
             {
@@ -489,12 +508,39 @@ void CreateEngineDebugWidgets()
         }
         ImGui::EndCombo();
     }
-    ImGui::SliderFloat("Pitch", &pitch, 0.0f, 3.0f);
-    ImGui::SliderFloat("Gain", &gain, 0.0f, 2.0f);
+    ImGui::End();
+    
+    auto playgroundScene = mSystems->mSceneManager.FindScene(PLAYGROUND_SCENE_NAME);
+    auto worldTouchPos = mSystems->mInputStateManager.VGetPointingPosInWorldSpace(playgroundScene->GetCamera().GetViewMatrix(), playgroundScene->GetCamera().GetProjMatrix());
+    if (sParticlePaintEnabled && mSystems->mInputStateManager.VButtonTapped(input::Button::MAIN_BUTTON))
+    {
+        mSystems->mParticleManager.CreateParticleEmitterAtPosition(strutils::StringId(sAvailableParticleNames.at(sParticleIndex)), glm::vec3(worldTouchPos.x, worldTouchPos.y, 0.0f), *playgroundScene);
+    }
+    
+    // Sound Effects
+    ImGui::Begin("Sound Effects", nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
+    if (ImGui::BeginCombo(" ", sAvailableSfx.at(sSfxIndex).c_str()))
+    {
+        for (size_t n = 0U; n < sAvailableSfx.size(); n++)
+        {
+            const bool isSelected = (sSfxIndex == n);
+            if (ImGui::Selectable(sAvailableSfx.at(n).c_str(), isSelected))
+            {
+                sSfxIndex = n;
+            }
+            if (isSelected)
+            {
+                ImGui::SetItemDefaultFocus();
+            }
+        }
+        ImGui::EndCombo();
+    }
+    ImGui::SliderFloat("Pitch", &sPitch, 0.0f, 3.0f);
+    ImGui::SliderFloat("Gain", &sGain, 0.0f, 2.0f);
     if (ImGui::Button("Play Sound"))
     {
-        CoreSystemsEngine::GetInstance().GetSoundManager().PreloadSfx(availableSfx[sfxIndex]);
-        CoreSystemsEngine::GetInstance().GetSoundManager().PlaySound(availableSfx[sfxIndex], false, gain, pitch);
+        CoreSystemsEngine::GetInstance().GetSoundManager().PreloadSfx(sAvailableSfx[sSfxIndex]);
+        CoreSystemsEngine::GetInstance().GetSoundManager().PlaySound(sAvailableSfx[sSfxIndex], false, sGain, sPitch);
     }
     ImGui::End();
     
