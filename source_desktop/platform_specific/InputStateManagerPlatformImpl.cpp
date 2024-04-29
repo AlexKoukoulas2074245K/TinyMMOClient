@@ -61,6 +61,20 @@ bool InputStateManagerPlatformImpl::VButtonTapped(const Button button) const
 
 ///------------------------------------------------------------------------------------------------
 
+bool InputStateManagerPlatformImpl::VKeyPressed(const Key key) const
+{
+    return (mCurrentFrameKeyState & (1 << static_cast<uint8_t>(key))) != 0;
+}
+
+///------------------------------------------------------------------------------------------------
+
+bool InputStateManagerPlatformImpl::VKeyTapped(const Key key) const
+{
+    return VKeyPressed(key) && (mPreviousFrameKeyState & (1 << static_cast<uint8_t>(key))) == 0;
+}
+
+///------------------------------------------------------------------------------------------------
+
 void InputStateManagerPlatformImpl::VProcessInputEvent(const SDL_Event& event, bool& shouldQuit, bool& windowSizeChange, bool& applicationMovingToBackground, bool& applicationMovingToForeground)
 {
     const auto& renderableDimensions = CoreSystemsEngine::GetInstance().GetContextRenderableDimensions();
@@ -103,6 +117,29 @@ void InputStateManagerPlatformImpl::VProcessInputEvent(const SDL_Event& event, b
             mCurrentFrameButtonState ^= (1 << event.button.button);
         } break;
             
+        case SDL_KEYDOWN:
+        {
+            switch (event.key.keysym.sym)
+            {
+                case SDLK_w: mCurrentFrameKeyState |= (1 << static_cast<uint8_t>(Key::W)); break;
+                case SDLK_a: mCurrentFrameKeyState |= (1 << static_cast<uint8_t>(Key::A)); break;
+                case SDLK_s: mCurrentFrameKeyState |= (1 << static_cast<uint8_t>(Key::S)); break;
+                case SDLK_d: mCurrentFrameKeyState |= (1 << static_cast<uint8_t>(Key::D)); break;
+            }
+            
+        } break;
+            
+        case SDL_KEYUP:
+        {
+            switch (event.key.keysym.sym)
+            {
+                case SDLK_w: mCurrentFrameKeyState ^= (1 << static_cast<uint8_t>(Key::W)); break;
+                case SDLK_a: mCurrentFrameKeyState ^= (1 << static_cast<uint8_t>(Key::A)); break;
+                case SDLK_s: mCurrentFrameKeyState ^= (1 << static_cast<uint8_t>(Key::S)); break;
+                case SDLK_d: mCurrentFrameKeyState ^= (1 << static_cast<uint8_t>(Key::D)); break;
+            }
+        } break;
+            
         case SDL_MOUSEMOTION:
         {
             mPointingPos = glm::vec2(event.motion.x/renderableDimensions.x, event.motion.y/renderableDimensions.y);
@@ -126,6 +163,7 @@ void InputStateManagerPlatformImpl::VProcessInputEvent(const SDL_Event& event, b
 void InputStateManagerPlatformImpl::VUpdate()
 {
     mPreviousFrameButtonState = mCurrentFrameButtonState;
+    mPreviousFrameKeyState = mCurrentFrameKeyState;
     mCurrentWheelDelta = glm::ivec2(0);
 }
 

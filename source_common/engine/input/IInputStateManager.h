@@ -29,6 +29,16 @@ enum class Button
 
 ///------------------------------------------------------------------------------------------------
 
+enum class Key
+{
+    W = 1,
+    A = 2,
+    S = 3,
+    D = 4
+};
+
+///------------------------------------------------------------------------------------------------
+
 class IInputStateManager
 {
 public:
@@ -40,6 +50,8 @@ public:
     
     virtual bool VButtonPressed(const Button button) const = 0;
     virtual bool VButtonTapped(const Button button) const = 0;
+    virtual bool VKeyPressed(const Key key) const = 0;
+    virtual bool VKeyTapped(const Key key) const = 0;
     virtual bool VIsTouchInputPlatform() const = 0;
     
     virtual void VProcessInputEvent(const SDL_Event& event, bool& shouldQuit, bool& windowSizeChange, bool& applicationMovingToBackground, bool& applicationMovingToForeground) = 0;

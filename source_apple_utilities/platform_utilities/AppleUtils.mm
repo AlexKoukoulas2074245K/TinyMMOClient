@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <platform_utilities/TinyMMOClientReachability.h>
 #include <engine/resloading/ResourceLoadingService.h>
+#include <engine/utils/Logging.h>
 #include <engine/utils/PlatformMacros.h>
 #include <engine/utils/StringUtils.h>
 #include <codecvt>
@@ -426,17 +427,26 @@ void RequestReview()
 
 ///-----------------------------------------------------------------------------------------------
 
-void SendPlayMessage()
+void SendPlayerState(const std::string playerState, std::function<void(const ServerWorldStateResponseData&)> serverWorldStateResponseCallback)
 {
+    const auto startTime = std::chrono::system_clock::now();
+    
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        ServerWorldStateResponseData responseData = {};
         int clientSocket;
         struct sockaddr_in serverAddr;
+        
+        auto responseErrorLambda = [&](const std::string&& errorMessage)
+        {
+            close(clientSocket);
+            responseData.mError = std::move(errorMessage);
+            serverWorldStateResponseCallback(responseData);
+        };
         
         // Create socket
         if ((clientSocket = socket(AF_INET, SOCK_STREAM, 0)) == -1)
         {
-            NSLog(@"Error: Socket creation failed");
-            close(clientSocket);
+            responseErrorLambda("Error: Socket creation failed");
             return;
         }
         
@@ -449,18 +459,13 @@ void SendPlayMessage()
         // Connect to server
         if (connect(clientSocket, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) == -1)
         {
-            NSLog(@"Error: Connection failed");
-            close(clientSocket);
+            responseErrorLambda("Error: Connection failed");
             return;
         }
         
-        // Dummy JSON string
-        std::string messageToSend = "{ \"message\": \"hello server\", \"client_name\": \"alex\"}";
-        
-        if (send(clientSocket, messageToSend.c_str(), messageToSend.size(), 0) == -1)
+        if (send(clientSocket, playerState.c_str(), playerState.size(), 0) == -1)
         {
-            NSLog(@"Error: Send failed");
-            close(clientSocket);
+            responseErrorLambda("Error: Send Failed");
             return;
         }
         
@@ -468,31 +473,27 @@ void SendPlayMessage()
         char nullTerminator = '\0';
         if (send(clientSocket, &nullTerminator, sizeof(nullTerminator), 0) == -1)
         {
-            NSLog(@"Error: Send failed");
-            close(clientSocket);
+            responseErrorLambda("Error: Send Failed");
             return;
         }
         
-        std::string responseMessage;
         while (true)
         {
             char buffer[4096];
             ssize_t bytesReceived = recv(clientSocket, buffer, sizeof(buffer), 0);
             if (bytesReceived == -1)
             {
-                NSLog(@"Error: recv() failed, Message too large");
-                close(clientSocket);
+                responseErrorLambda("Error: recv() Message too large!");
                 break;
             }
             else if (bytesReceived == 0)
             {
-                // Connection closed by server
                 break;
             }
             else
             {
-                responseMessage.append(buffer, bytesReceived);
-                if (responseMessage.find('\0') != std::string::npos)
+                responseData.mWorldState.append(buffer, bytesReceived);
+                if (responseData.mWorldState.find('\0') != std::string::npos)
                 {
                     // Null character found, indicating end of JSON message
                     break;
@@ -500,10 +501,11 @@ void SendPlayMessage()
             }
         }
         
-        if (!responseMessage.empty())
+        if (!responseData.mWorldState.empty())
         {
-            NSString* response = [NSString stringWithUTF8String:responseMessage.c_str()];
-            NSLog(@"Server says: \"%@\"", response);
+            const auto endTime = std::chrono::system_clock::now();
+            responseData.mPingMillis = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
+            serverWorldStateResponseCallback(responseData);
         }
         
         // Close socket

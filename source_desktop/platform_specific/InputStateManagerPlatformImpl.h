@@ -34,6 +34,8 @@ public:
     bool VIsTouchInputPlatform() const override;
     bool VButtonPressed(const Button button) const override;
     bool VButtonTapped(const Button button) const override;
+    bool VKeyPressed(const Key key) const override;
+    bool VKeyTapped(const Key key) const override;
     
     void VProcessInputEvent(const SDL_Event& event, bool& shouldQuit, bool& windowSizeChange, bool& applicationMovingToBackground, bool& applicationMovingToForeground) override;
     void VUpdate() override;
@@ -46,6 +48,8 @@ private:
     glm::ivec2 mCurrentWheelDelta;
     uint8_t mCurrentFrameButtonState = 0U;
     uint8_t mPreviousFrameButtonState = 0U;
+    uint8_t mCurrentFrameKeyState = 0U;
+    uint8_t mPreviousFrameKeyState = 0U;
 };
 
 ///------------------------------------------------------------------------------------------------

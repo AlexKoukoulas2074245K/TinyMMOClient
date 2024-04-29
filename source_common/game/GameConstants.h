@@ -25,6 +25,9 @@ namespace game_constants
 
     // Fonts
     inline const strutils::StringId DEFAULT_FONT_NAME = strutils::StringId("font");
+
+    // Networking
+    inline const float STATE_SEND_DELAY_MILLIS = 32.0f;
 }
 
 ///------------------------------------------------------------------------------------------------

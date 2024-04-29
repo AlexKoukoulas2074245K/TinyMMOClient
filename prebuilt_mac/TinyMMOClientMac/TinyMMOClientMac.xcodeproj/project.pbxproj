@@ -217,6 +217,7 @@
 		928B0D4E2B5D7B7E0025DF3F /* SDL2_image.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 928B0D4B2B5D7B7E0025DF3F /* SDL2_image.framework */; };
 		928B0D4F2B5D7B7E0025DF3F /* SDL2_image.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 928B0D4B2B5D7B7E0025DF3F /* SDL2_image.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		92CA97412B65132C00B53B01 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92CA97402B65132B00B53B01 /* StoreKit.framework */; };
+		92D54EE22BDFA00800DA4EC7 /* NameGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 92D54EE02BDFA00800DA4EC7 /* NameGenerator.cpp */; };
 		95BF1C18A001B37A45C9BF9E /* IRenderer.h in Sources */ = {isa = PBXBuildFile; fileRef = E0599E67CDFA7350C55C73A5 /* IRenderer.h */; };
 		9F60F6BEA7D20AB4B5EFA323 /* ResourceLoadingService.h in Sources */ = {isa = PBXBuildFile; fileRef = 7C92E4EC0FBCD6AFCA53FD77 /* ResourceLoadingService.h */; };
 		A190FCD102A510B7AF224622 /* AnimationManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E9824F6D620FAB012DF0BC78 /* AnimationManager.cpp */; };
@@ -395,6 +396,8 @@
 		928B0D4A2B5D7B7D0025DF3F /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = ../../../../../Library/Developer/SDL2.framework; sourceTree = "<group>"; };
 		928B0D4B2B5D7B7E0025DF3F /* SDL2_image.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2_image.framework; path = ../../../../../Library/Developer/SDL2_image.framework; sourceTree = "<group>"; };
 		92CA97402B65132B00B53B01 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		92D54EE02BDFA00800DA4EC7 /* NameGenerator.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = NameGenerator.cpp; sourceTree = "<group>"; };
+		92D54EE12BDFA00800DA4EC7 /* NameGenerator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NameGenerator.h; sourceTree = "<group>"; };
 		93D83DB41AD868D09B2A3C94 /* TextureResource.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = TextureResource.cpp; sourceTree = "<group>"; };
 		988043F06556266668BE5677 /* TypeTraits.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = TypeTraits.cpp; sourceTree = "<group>"; };
 		989BFF482B72A00F213431FE /* TextureResource.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = TextureResource.h; sourceTree = "<group>"; };
@@ -753,6 +756,7 @@
 		928B0B532B5C3C850025DF3F /* game */ = {
 			isa = PBXGroup;
 			children = (
+				92D54EDF2BDF9FE600DA4EC7 /* utils */,
 				928B0BA82B5C3C850025DF3F /* GameConstants.h */,
 				928B0BBE2B5C3C850025DF3F /* Game.h */,
 				928B0BC72B5C3C850025DF3F /* events */,
@@ -838,6 +842,15 @@
 				928B0D352B5C557D0025DF3F /* SceneManagerTest.cpp */,
 			);
 			path = scene;
+			sourceTree = "<group>";
+		};
+		92D54EDF2BDF9FE600DA4EC7 /* utils */ = {
+			isa = PBXGroup;
+			children = (
+				92D54EE02BDFA00800DA4EC7 /* NameGenerator.cpp */,
+				92D54EE12BDFA00800DA4EC7 /* NameGenerator.h */,
+			);
+			path = utils;
 			sourceTree = "<group>";
 		};
 		9C9C1F62F9CB94CF74AD4252 /* engine */ = {
@@ -1209,6 +1222,7 @@
 				005DDF1CA71A424F880BFF85 /* BackgroundMusicPlayer.mm in Sources */,
 				7A14147B43076FC43E6D5662 /* SoundManager.cpp in Sources */,
 				69A3B6CA894565C4F51E1123 /* SoundManager.h in Sources */,
+				92D54EE22BDFA00800DA4EC7 /* NameGenerator.cpp in Sources */,
 				2CCF496499DF11B16C0F2C43 /* SfxPlayer.h in Sources */,
 				A50C73CD4B3C9E1668BFADDD /* SfxPlayer.mm in Sources */,
 				DB820AAFF394F648CD278031 /* stb_image_write.h in Sources */,

@@ -33,6 +33,15 @@ struct PurchaseResultData
 
 ///-----------------------------------------------------------------------------------------------
 
+struct ServerWorldStateResponseData
+{
+    std::string mWorldState;
+    std::string mError;
+    long long mPingMillis;
+};
+
+///-----------------------------------------------------------------------------------------------
+
 bool IsConnectedToTheInternet();
 std::string GetPersistentDataDirectoryPath();
 std::string GetDeviceId();
@@ -45,7 +54,7 @@ std::string GetProductPrice(const std::string& productId);
 void InitiateProductPurchase(const std::string& productId, std::function<void(PurchaseResultData)> onPurchaseFinishedCallback);
 void GetMessageBoxTextInput(std::function<void(const std::string&)> inputTextReceivedCallback);
 void RequestReview();
-void SendPlayMessage();
+void SendPlayerState(const std::string playerState, std::function<void(const ServerWorldStateResponseData&)> serverWorldStateResponseCallback);
 
 ///-----------------------------------------------------------------------------------------------
 
