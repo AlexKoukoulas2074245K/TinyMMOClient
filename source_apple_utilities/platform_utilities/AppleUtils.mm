@@ -453,7 +453,7 @@ void SendPlayerState(const std::string playerState, std::function<void(const Ser
         // Specify server address
         serverAddr.sin_family = AF_INET;
         serverAddr.sin_port = htons(8070); // Use the same port as the server
-        //server_addr.sin_addr.s_addr = inet_addr("178.16.131.241");
+        //serverAddr.sin_addr.s_addr = inet_addr("178.16.131.241");
         serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
         
         // Connect to server

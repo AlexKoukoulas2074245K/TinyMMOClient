@@ -759,8 +759,8 @@
 				92D54EDF2BDF9FE600DA4EC7 /* utils */,
 				928B0BA82B5C3C850025DF3F /* GameConstants.h */,
 				928B0BBE2B5C3C850025DF3F /* Game.h */,
-				928B0BC72B5C3C850025DF3F /* events */,
 				928B0BCF2B5C3C850025DF3F /* Game.cpp */,
+				928B0BC72B5C3C850025DF3F /* events */,
 			);
 			path = game;
 			sourceTree = "<group>";

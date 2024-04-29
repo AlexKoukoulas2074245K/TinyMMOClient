@@ -49,6 +49,7 @@ static std::mutex sWorldMutex;
 ///------------------------------------------------------------------------------------------------
 
 Game::Game(const int argc, char** argv)
+    : mCanSendNetworkMessage(true)
 {
     if (argc > 0)
     {
@@ -155,8 +156,8 @@ void Game::CreatePlayer(const std::string& name, const glm::vec3& position, cons
     
     auto boundingRect = scene_object_utils::GetSceneObjectBoundingRect(*ninjaName);
     auto textLength = boundingRect.topRight.x - boundingRect.bottomLeft.x;
-    ninjaName->mPosition.x -= textLength/2.0f - 0.01f;
-    ninjaName->mPosition.y += 0.065f;
+    ninjaName->mPosition += game_constants::PLAYER_NAMEPLATE_OFFSET;
+    ninjaName->mPosition.x -= textLength/2.0f;
     
     mPlayerData.emplace_back(PlayerData{ strutils::StringId(name), position, velocity, color, isLocal, false });
 }
@@ -218,7 +219,7 @@ void Game::InterpolateLocalWorld(const float dtMillis)
             auto length = glm::length(impulseVector);
             if (length > 0.0f)
             {
-                playerData.mPlayerVelocity = glm::normalize(impulseVector) * 0.0004f * dtMillis;
+                playerData.mPlayerVelocity = glm::normalize(impulseVector) * game_constants::PLAYER_SPEED * dtMillis;
             }
         }
         
@@ -226,6 +227,33 @@ void Game::InterpolateLocalWorld(const float dtMillis)
         
         playerSceneObject->mPosition += playerData.mPlayerVelocity;
         playerNameSceneObject->mPosition += playerData.mPlayerVelocity;
+        
+        if (!playerData.mIsLocal && glm::length(playerData.mPlayerVelocity) <= 0.0f && glm::distance(playerData.mPlayerPosition, playerSceneObject->mPosition) > 0.01f)
+        {
+            auto directionToTarget = playerData.mPlayerPosition - playerSceneObject->mPosition;
+            playerSceneObject->mPosition += glm::normalize(directionToTarget) * game_constants::PLAYER_RUBBERBAND_SPEED;
+            playerNameSceneObject->mPosition += glm::normalize(directionToTarget) * game_constants::PLAYER_RUBBERBAND_SPEED;
+        }
+        
+//        else
+//        {
+//            // Move remote player to current position
+//            auto directionToPosition = playerData.mPlayerPosition - playerSceneObject->mPosition;
+//            auto directionToPositionLength = glm::length(directionToPosition);
+//            
+//            if (directionToPositionLength > 0.005f)
+//            {
+//                auto normalizedDirectionToPosition = glm::normalize(directionToPosition);
+//                playerSceneObject->mPosition += normalizedDirectionToPosition * game_constants::PLAYER_SPEED * dtMillis;
+//                
+//                playerNameSceneObject->mPosition = playerSceneObject->mPosition;
+//                
+//                auto boundingRect = scene_object_utils::GetSceneObjectBoundingRect(*playerNameSceneObject);
+//                auto textLength = boundingRect.topRight.x - boundingRect.bottomLeft.x;
+//                playerNameSceneObject->mPosition += game_constants::PLAYER_NAMEPLATE_OFFSET;
+//                playerNameSceneObject->mPosition.x -= textLength/2.0f;
+//            }
+//        }
     }
 }
 
@@ -238,6 +266,11 @@ void Game::CheckForStateSending(const float dtMillis)
     if (stateSendingTimer > game_constants::STATE_SEND_DELAY_MILLIS)
     {
         stateSendingTimer -= game_constants::STATE_SEND_DELAY_MILLIS;
+        
+        if (!mCanSendNetworkMessage)
+        {
+            return;
+        }
         
         std::lock_guard<std::mutex> worldLockGuard(sWorldMutex);
         auto playerIter = std::find_if(mPlayerData.begin(), mPlayerData.end(), [&](PlayerData& playerData){ return playerData.mIsLocal; });
@@ -264,6 +297,7 @@ void Game::CheckForStateSending(const float dtMillis)
 #if defined(MACOS) || defined(MOBILE_FLOW)
         apple_utils::SendPlayerState(playerJson.dump(), [&](const apple_utils::ServerWorldStateResponseData& responseData)
         {
+            mCanSendNetworkMessage = true;
             if (!responseData.mError.empty())
             {
                 logging::Log(logging::LogType::ERROR, responseData.mError.c_str());
@@ -275,6 +309,7 @@ void Game::CheckForStateSending(const float dtMillis)
             }
         });
 #endif
+        mCanSendNetworkMessage = false;
     }
 }
 

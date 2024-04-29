@@ -55,6 +55,7 @@ private:
     std::atomic<int> mLastPingMillis = 0;
     std::vector<PlayerData> mPlayerData;
     std::vector<strutils::StringId> mPlayerNamesToCleanup;
+    bool mCanSendNetworkMessage;
 };
 
 ///------------------------------------------------------------------------------------------------

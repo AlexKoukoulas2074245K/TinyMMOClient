@@ -102,7 +102,7 @@ inline T Abs(const T val)
 /// @returns the sin of the value.
 inline float Sinf(const float val)
 {
-    return std::sinf(val);
+    return sinf(val);
 }
 
 ///-----------------------------------------------------------------------------------------------
