@@ -30,7 +30,7 @@
 #include <game/utils/NameGenerator.h>
 #include <imgui/imgui.h>
 #include <mutex>
-
+#include <net_common/PlayerData.h>
 #if defined(MOBILE_FLOW)
 #include <platform_specific/IOSUtils.h>
 #endif
