@@ -55,7 +55,7 @@ std::string GetProductPrice(const std::string& productId);
 void InitiateProductPurchase(const std::string& productId, std::function<void(PurchaseResultData)> onPurchaseFinishedCallback);
 void GetMessageBoxTextInput(std::function<void(const std::string&)> inputTextReceivedCallback);
 void RequestReview();
-void SendNetworkMessage(const nlohmann::json& networkMessage, const networking::MessageType messageType, std::function<void(const ServerResponseData&)> serverResponseCallback);
+void SendNetworkMessage(const nlohmann::json& networkMessage, const networking::MessageType messageType, const bool highPriority, std::function<void(const ServerResponseData&)> serverResponseCallback);
 
 ///-----------------------------------------------------------------------------------------------
 

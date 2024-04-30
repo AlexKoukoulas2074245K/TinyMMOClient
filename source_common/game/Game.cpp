@@ -157,10 +157,10 @@ void Game::CreateDebugWidgets()
 
 ///------------------------------------------------------------------------------------------------
 
-void Game::SendNetworkMessage(const nlohmann::json& message, const networking::MessageType messageType)
+void Game::SendNetworkMessage(const nlohmann::json& message, const networking::MessageType messageType, const bool highPriority)
 {
 #if defined(MACOS) || defined(MOBILE_FLOW)
-    apple_utils::SendNetworkMessage(message, messageType, [&](const apple_utils::ServerResponseData& responseData)
+    apple_utils::SendNetworkMessage(message, messageType, highPriority, [&](const apple_utils::ServerResponseData& responseData)
     {
         if (!responseData.mError.empty())
         {
@@ -315,13 +315,13 @@ void Game::CheckForStateSending(const float dtMillis)
         // Send an empty state just to request other world entities
         if (playerIter == mPlayerData.end())
         {
-            SendNetworkMessage(nlohmann::json(), networking::MessageType::CS_PLAYER_STATE);
+            SendNetworkMessage(nlohmann::json(), networking::MessageType::CS_PLAYER_STATE, false);
         }
         // Local player found in world data. Send its updated state
         else
         {
             auto& playerData = *playerIter;
-            SendNetworkMessage(playerData.SerializeToJson(), networking::MessageType::CS_PLAYER_STATE);
+            SendNetworkMessage(playerData.SerializeToJson(), networking::MessageType::CS_PLAYER_STATE, false);
         }
         
     }
@@ -438,7 +438,7 @@ void Game::OnPlayButtonPressed()
     });
     
     // Request login details
-    SendNetworkMessage(nlohmann::json(), networking::MessageType::CS_REQUEST_LOGIN);
+    SendNetworkMessage(nlohmann::json(), networking::MessageType::CS_REQUEST_LOGIN, true);
 }
 
 ///------------------------------------------------------------------------------------------------
