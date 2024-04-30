@@ -221,6 +221,7 @@
 		92B8A58A2BE0F547006EC56F /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 92B8A5832BE0F547006EC56F /* .gitignore */; };
 		92B8A58B2BE0F547006EC56F /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 92B8A5842BE0F547006EC56F /* LICENSE */; };
 		92B8A58C2BE0F547006EC56F /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 92B8A5842BE0F547006EC56F /* LICENSE */; };
+		92B8A5992BE131DD006EC56F /* NetworkMessages.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 92B8A5982BE131DD006EC56F /* NetworkMessages.cpp */; };
 		92CA97412B65132C00B53B01 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92CA97402B65132B00B53B01 /* StoreKit.framework */; };
 		92D54EE22BDFA00800DA4EC7 /* NameGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 92D54EE02BDFA00800DA4EC7 /* NameGenerator.cpp */; };
 		95BF1C18A001B37A45C9BF9E /* IRenderer.h in Sources */ = {isa = PBXBuildFile; fileRef = E0599E67CDFA7350C55C73A5 /* IRenderer.h */; };
@@ -245,6 +246,7 @@
 		CB1B337E51727F74A3851A0E /* BackgroundMusicPlayer.h in Sources */ = {isa = PBXBuildFile; fileRef = 9A0A1CFEB31EB9D7990F0B4B /* BackgroundMusicPlayer.h */; };
 		CCE13A87F90CB8EB69073CD1 /* FileUtils.h in Sources */ = {isa = PBXBuildFile; fileRef = 0D09AB023B7A329D725F2F2F /* FileUtils.h */; };
 		D44276B3AAC7224FC2221FC6 /* ImageSurfaceResource.h in Sources */ = {isa = PBXBuildFile; fileRef = CAEF02928D06B177B1091C5F /* ImageSurfaceResource.h */; };
+		D6B3BDD48999F9AF32D62641 /* NetworkMessages.h in Sources */ = {isa = PBXBuildFile; fileRef = 83294548BB5AEF7EB30C76DC /* NetworkMessages.h */; };
 		D6C5F484EB7FB13F7EB6438F /* BaseDataFileDeserializer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A05CE2983C7CEA1D2A25585 /* BaseDataFileDeserializer.cpp */; };
 		D7CE3ABE255F8D331D6B9B40 /* DataFileResource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 431D52A0E0BD619E5CEDBCA7 /* DataFileResource.cpp */; };
 		DB820AAFF394F648CD278031 /* stb_image_write.h in Sources */ = {isa = PBXBuildFile; fileRef = 3E13E4D3AA7809E3A06CFF75 /* stb_image_write.h */; };
@@ -329,6 +331,7 @@
 		7C92E4EC0FBCD6AFCA53FD77 /* ResourceLoadingService.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = ResourceLoadingService.h; sourceTree = "<group>"; };
 		7F068929D88F95729D0195E3 /* BackgroundMusicPlayer.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; path = BackgroundMusicPlayer.mm; sourceTree = "<group>"; };
 		82DFED0E0B1AB607780AED60 /* Animations.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = Animations.h; sourceTree = "<group>"; };
+		83294548BB5AEF7EB30C76DC /* NetworkMessages.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = NetworkMessages.h; sourceTree = "<group>"; };
 		88B55A70915E2429F0F03C71 /* MeshResource.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = MeshResource.h; sourceTree = "<group>"; };
 		8AE4C68818CCB619974358E0 /* RenderingUtils.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = RenderingUtils.h; sourceTree = "<group>"; };
 		8D6E209DDF4F577F8C87C6A0 /* BaseDataFileDeserializer.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = BaseDataFileDeserializer.h; sourceTree = "<group>"; };
@@ -403,6 +406,7 @@
 		928B0D4B2B5D7B7E0025DF3F /* SDL2_image.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2_image.framework; path = ../../../../../Library/Developer/SDL2_image.framework; sourceTree = "<group>"; };
 		92B8A5832BE0F547006EC56F /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		92B8A5842BE0F547006EC56F /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		92B8A5982BE131DD006EC56F /* NetworkMessages.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = NetworkMessages.cpp; sourceTree = "<group>"; };
 		92CA97402B65132B00B53B01 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		92D54EE02BDFA00800DA4EC7 /* NameGenerator.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = NameGenerator.cpp; sourceTree = "<group>"; };
 		92D54EE12BDFA00800DA4EC7 /* NameGenerator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NameGenerator.h; sourceTree = "<group>"; };
@@ -911,6 +915,8 @@
 			children = (
 				A7F720915E74A51C6579763C /* SerializableNetworkObjects.h */,
 				BE806858C85634D9FB14B857 /* NetworkObjectDefinitions.inc */,
+				83294548BB5AEF7EB30C76DC /* NetworkMessages.h */,
+				92B8A5982BE131DD006EC56F /* NetworkMessages.cpp */,
 			);
 			path = net_common;
 			sourceTree = "<group>";
@@ -1257,12 +1263,14 @@
 				005DDF1CA71A424F880BFF85 /* BackgroundMusicPlayer.mm in Sources */,
 				7A14147B43076FC43E6D5662 /* SoundManager.cpp in Sources */,
 				69A3B6CA894565C4F51E1123 /* SoundManager.h in Sources */,
+				92B8A5992BE131DD006EC56F /* NetworkMessages.cpp in Sources */,
 				92D54EE22BDFA00800DA4EC7 /* NameGenerator.cpp in Sources */,
 				2CCF496499DF11B16C0F2C43 /* SfxPlayer.h in Sources */,
 				A50C73CD4B3C9E1668BFADDD /* SfxPlayer.mm in Sources */,
 				DB820AAFF394F648CD278031 /* stb_image_write.h in Sources */,
 				9FE4A0895085C4A710AF1FF6 /* SerializableNetworkObjects.h in Sources */,
 				5E524DDE069F7535F27650B6 /* NetworkObjectDefinitions.inc in Sources */,
+				D6B3BDD48999F9AF32D62641 /* NetworkMessages.h in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -30,7 +30,9 @@
 #include <game/utils/NameGenerator.h>
 #include <imgui/imgui.h>
 #include <mutex>
+#include <net_common/NetworkMessages.h>
 #include <net_common/SerializableNetworkObjects.h>
+
 #if defined(MOBILE_FLOW)
 #include <platform_specific/IOSUtils.h>
 #endif
@@ -285,8 +287,8 @@ void Game::CheckForStateSending(const float dtMillis)
         assert(playerIter != mPlayerData.end());
         auto& playerData = *playerIter;
         
-#if defined(MACOS) || defined(MOBILE_FLOW)
-        apple_utils::SendPlayerState(playerData.SerializeToJsonString(), [&](const apple_utils::ServerWorldStateResponseData& responseData)
+#if defined(MACOS) || defined(MOBILE_FLOW)        
+        apple_utils::SendNetworkMessage(playerData.SerializeToJson(), networking::MessageType::CS_PLAYER_STATE, [&](const apple_utils::ServerResponseData& responseData)
         {
             mCanSendNetworkMessage = true;
             if (!responseData.mError.empty())
@@ -296,7 +298,7 @@ void Game::CheckForStateSending(const float dtMillis)
             else
             {
                 mLastPingMillis = static_cast<int>(responseData.mPingMillis);
-                OnServerWorldStateUpdate(responseData.mWorldState);
+                OnServerResponse(responseData.mResponse);
             }
         });
 #endif
@@ -306,64 +308,77 @@ void Game::CheckForStateSending(const float dtMillis)
 
 ///------------------------------------------------------------------------------------------------
 
-void Game::OnServerWorldStateUpdate(const std::string& worldStateString)
+void Game::OnServerResponse(const std::string& response)
 {
-    if (nlohmann::json::accept(worldStateString))
+    if (nlohmann::json::accept(response))
     {
-        auto worldStateJson = nlohmann::json::parse(worldStateString);
+        auto responseJson = nlohmann::json::parse(response);
         //logging::Log(logging::LogType::INFO, worldStateJson.dump(4).c_str());
         
-        std::lock_guard<std::mutex> worldLockGuard(sWorldMutex);
-        
-        // Invalidate all local player data
-        for (auto& playerData: mPlayerData)
+        if (networking::IsMessageOfType(responseJson, networking::MessageType::SC_PLAYER_STATE_RESPONSE))
         {
-            playerData.invalidated = true;
+            OnServerPlayerStateResponse(responseJson);
         }
-        
-        // Parse and update local player data validating them
-        for (const auto& playerJson: worldStateJson[networking::PlayerData::ObjectCollectionHeader()])
+        else
         {
-            networking::PlayerData remotePlayerData;
-            remotePlayerData.DeserializeFromJson(playerJson);
-            
-            auto playerIter = std::find_if(mPlayerData.begin(), mPlayerData.end(), [&](networking::PlayerData& playerData){ return playerData.playerName == remotePlayerData.playerName; });
-            if (playerIter == mPlayerData.end())
-            {
-                CreatePlayerWorldObject(remotePlayerData);
-            }
-            else
-            {
-                auto& playerData = *playerIter;
-                
-                // Local position is not updated (for now)
-                if (!remotePlayerData.isLocal)
-                {
-                    playerData.playerPosition = remotePlayerData.playerPosition;
-                    playerData.playerVelocity = remotePlayerData.playerVelocity;
-                }
-                
-                playerData.invalidated = false;
-            }
-        }
-        
-        // Clean up all player data entries that the server does not know of (anymore)
-        for (auto iter = mPlayerData.begin(); iter != mPlayerData.end();)
-        {
-            if (iter->invalidated)
-            {
-                playerNamesToCleanup.push_back(iter->playerName);
-                iter = mPlayerData.erase(iter);
-            }
-            else
-            {
-                iter++;
-            }
+            logging::Log(logging::LogType::ERROR, "Unrecognised message type %d", static_cast<int>(networking::GetMessageType(responseJson)));
         }
     }
     else
     {
         logging::Log(logging::LogType::ERROR, "Error parsing world state");
+    }
+    
+}
+
+void Game::OnServerPlayerStateResponse(const nlohmann::json& responseJson)
+{
+    std::lock_guard<std::mutex> worldLockGuard(sWorldMutex);
+    
+    // Invalidate all local player data
+    for (auto& playerData: mPlayerData)
+    {
+        playerData.invalidated = true;
+    }
+    
+    // Parse and update local player data validating them
+    for (const auto& playerJson: responseJson[networking::PlayerData::ObjectCollectionHeader()])
+    {
+        networking::PlayerData remotePlayerData;
+        remotePlayerData.DeserializeFromJson(playerJson);
+        
+        auto playerIter = std::find_if(mPlayerData.begin(), mPlayerData.end(), [&](networking::PlayerData& playerData){ return playerData.playerName == remotePlayerData.playerName; });
+        if (playerIter == mPlayerData.end())
+        {
+            CreatePlayerWorldObject(remotePlayerData);
+        }
+        else
+        {
+            auto& playerData = *playerIter;
+            
+            // Local position is not updated (for now)
+            if (!remotePlayerData.isLocal)
+            {
+                playerData.playerPosition = remotePlayerData.playerPosition;
+                playerData.playerVelocity = remotePlayerData.playerVelocity;
+            }
+            
+            playerData.invalidated = false;
+        }
+    }
+    
+    // Clean up all player data entries that the server does not know of (anymore)
+    for (auto iter = mPlayerData.begin(); iter != mPlayerData.end();)
+    {
+        if (iter->invalidated)
+        {
+            playerNamesToCleanup.push_back(iter->playerName);
+            iter = mPlayerData.erase(iter);
+        }
+        else
+        {
+            iter++;
+        }
     }
 }
 

@@ -427,12 +427,14 @@ void RequestReview()
 
 ///-----------------------------------------------------------------------------------------------
 
-void SendPlayerState(const std::string playerState, std::function<void(const ServerWorldStateResponseData&)> serverWorldStateResponseCallback)
+void SendNetworkMessage(const nlohmann::json& networkMessage, const networking::MessageType messageType, std::function<void(const ServerResponseData&)> serverResponseCallback)
 {
+    auto finalNetworkMessageJson = networkMessage;
+    networking::PopulateMessageHeader(finalNetworkMessageJson, messageType);
     const auto startTime = std::chrono::system_clock::now();
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        ServerWorldStateResponseData responseData = {};
+        ServerResponseData responseData = {};
         int clientSocket;
         struct sockaddr_in serverAddr;
         
@@ -440,7 +442,7 @@ void SendPlayerState(const std::string playerState, std::function<void(const Ser
         {
             close(clientSocket);
             responseData.mError = std::move(errorMessage);
-            serverWorldStateResponseCallback(responseData);
+            serverResponseCallback(responseData);
         };
         
         // Create socket
@@ -463,7 +465,8 @@ void SendPlayerState(const std::string playerState, std::function<void(const Ser
             return;
         }
         
-        if (send(clientSocket, playerState.c_str(), playerState.size(), 0) == -1)
+        auto networkMessageString = finalNetworkMessageJson.dump();
+        if (send(clientSocket, networkMessageString.c_str(), networkMessageString.size(), 0) == -1)
         {
             responseErrorLambda("Error: Send Failed");
             return;
@@ -492,8 +495,8 @@ void SendPlayerState(const std::string playerState, std::function<void(const Ser
             }
             else
             {
-                responseData.mWorldState.append(buffer, bytesReceived);
-                if (responseData.mWorldState.find('\0') != std::string::npos)
+                responseData.mResponse.append(buffer, bytesReceived);
+                if (responseData.mResponse.find('\0') != std::string::npos)
                 {
                     // Null character found, indicating end of JSON message
                     break;
@@ -501,11 +504,11 @@ void SendPlayerState(const std::string playerState, std::function<void(const Ser
             }
         }
         
-        if (!responseData.mWorldState.empty())
+        if (!responseData.mResponse.empty())
         {
             const auto endTime = std::chrono::system_clock::now();
             responseData.mPingMillis = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
-            serverWorldStateResponseCallback(responseData);
+            serverResponseCallback(responseData);
         }
         
         // Close socket

@@ -16,6 +16,7 @@
 #include <engine/utils/StringUtils.h>
 #include <game/events/EventSystem.h>
 #include <net_common/SerializableNetworkObjects.h>
+#include <nlohmann/json.hpp>
 
 ///------------------------------------------------------------------------------------------------
 
@@ -38,7 +39,8 @@ private:
     void CreatePlayerWorldObject(const networking::PlayerData& playerData);
     void InterpolateLocalWorld(const float dtMillis);
     void CheckForStateSending(const float dtMillis);
-    void OnServerWorldStateUpdate(const std::string& worldStateString);
+    void OnServerResponse(const std::string& response);
+    void OnServerPlayerStateResponse(const nlohmann::json& responseJson);
     
 private:
     std::atomic<int> mLastPingMillis = 0;
