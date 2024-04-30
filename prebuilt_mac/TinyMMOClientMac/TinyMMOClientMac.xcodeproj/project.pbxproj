@@ -222,6 +222,7 @@
 		92B8A58B2BE0F547006EC56F /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 92B8A5842BE0F547006EC56F /* LICENSE */; };
 		92B8A58C2BE0F547006EC56F /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 92B8A5842BE0F547006EC56F /* LICENSE */; };
 		92B8A5992BE131DD006EC56F /* NetworkMessages.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 92B8A5982BE131DD006EC56F /* NetworkMessages.cpp */; };
+		92B8A59F2BE13B00006EC56F /* AnimatedButton.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 92B8A59E2BE13B00006EC56F /* AnimatedButton.cpp */; };
 		92CA97412B65132C00B53B01 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92CA97402B65132B00B53B01 /* StoreKit.framework */; };
 		92D54EE22BDFA00800DA4EC7 /* NameGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 92D54EE02BDFA00800DA4EC7 /* NameGenerator.cpp */; };
 		95BF1C18A001B37A45C9BF9E /* IRenderer.h in Sources */ = {isa = PBXBuildFile; fileRef = E0599E67CDFA7350C55C73A5 /* IRenderer.h */; };
@@ -407,6 +408,8 @@
 		92B8A5832BE0F547006EC56F /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		92B8A5842BE0F547006EC56F /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		92B8A5982BE131DD006EC56F /* NetworkMessages.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = NetworkMessages.cpp; sourceTree = "<group>"; };
+		92B8A59D2BE13B00006EC56F /* AnimatedButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AnimatedButton.h; sourceTree = "<group>"; };
+		92B8A59E2BE13B00006EC56F /* AnimatedButton.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AnimatedButton.cpp; sourceTree = "<group>"; };
 		92CA97402B65132B00B53B01 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		92D54EE02BDFA00800DA4EC7 /* NameGenerator.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = NameGenerator.cpp; sourceTree = "<group>"; };
 		92D54EE12BDFA00800DA4EC7 /* NameGenerator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NameGenerator.h; sourceTree = "<group>"; };
@@ -773,6 +776,8 @@
 			children = (
 				92D54EDF2BDF9FE600DA4EC7 /* utils */,
 				928B0BA82B5C3C850025DF3F /* GameConstants.h */,
+				92B8A59E2BE13B00006EC56F /* AnimatedButton.cpp */,
+				92B8A59D2BE13B00006EC56F /* AnimatedButton.h */,
 				928B0BBE2B5C3C850025DF3F /* Game.h */,
 				928B0BCF2B5C3C850025DF3F /* Game.cpp */,
 				928B0BC72B5C3C850025DF3F /* events */,
@@ -1222,6 +1227,7 @@
 				45963ED9A5DA3C4EB9144646 /* TextureResource.h in Sources */,
 				F51ECBEA53C3E1BE870B0612 /* ShaderResource.h in Sources */,
 				7CA340B584BA7BDBF8857C4C /* OBJMeshLoader.h in Sources */,
+				92B8A59F2BE13B00006EC56F /* AnimatedButton.cpp in Sources */,
 				BE9038402F304B01BC7CAAB8 /* DataFileResource.h in Sources */,
 				C729734CCEC807E5626787EB /* IResourceLoader.h in Sources */,
 				191617E17721C2C19E20E920 /* IResource.h in Sources */,

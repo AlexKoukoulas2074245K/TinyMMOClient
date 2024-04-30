@@ -15,13 +15,14 @@
 #include <engine/utils/MathUtils.h>
 #include <engine/utils/StringUtils.h>
 #include <game/events/EventSystem.h>
+#include <net_common/NetworkMessages.h>
 #include <net_common/SerializableNetworkObjects.h>
 #include <nlohmann/json.hpp>
 
 ///------------------------------------------------------------------------------------------------
 
-class GameSceneTransitionManager;
-class TutorialManager;
+
+class AnimatedButton;
 class Game final
 {
 public:
@@ -36,17 +37,21 @@ public:
     void CreateDebugWidgets();
     
 private:
+    void SendNetworkMessage(const nlohmann::json& message, const networking::MessageType messageType);
     void CreatePlayerWorldObject(const networking::PlayerData& playerData);
     void InterpolateLocalWorld(const float dtMillis);
     void CheckForStateSending(const float dtMillis);
     void OnServerResponse(const std::string& response);
     void OnServerPlayerStateResponse(const nlohmann::json& responseJson);
+    void OnServerLoginResponse(const nlohmann::json& responseJson);
+    void OnPlayButtonPressed();
     
 private:
     std::atomic<int> mLastPingMillis = 0;
+    std::unique_ptr<AnimatedButton> mPlayButton;
     std::vector<networking::PlayerData> mPlayerData;
     std::vector<strutils::StringId> playerNamesToCleanup;
-    bool mCanSendNetworkMessage;
+    std::vector<networking::PlayerData> mPendingPlayerDataToCreate;
 };
 
 ///------------------------------------------------------------------------------------------------

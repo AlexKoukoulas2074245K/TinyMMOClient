@@ -427,11 +427,18 @@ void RequestReview()
 
 ///-----------------------------------------------------------------------------------------------
 
+static bool canSendNetworkMessage = true;
 void SendNetworkMessage(const nlohmann::json& networkMessage, const networking::MessageType messageType, std::function<void(const ServerResponseData&)> serverResponseCallback)
 {
+    if (!canSendNetworkMessage)
+    {
+        return;
+    }
+    
     auto finalNetworkMessageJson = networkMessage;
     networking::PopulateMessageHeader(finalNetworkMessageJson, messageType);
     const auto startTime = std::chrono::system_clock::now();
+    canSendNetworkMessage = false;
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         ServerResponseData responseData = {};
@@ -440,6 +447,7 @@ void SendNetworkMessage(const nlohmann::json& networkMessage, const networking::
         
         auto responseErrorLambda = [&](const std::string&& errorMessage)
         {
+            canSendNetworkMessage = true;
             close(clientSocket);
             responseData.mError = std::move(errorMessage);
             serverResponseCallback(responseData);
@@ -506,6 +514,7 @@ void SendNetworkMessage(const nlohmann::json& networkMessage, const networking::
         
         if (!responseData.mResponse.empty())
         {
+            canSendNetworkMessage = true;
             const auto endTime = std::chrono::system_clock::now();
             responseData.mPingMillis = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
             serverResponseCallback(responseData);

@@ -25,13 +25,12 @@
 #include <engine/utils/OSMessageBox.h>
 #include <engine/utils/PlatformMacros.h>
 #include <fstream>
+#include <game/AnimatedButton.h>
 #include <game/Game.h>
 #include <game/events/EventSystem.h>
 #include <game/utils/NameGenerator.h>
 #include <imgui/imgui.h>
 #include <mutex>
-#include <net_common/NetworkMessages.h>
-#include <net_common/SerializableNetworkObjects.h>
 
 #if defined(MOBILE_FLOW)
 #include <platform_specific/IOSUtils.h>
@@ -46,13 +45,14 @@
 ///------------------------------------------------------------------------------------------------
 
 static const strutils::StringId MAIN_MENU_SCENE = strutils::StringId("main_menu_scene");
+static const strutils::StringId PLAY_BUTTON_NAME = strutils::StringId("play_button");
 static float PLAYER_SPEED = 0.0002f;
 static std::mutex sWorldMutex;
+static std::mutex sPendingObjectDataToCreateMutex;
 
 ///------------------------------------------------------------------------------------------------
 
 Game::Game(const int argc, char** argv)
-    : mCanSendNetworkMessage(true)
 {
     if (argc > 0)
     {
@@ -84,19 +84,31 @@ void Game::Init()
     auto background = scene->CreateSceneObject(strutils::StringId("forest"));
     background->mPosition.z = 0.0f;
     background->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "world/japanese_forest.png");
-    
-    auto pos = glm::vec3(math::RandomFloat(-0.3f, 0.3f), math::RandomFloat(-0.15f, 0.15f), 0.1f);
-    auto color = math::RandomFloat(0.0f, 1.0f);
-    auto name = GenerateName();
-    
-    networking::PlayerData playerData = { strutils::StringId(name), pos, {}, color, true };
-    CreatePlayerWorldObject(playerData);
+        
+    mPlayButton = std::make_unique<AnimatedButton>(glm::vec3(-0.057f, 0.038f, 1.0f), glm::vec3(0.001f, 0.001f, 0.001f), game_constants::DEFAULT_FONT_NAME, "Play", PLAY_BUTTON_NAME, [&](){ OnPlayButtonPressed(); }, *scene);
+    mPlayButton->GetSceneObject()->mShaderFloatUniformValues[strutils::StringId("custom_alpha")] = 1.0f;
 }
 
 ///------------------------------------------------------------------------------------------------
 
 void Game::Update(const float dtMillis)
 {
+    if (mPlayButton) 
+    {
+        mPlayButton->Update(dtMillis);
+    }
+    
+    {
+        std::lock_guard<std::mutex> loginResponseGuard(sPendingObjectDataToCreateMutex);
+        std::lock_guard<std::mutex> worldGuard(sWorldMutex);
+
+        for (const auto& playerData: mPendingPlayerDataToCreate)
+        {
+            CreatePlayerWorldObject({ playerData.playerName, playerData.playerPosition, {}, playerData.color, playerData.isLocal, false });
+        }
+        mPendingPlayerDataToCreate.clear();
+    }
+    
     InterpolateLocalWorld(dtMillis);
     CheckForStateSending(dtMillis);
 }
@@ -142,6 +154,26 @@ void Game::CreateDebugWidgets()
 {
 }
 #endif
+
+///------------------------------------------------------------------------------------------------
+
+void Game::SendNetworkMessage(const nlohmann::json& message, const networking::MessageType messageType)
+{
+#if defined(MACOS) || defined(MOBILE_FLOW)
+    apple_utils::SendNetworkMessage(message, messageType, [&](const apple_utils::ServerResponseData& responseData)
+    {
+        if (!responseData.mError.empty())
+        {
+            logging::Log(logging::LogType::ERROR, responseData.mError.c_str());
+        }
+        else
+        {
+            mLastPingMillis = static_cast<int>(responseData.mPingMillis);
+            OnServerResponse(responseData.mResponse);
+        }
+    });
+#endif
+}
 
 ///------------------------------------------------------------------------------------------------
 
@@ -276,33 +308,22 @@ void Game::CheckForStateSending(const float dtMillis)
     {
         stateSendingTimer -= game_constants::STATE_SEND_DELAY_MILLIS;
         
-        if (!mCanSendNetworkMessage)
-        {
-            return;
-        }
-        
         std::lock_guard<std::mutex> worldLockGuard(sWorldMutex);
         auto playerIter = std::find_if(mPlayerData.begin(), mPlayerData.end(), [&](networking::PlayerData& playerData){ return playerData.isLocal; });
         
-        assert(playerIter != mPlayerData.end());
-        auto& playerData = *playerIter;
-        
-#if defined(MACOS) || defined(MOBILE_FLOW)        
-        apple_utils::SendNetworkMessage(playerData.SerializeToJson(), networking::MessageType::CS_PLAYER_STATE, [&](const apple_utils::ServerResponseData& responseData)
+        // Local player is not found in local world data.
+        // Send an empty state just to request other world entities
+        if (playerIter == mPlayerData.end())
         {
-            mCanSendNetworkMessage = true;
-            if (!responseData.mError.empty())
-            {
-                logging::Log(logging::LogType::ERROR, responseData.mError.c_str());
-            }
-            else
-            {
-                mLastPingMillis = static_cast<int>(responseData.mPingMillis);
-                OnServerResponse(responseData.mResponse);
-            }
-        });
-#endif
-        mCanSendNetworkMessage = false;
+            SendNetworkMessage(nlohmann::json(), networking::MessageType::CS_PLAYER_STATE);
+        }
+        // Local player found in world data. Send its updated state
+        else
+        {
+            auto& playerData = *playerIter;
+            SendNetworkMessage(playerData.SerializeToJson(), networking::MessageType::CS_PLAYER_STATE);
+        }
+        
     }
 }
 
@@ -318,6 +339,10 @@ void Game::OnServerResponse(const std::string& response)
         if (networking::IsMessageOfType(responseJson, networking::MessageType::SC_PLAYER_STATE_RESPONSE))
         {
             OnServerPlayerStateResponse(responseJson);
+        }
+        else if (networking::IsMessageOfType(responseJson, networking::MessageType::SC_REQUEST_LOGIN_RESPONSE))
+        {
+            OnServerLoginResponse(responseJson);
         }
         else
         {
@@ -350,7 +375,8 @@ void Game::OnServerPlayerStateResponse(const nlohmann::json& responseJson)
         auto playerIter = std::find_if(mPlayerData.begin(), mPlayerData.end(), [&](networking::PlayerData& playerData){ return playerData.playerName == remotePlayerData.playerName; });
         if (playerIter == mPlayerData.end())
         {
-            CreatePlayerWorldObject(remotePlayerData);
+            std::lock_guard<std::mutex> pendingObjectDataToCreateGuard(sPendingObjectDataToCreateMutex);
+            mPendingPlayerDataToCreate.push_back(remotePlayerData);
         }
         else
         {
@@ -380,6 +406,39 @@ void Game::OnServerPlayerStateResponse(const nlohmann::json& responseJson)
             iter++;
         }
     }
+}
+
+///------------------------------------------------------------------------------------------------
+
+void Game::OnServerLoginResponse(const nlohmann::json& responseJson)
+{
+    networking::LoginResponse loginResponse;
+    loginResponse.DeserializeFromJson(responseJson);
+    
+    if (loginResponse.allowed)
+    {
+        std::lock_guard<std::mutex> pendingObjectDataToCreateGuard(sPendingObjectDataToCreateMutex);
+        mPendingPlayerDataToCreate.emplace_back(networking::PlayerData{loginResponse.playerName, loginResponse.playerPosition, {}, loginResponse.color, true, false });
+    }
+}
+
+///------------------------------------------------------------------------------------------------
+
+void Game::OnPlayButtonPressed()
+{
+    auto& systemsEngine = CoreSystemsEngine::GetInstance();
+    auto& sceneManager = systemsEngine.GetSceneManager();
+    auto scene = sceneManager.FindScene(strutils::StringId("world"));
+    
+    // Fade button out
+    CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenValueAnimation>(mPlayButton->GetSceneObject()->mShaderFloatUniformValues[strutils::StringId("custom_alpha")], 0.0f, 0.2f), [=]()
+    {
+        scene->RemoveSceneObject(PLAY_BUTTON_NAME);
+        mPlayButton = nullptr;
+    });
+    
+    // Request login details
+    SendNetworkMessage(nlohmann::json(), networking::MessageType::CS_REQUEST_LOGIN);
 }
 
 ///------------------------------------------------------------------------------------------------
