@@ -322,7 +322,7 @@ void Game::OnServerWorldStateUpdate(const std::string& worldStateString)
         }
         
         // Parse and update local player data validating them
-        for (const auto& playerJson: worldStateJson["playerData"])
+        for (const auto& playerJson: worldStateJson[networking::PlayerData::ObjectCollectionHeader()])
         {
             networking::PlayerData remotePlayerData;
             remotePlayerData.DeserializeFromJson(playerJson);
