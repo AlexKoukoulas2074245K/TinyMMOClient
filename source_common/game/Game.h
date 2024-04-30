@@ -15,18 +15,7 @@
 #include <engine/utils/MathUtils.h>
 #include <engine/utils/StringUtils.h>
 #include <game/events/EventSystem.h>
-
-///------------------------------------------------------------------------------------------------
-
-struct PlayerData
-{
-    strutils::StringId mPlayerName;
-    glm::vec3 mPlayerPosition;
-    glm::vec3 mPlayerVelocity;
-    float mColor;
-    bool mIsLocal;
-    bool mInvalidated;
-};
+#include <net_common/SerializableNetworkObjects.h>
 
 ///------------------------------------------------------------------------------------------------
 
@@ -46,15 +35,15 @@ public:
     void CreateDebugWidgets();
     
 private:
-    void CreatePlayer(const std::string& name, const glm::vec3& position, const glm::vec3& velocity, const float color, const bool isLocal);
+    void CreatePlayerWorldObject(const networking::PlayerData& playerData);
     void InterpolateLocalWorld(const float dtMillis);
     void CheckForStateSending(const float dtMillis);
     void OnServerWorldStateUpdate(const std::string& worldStateString);
     
 private:
     std::atomic<int> mLastPingMillis = 0;
-    std::vector<PlayerData> mPlayerData;
-    std::vector<strutils::StringId> mPlayerNamesToCleanup;
+    std::vector<networking::PlayerData> mPlayerData;
+    std::vector<strutils::StringId> playerNamesToCleanup;
     bool mCanSendNetworkMessage;
 };
 

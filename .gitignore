@@ -1,5 +1,6 @@
 # Project Specifics
 *.DS_Store
+**.DS_Store*
 *.Thumbs.db
 /build/*
 *.xcuserstate
