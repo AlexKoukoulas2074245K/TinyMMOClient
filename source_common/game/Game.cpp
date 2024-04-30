@@ -44,6 +44,7 @@
 ///------------------------------------------------------------------------------------------------
 
 static const strutils::StringId MAIN_MENU_SCENE = strutils::StringId("main_menu_scene");
+static float PLAYER_SPEED = 0.0002f;
 static std::mutex sWorldMutex;
 
 ///------------------------------------------------------------------------------------------------
@@ -119,8 +120,17 @@ void Game::WindowResize()
 #if defined(USE_IMGUI)
 void Game::CreateDebugWidgets()
 {
+    static float sPlayerSpeedMultiplier = 1.0f;
+    
     ImGui::Begin("Net Stats", nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
     ImGui::Text("Ping %d millis", mLastPingMillis.load());
+    ImGui::End();
+    
+    ImGui::Begin("Game Hacks", nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
+    if (ImGui::SliderFloat("Player Speed Multiplier", &sPlayerSpeedMultiplier, 0.1f, 3.0f))
+    {
+        PLAYER_SPEED = 0.0002f * sPlayerSpeedMultiplier;
+    }
     ImGui::End();
 }
 #else
@@ -219,41 +229,36 @@ void Game::InterpolateLocalWorld(const float dtMillis)
             auto length = glm::length(impulseVector);
             if (length > 0.0f)
             {
-                playerData.mPlayerVelocity = glm::normalize(impulseVector) * game_constants::PLAYER_SPEED * dtMillis;
+                playerData.mPlayerVelocity = glm::normalize(impulseVector) * PLAYER_SPEED * dtMillis;
+                playerData.mPlayerPosition += playerData.mPlayerVelocity;
+                
+                playerSceneObject->mPosition += playerData.mPlayerVelocity;
+                playerNameSceneObject->mPosition += playerData.mPlayerVelocity;
             }
         }
-        
-        playerData.mPlayerPosition += playerData.mPlayerVelocity;
-        
-        playerSceneObject->mPosition += playerData.mPlayerVelocity;
-        playerNameSceneObject->mPosition += playerData.mPlayerVelocity;
-        
-        if (!playerData.mIsLocal && glm::length(playerData.mPlayerVelocity) <= 0.0f && glm::distance(playerData.mPlayerPosition, playerSceneObject->mPosition) > 0.01f)
+        else
         {
             auto directionToTarget = playerData.mPlayerPosition - playerSceneObject->mPosition;
-            playerSceneObject->mPosition += glm::normalize(directionToTarget) * game_constants::PLAYER_RUBBERBAND_SPEED;
-            playerNameSceneObject->mPosition += glm::normalize(directionToTarget) * game_constants::PLAYER_RUBBERBAND_SPEED;
+            auto distanceToTarget = glm::length(directionToTarget);
+            
+            // If (unlikely) we the player is exactly on target, or if
+            // the player's movement delta vector length exceeds the distance to target
+            // we teleport to target
+            if (distanceToTarget <= 0.0f || distanceToTarget < glm::length(glm::normalize(directionToTarget) * PLAYER_SPEED * dtMillis))
+            {
+                playerSceneObject->mPosition = playerData.mPlayerPosition;
+                playerNameSceneObject->mPosition = playerSceneObject->mPosition + game_constants::PLAYER_NAMEPLATE_OFFSET;
+                
+                auto boundingRect = scene_object_utils::GetSceneObjectBoundingRect(*playerNameSceneObject);
+                auto textLength = boundingRect.topRight.x - boundingRect.bottomLeft.x;
+                playerNameSceneObject->mPosition.x -= textLength/2.0f;
+            }
+            else
+            {
+                playerSceneObject->mPosition += glm::normalize(directionToTarget) * PLAYER_SPEED * dtMillis;
+                playerNameSceneObject->mPosition += glm::normalize(directionToTarget) * PLAYER_SPEED * dtMillis;
+            }
         }
-        
-//        else
-//        {
-//            // Move remote player to current position
-//            auto directionToPosition = playerData.mPlayerPosition - playerSceneObject->mPosition;
-//            auto directionToPositionLength = glm::length(directionToPosition);
-//            
-//            if (directionToPositionLength > 0.005f)
-//            {
-//                auto normalizedDirectionToPosition = glm::normalize(directionToPosition);
-//                playerSceneObject->mPosition += normalizedDirectionToPosition * game_constants::PLAYER_SPEED * dtMillis;
-//                
-//                playerNameSceneObject->mPosition = playerSceneObject->mPosition;
-//                
-//                auto boundingRect = scene_object_utils::GetSceneObjectBoundingRect(*playerNameSceneObject);
-//                auto textLength = boundingRect.topRight.x - boundingRect.bottomLeft.x;
-//                playerNameSceneObject->mPosition += game_constants::PLAYER_NAMEPLATE_OFFSET;
-//                playerNameSceneObject->mPosition.x -= textLength/2.0f;
-//            }
-//        }
     }
 }
 

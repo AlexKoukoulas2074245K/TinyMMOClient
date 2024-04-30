@@ -27,12 +27,11 @@ namespace game_constants
     inline const strutils::StringId DEFAULT_FONT_NAME = strutils::StringId("font");
     
     // Game Constants
-    inline const float PLAYER_SPEED = 0.0004f;
-    inline const float PLAYER_RUBBERBAND_SPEED = 0.004f;
+    //inline const float PLAYER_RUBBERBAND_SPEED = 0.002f;
     inline const glm::vec3 PLAYER_NAMEPLATE_OFFSET = {0.01f, 0.065f, 0.0f};
 
     // Networking
-    inline const float STATE_SEND_DELAY_MILLIS = 300.0f;
+    inline const float STATE_SEND_DELAY_MILLIS = 16.66666f;
 
 }
 
