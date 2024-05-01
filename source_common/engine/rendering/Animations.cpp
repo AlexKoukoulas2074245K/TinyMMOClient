@@ -201,6 +201,29 @@ std::shared_ptr<scene::SceneObject> TweenRotationAnimation::VGetSceneObject()
 
 ///------------------------------------------------------------------------------------------------
 
+ContinualRotationAnimation::ContinualRotationAnimation(std::shared_ptr<scene::SceneObject> sceneObjectTarget, const float rotationSpeed, const float secsDelay)
+    : BaseAnimation(animation_flags::NONE, -1.0f, secsDelay)
+    , mSceneObjectTarget(sceneObjectTarget)
+    , mRotationSpeed(rotationSpeed)
+{
+}
+
+AnimationUpdateResult ContinualRotationAnimation::VUpdate(const float dtMillis)
+{
+    auto animationUpdateResult = BaseAnimation::VUpdate(dtMillis);
+    
+    mSceneObjectTarget->mRotation.z += mRotationSpeed;
+    
+    return animationUpdateResult;
+}
+
+std::shared_ptr<scene::SceneObject> ContinualRotationAnimation::VGetSceneObject()
+{
+    return mSceneObjectTarget;
+}
+
+///------------------------------------------------------------------------------------------------
+
 TweenValueAnimation::TweenValueAnimation(float& value, const float targetValue, const float secsDuration, const uint8_t animationFlags /* = animation_flags::NONE */, const float secsDelay /* = 0.0f */, const std::function<float(const float)> tweeningFunc /* = math::LinearFunction */, const math::TweeningMode tweeningMode /* = math::TweeningMode::EASE_IN */)
     : BaseAnimation(animationFlags, secsDuration, secsDelay)
     , mValue(value)

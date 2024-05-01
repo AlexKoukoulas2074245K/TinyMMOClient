@@ -139,6 +139,20 @@ private:
 
 ///------------------------------------------------------------------------------------------------
 
+class ContinualRotationAnimation final: public BaseAnimation
+{
+public:
+    ContinualRotationAnimation(std::shared_ptr<scene::SceneObject> sceneObjectTarget, const float rotationSpeed, const float secsDelay);
+    AnimationUpdateResult VUpdate(const float dtMillis) override;
+    std::shared_ptr<scene::SceneObject> VGetSceneObject() override;
+    
+private:
+    std::shared_ptr<scene::SceneObject> mSceneObjectTarget;
+    const float mRotationSpeed;
+};
+
+///------------------------------------------------------------------------------------------------
+
 class TweenValueAnimation final: public BaseAnimation
 {
 public:

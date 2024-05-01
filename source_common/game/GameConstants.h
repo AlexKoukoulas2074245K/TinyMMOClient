@@ -31,7 +31,8 @@ namespace game_constants
     inline const glm::vec3 PLAYER_NAMEPLATE_OFFSET = {0.01f, 0.065f, 0.0f};
 
     // Networking
-    inline const float STATE_SEND_DELAY_MILLIS = 16.66666f;
+    inline const int STATE_SEND_MIN_DELAY_MILLIS = 16.6666f;
+    inline const int STATE_SEND_MAX_DELAY_MILLIS = 100.0f;
 
 }
 

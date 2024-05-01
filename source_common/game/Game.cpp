@@ -31,6 +31,7 @@
 #include <game/utils/NameGenerator.h>
 #include <imgui/imgui.h>
 #include <mutex>
+#include <net_common/WorldObjectTypes.h>
 
 #if defined(MOBILE_FLOW)
 #include <platform_specific/IOSUtils.h>
@@ -48,11 +49,11 @@ static const strutils::StringId MAIN_MENU_SCENE = strutils::StringId("main_menu_
 static const strutils::StringId PLAY_BUTTON_NAME = strutils::StringId("play_button");
 static float PLAYER_SPEED = 0.0002f;
 static std::mutex sWorldMutex;
-static std::mutex sPendingObjectDataToCreateMutex;
 
 ///------------------------------------------------------------------------------------------------
 
 Game::Game(const int argc, char** argv)
+    : mStateSendingDelayMillis(game_constants::STATE_SEND_MAX_DELAY_MILLIS)
 {
     if (argc > 0)
     {
@@ -98,15 +99,16 @@ void Game::Update(const float dtMillis)
         mPlayButton->Update(dtMillis);
     }
     
+    // Pending world object creation
     {
-        std::lock_guard<std::mutex> loginResponseGuard(sPendingObjectDataToCreateMutex);
         std::lock_guard<std::mutex> worldGuard(sWorldMutex);
 
-        for (const auto& playerData: mPendingPlayerDataToCreate)
+        for (auto worldObjectData: mPendingWorldObjectDataToCreate)
         {
-            CreatePlayerWorldObject({ playerData.playerName, playerData.playerPosition, {}, playerData.color, playerData.isLocal, false });
+            worldObjectData.invalidated = false;
+            CreateWorldObject(worldObjectData);
         }
-        mPendingPlayerDataToCreate.clear();
+        mPendingWorldObjectDataToCreate.clear();
     }
     
     InterpolateLocalWorld(dtMillis);
@@ -140,6 +142,7 @@ void Game::CreateDebugWidgets()
     
     ImGui::Begin("Net Stats", nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
     ImGui::Text("Ping %d millis", mLastPingMillis.load());
+    ImGui::Text("State sending %d millis", static_cast<int>(mStateSendingDelayMillis));
     ImGui::End();
     
     ImGui::Begin("Game Hacks", nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
@@ -177,35 +180,54 @@ void Game::SendNetworkMessage(const nlohmann::json& message, const networking::M
 
 ///------------------------------------------------------------------------------------------------
 
-void Game::CreatePlayerWorldObject(const networking::PlayerData& playerData)
+void Game::CreateWorldObject(const networking::WorldObjectData& worldObjectData)
 {
     auto& systemsEngine = CoreSystemsEngine::GetInstance();
     auto scene = systemsEngine.GetSceneManager().FindScene(strutils::StringId("world"));
-    auto ninja = scene->CreateSceneObject(playerData.playerName);
-    ninja->mPosition = playerData.playerPosition;
-    ninja->mScale /= 10.0f;
-    ninja->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + "portrait.vs");
-    ninja->mTextureResourceId =  systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "world/portrait.png");
-    ninja->mShaderFloatUniformValues[strutils::StringId("portrait_value")] = playerData.color;
     
-    auto ninjaName = scene->CreateSceneObject(strutils::StringId(playerData.playerName.GetString() + "_name"));
+    switch (worldObjectData.objectType)
+    {
+        case networking::OBJ_TYPE_PLAYER:
+        {
+            auto ninja = scene->CreateSceneObject(strutils::StringId(worldObjectData.objectId));
+            ninja->mPosition = worldObjectData.objectPosition;
+            ninja->mScale /= 10.0f;
+            ninja->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + "portrait.vs");
+            ninja->mTextureResourceId =  systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "world/portrait.png");
+            ninja->mShaderFloatUniformValues[strutils::StringId("portrait_value")] = worldObjectData.color;
+            
+            auto ninjaName = scene->CreateSceneObject(strutils::StringId(std::to_string(worldObjectData.objectId) + "_name"));
+            scene::TextSceneObjectData textSceneObjectData;
+            textSceneObjectData.mFontName = game_constants::DEFAULT_FONT_NAME;
+            textSceneObjectData.mText = worldObjectData.objectName.GetString();
+            
+            ninjaName->mScale /= 3000.0f;
+            ninjaName->mPosition = ninja->mPosition;
+            ninjaName->mSceneObjectTypeData = std::move(textSceneObjectData);
+            ninjaName->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + "portrait.vs");
+            ninjaName->mShaderFloatUniformValues[strutils::StringId("portrait_value")] = worldObjectData.color;
+            
+            auto boundingRect = scene_object_utils::GetSceneObjectBoundingRect(*ninjaName);
+            auto textLength = boundingRect.topRight.x - boundingRect.bottomLeft.x;
+            ninjaName->mPosition += game_constants::PLAYER_NAMEPLATE_OFFSET;
+            ninjaName->mPosition.x -= textLength/2.0f;
+        } break;
+            
+        case networking::OBJ_TYPE_NPC_SHURIKEN:
+        {
+            auto worldObject = scene->CreateSceneObject(strutils::StringId(worldObjectData.objectId));
+            worldObject->mPosition = worldObjectData.objectPosition;
+            worldObject->mScale /= 30.0f;
+            worldObject->mTextureResourceId =  systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "world/shuriken.png");
+        } break;
+            
+        default:
+        {
+            assert(false);
+        } break;
+    }
     
-    scene::TextSceneObjectData textSceneObjectData;
-    textSceneObjectData.mFontName = game_constants::DEFAULT_FONT_NAME;
-    textSceneObjectData.mText = playerData.playerName.GetString();
-    
-    ninjaName->mScale /= 3000.0f;
-    ninjaName->mPosition = ninja->mPosition;
-    ninjaName->mSceneObjectTypeData = std::move(textSceneObjectData);
-    ninjaName->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + "portrait.vs");
-    ninjaName->mShaderFloatUniformValues[strutils::StringId("portrait_value")] = playerData.color;
-    
-    auto boundingRect = scene_object_utils::GetSceneObjectBoundingRect(*ninjaName);
-    auto textLength = boundingRect.topRight.x - boundingRect.bottomLeft.x;
-    ninjaName->mPosition += game_constants::PLAYER_NAMEPLATE_OFFSET;
-    ninjaName->mPosition.x -= textLength/2.0f;
-    
-    mPlayerData.emplace_back(playerData);
+    mWorldObjectData.emplace_back(worldObjectData);
 }
 
 ///------------------------------------------------------------------------------------------------
@@ -220,80 +242,109 @@ void Game::InterpolateLocalWorld(const float dtMillis)
 
     auto scene = sceneManager.FindScene(strutils::StringId("world"));
     
-    for (auto& playerNameToCleanup: playerNamesToCleanup)
+    for (int worldObjectIDToCleanup: mWorldObjectIDsToCleanup)
     {
-        scene->RemoveSceneObject(playerNameToCleanup);
-        scene->RemoveSceneObject(strutils::StringId(playerNameToCleanup.GetString() + "_name"));
+        scene->RemoveSceneObject(strutils::StringId(worldObjectIDToCleanup));
+        scene->RemoveSceneObject(strutils::StringId(std::to_string(worldObjectIDToCleanup) + "_name"));
     }
-    playerNamesToCleanup.clear();
+    mWorldObjectIDsToCleanup.clear();
     
-    for (auto& playerData: mPlayerData)
+    for (auto& objectData: mWorldObjectData)
     {
-        auto playerSceneObject = scene->FindSceneObject(playerData.playerName);
-        auto playerNameSceneObject = scene->FindSceneObject(strutils::StringId(playerData.playerName.GetString() + "_name"));
-        
-        if (playerData.isLocal)
+        switch (objectData.objectType)
         {
-            glm::vec3 impulseVector = {};
-            if (inputStateManager.VKeyPressed(input::Key::W))
+            case networking::OBJ_TYPE_PLAYER:
             {
-                impulseVector.y = 1.0f;
-            }
-            else if (inputStateManager.VKeyPressed(input::Key::S))
-            {
-                impulseVector.y = -1.0f;
-            }
-            else
-            {
-                impulseVector.y = 0.0f;
-            }
-            
-            if (inputStateManager.VKeyPressed(input::Key::A))
-            {
-                impulseVector.x = -1.0f;
-            }
-            else if (inputStateManager.VKeyPressed(input::Key::D))
-            {
-                impulseVector.x = 1.0f;
-            }
-            else
-            {
-                impulseVector.x = 0.0f;
-            }
-            
-            playerData.playerVelocity = {};
-            auto length = glm::length(impulseVector);
-            if (length > 0.0f)
-            {
-                playerData.playerVelocity = glm::normalize(impulseVector) * PLAYER_SPEED * dtMillis;
-                playerData.playerPosition += playerData.playerVelocity;
+                auto playerSceneObject = scene->FindSceneObject(strutils::StringId(objectData.objectId));
+                auto playerNameSceneObject = scene->FindSceneObject(strutils::StringId(std::to_string(objectData.objectId) + "_name"));
                 
-                playerSceneObject->mPosition += playerData.playerVelocity;
-                playerNameSceneObject->mPosition += playerData.playerVelocity;
-            }
-        }
-        else
-        {
-            auto directionToTarget = playerData.playerPosition - playerSceneObject->mPosition;
-            auto distanceToTarget = glm::length(directionToTarget);
-            
-            // If (unlikely) we the player is exactly on target, or if
-            // the player's movement delta vector length exceeds the distance to target
-            // we teleport to target
-            if (distanceToTarget <= 0.0f || distanceToTarget < glm::length(glm::normalize(directionToTarget) * PLAYER_SPEED * dtMillis))
+                if (objectData.isLocal)
+                {
+                    glm::vec3 impulseVector = {};
+                    if (inputStateManager.VKeyPressed(input::Key::W))
+                    {
+                        impulseVector.y = 1.0f;
+                    }
+                    else if (inputStateManager.VKeyPressed(input::Key::S))
+                    {
+                        impulseVector.y = -1.0f;
+                    }
+                    else
+                    {
+                        impulseVector.y = 0.0f;
+                    }
+                    
+                    if (inputStateManager.VKeyPressed(input::Key::A))
+                    {
+                        impulseVector.x = -1.0f;
+                    }
+                    else if (inputStateManager.VKeyPressed(input::Key::D))
+                    {
+                        impulseVector.x = 1.0f;
+                    }
+                    else
+                    {
+                        impulseVector.x = 0.0f;
+                    }
+                    
+                    if (inputStateManager.VButtonTapped(input::Button::MAIN_BUTTON))
+                    {
+                        auto worldTouchPos = inputStateManager.VGetPointingPosInWorldSpace(scene->GetCamera().GetViewMatrix(), scene->GetCamera().GetProjMatrix());
+                        
+                        networking::ThrowRangedWeaponRequest throwRangedWeaponRequest;
+                        throwRangedWeaponRequest.playerId = objectData.objectId;
+                        throwRangedWeaponRequest.targetPosition = glm::vec3(worldTouchPos.x, worldTouchPos.y, objectData.objectPosition.z);
+                        SendNetworkMessage(throwRangedWeaponRequest.SerializeToJson(), networking::MessageType::CS_THROW_RANGED_WEAPON, true);
+                    }
+                    
+                    objectData.objectVelocity = {};
+                    auto length = glm::length(impulseVector);
+                    if (length > 0.0f)
+                    {
+                        objectData.objectVelocity = glm::normalize(impulseVector) * PLAYER_SPEED * dtMillis;
+                        objectData.objectPosition += objectData.objectVelocity;
+                        
+                        playerSceneObject->mPosition += objectData.objectVelocity;
+                        playerNameSceneObject->mPosition += objectData.objectVelocity;
+                    }
+                }
+                else
+                {
+                    auto directionToTarget = objectData.objectPosition - playerSceneObject->mPosition;
+                    auto distanceToTarget = glm::length(directionToTarget);
+                    
+                    // If (unlikely) we the player is exactly on target, or if
+                    // the player's movement delta vector length exceeds the distance to target
+                    // we teleport to target
+                    if (distanceToTarget <= 0.0f || distanceToTarget < glm::length(glm::normalize(directionToTarget) * PLAYER_SPEED * dtMillis))
+                    {
+                        playerSceneObject->mPosition = objectData.objectPosition;
+                        playerNameSceneObject->mPosition = playerSceneObject->mPosition + game_constants::PLAYER_NAMEPLATE_OFFSET;
+                        
+                        auto boundingRect = scene_object_utils::GetSceneObjectBoundingRect(*playerNameSceneObject);
+                        auto textLength = boundingRect.topRight.x - boundingRect.bottomLeft.x;
+                        playerNameSceneObject->mPosition.x -= textLength/2.0f;
+                    }
+                    else
+                    {
+                        playerSceneObject->mPosition += glm::normalize(directionToTarget) * PLAYER_SPEED * dtMillis;
+                        playerNameSceneObject->mPosition += glm::normalize(directionToTarget) * PLAYER_SPEED * dtMillis;
+                    }
+                }
+            } break;
+                 
+            case networking::OBJ_TYPE_NPC_SHURIKEN:
             {
-                playerSceneObject->mPosition = playerData.playerPosition;
-                playerNameSceneObject->mPosition = playerSceneObject->mPosition + game_constants::PLAYER_NAMEPLATE_OFFSET;
+                auto npcSceneObject = scene->FindSceneObject(strutils::StringId(objectData.objectId));
                 
-                auto boundingRect = scene_object_utils::GetSceneObjectBoundingRect(*playerNameSceneObject);
-                auto textLength = boundingRect.topRight.x - boundingRect.bottomLeft.x;
-                playerNameSceneObject->mPosition.x -= textLength/2.0f;
-            }
-            else
+                objectData.objectPosition += objectData.objectVelocity * dtMillis;
+                npcSceneObject->mPosition = objectData.objectPosition;
+            } break;
+                
+            default:
             {
-                playerSceneObject->mPosition += glm::normalize(directionToTarget) * PLAYER_SPEED * dtMillis;
-                playerNameSceneObject->mPosition += glm::normalize(directionToTarget) * PLAYER_SPEED * dtMillis;
-            }
+                assert(false);
+            } break;
         }
     }
 }
@@ -303,25 +354,26 @@ void Game::InterpolateLocalWorld(const float dtMillis)
 void Game::CheckForStateSending(const float dtMillis)
 {
     static float stateSendingTimer = 0.0f;
+    mStateSendingDelayMillis = mLastPingMillis.load() < game_constants::STATE_SEND_MIN_DELAY_MILLIS ? game_constants::STATE_SEND_MIN_DELAY_MILLIS : game_constants::STATE_SEND_MAX_DELAY_MILLIS;
+
     stateSendingTimer += dtMillis;
-    if (stateSendingTimer > game_constants::STATE_SEND_DELAY_MILLIS)
+    if (stateSendingTimer > mStateSendingDelayMillis)
     {
-        stateSendingTimer -= game_constants::STATE_SEND_DELAY_MILLIS;
+        stateSendingTimer -= mStateSendingDelayMillis;
         
         std::lock_guard<std::mutex> worldLockGuard(sWorldMutex);
-        auto playerIter = std::find_if(mPlayerData.begin(), mPlayerData.end(), [&](networking::PlayerData& playerData){ return playerData.isLocal; });
+        auto localPlayerFoundIter = std::find_if(mWorldObjectData.begin(), mWorldObjectData.end(), [&](networking::WorldObjectData& worldObjectEntry){ return worldObjectEntry.objectType == networking::OBJ_TYPE_PLAYER && worldObjectEntry.isLocal; });
         
         // Local player is not found in local world data.
         // Send an empty state just to request other world entities
-        if (playerIter == mPlayerData.end())
+        if (localPlayerFoundIter == mWorldObjectData.end())
         {
             SendNetworkMessage(nlohmann::json(), networking::MessageType::CS_PLAYER_STATE, false);
         }
         // Local player found in world data. Send its updated state
         else
         {
-            auto& playerData = *playerIter;
-            SendNetworkMessage(playerData.SerializeToJson(), networking::MessageType::CS_PLAYER_STATE, false);
+            SendNetworkMessage(localPlayerFoundIter->SerializeToJson(), networking::MessageType::CS_PLAYER_STATE, false);
         }
         
     }
@@ -334,7 +386,7 @@ void Game::OnServerResponse(const std::string& response)
     if (nlohmann::json::accept(response))
     {
         auto responseJson = nlohmann::json::parse(response);
-        //logging::Log(logging::LogType::INFO, worldStateJson.dump(4).c_str());
+        //logging::Log(logging::LogType::INFO, responseJson.dump(4).c_str());
         
         if (networking::IsMessageOfType(responseJson, networking::MessageType::SC_PLAYER_STATE_RESPONSE))
         {
@@ -343,6 +395,9 @@ void Game::OnServerResponse(const std::string& response)
         else if (networking::IsMessageOfType(responseJson, networking::MessageType::SC_REQUEST_LOGIN_RESPONSE))
         {
             OnServerLoginResponse(responseJson);
+        }
+        else if (networking::IsMessageOfType(responseJson, networking::MessageType::SC_THROW_RANGED_WEAPON_RESPONSE))
+        {
         }
         else
         {
@@ -360,50 +415,54 @@ void Game::OnServerPlayerStateResponse(const nlohmann::json& responseJson)
 {
     std::lock_guard<std::mutex> worldLockGuard(sWorldMutex);
     
-    // Invalidate all local player data
-    for (auto& playerData: mPlayerData)
+    // Invalidate all local world object data
+    for (auto& worldObjectData: mWorldObjectData)
     {
-        playerData.invalidated = true;
+        worldObjectData.invalidated = true;
     }
     
-    // Parse and update local player data validating them
-    for (const auto& playerJson: responseJson[networking::PlayerData::ObjectCollectionHeader()])
+    // Parse and update local world object data validating them
+    for (const auto& worldObjectJson: responseJson[networking::WorldObjectData::ObjectCollectionHeader()])
     {
-        networking::PlayerData remotePlayerData;
-        remotePlayerData.DeserializeFromJson(playerJson);
+        networking::WorldObjectData remoteWorldObjectData;
+        remoteWorldObjectData.DeserializeFromJson(worldObjectJson);
         
-        auto playerIter = std::find_if(mPlayerData.begin(), mPlayerData.end(), [&](networking::PlayerData& playerData){ return playerData.playerName == remotePlayerData.playerName; });
-        if (playerIter == mPlayerData.end())
+        auto worldObjectIter = std::find_if(mWorldObjectData.begin(), mWorldObjectData.end(), [&](networking::WorldObjectData& worldObjectData)
         {
-            std::lock_guard<std::mutex> pendingObjectDataToCreateGuard(sPendingObjectDataToCreateMutex);
-            mPendingPlayerDataToCreate.push_back(remotePlayerData);
+            return worldObjectData.objectId == remoteWorldObjectData.objectId;
+        });
+        
+        if (worldObjectIter == mWorldObjectData.end())
+        {
+            mPendingWorldObjectDataToCreate.push_back(remoteWorldObjectData);
         }
         else
         {
-            auto& playerData = *playerIter;
+            auto& worldObjectData = *worldObjectIter;
             
             // Local position is not updated (for now)
-            if (!remotePlayerData.isLocal)
+            if (worldObjectData.objectType != networking::OBJ_TYPE_PLAYER || !worldObjectData.isLocal)
             {
-                playerData.playerPosition = remotePlayerData.playerPosition;
-                playerData.playerVelocity = remotePlayerData.playerVelocity;
+                worldObjectData.objectPosition = remoteWorldObjectData.objectPosition;
+                worldObjectData.objectVelocity = remoteWorldObjectData.objectVelocity;
             }
             
-            playerData.invalidated = false;
+            worldObjectData.invalidated = false;
         }
     }
     
     // Clean up all player data entries that the server does not know of (anymore)
-    for (auto iter = mPlayerData.begin(); iter != mPlayerData.end();)
+    for (auto worldObjectIter = mWorldObjectData.begin(); worldObjectIter != mWorldObjectData.end();)
     {
-        if (iter->invalidated)
+        auto& worldObjectData = *worldObjectIter;
+        if (worldObjectData.invalidated)
         {
-            playerNamesToCleanup.push_back(iter->playerName);
-            iter = mPlayerData.erase(iter);
+            mWorldObjectIDsToCleanup.push_back(strutils::StringId(worldObjectData.objectId));
+            worldObjectIter = mWorldObjectData.erase(worldObjectIter);
         }
         else
         {
-            iter++;
+            worldObjectIter++;
         }
     }
 }
@@ -417,8 +476,8 @@ void Game::OnServerLoginResponse(const nlohmann::json& responseJson)
     
     if (loginResponse.allowed)
     {
-        std::lock_guard<std::mutex> pendingObjectDataToCreateGuard(sPendingObjectDataToCreateMutex);
-        mPendingPlayerDataToCreate.emplace_back(networking::PlayerData{loginResponse.playerName, loginResponse.playerPosition, {}, loginResponse.color, true, false });
+        std::lock_guard<std::mutex> worldLockGuard(sWorldMutex);
+        mPendingWorldObjectDataToCreate.emplace_back(networking::WorldObjectData{ loginResponse.playerId, 0, loginResponse.playerName, loginResponse.playerPosition, {}, loginResponse.color, networking::OBJ_TYPE_PLAYER, true, false });
     }
 }
 

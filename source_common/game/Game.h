@@ -38,7 +38,7 @@ public:
     
 private:
     void SendNetworkMessage(const nlohmann::json& message, const networking::MessageType messageType, const bool highPriority);
-    void CreatePlayerWorldObject(const networking::PlayerData& playerData);
+    void CreateWorldObject(const networking::WorldObjectData& worldObjectData);
     void InterpolateLocalWorld(const float dtMillis);
     void CheckForStateSending(const float dtMillis);
     void OnServerResponse(const std::string& response);
@@ -49,9 +49,10 @@ private:
 private:
     std::atomic<int> mLastPingMillis = 0;
     std::unique_ptr<AnimatedButton> mPlayButton;
-    std::vector<networking::PlayerData> mPlayerData;
-    std::vector<strutils::StringId> playerNamesToCleanup;
-    std::vector<networking::PlayerData> mPendingPlayerDataToCreate;
+    std::vector<int> mWorldObjectIDsToCleanup;
+    std::vector<networking::WorldObjectData> mWorldObjectData;
+    std::vector<networking::WorldObjectData> mPendingWorldObjectDataToCreate;
+    float mStateSendingDelayMillis;
 };
 
 ///------------------------------------------------------------------------------------------------

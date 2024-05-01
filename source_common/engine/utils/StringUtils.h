@@ -261,6 +261,12 @@ public:
     {
     }
     
+    explicit StringId(const long long l)
+    : mString(std::to_string(l))
+    , mStringId(static_cast<uint32_t>(l))
+    {
+    }
+    
     operator uint32_t () { return mStringId; }
     bool operator < (const StringId& rhs) { return mStringId < rhs.GetStringId(); }
     
