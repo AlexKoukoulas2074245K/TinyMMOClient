@@ -34,18 +34,18 @@ namespace resources
 ///------------------------------------------------------------------------------------------------
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
-    std::string ResourceLoadingService::RES_ROOT = "../../assets/";
+std::string ResourceLoadingService::RES_ROOT = "../../assets/";
 #elif __APPLE__
-    #include <TargetConditionals.h>
-    #if TARGET_IPHONE_SIMULATOR
-        std::string ResourceLoadingService::RES_ROOT = "assets/";
-    #elif TARGET_OS_IPHONE
-        std::string ResourceLoadingService::RES_ROOT = "assets/";
-    #else
-        std::string ResourceLoadingService::RES_ROOT = "";
-    #endif
+#include <TargetConditionals.h>
+#if TARGET_IPHONE_SIMULATOR
+std::string ResourceLoadingService::RES_ROOT = "assets/";
+#elif TARGET_OS_IPHONE
+std::string ResourceLoadingService::RES_ROOT = "assets/";
 #else
-    std::string ResourceLoadingService::RES_ROOT = "";
+std::string ResourceLoadingService::RES_ROOT = "";
+#endif
+#else
+std::string ResourceLoadingService::RES_ROOT = "";
 #endif
 
 std::string ResourceLoadingService::RES_DATA_ROOT          = RES_ROOT + "data/";
@@ -66,9 +66,9 @@ class LoadingJob
 {
 public:
     LoadingJob(const IResourceLoader* loader, const std::string& resourcePath, const ResourceId targetResourceId)
-        : mLoader(loader)
-        , mResourcePath(resourcePath)
-        , mTargetResourceId(targetResourceId)
+    : mLoader(loader)
+    , mResourcePath(resourcePath)
+    , mTargetResourceId(targetResourceId)
     {
     }
     
@@ -81,10 +81,10 @@ class JobResult
 {
 public:
     JobResult(std::shared_ptr<IResource> resource, const IResourceLoader* loader, const std::string& resourcePath, const ResourceId targetResourceId)
-        : mResource(std::move(resource))
-        , mLoader(loader)
-        , mResourcePath(resourcePath)
-        , mTargetResourceId(targetResourceId)
+    : mResource(std::move(resource))
+    , mLoader(loader)
+    , mResourcePath(resourcePath)
+    , mTargetResourceId(targetResourceId)
     {
     }
     
@@ -101,7 +101,7 @@ public:
     void StartWorker()
     {
         mThread = std::thread([&]
-        {
+                              {
             while(true)
             {
                 using namespace std::chrono_literals;
@@ -198,7 +198,7 @@ void ResourceLoadingService::Update()
     {
         auto finishedJob = mAsyncLoaderWorker->mResults.dequeue();
         mResourceMap[finishedJob.mTargetResourceId] = finishedJob.mResource;
- 
+        
         if (dynamic_cast<const ImageSurfaceLoader*>(finishedJob.mLoader))
         {
             mResourceMap[finishedJob.mTargetResourceId] = mResourceLoaders.back()->VCreateAndLoadResource(finishedJob.mResourcePath);
@@ -225,7 +225,7 @@ void ResourceLoadingService::SetAsyncLoading(const bool asyncLoading)
 ///------------------------------------------------------------------------------------------------
 
 ResourceId ResourceLoadingService::GetResourceIdFromPath(const std::string& path, const bool isDynamicallyGenerated)
-{    
+{
     return strutils::GetStringHash(isDynamicallyGenerated ? path : AdjustResourcePath(path));
 }
 
@@ -388,6 +388,7 @@ void ResourceLoadingService::LoadResourceInternal(const std::string& resourcePat
 {
     // Get resource extension
     const auto resourceFileExtension = fileutils::GetFileExtension(resourcePath);
+    const auto resourceFileName = fileutils::GetFileName(resourcePath);
     
     // Pick appropriate loader
     strutils::StringId fileExtension(fileutils::GetFileExtension(resourcePath));
@@ -409,7 +410,7 @@ void ResourceLoadingService::LoadResourceInternal(const std::string& resourcePat
             
             // Images are loaded in 2 steps so that we can separate the file I/O and GL part
             // for async loading
-            if (dynamic_cast<ImageSurfaceLoader*>(selectedLoader))
+            if (dynamic_cast<ImageSurfaceLoader*>(selectedLoader) && !IsNavmapImage(resourceFileName))
             {
                 loadedResource = mResourceLoaders.back()->VCreateAndLoadResource(RES_ROOT + resourcePath);
                 mResourceMap[resourceId] = std::move(loadedResource);
@@ -429,12 +430,14 @@ void ResourceLoadingService::LoadResourceInternal(const std::string& resourcePat
 
 std::string ResourceLoadingService::AdjustResourcePath(const std::string& resourcePath) const
 {
-//    if (strutils::StringStartsWith(resourcePath, objectiveC_utils::GetLocalFileSaveLocation()))
-//    {
-//        return resourcePath;
-//    }
-//
     return !strutils::StringStartsWith(resourcePath, RES_ROOT) ? resourcePath : resourcePath.substr(RES_ROOT.size(), resourcePath.size() - RES_ROOT.size());
+}
+
+///------------------------------------------------------------------------------------------------
+
+bool ResourceLoadingService::IsNavmapImage(const std::string& fileName) const
+{
+    return strutils::StringEndsWith(fileName, "_navmap.png");
 }
 
 ///------------------------------------------------------------------------------------------------

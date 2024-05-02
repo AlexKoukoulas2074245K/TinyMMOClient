@@ -21,6 +21,10 @@
 
 ///------------------------------------------------------------------------------------------------
 
+namespace scene
+{
+    class SceneObject;
+}
 
 class AnimatedButton;
 class Game final
@@ -37,10 +41,13 @@ public:
     void CreateDebugWidgets();
     
 private:
-    void SendNetworkMessage(const nlohmann::json& message, const networking::MessageType messageType, const bool highPriority);
-    void CreateWorldObject(const networking::WorldObjectData& worldObjectData);
+    void UpdateGUI(const float dtMillis);
+    void CheckForPendingWorldObjectsToBeCreated();
     void InterpolateLocalWorld(const float dtMillis);
     void CheckForStateSending(const float dtMillis);
+    void UpdateCamera(const float dtMillis);
+    void SendNetworkMessage(const nlohmann::json& message, const networking::MessageType messageType, const bool highPriority);
+    void CreateWorldObject(const networking::WorldObjectData& worldObjectData);
     void OnServerResponse(const std::string& response);
     void OnServerPlayerStateResponse(const nlohmann::json& responseJson);
     void OnServerLoginResponse(const nlohmann::json& responseJson);
@@ -49,6 +56,7 @@ private:
 private:
     std::atomic<int> mLastPingMillis = 0;
     std::unique_ptr<AnimatedButton> mPlayButton;
+    std::shared_ptr<scene::SceneObject> mLocalPlayerSceneObject;
     std::vector<int> mWorldObjectIDsToCleanup;
     std::vector<networking::WorldObjectData> mWorldObjectData;
     std::vector<networking::WorldObjectData> mPendingWorldObjectDataToCreate;

@@ -13,6 +13,7 @@
 #include <engine/rendering/Fonts.h>
 #include <engine/rendering/ParticleManager.h>
 #include <engine/resloading/ResourceLoadingService.h>
+#include <engine/resloading/ImageSurfaceResource.h>
 #include <engine/scene/SceneManager.h>
 #include <engine/scene/Scene.h>
 #include <engine/scene/SceneObject.h>
@@ -52,6 +53,16 @@ static std::mutex sWorldMutex;
 
 ///------------------------------------------------------------------------------------------------
 
+static glm::vec3 GetRGBAt(SDL_Surface* surface, const int x, const int y)
+{
+    Uint8 r,g,b;
+    auto pixel = *(Uint32*)((Uint8*)surface->pixels + y * surface->pitch + x * surface->format->BytesPerPixel);
+    SDL_GetRGB(pixel, surface->format, &r, &g, &b);
+    return glm::vec3(r/255.0f, g/255.0f, b/255.0f);
+}
+
+///------------------------------------------------------------------------------------------------
+
 Game::Game(const int argc, char** argv)
     : mStateSendingDelayMillis(game_constants::STATE_SEND_MAX_DELAY_MILLIS)
 {
@@ -72,6 +83,7 @@ Game::Game(const int argc, char** argv)
 Game::~Game(){}
 
 ///------------------------------------------------------------------------------------------------
+SDL_Surface* sNavmapSurface = nullptr;
 
 void Game::Init()
 {
@@ -84,8 +96,13 @@ void Game::Init()
     
     auto background = scene->CreateSceneObject(strutils::StringId("forest"));
     background->mPosition.z = 0.0f;
+    background->mScale *= 2.0f;
     background->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "world/japanese_forest.png");
         
+    auto navmapResourceID = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "world/japanese_forest_navmap.png");
+    sNavmapSurface = systemsEngine.GetResourceLoadingService().GetResource<resources::ImageSurfaceResource>(navmapResourceID).GetSurface();
+    
+    mLocalPlayerSceneObject = nullptr;
     mPlayButton = std::make_unique<AnimatedButton>(glm::vec3(-0.057f, 0.038f, 1.0f), glm::vec3(0.001f, 0.001f, 0.001f), game_constants::DEFAULT_FONT_NAME, "Play", PLAY_BUTTON_NAME, [&](){ OnPlayButtonPressed(); }, *scene);
     mPlayButton->GetSceneObject()->mShaderFloatUniformValues[strutils::StringId("custom_alpha")] = 1.0f;
 }
@@ -94,25 +111,23 @@ void Game::Init()
 
 void Game::Update(const float dtMillis)
 {
-    if (mPlayButton) 
-    {
-        mPlayButton->Update(dtMillis);
-    }
-    
-    // Pending world object creation
-    {
-        std::lock_guard<std::mutex> worldGuard(sWorldMutex);
-
-        for (auto worldObjectData: mPendingWorldObjectDataToCreate)
-        {
-            worldObjectData.invalidated = false;
-            CreateWorldObject(worldObjectData);
-        }
-        mPendingWorldObjectDataToCreate.clear();
-    }
-    
+    UpdateGUI(dtMillis);
+    CheckForPendingWorldObjectsToBeCreated();
     InterpolateLocalWorld(dtMillis);
     CheckForStateSending(dtMillis);
+    UpdateCamera(dtMillis);
+}
+
+///------------------------------------------------------------------------------------------------
+
+void Game::UpdateCamera(const float dtMillis)
+{
+    if (mLocalPlayerSceneObject)
+    {
+        auto& systemsEngine = CoreSystemsEngine::GetInstance();
+        auto scene = systemsEngine.GetSceneManager().FindScene(strutils::StringId("world"));
+        scene->GetCamera().SetPosition(glm::vec3(mLocalPlayerSceneObject->mPosition.x, mLocalPlayerSceneObject->mPosition.y, scene->GetCamera().GetPosition().z));
+    }
 }
 
 ///------------------------------------------------------------------------------------------------
@@ -160,74 +175,27 @@ void Game::CreateDebugWidgets()
 
 ///------------------------------------------------------------------------------------------------
 
-void Game::SendNetworkMessage(const nlohmann::json& message, const networking::MessageType messageType, const bool highPriority)
+void Game::UpdateGUI(const float dtMillis)
 {
-#if defined(MACOS) || defined(MOBILE_FLOW)
-    apple_utils::SendNetworkMessage(message, messageType, highPriority, [&](const apple_utils::ServerResponseData& responseData)
+    if (mPlayButton)
     {
-        if (!responseData.mError.empty())
-        {
-            logging::Log(logging::LogType::ERROR, responseData.mError.c_str());
-        }
-        else
-        {
-            mLastPingMillis = static_cast<int>(responseData.mPingMillis);
-            OnServerResponse(responseData.mResponse);
-        }
-    });
-#endif
+        mPlayButton->Update(dtMillis);
+    }
 }
 
 ///------------------------------------------------------------------------------------------------
 
-void Game::CreateWorldObject(const networking::WorldObjectData& worldObjectData)
+void Game::CheckForPendingWorldObjectsToBeCreated()
 {
-    auto& systemsEngine = CoreSystemsEngine::GetInstance();
-    auto scene = systemsEngine.GetSceneManager().FindScene(strutils::StringId("world"));
-    
-    switch (worldObjectData.objectType)
+    // Pending world object creation
+    std::lock_guard<std::mutex> worldGuard(sWorldMutex);
+
+    for (auto worldObjectData: mPendingWorldObjectDataToCreate)
     {
-        case networking::OBJ_TYPE_PLAYER:
-        {
-            auto ninja = scene->CreateSceneObject(strutils::StringId(worldObjectData.objectId));
-            ninja->mPosition = worldObjectData.objectPosition;
-            ninja->mScale /= 10.0f;
-            ninja->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + "portrait.vs");
-            ninja->mTextureResourceId =  systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "world/portrait.png");
-            ninja->mShaderFloatUniformValues[strutils::StringId("portrait_value")] = worldObjectData.color;
-            
-            auto ninjaName = scene->CreateSceneObject(strutils::StringId(std::to_string(worldObjectData.objectId) + "_name"));
-            scene::TextSceneObjectData textSceneObjectData;
-            textSceneObjectData.mFontName = game_constants::DEFAULT_FONT_NAME;
-            textSceneObjectData.mText = worldObjectData.objectName.GetString();
-            
-            ninjaName->mScale /= 3000.0f;
-            ninjaName->mPosition = ninja->mPosition;
-            ninjaName->mSceneObjectTypeData = std::move(textSceneObjectData);
-            ninjaName->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + "portrait.vs");
-            ninjaName->mShaderFloatUniformValues[strutils::StringId("portrait_value")] = worldObjectData.color;
-            
-            auto boundingRect = scene_object_utils::GetSceneObjectBoundingRect(*ninjaName);
-            auto textLength = boundingRect.topRight.x - boundingRect.bottomLeft.x;
-            ninjaName->mPosition += game_constants::PLAYER_NAMEPLATE_OFFSET;
-            ninjaName->mPosition.x -= textLength/2.0f;
-        } break;
-            
-        case networking::OBJ_TYPE_NPC_SHURIKEN:
-        {
-            auto worldObject = scene->CreateSceneObject(strutils::StringId(worldObjectData.objectId));
-            worldObject->mPosition = worldObjectData.objectPosition;
-            worldObject->mScale /= 30.0f;
-            worldObject->mTextureResourceId =  systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "world/shuriken.png");
-        } break;
-            
-        default:
-        {
-            assert(false);
-        } break;
+        worldObjectData.invalidated = false;
+        CreateWorldObject(worldObjectData);
     }
-    
-    mWorldObjectData.emplace_back(worldObjectData);
+    mPendingWorldObjectDataToCreate.clear();
 }
 
 ///------------------------------------------------------------------------------------------------
@@ -302,6 +270,11 @@ void Game::InterpolateLocalWorld(const float dtMillis)
                     if (length > 0.0f)
                     {
                         objectData.objectVelocity = glm::normalize(impulseVector) * PLAYER_SPEED * dtMillis;
+                        
+                        auto navmapCoords = glm::ivec2(static_cast<int>((objectData.objectPosition.x/2.0f + 0.5f) * sNavmapSurface->w), static_cast<int>((1.0f - (objectData.objectPosition.y/2.0f + 0.5f)) * sNavmapSurface->h));
+                        auto navmapColor = GetRGBAt(sNavmapSurface, navmapCoords.x, navmapCoords.y);
+                        
+                        objectData.objectVelocity *= navmapColor.r * navmapColor.r;
                         objectData.objectPosition += objectData.objectVelocity;
                         
                         playerSceneObject->mPosition += objectData.objectVelocity;
@@ -377,6 +350,83 @@ void Game::CheckForStateSending(const float dtMillis)
         }
         
     }
+}
+
+///------------------------------------------------------------------------------------------------
+
+void Game::SendNetworkMessage(const nlohmann::json& message, const networking::MessageType messageType, const bool highPriority)
+{
+#if defined(MACOS) || defined(MOBILE_FLOW)
+    apple_utils::SendNetworkMessage(message, messageType, highPriority, [&](const apple_utils::ServerResponseData& responseData)
+    {
+        if (!responseData.mError.empty())
+        {
+            logging::Log(logging::LogType::ERROR, responseData.mError.c_str());
+        }
+        else
+        {
+            mLastPingMillis = static_cast<int>(responseData.mPingMillis);
+            OnServerResponse(responseData.mResponse);
+        }
+    });
+#endif
+}
+
+///------------------------------------------------------------------------------------------------
+
+void Game::CreateWorldObject(const networking::WorldObjectData& worldObjectData)
+{
+    auto& systemsEngine = CoreSystemsEngine::GetInstance();
+    auto scene = systemsEngine.GetSceneManager().FindScene(strutils::StringId("world"));
+    
+    switch (worldObjectData.objectType)
+    {
+        case networking::OBJ_TYPE_PLAYER:
+        {
+            auto ninja = scene->CreateSceneObject(strutils::StringId(worldObjectData.objectId));
+            ninja->mPosition = worldObjectData.objectPosition;
+            ninja->mScale /= 10.0f;
+            ninja->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + "portrait.vs");
+            ninja->mTextureResourceId =  systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "world/portrait.png");
+            ninja->mShaderFloatUniformValues[strutils::StringId("portrait_value")] = worldObjectData.color;
+            
+            auto ninjaName = scene->CreateSceneObject(strutils::StringId(std::to_string(worldObjectData.objectId) + "_name"));
+            scene::TextSceneObjectData textSceneObjectData;
+            textSceneObjectData.mFontName = game_constants::DEFAULT_FONT_NAME;
+            textSceneObjectData.mText = worldObjectData.objectName.GetString();
+            
+            ninjaName->mScale /= 3000.0f;
+            ninjaName->mPosition = ninja->mPosition;
+            ninjaName->mSceneObjectTypeData = std::move(textSceneObjectData);
+            ninjaName->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + "portrait.vs");
+            ninjaName->mShaderFloatUniformValues[strutils::StringId("portrait_value")] = worldObjectData.color;
+            
+            auto boundingRect = scene_object_utils::GetSceneObjectBoundingRect(*ninjaName);
+            auto textLength = boundingRect.topRight.x - boundingRect.bottomLeft.x;
+            ninjaName->mPosition += game_constants::PLAYER_NAMEPLATE_OFFSET;
+            ninjaName->mPosition.x -= textLength/2.0f;
+            
+            if (worldObjectData.isLocal)
+            {
+                mLocalPlayerSceneObject = ninja;
+            }
+        } break;
+            
+        case networking::OBJ_TYPE_NPC_SHURIKEN:
+        {
+            auto worldObject = scene->CreateSceneObject(strutils::StringId(worldObjectData.objectId));
+            worldObject->mPosition = worldObjectData.objectPosition;
+            worldObject->mScale /= 30.0f;
+            worldObject->mTextureResourceId =  systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "world/shuriken.png");
+        } break;
+            
+        default:
+        {
+            assert(false);
+        } break;
+    }
+    
+    mWorldObjectData.emplace_back(worldObjectData);
 }
 
 ///------------------------------------------------------------------------------------------------

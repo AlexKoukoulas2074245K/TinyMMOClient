@@ -203,6 +203,9 @@ private:
     // Strips the leading RES_ROOT from the resourcePath given, if present
     std::string AdjustResourcePath(const std::string& resourcePath) const;
     
+    // Returns whether the file name implies a navmap image that doesn't need to be GL Texture-Loaded.
+    bool IsNavmapImage(const std::string& fileName) const;
+    
 private:
     class AsyncLoaderWorker;
     
