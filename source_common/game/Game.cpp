@@ -306,6 +306,7 @@ void Game::InterpolateLocalWorld(const float dtMillis)
                 }
             } break;
                  
+            case networking::OBJ_TYPE_NPC_ENEMY:
             case networking::OBJ_TYPE_NPC_SHURIKEN:
             {
                 auto npcSceneObject = scene->FindSceneObject(strutils::StringId(objectData.objectId));
@@ -410,6 +411,14 @@ void Game::CreateWorldObject(const networking::WorldObjectData& worldObjectData)
             {
                 mLocalPlayerSceneObject = ninja;
             }
+        } break;
+          
+        case networking::OBJ_TYPE_NPC_ENEMY:
+        {
+            auto worldObject = scene->CreateSceneObject(strutils::StringId(worldObjectData.objectId));
+            worldObject->mPosition = worldObjectData.objectPosition;
+            worldObject->mScale /= 13.0f;
+            worldObject->mTextureResourceId =  systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "world/portrait_enemy.png");
         } break;
             
         case networking::OBJ_TYPE_NPC_SHURIKEN:
