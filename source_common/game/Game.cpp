@@ -50,6 +50,7 @@
 static const strutils::StringId MAIN_MENU_SCENE = strutils::StringId("main_menu_scene");
 static const strutils::StringId PLAY_BUTTON_NAME = strutils::StringId("play_button");
 static float PLAYER_SPEED = 0.0002f;
+static const float ENEMY_SPEED = 0.0002f;
 static std::mutex sWorldMutex;
 
 ///------------------------------------------------------------------------------------------------
@@ -165,6 +166,43 @@ void Game::CreateDebugWidgets()
     if (ImGui::SliderFloat("Player Speed Multiplier", &sPlayerSpeedMultiplier, 0.1f, 3.0f))
     {
         PLAYER_SPEED = 0.0002f * sPlayerSpeedMultiplier;
+    }
+    ImGui::End();
+    
+    
+    ImGui::Begin("Enemy NPC Data", nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
+    std::lock_guard<std::mutex> worldGuard(sWorldMutex);
+    
+    for (auto& objectData: mWorldObjectData)
+    {
+        if (objectData.objectType == networking::OBJ_TYPE_NPC_ENEMY)
+        {
+            if (ImGui::CollapsingHeader(std::to_string(objectData.objectId).c_str(), ImGuiTreeNodeFlags_None))
+            {
+                ImGui::PushID(std::to_string(objectData.objectId).c_str());
+                
+                switch (objectData.objectState)
+                {
+                    case networking::OBJ_STATE_ALIVE:
+                    {
+                        ImGui::Text("State: Alive");
+                        ImGui::Text("Speed: %.4f, %.4f", objectData.objectVelocity.x, objectData.objectVelocity.y);
+                    } break;
+                        
+                    case networking::OBJ_STATE_CHASING:
+                    {
+                        ImGui::Text("State: Chasing %llu", objectData.parentObjectId);
+                        ImGui::Text("Speed: %.4f, %.4f", objectData.objectVelocity.x, objectData.objectVelocity.y);
+                    } break;
+                        
+                    case networking::OBJ_STATE_DEAD:
+                    {
+                        ImGui::Text("State: Dead");
+                    } break;
+                }
+                ImGui::PopID();
+            }
+        }
     }
     ImGui::End();
 }
@@ -309,26 +347,38 @@ void Game::InterpolateLocalWorld(const float dtMillis)
                  
             case networking::OBJ_TYPE_NPC_ENEMY:
             {
-                auto enemySceneObject = scene->FindSceneObject(strutils::StringId(objectData.objectId));
-                auto directionToTarget = objectData.objectPosition - enemySceneObject->mPosition;
-                auto distanceToTarget = glm::length(directionToTarget);
-                
-                if (distanceToTarget <= 0.0f || distanceToTarget < glm::length(glm::normalize(directionToTarget) * PLAYER_SPEED * dtMillis))
+                auto npcSceneObject = scene->FindSceneObject(strutils::StringId(objectData.objectId));
+                if (objectData.objectState == networking::OBJ_STATE_ALIVE)
                 {
-                    enemySceneObject->mPosition = objectData.objectPosition;
+                    npcSceneObject->mPosition = objectData.objectPosition;
                 }
-                else
+                else if (objectData.objectState == networking::OBJ_STATE_CHASING)
                 {
-                    enemySceneObject->mPosition += glm::normalize(directionToTarget) * PLAYER_SPEED * dtMillis;
+                    auto playerObjectDataIter = std::find_if(mWorldObjectData.begin(), mWorldObjectData.end(), [&](const networking::WorldObjectData& otherObjectData){ return otherObjectData.objectId == objectData.parentObjectId; });
+                    if (playerObjectDataIter != mWorldObjectData.end() && playerObjectDataIter->objectState == networking::OBJ_STATE_ALIVE)
+                    {
+                        auto& playerObjectData = *playerObjectDataIter;
+                        objectData.objectVelocity = glm::normalize(playerObjectData.objectPosition - npcSceneObject->mPosition) * ENEMY_SPEED;
+                        objectData.objectVelocity.z = 0.0f;
+                        npcSceneObject->mPosition += objectData.objectVelocity * dtMillis;
+                    }
+                    else
+                    {
+                        npcSceneObject->mPosition = objectData.objectPosition;
+                    }
                 }
             } break;
-
+                
+                
             case networking::OBJ_TYPE_NPC_SHURIKEN:
             {
-                auto npcSceneObject = scene->FindSceneObject(strutils::StringId(objectData.objectId));
-                
-                objectData.objectPosition += objectData.objectVelocity * dtMillis;
-                npcSceneObject->mPosition = objectData.objectPosition;
+                if (objectData.objectState != networking::OBJ_STATE_DEAD)
+                {
+                    auto npcSceneObject = scene->FindSceneObject(strutils::StringId(objectData.objectId));
+                    
+                    objectData.objectPosition += objectData.objectVelocity * dtMillis;
+                    npcSceneObject->mPosition = objectData.objectPosition;
+                }
             } break;
                 
             default:
@@ -522,6 +572,8 @@ void Game::OnServerPlayerStateResponse(const nlohmann::json& responseJson)
                 worldObjectData.objectVelocity = remoteWorldObjectData.objectVelocity;
             }
             
+            worldObjectData.parentObjectId = remoteWorldObjectData.parentObjectId;
+            worldObjectData.objectState = remoteWorldObjectData.objectState;
             worldObjectData.invalidated = false;
         }
     }
