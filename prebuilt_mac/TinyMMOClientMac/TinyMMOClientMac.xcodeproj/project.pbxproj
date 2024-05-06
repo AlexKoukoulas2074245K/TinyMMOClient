@@ -31,6 +31,7 @@
 		3E3B65024B721F5CCC0D71E0 /* Animations.h in Sources */ = {isa = PBXBuildFile; fileRef = 82DFED0E0B1AB607780AED60 /* Animations.h */; };
 		45963ED9A5DA3C4EB9144646 /* TextureResource.h in Sources */ = {isa = PBXBuildFile; fileRef = 989BFF482B72A00F213431FE /* TextureResource.h */; };
 		4E9ADD55CB0B5CA8962F347E /* StringUtils.h in Sources */ = {isa = PBXBuildFile; fileRef = EF61AB7D638A80B4ABD5D5B7 /* StringUtils.h */; };
+		514E39DF539500706F03EC42 /* WorldObjectStates.h in Sources */ = {isa = PBXBuildFile; fileRef = BA4AC24CD1BEEBF435E7CA14 /* WorldObjectStates.h */; };
 		5285724978640648FFD94960 /* TextureResource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93D83DB41AD868D09B2A3C94 /* TextureResource.cpp */; };
 		532521F009DF925259026C23 /* SerializationDefinitions.h in Sources */ = {isa = PBXBuildFile; fileRef = F05BCACB9D0D7193765BB311 /* SerializationDefinitions.h */; };
 		55B88F03ED55A2709BD2B704 /* SceneObjectUtils.h in Sources */ = {isa = PBXBuildFile; fileRef = FB0E9FCA60AD270C9B09FA51 /* SceneObjectUtils.h */; };
@@ -427,6 +428,7 @@
 		AD86196C948CE14DCBBE5446 /* IResourceLoader.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = IResourceLoader.h; sourceTree = "<group>"; };
 		B645F5160C1B36C70F708518 /* ImageSurfaceLoader.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = ImageSurfaceLoader.cpp; sourceTree = "<group>"; };
 		B83F90BE48846F5019309046 /* DataFileLoader.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = DataFileLoader.h; sourceTree = "<group>"; };
+		BA4AC24CD1BEEBF435E7CA14 /* WorldObjectStates.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = WorldObjectStates.h; path = WorldObjectStates.h; sourceTree = "<group>"; };
 		BB8C2E3FACC90180DAAE4F40 /* Fonts.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = Fonts.cpp; sourceTree = "<group>"; };
 		BE806858C85634D9FB14B857 /* NetworkObjectDefinitions.inc */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.pascal; path = NetworkObjectDefinitions.inc; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		CAEF02928D06B177B1091C5F /* ImageSurfaceResource.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = ImageSurfaceResource.h; sourceTree = "<group>"; };
@@ -925,6 +927,7 @@
 				83294548BB5AEF7EB30C76DC /* NetworkMessages.h */,
 				92B8A5982BE131DD006EC56F /* NetworkMessages.cpp */,
 				4230154D7A5B45B2288322EE /* WorldObjectTypes.h */,
+				BA4AC24CD1BEEBF435E7CA14 /* WorldObjectStates.h */,
 			);
 			path = net_common;
 			sourceTree = "<group>";
@@ -1281,6 +1284,7 @@
 				5E524DDE069F7535F27650B6 /* NetworkObjectDefinitions.inc in Sources */,
 				D6B3BDD48999F9AF32D62641 /* NetworkMessages.h in Sources */,
 				74069A969F34BEBE941BF781 /* WorldObjectTypes.h in Sources */,
+				514E39DF539500706F03EC42 /* WorldObjectStates.h in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

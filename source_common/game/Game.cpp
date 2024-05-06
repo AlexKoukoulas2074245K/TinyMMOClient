@@ -33,6 +33,7 @@
 #include <imgui/imgui.h>
 #include <mutex>
 #include <net_common/WorldObjectTypes.h>
+#include <net_common/WorldObjectStates.h>
 
 #if defined(MOBILE_FLOW)
 #include <platform_specific/IOSUtils.h>
@@ -307,6 +308,21 @@ void Game::InterpolateLocalWorld(const float dtMillis)
             } break;
                  
             case networking::OBJ_TYPE_NPC_ENEMY:
+            {
+                auto enemySceneObject = scene->FindSceneObject(strutils::StringId(objectData.objectId));
+                auto directionToTarget = objectData.objectPosition - enemySceneObject->mPosition;
+                auto distanceToTarget = glm::length(directionToTarget);
+                
+                if (distanceToTarget <= 0.0f || distanceToTarget < glm::length(glm::normalize(directionToTarget) * PLAYER_SPEED * dtMillis))
+                {
+                    enemySceneObject->mPosition = objectData.objectPosition;
+                }
+                else
+                {
+                    enemySceneObject->mPosition += glm::normalize(directionToTarget) * PLAYER_SPEED * dtMillis;
+                }
+            } break;
+
             case networking::OBJ_TYPE_NPC_SHURIKEN:
             {
                 auto npcSceneObject = scene->FindSceneObject(strutils::StringId(objectData.objectId));
@@ -536,7 +552,17 @@ void Game::OnServerLoginResponse(const nlohmann::json& responseJson)
     if (loginResponse.allowed)
     {
         std::lock_guard<std::mutex> worldLockGuard(sWorldMutex);
-        mPendingWorldObjectDataToCreate.emplace_back(networking::WorldObjectData{ loginResponse.playerId, 0, loginResponse.playerName, loginResponse.playerPosition, {}, loginResponse.color, networking::OBJ_TYPE_PLAYER, true, false });
+        
+        networking::WorldObjectData worldObjectData = {};
+        worldObjectData.objectId = loginResponse.playerId;
+        worldObjectData.objectName = loginResponse.playerName;
+        worldObjectData.objectPosition = loginResponse.playerPosition;
+        worldObjectData.color = loginResponse.color;
+        worldObjectData.objectType = networking::OBJ_TYPE_PLAYER;
+        worldObjectData.objectState = networking::OBJ_STATE_ALIVE;
+        worldObjectData.isLocal = true;
+        worldObjectData.invalidated = false;
+        mPendingWorldObjectDataToCreate.push_back(worldObjectData);
     }
 }
 
