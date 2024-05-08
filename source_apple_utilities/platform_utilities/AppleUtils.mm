@@ -428,7 +428,7 @@ void RequestReview()
 ///-----------------------------------------------------------------------------------------------
 
 static bool canSendNetworkMessage = true;
-void SendNetworkMessage(const nlohmann::json& networkMessage, const networking::MessageType messageType, const bool highPriority, std::function<void(const ServerResponseData&)> serverResponseCallback)
+void SendNetworkMessage(const nlohmann::json& networkMessage, const networking::MessageType messageType, const bool highPriority, std::function<void(const networking::ServerResponseData&)> serverResponseCallback)
 {
     if (!canSendNetworkMessage && !highPriority)
     {
@@ -441,7 +441,7 @@ void SendNetworkMessage(const nlohmann::json& networkMessage, const networking::
     canSendNetworkMessage = false;
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        ServerResponseData responseData = {};
+        networking::ServerResponseData responseData = {};
         int clientSocket;
         struct sockaddr_in serverAddr;
         
@@ -463,8 +463,8 @@ void SendNetworkMessage(const nlohmann::json& networkMessage, const networking::
         // Specify server address
         serverAddr.sin_family = AF_INET;
         serverAddr.sin_port = htons(8070); // Use the same port as the server
-        serverAddr.sin_addr.s_addr = inet_addr("178.16.131.241");
-        //serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+        //serverAddr.sin_addr.s_addr = inet_addr("178.16.131.241");
+        serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
         
         // Connect to server
         if (connect(clientSocket, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) == -1)

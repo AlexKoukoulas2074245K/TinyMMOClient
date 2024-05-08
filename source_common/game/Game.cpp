@@ -424,7 +424,7 @@ void Game::CheckForStateSending(const float dtMillis)
 void Game::SendNetworkMessage(const nlohmann::json& message, const networking::MessageType messageType, const bool highPriority)
 {
 #if defined(MACOS) || defined(MOBILE_FLOW)
-    apple_utils::SendNetworkMessage(message, messageType, highPriority, [&](const apple_utils::ServerResponseData& responseData)
+    apple_utils::SendNetworkMessage(message, messageType, highPriority, [&](const networking::ServerResponseData& responseData)
     {
         if (!responseData.mError.empty())
         {
