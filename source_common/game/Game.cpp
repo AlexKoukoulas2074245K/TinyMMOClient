@@ -122,7 +122,7 @@ void Game::Update(const float dtMillis)
 
 ///------------------------------------------------------------------------------------------------
 
-void Game::UpdateCamera(const float dtMillis)
+void Game::UpdateCamera(const float)
 {
     if (mLocalPlayerSceneObject)
     {
@@ -425,6 +425,19 @@ void Game::SendNetworkMessage(const nlohmann::json& message, const networking::M
 {
 #if defined(MACOS) || defined(MOBILE_FLOW)
     apple_utils::SendNetworkMessage(message, messageType, highPriority, [&](const apple_utils::ServerResponseData& responseData)
+    {
+        if (!responseData.mError.empty())
+        {
+            logging::Log(logging::LogType::ERROR, responseData.mError.c_str());
+        }
+        else
+        {
+            mLastPingMillis = static_cast<int>(responseData.mPingMillis);
+            OnServerResponse(responseData.mResponse);
+        }
+    });
+#elif defined(WINDOWS)
+    windows_utils::SendNetworkMessage(message, messageType, highPriority, [&](const networking::ServerResponseData& responseData)
     {
         if (!responseData.mError.empty())
         {

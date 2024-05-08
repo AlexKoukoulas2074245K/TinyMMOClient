@@ -23,7 +23,7 @@
 
 namespace scene
 {
-    class SceneObject;
+    struct SceneObject;
 }
 
 class AnimatedButton;

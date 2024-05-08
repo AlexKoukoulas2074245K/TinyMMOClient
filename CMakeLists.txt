@@ -43,6 +43,7 @@ endif()
 
 # Add common includes
 include_directories(source_common)
+include_directories(source_net_common)
 include_directories(${PLATFORM_DIRECTORY})
 include_directories(${PLATFORM_UTILITIES_DIRECTORY})
 include_directories(${SDL2_INCLUDE_DIRS} ${SDL2main_INCLUDE_DIRS})
@@ -65,6 +66,7 @@ endif()
 add_subdirectory(${PLATFORM_DIRECTORY})
 add_subdirectory(${PLATFORM_UTILITIES_DIRECTORY})
 add_subdirectory(source_common)
+add_subdirectory(source_net_common)
 add_subdirectory(lib/googletest)
 add_subdirectory(source_test)
 
@@ -73,15 +75,18 @@ if(WIN32)
   target_compile_definitions(${PROJECT_NAME} PRIVATE USE_IMGUI=1)
   target_compile_definitions(${PROJECT_NAME}_platform_utilities PRIVATE USE_IMGUI=1)
   target_compile_definitions(${PROJECT_NAME}_platform PRIVATE USE_IMGUI=1)
+  target_compile_definitions(${PROJECT_NAME}_net_common PRIVATE USE_IMGUI=1)
   target_compile_options(${PROJECT_NAME} PRIVATE /W4)
   target_compile_options(${PROJECT_NAME}_platform PRIVATE /W4)
   target_compile_options(${PROJECT_NAME}_platform_utilities PRIVATE /W4)
+  target_compile_options(${PROJECT_NAME}_net_common PRIVATE /W4)
   target_compile_options(${PROJECT_NAME}_test PRIVATE /W4)
   set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
 else()
   target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic -Werror)
   target_compile_options(${PROJECT_NAME}_platform PRIVATE -Wall -Wextra -pedantic -Werror)
   target_compile_options(${PROJECT_NAME}_platform_utilities PRIVATE -Wall -Wextra -pedantic -Werror)
+  target_compile_options(${PROJECT_NAME}_net_common PRIVATE -Wall -Wextra -pedantic -Werror)
   target_compile_options(${PROJECT_NAME}_test PRIVATE -Wall -Wextra -pedantic -Werror)
 endif()
 
@@ -89,6 +94,6 @@ endif()
 set_target_properties(gmock gmock_main gtest gtest_main TinyMMOClient_lib PROPERTIES FOLDER HiddenTargets)
 
 # Put these targets in the 'ProjectTargets' folder in the IDE.
-set_target_properties(TinyMMOClient TinyMMOClient_platform TinyMMOClient_test TinyMMOClient_platform_utilities PROPERTIES FOLDER ProjectTargets)
+set_target_properties(TinyMMOClient TinyMMOClient_platform TinyMMOClient_test TinyMMOClient_platform_utilities TinyMMOClient_net_common PROPERTIES FOLDER ProjectTargets)
 
 
