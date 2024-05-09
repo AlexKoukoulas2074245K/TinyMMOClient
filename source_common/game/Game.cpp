@@ -29,6 +29,7 @@
 #include <game/AnimatedButton.h>
 #include <game/Game.h>
 #include <game/events/EventSystem.h>
+#include <game/PlayerController.h>
 #include <game/utils/NameGenerator.h>
 #include <imgui/imgui.h>
 #include <mutex>
@@ -49,13 +50,12 @@
 
 static const strutils::StringId MAIN_MENU_SCENE = strutils::StringId("main_menu_scene");
 static const strutils::StringId PLAY_BUTTON_NAME = strutils::StringId("play_button");
-static float PLAYER_SPEED = 0.0002f;
 static const float ENEMY_SPEED = 0.0002f;
 static std::mutex sWorldMutex;
 
 ///------------------------------------------------------------------------------------------------
 
-static glm::vec3 GetRGBAt(SDL_Surface* surface, const int x, const int y)
+glm::vec3 GetRGBAt(SDL_Surface* surface, const int x, const int y)
 {
     Uint8 r,g,b;
     auto pixel = *(Uint32*)((Uint8*)surface->pixels + y * surface->pitch + x * surface->format->BytesPerPixel);
@@ -107,6 +107,14 @@ void Game::Init()
     mLocalPlayerSceneObject = nullptr;
     mPlayButton = std::make_unique<AnimatedButton>(glm::vec3(-0.057f, 0.038f, 1.0f), glm::vec3(0.001f, 0.001f, 0.001f), game_constants::DEFAULT_FONT_NAME, "Play", PLAY_BUTTON_NAME, [&](){ OnPlayButtonPressed(); }, *scene);
     mPlayButton->GetSceneObject()->mShaderFloatUniformValues[strutils::StringId("custom_alpha")] = 1.0f;
+    
+    mPlayerController = std::make_unique<PlayerController>();
+    
+    auto& eventSystem = events::EventSystem::GetInstance();
+    mSendNetworkMessageEventListener = eventSystem.RegisterForEvent<events::SendNetworkMessageEvent>([=](const events::SendNetworkMessageEvent& event)
+    {
+        SendNetworkMessage(event.mMessageJson, event.mMessageType, event.mIsHighPriority);
+    });
 }
 
 ///------------------------------------------------------------------------------------------------
@@ -155,19 +163,19 @@ void Game::WindowResize()
 #if defined(USE_IMGUI)
 void Game::CreateDebugWidgets()
 {
-    static float sPlayerSpeedMultiplier = 1.0f;
+    //static float sPlayerSpeedMultiplier = 1.0f;
     
     ImGui::Begin("Net Stats", nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
     ImGui::Text("Ping %d millis", mLastPingMillis.load());
     ImGui::Text("State sending %d millis", static_cast<int>(mStateSendingDelayMillis));
     ImGui::End();
-    
-    ImGui::Begin("Game Hacks", nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
-    if (ImGui::SliderFloat("Player Speed Multiplier", &sPlayerSpeedMultiplier, 0.1f, 3.0f))
-    {
-        PLAYER_SPEED = 0.0002f * sPlayerSpeedMultiplier;
-    }
-    ImGui::End();
+//    
+//    ImGui::Begin("Game Hacks", nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
+//    if (ImGui::SliderFloat("Player Speed Multiplier", &sPlayerSpeedMultiplier, 0.1f, 3.0f))
+//    {
+//        PLAYER_SPEED = 0.0002f * sPlayerSpeedMultiplier;
+//    }
+//    ImGui::End();
     
     
     ImGui::Begin("Enemy NPC Data", nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
@@ -242,7 +250,6 @@ void Game::CheckForPendingWorldObjectsToBeCreated()
 void Game::InterpolateLocalWorld(const float dtMillis)
 {
     auto& systemsEngine = CoreSystemsEngine::GetInstance();
-    auto& inputStateManager = systemsEngine.GetInputStateManager();
     auto& sceneManager = systemsEngine.GetSceneManager();
     
     std::lock_guard<std::mutex> worldLockGuard(sWorldMutex);
@@ -267,58 +274,7 @@ void Game::InterpolateLocalWorld(const float dtMillis)
                 
                 if (objectData.isLocal)
                 {
-                    glm::vec3 impulseVector = {};
-                    if (inputStateManager.VKeyPressed(input::Key::W))
-                    {
-                        impulseVector.y = 1.0f;
-                    }
-                    else if (inputStateManager.VKeyPressed(input::Key::S))
-                    {
-                        impulseVector.y = -1.0f;
-                    }
-                    else
-                    {
-                        impulseVector.y = 0.0f;
-                    }
-                    
-                    if (inputStateManager.VKeyPressed(input::Key::A))
-                    {
-                        impulseVector.x = -1.0f;
-                    }
-                    else if (inputStateManager.VKeyPressed(input::Key::D))
-                    {
-                        impulseVector.x = 1.0f;
-                    }
-                    else
-                    {
-                        impulseVector.x = 0.0f;
-                    }
-                    
-                    if (inputStateManager.VButtonTapped(input::Button::MAIN_BUTTON))
-                    {
-                        auto worldTouchPos = inputStateManager.VGetPointingPosInWorldSpace(scene->GetCamera().GetViewMatrix(), scene->GetCamera().GetProjMatrix());
-                        
-                        networking::ThrowRangedWeaponRequest throwRangedWeaponRequest;
-                        throwRangedWeaponRequest.playerId = objectData.objectId;
-                        throwRangedWeaponRequest.targetPosition = glm::vec3(worldTouchPos.x, worldTouchPos.y, objectData.objectPosition.z);
-                        SendNetworkMessage(throwRangedWeaponRequest.SerializeToJson(), networking::MessageType::CS_THROW_RANGED_WEAPON, true);
-                    }
-                    
-                    objectData.objectVelocity = {};
-                    auto length = glm::length(impulseVector);
-                    if (length > 0.0f)
-                    {
-                        objectData.objectVelocity = glm::normalize(impulseVector) * PLAYER_SPEED * dtMillis;
-                        
-                        auto navmapCoords = glm::ivec2(static_cast<int>((objectData.objectPosition.x/2.0f + 0.5f) * sNavmapSurface->w), static_cast<int>((1.0f - (objectData.objectPosition.y/2.0f + 0.5f)) * sNavmapSurface->h));
-                        auto navmapColor = GetRGBAt(sNavmapSurface, navmapCoords.x, navmapCoords.y);
-                        
-                        objectData.objectVelocity *= navmapColor.r * navmapColor.r;
-                        objectData.objectPosition += objectData.objectVelocity;
-                        
-                        playerSceneObject->mPosition += objectData.objectVelocity;
-                        playerNameSceneObject->mPosition += objectData.objectVelocity;
-                    }
+                    mPlayerController->Update(dtMillis, strutils::StringId(objectData.objectId), objectData, *scene);
                 }
                 else
                 {
@@ -328,7 +284,7 @@ void Game::InterpolateLocalWorld(const float dtMillis)
                     // If (unlikely) we the player is exactly on target, or if
                     // the player's movement delta vector length exceeds the distance to target
                     // we teleport to target
-                    if (distanceToTarget <= 0.0f || distanceToTarget < glm::length(glm::normalize(directionToTarget) * PLAYER_SPEED * dtMillis))
+                    if (distanceToTarget <= 0.0f || distanceToTarget < glm::length(glm::normalize(directionToTarget) * game_constants::PLAYER_SPEED * dtMillis))
                     {
                         playerSceneObject->mPosition = objectData.objectPosition;
                         playerNameSceneObject->mPosition = playerSceneObject->mPosition + game_constants::PLAYER_NAMEPLATE_OFFSET;
@@ -339,8 +295,8 @@ void Game::InterpolateLocalWorld(const float dtMillis)
                     }
                     else
                     {
-                        playerSceneObject->mPosition += glm::normalize(directionToTarget) * PLAYER_SPEED * dtMillis;
-                        playerNameSceneObject->mPosition += glm::normalize(directionToTarget) * PLAYER_SPEED * dtMillis;
+                        playerSceneObject->mPosition += glm::normalize(directionToTarget) * game_constants::PLAYER_SPEED * dtMillis;
+                        playerNameSceneObject->mPosition += glm::normalize(directionToTarget) * game_constants::PLAYER_SPEED * dtMillis;
                     }
                 }
             } break;

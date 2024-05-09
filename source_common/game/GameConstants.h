@@ -33,7 +33,7 @@ namespace game_constants
     // Networking
     inline const float STATE_SEND_MIN_DELAY_MILLIS = 16.6666f;
     inline const float STATE_SEND_MAX_DELAY_MILLIS = 100.0f;
-
+    inline const float PLAYER_SPEED = 0.0002f;
 }
 
 ///------------------------------------------------------------------------------------------------

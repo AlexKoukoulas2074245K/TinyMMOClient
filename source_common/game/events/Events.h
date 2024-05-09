@@ -10,6 +10,11 @@
 
 ///------------------------------------------------------------------------------------------------
 
+#include <net_common/NetworkMessages.h>
+#include <nlohmann/json.hpp>
+
+///------------------------------------------------------------------------------------------------
+
 namespace events
 {
 
@@ -18,6 +23,23 @@ namespace events
 class DummyEvent
 {
     
+};
+
+///------------------------------------------------------------------------------------------------
+
+class SendNetworkMessageEvent
+{
+public:
+    SendNetworkMessageEvent(const nlohmann::json& messageJson, const networking::MessageType messageType, const bool isHighPriority)
+        : mMessageJson(messageJson)
+        , mMessageType(messageType)
+        , mIsHighPriority(isHighPriority)
+    {
+    }
+    
+    const nlohmann::json& mMessageJson;
+    const networking::MessageType mMessageType;
+    const bool mIsHighPriority;
 };
 
 ///------------------------------------------------------------------------------------------------

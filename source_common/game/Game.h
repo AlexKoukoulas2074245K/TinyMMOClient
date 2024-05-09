@@ -27,6 +27,7 @@ namespace scene
 }
 
 class AnimatedButton;
+class PlayerController;
 class Game final
 {
 public:
@@ -56,10 +57,13 @@ private:
 private:
     std::atomic<int> mLastPingMillis = 0;
     std::unique_ptr<AnimatedButton> mPlayButton;
+    std::unique_ptr<PlayerController> mPlayerController;
+    std::unique_ptr<events::IListener> mSendNetworkMessageEventListener;
     std::shared_ptr<scene::SceneObject> mLocalPlayerSceneObject;
     std::vector<int> mWorldObjectIDsToCleanup;
     std::vector<networking::WorldObjectData> mWorldObjectData;
     std::vector<networking::WorldObjectData> mPendingWorldObjectDataToCreate;
+    
     float mStateSendingDelayMillis;
 };
 
