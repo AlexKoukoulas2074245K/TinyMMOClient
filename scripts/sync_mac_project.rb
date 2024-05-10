@@ -10,6 +10,10 @@ project = Xcodeproj::Project.open(project_path)
 #find all relevant source files
 files = Dir.glob(["../source_common/**/*.cpp", "../source_common/**/*.h","../source_net_common/**/*.cpp", "../source_net_common/**/*.h", "../source_net_common/**/*.inc", "../source_test/**/*.cpp", "../source_test/**/*.h", "../source_desktop/**/*.cpp", "../source_desktop/**/*.h", "../source_desktop/**/*.m", "../source_desktop/**/*.mm", "../source_apple_utilities/**/*.cpp", "../source_apple_utilities/**/*.h", "../source_apple_utilities/**/*.m", "../source_apple_utilities/**/*.mm"]).select{|file| !file.include? "main.cpp"}
 
+for target in project.targets do
+    puts "Found Project Target #{target}"
+end
+
 #delete refs to non-existent files
 for f in project.files do
   full_path = f.full_path.to_s[3..-1]
@@ -60,9 +64,10 @@ for f in files do
   # once again, replace the full path in file reference to a file name
   file_reference.path = file_name
 
-  # add the file reference to the first (main) target's `Compile Sources` build phase
-  # even though the main target will work for most cases, you might want to replace it with a specific one
-  project.targets.first.source_build_phase.add_file_reference(file_reference)
+  # add the file reference to all targets `Compile Sources` build phase
+  for target in project.targets do
+      target.source_build_phase.add_file_reference(file_reference)
+  end
 
   puts "Copied over #{f}"
 end

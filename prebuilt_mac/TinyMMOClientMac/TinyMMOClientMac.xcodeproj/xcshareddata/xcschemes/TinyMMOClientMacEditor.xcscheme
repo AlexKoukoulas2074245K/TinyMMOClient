@@ -15,9 +15,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "926BFE332BDA82C600E82D03"
-               BuildableName = "TinyMMOClientMacTest.app"
-               BlueprintName = "TinyMMOClientMacTest"
+               BlueprintIdentifier = "92B0F2F02BEE24CB00007ABE"
+               BuildableName = "TinyMMOClientEditor.app"
+               BlueprintName = "TinyMMOClientEditor"
                ReferencedContainer = "container:TinyMMOClientMac.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -44,9 +44,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "926BFE332BDA82C600E82D03"
-            BuildableName = "TinyMMOClientMacTest.app"
-            BlueprintName = "TinyMMOClientMacTest"
+            BlueprintIdentifier = "92B0F2F02BEE24CB00007ABE"
+            BuildableName = "TinyMMOClientEditor.app"
+            BlueprintName = "TinyMMOClientEditor"
             ReferencedContainer = "container:TinyMMOClientMac.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -61,9 +61,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "926BFE332BDA82C600E82D03"
-            BuildableName = "TinyMMOClientMacTest.app"
-            BlueprintName = "TinyMMOClientMacTest"
+            BlueprintIdentifier = "92B0F2F02BEE24CB00007ABE"
+            BuildableName = "TinyMMOClientEditor.app"
+            BlueprintName = "TinyMMOClientEditor"
             ReferencedContainer = "container:TinyMMOClientMac.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

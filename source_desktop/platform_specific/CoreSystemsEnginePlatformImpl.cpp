@@ -31,10 +31,17 @@
 
 ///------------------------------------------------------------------------------------------------
 
+#if defined(USE_EDITOR)
+static constexpr int DEFAULT_WINDOW_WIDTH  = 1800;
+static constexpr int DEFAULT_WINDOW_HEIGHT = 1200;
+static constexpr int MIN_WINDOW_WIDTH      = 1800;
+static constexpr int MIN_WINDOW_HEIGHT     = 1200;
+#else
 static constexpr int DEFAULT_WINDOW_WIDTH  = 1266;
 static constexpr int DEFAULT_WINDOW_HEIGHT = 585;
 static constexpr int MIN_WINDOW_WIDTH      = 750;
 static constexpr int MIN_WINDOW_HEIGHT     = 585;
+#endif
 
 static const float DEFAULT_FRAME_MILLIS = 1000.0f/60.0f;
 

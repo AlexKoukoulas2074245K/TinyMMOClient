@@ -100,7 +100,7 @@ void Game::Init()
     background->mPosition.z = 0.0f;
     background->mScale *= 2.0f;
     background->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "world/japanese_forest.png");
-        
+    
     auto navmapResourceID = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "world/japanese_forest_navmap.png");
     sNavmapSurface = systemsEngine.GetResourceLoadingService().GetResource<resources::ImageSurfaceResource>(navmapResourceID).GetSurface();
     
