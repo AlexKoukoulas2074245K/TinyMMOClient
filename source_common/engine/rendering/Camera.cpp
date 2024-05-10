@@ -21,7 +21,7 @@ namespace rendering
 
 ///------------------------------------------------------------------------------------------------
 
-static const glm::vec3 DEFAULT_CAMERA_POSITION     = {0.0f, -0.0087f, -5.0f};
+static const glm::vec3 DEFAULT_CAMERA_POSITION     = {0.0f, 0.0f, -5.0f};
 static const glm::vec3 DEFAULT_CAMERA_FRONT_VECTOR = {0.0f, 0.0f, -1.0f};
 static const glm::vec3 DEFAULT_CAMERA_UP_VECTOR    = {0.0f, 1.0f, 0.0f};
 

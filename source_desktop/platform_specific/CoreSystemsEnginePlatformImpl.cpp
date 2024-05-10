@@ -364,6 +364,7 @@ void CoreSystemsEngine::Start(std::function<void()> clientInitFunction, std::fun
         mSystems->mInputStateManager.VUpdate();
     }
     
+    ImGui::DestroyContext();
     clientApplicationMovingToBackgroundFunction();
 }
 

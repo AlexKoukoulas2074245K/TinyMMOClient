@@ -1256,8 +1256,14 @@ ImGuiIO::ImGuiIO()
     DisplaySize = ImVec2(-1.0f, -1.0f);
     DeltaTime = 1.0f / 60.0f;
     IniSavingRate = 5.0f;
-    IniFilename = "imgui.ini"; // Important: "imgui.ini" is relative to current working dir, most apps will want to lock this to an absolute path (e.g. same path as executables).
-    LogFilename = "imgui_log.txt";
+    
+#ifdef USE_EDITOR
+    IniFilename = "/Users/Code/TinyMMOClient/assets/data/editor_imgui.ini"; // Important: "imgui.ini" is relative to current working dir, most apps will want to lock this to an absolute path (e.g. same path as executables).
+    LogFilename = "/Users/Code/TinyMMOClient/assets/data/editor_imgui_log.txt";
+#else
+    IniFilename = "/Users/Code/TinyMMOClient/assets/data/client_imgui.ini"; // Important: "imgui.ini" is relative to current working dir, most apps will want to lock this to an absolute path (e.g. same path as executables).
+    LogFilename = "/Users/Code/TinyMMOClient/assets/data/client_imgui_log.txt";
+#endif
 #ifndef IMGUI_DISABLE_OBSOLETE_KEYIO
     for (int i = 0; i < ImGuiKey_COUNT; i++)
         KeyMap[i] = -1;

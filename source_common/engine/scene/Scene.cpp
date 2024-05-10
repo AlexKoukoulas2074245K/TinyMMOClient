@@ -275,7 +275,7 @@ bool Scene::HasLoadedPredefinedObjects() const { return mHasLoadedPredefinedObje
 
 ///------------------------------------------------------------------------------------------------
 
-void Scene::SetLoaded(const bool loaded) { mLoaded = loaded; }
+void Scene::SetLoaded(const bool loaded) { mLoaded = loaded;  if (mLoaded) SDL_RaiseWindow(&CoreSystemsEngine::GetInstance().GetContextWindow()); }
 
 ///------------------------------------------------------------------------------------------------
 

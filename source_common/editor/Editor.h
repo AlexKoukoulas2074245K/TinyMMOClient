@@ -10,8 +10,12 @@
 
 ///------------------------------------------------------------------------------------------------
 
+#include <engine/resloading/ResourceLoadingService.h>
+#include <engine/resloading/ImageSurfaceResource.h>
+#include <engine/resloading/TextureResource.h>
 #include <engine/utils/MathUtils.h>
 #include <engine/utils/StringUtils.h>
+#include <vector>
 
 ///------------------------------------------------------------------------------------------------
 
@@ -32,6 +36,21 @@ public:
     void WindowResize();
     void OnOneSecondElapsed();
     void CreateDebugWidgets();
+    
+private:
+    void CreateGrid(const int gridRows, const int gridCols);
+    
+private:
+    struct MapTileData
+    {
+        resources::ResourceId mResourceId;
+        resources::GLuint mTextureId;
+        std::string mTileName;
+    };
+    
+    int mGridRows, mGridCols;
+    int mSelectedPaletteTile;
+    std::vector<MapTileData> mPaletteTileData;
 };
 
 ///------------------------------------------------------------------------------------------------
