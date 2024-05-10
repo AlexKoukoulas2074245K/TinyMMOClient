@@ -40,6 +40,16 @@
 ///------------------------------------------------------------------------------------------------
 
 static const strutils::StringId EDITOR_SCENE = strutils::StringId("editor_scene");
+static const strutils::StringId TILE_CONNECTOR_TYPE_UNIFORM_NAME = strutils::StringId("connector_type");
+
+static const std::string MAP_FILES_FOLDER = "world/maps/";
+static const std::string TILES_FOLDER = "world/map_tiles/";
+static const std::string ZERO_BLANK_TILE_NAME = "0_blank.png";
+static const std::string ZERO_DIAGL_CONNECTOR_TILE_NAME = "0_diagl_connector.png";
+static const std::string ZERO_DIAGR_CONNECTOR_TILE_NAME = "0_diagr_connector.png";
+static const std::string ZERO_HOR_CONNECTOR_TILE_NAME = "0_hor_connector.png";
+static const std::string ZERO_VER_CONNECTOR_TILE_NAME = "0_ver_connector.png";
+static const std::string WORLD_MAP_TILE_SHADER = "world_map_tile.vs";
 static constexpr int DEFAULT_GRID_ROWS = 32;
 static constexpr int DEFAULT_GRID_COLS = 32;
 static const float TILE_SIZE = 0.013f;
@@ -48,6 +58,25 @@ static const float TILE_DEFAULT_Z = 0.1f;
 static const float TILE_HIGHLIGHTED_Z = 0.2f;
 static const glm::vec3 TILE_DEFAULT_SCALE = glm::vec3(TILE_SIZE);
 static const glm::vec3 TILE_HIGHLIGHTED_SCALE = glm::vec3(HIGHLIGHTED_TILE_SIZE);
+
+static std::unordered_set<std::string> ZERO_SPECIAL_TILES =
+{
+    ZERO_BLANK_TILE_NAME,
+    ZERO_DIAGL_CONNECTOR_TILE_NAME,
+    ZERO_DIAGR_CONNECTOR_TILE_NAME,
+    ZERO_HOR_CONNECTOR_TILE_NAME,
+    ZERO_VER_CONNECTOR_TILE_NAME
+};
+
+namespace TileConnectorType
+{
+    static constexpr int NONE  = 0;
+    static constexpr int VER   = 1;
+    static constexpr int HOR   = 2;
+    static constexpr int DIAGL = 3;
+    static constexpr int DIAGR = 4;
+    static constexpr int INVALID = 5;
+};
 
 ///------------------------------------------------------------------------------------------------
 
@@ -111,6 +140,64 @@ void Editor::Update(const float dtMillis)
             {
                 highlightedTileCandidates.push_back(tile.get());
             }
+            
+            auto tileTextureFileName = fileutils::GetFileName(systemsEngine.GetResourceLoadingService().GetResourcePath(tile->mTextureResourceId));
+            if (tileTextureFileName == ZERO_HOR_CONNECTOR_TILE_NAME)
+            {
+                if (x == 0 || x == mGridCols - 1)
+                {
+                    tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = TileConnectorType::INVALID;
+                }
+                else
+                {
+                    tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = TileConnectorType::HOR;
+                    tile->mEffectTextureResourceIds[0] = scene->FindSceneObject(strutils::StringId(std::to_string(x - 1) + "," + std::to_string(y)))->mTextureResourceId;
+                    tile->mEffectTextureResourceIds[1] = scene->FindSceneObject(strutils::StringId(std::to_string(x + 1) + "," + std::to_string(y)))->mTextureResourceId;
+                }
+            }
+            else if (tileTextureFileName == ZERO_VER_CONNECTOR_TILE_NAME)
+            {
+                if (y == 0 || y == mGridRows - 1)
+                {
+                    tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = TileConnectorType::INVALID;
+                }
+                else
+                {
+                    tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = TileConnectorType::VER;
+                    tile->mEffectTextureResourceIds[0] = scene->FindSceneObject(strutils::StringId(std::to_string(x) + "," + std::to_string(y - 1)))->mTextureResourceId;
+                    tile->mEffectTextureResourceIds[1] = scene->FindSceneObject(strutils::StringId(std::to_string(x) + "," + std::to_string(y + 1)))->mTextureResourceId;
+                }
+            }
+            else if (tileTextureFileName == ZERO_DIAGL_CONNECTOR_TILE_NAME)
+            {
+                if (y == 0 || y == mGridRows - 1 || x == 0 || x == mGridCols - 1)
+                {
+                    tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = TileConnectorType::INVALID;
+                }
+                else
+                {
+                    tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = TileConnectorType::DIAGL;
+                    tile->mEffectTextureResourceIds[0] = scene->FindSceneObject(strutils::StringId(std::to_string(x - 1) + "," + std::to_string(y - 1)))->mTextureResourceId;
+                    tile->mEffectTextureResourceIds[1] = scene->FindSceneObject(strutils::StringId(std::to_string(x + 1) + "," + std::to_string(y + 1)))->mTextureResourceId;
+                }
+            }
+            else if (tileTextureFileName == ZERO_DIAGR_CONNECTOR_TILE_NAME)
+            {
+                if (y == 0 || y == mGridRows - 1 || x == 0 || x == mGridCols - 1)
+                {
+                    tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = TileConnectorType::INVALID;
+                }
+                else
+                {
+                    tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = TileConnectorType::DIAGR;
+                    tile->mEffectTextureResourceIds[0] = scene->FindSceneObject(strutils::StringId(std::to_string(x - 1) + "," + std::to_string(y + 1)))->mTextureResourceId;
+                    tile->mEffectTextureResourceIds[1] = scene->FindSceneObject(strutils::StringId(std::to_string(x + 1) + "," + std::to_string(y - 1)))->mTextureResourceId;
+                }
+            }
+            else
+            {
+                tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = TileConnectorType::NONE;
+            }
         }
     }
     
@@ -122,7 +209,8 @@ void Editor::Update(const float dtMillis)
         
         if (inputStateManager.VButtonPressed(input::Button::MAIN_BUTTON))
         {
-            highlightedTileCandidates.front()->mTextureResourceId = mPaletteTileData[mSelectedPaletteTile].mResourceId;
+            const auto& selectedTile = mPaletteTileData[mSelectedPaletteTile];
+            highlightedTileCandidates.front()->mTextureResourceId = selectedTile.mResourceId;
         }
     }
 }
@@ -150,9 +238,6 @@ void Editor::WindowResize()
 #if defined(USE_IMGUI)
 void Editor::CreateDebugWidgets()
 {
-    static const std::string MAP_FILES_FOLDER = resources::ResourceLoadingService::RES_DATA_ROOT + "world/maps/";
-    static const std::string TILES_FOLDER = resources::ResourceLoadingService::RES_TEXTURES_ROOT + "world/map_tiles/";
-    
     {
         static constexpr int TILEMAP_NAME_BUFFER_SIZE = 64;
         static char sTileMapNameBuffer[TILEMAP_NAME_BUFFER_SIZE] = {};
@@ -161,7 +246,7 @@ void Editor::CreateDebugWidgets()
         
         if (sMapFileNames.empty())
         {
-            sMapFileNames = fileutils::GetAllFilenamesInDirectory(MAP_FILES_FOLDER);
+            sMapFileNames = fileutils::GetAllFilenamesInDirectory(resources::ResourceLoadingService::RES_DATA_ROOT + MAP_FILES_FOLDER);
         }
         
         ImGui::Begin("Tile Map File", nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
@@ -211,7 +296,7 @@ void Editor::CreateDebugWidgets()
         ImGui::Dummy(ImVec2(0.0f, 10.0f));
         if (ImGui::Button("  Load  "))
         {
-            std::ifstream dataFile(MAP_FILES_FOLDER + sTileMapNameBuffer);
+            std::ifstream dataFile(std::string("/Users/Code/TinyMMOClient/assets/data/world/maps/") + sTileMapNameBuffer);
             if (dataFile.is_open())
             {
                 std::stringstream buffer;
@@ -245,6 +330,12 @@ void Editor::CreateDebugWidgets()
                     }
                     rowCounter++;
                 }
+                
+                logging::Log(logging::LogType::ERROR, "Successfully loaded %s", (resources::ResourceLoadingService::RES_DATA_ROOT + MAP_FILES_FOLDER + sTileMapNameBuffer).c_str());
+            }
+            else
+            {
+                logging::Log(logging::LogType::ERROR, "Could not load %s", (resources::ResourceLoadingService::RES_DATA_ROOT + MAP_FILES_FOLDER + sTileMapNameBuffer).c_str());
             }
         }
         ImGui::SameLine();
@@ -280,6 +371,8 @@ void Editor::CreateDebugWidgets()
             std::ofstream outputMapJsonFile("/Users/Code/TinyMMOClient/assets/data/world/maps/" + std::string(sTileMapNameBuffer));
             auto mapJsonString = mapJson.dump(4);
             outputMapJsonFile.write(mapJsonString.c_str(), mapJsonString.size());
+            
+            logging::Log(logging::LogType::ERROR, "Successfully saved %s", ("/Users/Code/TinyMMOClient/assets/data/world/maps/" + std::string(sTileMapNameBuffer)).c_str());
         }
         
         ImGui::SeparatorText("Modify/Create");
@@ -300,21 +393,13 @@ void Editor::CreateDebugWidgets()
         
         if (mPaletteTileData.empty())
         {
-            auto mapTileFileNames = fileutils::GetAllFilenamesInDirectory(TILES_FOLDER);
+            auto mapTileFileNames = fileutils::GetAllFilenamesInDirectory(resources::ResourceLoadingService::RES_TEXTURES_ROOT + TILES_FOLDER);
             
             for (const auto& mapTileFileName: mapTileFileNames)
             {
-                auto loadedResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(TILES_FOLDER + mapTileFileName);
+                auto loadedResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + TILES_FOLDER + mapTileFileName);
                 const auto& tileTextureResource = CoreSystemsEngine::GetInstance().GetResourceLoadingService().GetResource<resources::TextureResource>(loadedResourceId);
-                
-                if (mapTileFileName == "empty.png")
-                {
-                    mPaletteTileData.insert(mPaletteTileData.begin(), { loadedResourceId, tileTextureResource.GetGLTextureId(), strutils::StringSplit(mapTileFileName, '.')[0] });
-                }
-                else
-                {
-                    mPaletteTileData.push_back({ loadedResourceId, tileTextureResource.GetGLTextureId(), strutils::StringSplit(mapTileFileName, '.')[0] });
-                }
+                mPaletteTileData.push_back({ loadedResourceId, tileTextureResource.GetGLTextureId(), mapTileFileName });
             }
             
             sGridRows = 1 + static_cast<int>(mPaletteTileData.size()) / GRID_COLS;
@@ -387,7 +472,9 @@ void Editor::CreateGrid(const int gridRows, const int gridCols)
             tile->mPosition.y = gridStartingY - y * TILE_SIZE;
             tile->mPosition.z = TILE_DEFAULT_Z;
             tile->mScale = TILE_DEFAULT_SCALE;
-            tile->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "world/map_tiles/empty.png");
+            tile->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + TILES_FOLDER + ZERO_BLANK_TILE_NAME);
+            tile->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + WORLD_MAP_TILE_SHADER);
+            tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = TileConnectorType::NONE;
         }
     }
 }
