@@ -7,7 +7,7 @@
 
 ///------------------------------------------------------------------------------------------------
 
-#if defined(RUN_TESTS) && !defined(NDEBUG)
+#if defined(RUN_TESTS)
 #include <gtest/gtest.h>
 #include <engine/utils/PlatformMacros.h>
 

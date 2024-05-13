@@ -98,10 +98,10 @@ void Game::Init()
     
     auto background = scene->CreateSceneObject(strutils::StringId("forest"));
     background->mPosition.z = 0.0f;
-    background->mScale *= 2.0f;
-    background->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "world/japanese_forest.png");
+    background->mScale *= game_constants::MAP_SCALE;
+    background->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "world/maps/map_tower.png");
     
-    auto navmapResourceID = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "world/japanese_forest_navmap.png");
+    auto navmapResourceID = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "world/maps/map_tower_navmap.png");
     sNavmapSurface = systemsEngine.GetResourceLoadingService().GetResource<resources::ImageSurfaceResource>(navmapResourceID).GetSurface();
     
     mLocalPlayerSceneObject = nullptr;

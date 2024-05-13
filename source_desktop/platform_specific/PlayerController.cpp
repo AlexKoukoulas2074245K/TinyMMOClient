@@ -77,7 +77,7 @@ void PlayerController::Update(const float dtMillis, const strutils::StringId& pl
     {
         objectData.objectVelocity = glm::normalize(impulseVector) * game_constants::PLAYER_SPEED * dtMillis;
         
-        auto navmapCoords = glm::ivec2(static_cast<int>((objectData.objectPosition.x/2.0f + 0.5f) * sNavmapSurface->w), static_cast<int>((1.0f - (objectData.objectPosition.y/2.0f + 0.5f)) * sNavmapSurface->h));
+        auto navmapCoords = glm::ivec2(static_cast<int>((objectData.objectPosition.x/game_constants::MAP_SCALE + 0.5f) * sNavmapSurface->w), static_cast<int>((1.0f - (objectData.objectPosition.y/game_constants::MAP_SCALE + 0.5f)) * sNavmapSurface->h));
         auto navmapColor = GetRGBAt(sNavmapSurface, navmapCoords.x, navmapCoords.y);
         
         objectData.objectVelocity *= navmapColor.r * navmapColor.r;

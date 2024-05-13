@@ -69,6 +69,7 @@ static const float TILE_DEFAULT_Z = 0.1f;
 static const float ZOOM_SPEED = 1.25f;
 
 static const glm::vec3 TILE_DEFAULT_SCALE = glm::vec3(TILE_SIZE);
+static const glm::vec3 EMPTY_NAVMAP_TILE_COLOR = {1.0f, 1.0f, 1.0f};
 
 static std::unordered_set<std::string> ZERO_SPECIAL_TILES =
 {
@@ -81,10 +82,11 @@ static std::unordered_set<std::string> ZERO_SPECIAL_TILES =
     ZERO_VER_CONNECTOR_TILE_FILE_NAME
 };
 
-static std::unordered_set<std::string> SOLID_TILES =
+static std::unordered_map<std::string, glm::vec3> SPECIAL_NAVMAP_TILES_TO_COLORS =
 {
-    "wall_top.png",
-    "wall_body.png"
+    { "wall_top.png", { 0.0f, 0.0f, 0.0f } },
+    { "wall_body.png", { 0.0f, 0.0f, 0.0f } },
+    { "water.png", { 0.0f, 0.0f, 1.0f } }
 };
 
 namespace TileConnectorType
@@ -328,6 +330,8 @@ void Editor::CreateDebugWidgets()
         ImGui::SameLine();
         if (ImGui::Button("  Save  "))
         {
+            auto beginTimePoint = std::chrono::high_resolution_clock::now();
+            
             nlohmann::json mapJson;
             nlohmann::json mapMetaDataJson;
             nlohmann::json mapTileDataJson;
@@ -356,9 +360,10 @@ void Editor::CreateDebugWidgets()
             std::ofstream outputMapJsonFile(NON_SANDBOXED_MAPS_FOLDER + std::string(sMapNameBuffer));
             auto mapJsonString = mapJson.dump(4);
             outputMapJsonFile.write(mapJsonString.c_str(), mapJsonString.size());
+            outputMapJsonFile.close();
             
             // Render map texture
-            rendering::ExportToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + fileutils::GetFileNameWithoutExtension(std::string(sMapNameBuffer)) + ".png", scene->GetSceneObjects());
+            rendering::ExportToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + fileutils::GetFileNameWithoutExtension(std::string(sMapNameBuffer)) + ".png", scene->GetSceneObjects(), rendering::BlurStep::DONT_BLUR);
             
             // Render map navmap texture
             for (auto y = 0; y < mGridRows; ++y)
@@ -370,13 +375,16 @@ void Editor::CreateDebugWidgets()
                     auto tileTextureResourcePath = fileutils::GetFileName(systemsEngine.GetResourceLoadingService().GetResourcePath(tileSceneObject->mTextureResourceId));
                     
                     tileSceneObject->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + WORLD_MAP_TILE_NAVMAP_GEN_SHADER);
-                    tileSceneObject->mShaderVec3UniformValues[NAVMAP_TILE_COLOR_UNIFORM_NAME] = SOLID_TILES.count(tileTextureResourcePath) ? glm::vec3(0.0f, 0.0f, 0.0f) : glm::vec3(1.0f, 1.0f, 1.0f);
+                    tileSceneObject->mShaderVec3UniformValues[NAVMAP_TILE_COLOR_UNIFORM_NAME] = SPECIAL_NAVMAP_TILES_TO_COLORS.count(tileTextureResourcePath) ? SPECIAL_NAVMAP_TILES_TO_COLORS.at(tileTextureResourcePath) : EMPTY_NAVMAP_TILE_COLOR;
                 }
             }
-            rendering::ExportToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + fileutils::GetFileNameWithoutExtension(std::string(sMapNameBuffer)) + "_navmap.png", scene->GetSceneObjects());
+            rendering::ExportToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + fileutils::GetFileNameWithoutExtension(std::string(sMapNameBuffer)) + "_navmap.png", scene->GetSceneObjects(), rendering::BlurStep::BLUR);
             
             logging::Log(logging::LogType::ERROR, "Successfully saved %s", (NON_SANDBOXED_MAPS_FOLDER + std::string(sMapNameBuffer)).c_str());
-            ospopups::ShowMessageBox(ospopups::MessageBoxType::INFO, "Export complete", "Finished saving map file and exporting texture for " + fileutils::GetFileNameWithoutExtension(std::string(sMapNameBuffer)) + ".");
+            
+            auto endTimePoint = std::chrono::high_resolution_clock::now();
+            
+            ospopups::ShowMessageBox(ospopups::MessageBoxType::INFO, "Export complete", "Finished saving map file and exporting texture & navmap for " + fileutils::GetFileNameWithoutExtension(std::string(sMapNameBuffer)) + ". Operation took " + std::to_string(std::chrono::duration_cast<std::chrono::seconds>(endTimePoint - beginTimePoint).count()) + " secs");
         }
         
         ImGui::SeparatorText("Modify/Create");

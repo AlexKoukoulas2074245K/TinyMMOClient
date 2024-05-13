@@ -25,7 +25,14 @@ namespace rendering
 
 ///------------------------------------------------------------------------------------------------
 
-void ExportToPNG(const std::string& exportFilePath, std::vector<std::shared_ptr<scene::SceneObject>>& sceneObjects);
+enum class BlurStep
+{
+    DONT_BLUR, BLUR
+};
+
+///------------------------------------------------------------------------------------------------
+
+void ExportToPNG(const std::string& exportFilePath, std::vector<std::shared_ptr<scene::SceneObject>>& sceneObjects, const BlurStep blurStep);
 
 ///------------------------------------------------------------------------------------------------
 

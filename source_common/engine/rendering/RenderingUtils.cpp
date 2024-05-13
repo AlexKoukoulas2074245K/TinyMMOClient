@@ -27,7 +27,110 @@ namespace rendering
 
 ///------------------------------------------------------------------------------------------------
 
-void ExportToPNG(const std::string& exportFilePath, std::vector<std::shared_ptr<scene::SceneObject>>& sceneObjects)
+struct Pixel
+{
+    GLubyte r, g, b, a;
+};
+
+// Function to convert GLubyte array to vector of pixels
+static std::vector<Pixel> ConvertToPixels(GLubyte* pixelData, int width, int height)
+{
+    std::vector<Pixel> pixels(width * height);
+    for (int i = 0; i < width * height; ++i) 
+    {
+        pixels[i].r = pixelData[i * 4];
+        pixels[i].g = pixelData[i * 4 + 1];
+        pixels[i].b = pixelData[i * 4 + 2];
+        pixels[i].a = pixelData[i * 4 + 3];
+    }
+    return pixels;
+}
+
+// Function to convert vector of pixels to GLubyte array
+static void ConvertToGLubyte(std::vector<Pixel>& pixels, GLubyte* pixelData, int width, int height)
+{
+    for (int i = 0; i < width * height; ++i) 
+    {
+        pixelData[i * 4] = pixels[i].r;
+        pixelData[i * 4 + 1] = pixels[i].g;
+        pixelData[i * 4 + 2] = pixels[i].b;
+        pixelData[i * 4 + 3] = pixels[i].a;
+    }
+}
+
+static void ApplyGaussianBlur(std::vector<Pixel>& pixels, int width, int height)
+{
+    static float SIGMA = 15.5f;
+    
+    // Define the kernel size based on sigma (standard deviation)
+    int kernelSize = static_cast<int>(ceil(3 * SIGMA));
+
+    // Calculate the Gaussian kernel
+    std::vector<float> kernel(2 * kernelSize + 1);
+    float sigmaSquared = SIGMA * SIGMA;
+    float sum = 0.0f;
+    for (int i = -kernelSize; i <= kernelSize; ++i) 
+    {
+        float x = static_cast<float>(i);
+        kernel[i + kernelSize] = exp(-(x * x) / (2 * sigmaSquared));
+        sum += kernel[i + kernelSize];
+    }
+
+    // Normalize the kernel
+    for (int i = 0; i < kernel.size(); ++i) 
+    {
+        kernel[i] /= sum;
+    }
+    
+    // Perform horizontal blur
+    std::vector<Pixel> tempPixels(pixels);
+    for (int y = 0; y < height; ++y) 
+    {
+        for (int x = 0; x < width; ++x) 
+        {
+            float r = 0.0f, g = 0.0f, b = 0.0f, a = 0.0f;
+            for (int i = -kernelSize; i <= kernelSize; ++i) 
+            {
+                int newX = std::min(std::max(x + i, 0), width - 1);
+                r += kernel[i + kernelSize] * tempPixels[y * width + newX].r;
+                g += kernel[i + kernelSize] * tempPixels[y * width + newX].g;
+                b += kernel[i + kernelSize] * tempPixels[y * width + newX].b;
+                a += kernel[i + kernelSize] * tempPixels[y * width + newX].a;
+            }
+            
+            pixels[y * width + x].r = static_cast<GLubyte>(r);
+            pixels[y * width + x].g = static_cast<GLubyte>(g);
+            pixels[y * width + x].b = static_cast<GLubyte>(b);
+            pixels[y * width + x].a = static_cast<GLubyte>(a);
+        }
+    }
+
+    // Perform vertical blur
+    tempPixels = pixels;
+    for (int y = 0; y < height; ++y) 
+    {
+        for (int x = 0; x < width; ++x)
+        {
+            float r = 0.0f, g = 0.0f, b = 0.0f, a = 0.0f;
+            for (int i = -kernelSize; i <= kernelSize; ++i) 
+            {
+                int newY = std::min(std::max(y + i, 0), height - 1);
+                r += kernel[i + kernelSize] * tempPixels[newY * width + x].r;
+                g += kernel[i + kernelSize] * tempPixels[newY * width + x].g;
+                b += kernel[i + kernelSize] * tempPixels[newY * width + x].b;
+                a += kernel[i + kernelSize] * tempPixels[newY * width + x].a;
+            }
+            pixels[y * width + x].r = static_cast<GLubyte>(r);
+            pixels[y * width + x].g = static_cast<GLubyte>(g);
+            pixels[y * width + x].b = static_cast<GLubyte>(b);
+            pixels[y * width + x].a = static_cast<GLubyte>(a);
+        }
+    }
+}
+
+///------------------------------------------------------------------------------------------------
+
+void ExportToPNG(const std::string& exportFilePath, std::vector<std::shared_ptr<scene::SceneObject>>& sceneObjects, const BlurStep blurStep)
 {
     GLint oldFrameBuffer;
     GLint oldRenderBuffer;
@@ -98,6 +201,15 @@ void ExportToPNG(const std::string& exportFilePath, std::vector<std::shared_ptr<
 
         // Free the temporary buffer
         free(rowBuffer);
+        
+        // Blur image if needed
+        if (blurStep == BlurStep::BLUR)
+        {
+            std::vector<Pixel> pixelVector = ConvertToPixels(pixels, width, height);
+            ApplyGaussianBlur(pixelVector, width, height);
+            ConvertToGLubyte(pixelVector, pixels, width, height);
+        }
+        
         
         stbi_write_png(exportFilePath.c_str(), width, height, 4, pixels, width * 4);
         
