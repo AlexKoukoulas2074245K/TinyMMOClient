@@ -43,6 +43,7 @@
 static const strutils::StringId EDITOR_SCENE = strutils::StringId("editor_scene");
 static const strutils::StringId TILE_CONNECTOR_TYPE_UNIFORM_NAME = strutils::StringId("connector_type");
 static const strutils::StringId TILE_HIGHLIGHTED_UNIFORM_NAME = strutils::StringId("highlighted");
+static const strutils::StringId NAVMAP_TILE_COLOR_UNIFORM_NAME = strutils::StringId("navmap_tile_color");
 
 static const std::string NON_SANDBOXED_MAPS_FOLDER = "/Users/Code/TinyMMOClient/assets/data/world/maps/";
 static const std::string NON_SANDBOXED_MAP_TEXTURES_FOLDER = "/Users/Code/TinyMMOClient/assets/textures/world/maps/";
@@ -56,6 +57,7 @@ static const std::string ZERO_BOTLEFT_CONNECTOR_TILE_FILE_NAME = "0_botleft_conn
 static const std::string ZERO_HOR_CONNECTOR_TILE_FILE_NAME = "0_hor_connector.png";
 static const std::string ZERO_VER_CONNECTOR_TILE_FILE_NAME = "0_ver_connector.png";
 static const std::string WORLD_MAP_TILE_SHADER = "world_map_tile.vs";
+static const std::string WORLD_MAP_TILE_NAVMAP_GEN_SHADER = "world_map_tile_navmap_gen.vs";
 
 static constexpr int DEFAULT_GRID_ROWS = 32;
 static constexpr int DEFAULT_GRID_COLS = 32;
@@ -63,13 +65,10 @@ static constexpr int MAX_GRID_ROWS = 64;
 static constexpr int MAX_GRID_COLS = 64;
 
 static const float TILE_SIZE = 0.013f;
-//static const float HIGHLIGHTED_TILE_SIZE = 0.014f;
 static const float TILE_DEFAULT_Z = 0.1f;
-//static const float TILE_HIGHLIGHTED_Z = 0.2f;
 static const float ZOOM_SPEED = 1.25f;
 
 static const glm::vec3 TILE_DEFAULT_SCALE = glm::vec3(TILE_SIZE);
-//static const glm::vec3 TILE_HIGHLIGHTED_SCALE = glm::vec3(HIGHLIGHTED_TILE_SIZE);
 
 static std::unordered_set<std::string> ZERO_SPECIAL_TILES =
 {
@@ -80,6 +79,12 @@ static std::unordered_set<std::string> ZERO_SPECIAL_TILES =
     ZERO_BOTLEFT_CONNECTOR_TILE_FILE_NAME,
     ZERO_HOR_CONNECTOR_TILE_FILE_NAME,
     ZERO_VER_CONNECTOR_TILE_FILE_NAME
+};
+
+static std::unordered_set<std::string> SOLID_TILES =
+{
+    "wall_top.png",
+    "wall_body.png"
 };
 
 namespace TileConnectorType
@@ -137,7 +142,6 @@ void Editor::Update(const float dtMillis)
 {
     auto& systemsEngine = CoreSystemsEngine::GetInstance();
     auto& inputStateManager = systemsEngine.GetInputStateManager();
-    //auto& animationManager = systemsEngine.GetAnimationManager();
     auto scene = systemsEngine.GetSceneManager().FindScene(EDITOR_SCENE);
     
     auto worldTouchPos = inputStateManager.VGetPointingPosInWorldSpace(scene->GetCamera().GetViewMatrix(), scene->GetCamera().GetProjMatrix());
@@ -173,8 +177,6 @@ void Editor::Update(const float dtMillis)
     if (!highlightedTileCandidates.empty())
     {
         std::sort(highlightedTileCandidates.begin(), highlightedTileCandidates.end(), [&](scene::SceneObject* lhs, scene::SceneObject* rhs){ return glm::distance(glm::vec2(lhs->mPosition.x, lhs->mPosition.y), worldTouchPos) < glm::distance(glm::vec2(rhs->mPosition.x, rhs->mPosition.y), worldTouchPos); });
-//        highlightedTileCandidates.front()->mPosition.z = TILE_HIGHLIGHTED_Z;
-//        highlightedTileCandidates.front()->mScale = TILE_HIGHLIGHTED_SCALE;
         highlightedTileCandidates.front()->mShaderBoolUniformValues[TILE_HIGHLIGHTED_UNIFORM_NAME] = true;
         
         if (inputStateManager.VButtonPressed(input::Button::MAIN_BUTTON))
@@ -355,9 +357,25 @@ void Editor::CreateDebugWidgets()
             auto mapJsonString = mapJson.dump(4);
             outputMapJsonFile.write(mapJsonString.c_str(), mapJsonString.size());
             
+            // Render map texture
             rendering::ExportToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + fileutils::GetFileNameWithoutExtension(std::string(sMapNameBuffer)) + ".png", scene->GetSceneObjects());
-            logging::Log(logging::LogType::ERROR, "Successfully saved %s", (NON_SANDBOXED_MAPS_FOLDER + std::string(sMapNameBuffer)).c_str());
             
+            // Render map navmap texture
+            for (auto y = 0; y < mGridRows; ++y)
+            {
+                nlohmann::json rowJson;
+                for (auto x = 0; x < mGridCols; ++x)
+                {
+                    auto tileSceneObject = scene->FindSceneObject(strutils::StringId(std::to_string(x) + "," + std::to_string(y)));
+                    auto tileTextureResourcePath = fileutils::GetFileName(systemsEngine.GetResourceLoadingService().GetResourcePath(tileSceneObject->mTextureResourceId));
+                    
+                    tileSceneObject->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + WORLD_MAP_TILE_NAVMAP_GEN_SHADER);
+                    tileSceneObject->mShaderVec3UniformValues[NAVMAP_TILE_COLOR_UNIFORM_NAME] = SOLID_TILES.count(tileTextureResourcePath) ? glm::vec3(0.0f, 0.0f, 0.0f) : glm::vec3(1.0f, 1.0f, 1.0f);
+                }
+            }
+            rendering::ExportToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + fileutils::GetFileNameWithoutExtension(std::string(sMapNameBuffer)) + "_navmap.png", scene->GetSceneObjects());
+            
+            logging::Log(logging::LogType::ERROR, "Successfully saved %s", (NON_SANDBOXED_MAPS_FOLDER + std::string(sMapNameBuffer)).c_str());
             ospopups::ShowMessageBox(ospopups::MessageBoxType::INFO, "Export complete", "Finished saving map file and exporting texture for " + fileutils::GetFileNameWithoutExtension(std::string(sMapNameBuffer)) + ".");
         }
         
@@ -570,10 +588,12 @@ void Editor::UpdateTile(std::shared_ptr<scene::SceneObject> tile, std::shared_pt
         tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = TileConnectorType::NONE;
     }
     
-    if (!mViewOptions.mRenderConnectorTiles)
+    if (!mViewOptions.mRenderConnectorTiles && tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] != TileConnectorType::INVALID)
     {
         tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = TileConnectorType::NONE;
     }
+    
+    tile->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + WORLD_MAP_TILE_SHADER);
 }
 
 ///------------------------------------------------------------------------------------------------

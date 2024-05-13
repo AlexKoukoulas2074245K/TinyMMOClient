@@ -65,7 +65,7 @@ void ExportToPNG(const std::string& exportFilePath, std::vector<std::shared_ptr<
         const auto width = static_cast<GLsizei>(NEW_TEXTURE_SIZE);
         const auto height = static_cast<GLsizei>(NEW_TEXTURE_SIZE);
         
-        GLvoid* pixels = malloc(sizeof(GLubyte) * width * height * 4);
+        GLubyte* pixels = static_cast<GLubyte*>(malloc(sizeof(GLubyte) * width * height * 4));
         GL_CALL(glReadPixels(
            0,
            0,
@@ -75,6 +75,29 @@ void ExportToPNG(const std::string& exportFilePath, std::vector<std::shared_ptr<
            GL_UNSIGNED_BYTE,
            pixels
         ));
+        
+        // Calculate the size of one row in bytes
+        size_t rowSize = width * 4;
+
+        // Allocate memory for a single row to use for swapping
+        GLubyte* rowBuffer = static_cast<GLubyte*>(malloc(rowSize));
+
+        // Iterate through each row and swap with its corresponding row from the bottom
+        for (int y = 0; y < height / 2; ++y) {
+            int swapY = height - 1 - y; // Calculate the y-coordinate of the row to swap with
+
+            // Copy the current row to the temporary buffer
+            memcpy(rowBuffer, pixels + y * rowSize, rowSize);
+            
+            // Copy the corresponding row from the bottom to the current row
+            memcpy(pixels + y * rowSize, pixels + swapY * rowSize, rowSize);
+            
+            // Copy the contents of the temporary buffer (original current row) to the corresponding row from the bottom
+            memcpy(pixels + swapY * rowSize, rowBuffer, rowSize);
+        }
+
+        // Free the temporary buffer
+        free(rowBuffer);
         
         stbi_write_png(exportFilePath.c_str(), width, height, 4, pixels, width * 4);
         
