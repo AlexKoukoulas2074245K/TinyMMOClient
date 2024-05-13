@@ -58,6 +58,7 @@ static const float TILE_SIZE = 0.013f;
 static const float HIGHLIGHTED_TILE_SIZE = 0.014f;
 static const float TILE_DEFAULT_Z = 0.1f;
 static const float TILE_HIGHLIGHTED_Z = 0.2f;
+static const float ZOOM_SPEED = 1.25f;
 static const glm::vec3 TILE_DEFAULT_SCALE = glm::vec3(TILE_SIZE);
 static const glm::vec3 TILE_HIGHLIGHTED_SCALE = glm::vec3(HIGHLIGHTED_TILE_SIZE);
 
@@ -116,6 +117,8 @@ void Editor::Init()
     scene->SetLoaded(true);
     
     mSelectedPaletteTile = 0;
+    mViewOptions.mCameraZoom = scene->GetCamera().GetZoomFactor();
+    mViewOptions.mCameraPosition = scene->GetCamera().GetPosition();
     CreateGrid(DEFAULT_GRID_ROWS, DEFAULT_GRID_COLS);
 }
 
@@ -125,6 +128,7 @@ void Editor::Update(const float dtMillis)
 {
     auto& systemsEngine = CoreSystemsEngine::GetInstance();
     auto& inputStateManager = systemsEngine.GetInputStateManager();
+    //auto& animationManager = systemsEngine.GetAnimationManager();
     auto scene = systemsEngine.GetSceneManager().FindScene(EDITOR_SCENE);
     
     auto worldTouchPos = inputStateManager.VGetPointingPosInWorldSpace(scene->GetCamera().GetViewMatrix(), scene->GetCamera().GetProjMatrix());
@@ -147,63 +151,7 @@ void Editor::Update(const float dtMillis)
                 highlightedTileCandidates.push_back(tile.get());
             }
             
-            auto tileTextureFileName = fileutils::GetFileName(systemsEngine.GetResourceLoadingService().GetResourcePath(tile->mTextureResourceId));
-            if (tileTextureFileName == ZERO_HOR_CONNECTOR_TILE_FILE_NAME)
-            {
-                if (x == 0 || x == mGridCols - 1)
-                {
-                    tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = TileConnectorType::INVALID;
-                }
-                else
-                {
-                    tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = TileConnectorType::HOR;
-                    tile->mEffectTextureResourceIds[0] = scene->FindSceneObject(strutils::StringId(std::to_string(x - 1) + "," + std::to_string(y)))->mTextureResourceId;
-                    tile->mEffectTextureResourceIds[1] = scene->FindSceneObject(strutils::StringId(std::to_string(x + 1) + "," + std::to_string(y)))->mTextureResourceId;
-                }
-            }
-            else if (tileTextureFileName == ZERO_VER_CONNECTOR_TILE_FILE_NAME)
-            {
-                if (y == 0 || y == mGridRows - 1)
-                {
-                    tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = TileConnectorType::INVALID;
-                }
-                else
-                {
-                    tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = TileConnectorType::VER;
-                    tile->mEffectTextureResourceIds[0] = scene->FindSceneObject(strutils::StringId(std::to_string(x) + "," + std::to_string(y - 1)))->mTextureResourceId;
-                    tile->mEffectTextureResourceIds[1] = scene->FindSceneObject(strutils::StringId(std::to_string(x) + "," + std::to_string(y + 1)))->mTextureResourceId;
-                }
-            }
-            else if (tileTextureFileName == ZERO_TOPLEFT_CONNECTOR_TILE_FILE_NAME || tileTextureFileName == ZERO_BOTRIGHT_CONNECTOR_TILE_FILE_NAME)
-            {
-                if (y == 0 || y == mGridRows - 1 || x == 0 || x == mGridCols - 1)
-                {
-                    tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = TileConnectorType::INVALID;
-                }
-                else
-                {
-                    tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = tileTextureFileName == ZERO_TOPLEFT_CONNECTOR_TILE_FILE_NAME ? TileConnectorType::TOPLEFT : TileConnectorType::BOTRIGHT;
-                    tile->mEffectTextureResourceIds[0] = scene->FindSceneObject(strutils::StringId(std::to_string(x - 1) + "," + std::to_string(y - 1)))->mTextureResourceId;
-                    tile->mEffectTextureResourceIds[1] = scene->FindSceneObject(strutils::StringId(std::to_string(x + 1) + "," + std::to_string(y + 1)))->mTextureResourceId;
-                }
-            }
-            else if (tileTextureFileName == ZERO_TOPRIGHT_CONNECTOR_TILE_FILE_NAME || tileTextureFileName == ZERO_BOTLEFT_CONNECTOR_TILE_FILE_NAME)
-            {
-                if (y == 0 || y == mGridRows - 1 || x == 0 || x == mGridCols - 1)
-                {
-                    tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = TileConnectorType::INVALID;
-                }
-                else
-                {
-                    tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = tileTextureFileName == ZERO_TOPRIGHT_CONNECTOR_TILE_FILE_NAME ? TileConnectorType::TOPRIGHT : TileConnectorType::BOTLEFT;
-                    tile->mEffectTextureResourceIds[0] = scene->FindSceneObject(strutils::StringId(std::to_string(x - 1) + "," + std::to_string(y + 1)))->mTextureResourceId;
-                    tile->mEffectTextureResourceIds[1] = scene->FindSceneObject(strutils::StringId(std::to_string(x + 1) + "," + std::to_string(y - 1)))->mTextureResourceId;
-                }
-            }
-            else
-            {
-                tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = TileConnectorType::NONE;
-            }
+            UpdateTile(tile, scene, x, y);
         }
     }
     
@@ -219,6 +167,19 @@ void Editor::Update(const float dtMillis)
             highlightedTileCandidates.front()->mTextureResourceId = selectedTile.mResourceId;
         }
     }
+    
+    auto scrollDelta = inputStateManager.VGetScrollDelta();
+    if (scrollDelta.y != 0)
+    {
+        mViewOptions.mCameraZoom = mViewOptions.mCameraZoom * (scrollDelta.y > 0 ? ZOOM_SPEED : 1/ZOOM_SPEED);
+        scene->GetCamera().SetZoomFactor(mViewOptions.mCameraZoom);
+        
+        auto newWorldTouchPos = inputStateManager.VGetPointingPosInWorldSpace(scene->GetCamera().GetViewMatrix(), scene->GetCamera().GetProjMatrix());
+        mViewOptions.mCameraPosition.x -= newWorldTouchPos.x - worldTouchPos.x;
+        mViewOptions.mCameraPosition.y -= newWorldTouchPos.y - worldTouchPos.y;
+    }
+
+    scene->GetCamera().SetPosition(mViewOptions.mCameraPosition);
 }
 
 ///------------------------------------------------------------------------------------------------
@@ -387,6 +348,9 @@ void Editor::CreateDebugWidgets()
         
         ImGui::InputInt("x", &sDimensionsX);
         ImGui::InputInt("y", &sDimensionsY);
+        
+        ImGui::SeparatorText("View Options");
+        ImGui::Checkbox("Render Tile Connectors", &mViewOptions.mRenderConnectorTiles);
         ImGui::End();
     }
     
@@ -482,6 +446,76 @@ void Editor::CreateGrid(const int gridRows, const int gridCols)
             tile->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + WORLD_MAP_TILE_SHADER);
             tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = TileConnectorType::NONE;
         }
+    }
+}
+
+///------------------------------------------------------------------------------------------------
+
+void Editor::UpdateTile(std::shared_ptr<scene::SceneObject> tile, std::shared_ptr<scene::Scene> scene, const int tileCol, const int tileRow)
+{
+    auto& systemsEngine = CoreSystemsEngine::GetInstance();
+    
+    auto tileTextureFileName = fileutils::GetFileName(systemsEngine.GetResourceLoadingService().GetResourcePath(tile->mTextureResourceId));
+    if (tileTextureFileName == ZERO_HOR_CONNECTOR_TILE_FILE_NAME)
+    {
+        if (tileCol == 0 || tileCol == mGridCols - 1)
+        {
+            tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = TileConnectorType::INVALID;
+        }
+        else
+        {
+            tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = TileConnectorType::HOR;
+            tile->mEffectTextureResourceIds[0] = scene->FindSceneObject(strutils::StringId(std::to_string(tileCol - 1) + "," + std::to_string(tileRow)))->mTextureResourceId;
+            tile->mEffectTextureResourceIds[1] = scene->FindSceneObject(strutils::StringId(std::to_string(tileCol + 1) + "," + std::to_string(tileRow)))->mTextureResourceId;
+        }
+    }
+    else if (tileTextureFileName == ZERO_VER_CONNECTOR_TILE_FILE_NAME)
+    {
+        if (tileRow == 0 || tileRow == mGridRows - 1)
+        {
+            tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = TileConnectorType::INVALID;
+        }
+        else
+        {
+            tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = TileConnectorType::VER;
+            tile->mEffectTextureResourceIds[0] = scene->FindSceneObject(strutils::StringId(std::to_string(tileCol) + "," + std::to_string(tileRow - 1)))->mTextureResourceId;
+            tile->mEffectTextureResourceIds[1] = scene->FindSceneObject(strutils::StringId(std::to_string(tileCol) + "," + std::to_string(tileRow + 1)))->mTextureResourceId;
+        }
+    }
+    else if (tileTextureFileName == ZERO_TOPLEFT_CONNECTOR_TILE_FILE_NAME || tileTextureFileName == ZERO_BOTRIGHT_CONNECTOR_TILE_FILE_NAME)
+    {
+        if (tileRow == 0 || tileRow == mGridRows - 1 || tileCol == 0 || tileCol == mGridCols - 1)
+        {
+            tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = TileConnectorType::INVALID;
+        }
+        else
+        {
+            tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = tileTextureFileName == ZERO_TOPLEFT_CONNECTOR_TILE_FILE_NAME ? TileConnectorType::TOPLEFT : TileConnectorType::BOTRIGHT;
+            tile->mEffectTextureResourceIds[0] = scene->FindSceneObject(strutils::StringId(std::to_string(tileCol - 1) + "," + std::to_string(tileRow - 1)))->mTextureResourceId;
+            tile->mEffectTextureResourceIds[1] = scene->FindSceneObject(strutils::StringId(std::to_string(tileCol + 1) + "," + std::to_string(tileRow + 1)))->mTextureResourceId;
+        }
+    }
+    else if (tileTextureFileName == ZERO_TOPRIGHT_CONNECTOR_TILE_FILE_NAME || tileTextureFileName == ZERO_BOTLEFT_CONNECTOR_TILE_FILE_NAME)
+    {
+        if (tileRow == 0 || tileRow == mGridRows - 1 || tileCol == 0 || tileCol == mGridCols - 1)
+        {
+            tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = TileConnectorType::INVALID;
+        }
+        else
+        {
+            tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = tileTextureFileName == ZERO_TOPRIGHT_CONNECTOR_TILE_FILE_NAME ? TileConnectorType::TOPRIGHT : TileConnectorType::BOTLEFT;
+            tile->mEffectTextureResourceIds[0] = scene->FindSceneObject(strutils::StringId(std::to_string(tileCol - 1) + "," + std::to_string(tileRow + 1)))->mTextureResourceId;
+            tile->mEffectTextureResourceIds[1] = scene->FindSceneObject(strutils::StringId(std::to_string(tileCol + 1) + "," + std::to_string(tileRow - 1)))->mTextureResourceId;
+        }
+    }
+    else
+    {
+        tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = TileConnectorType::NONE;
+    }
+    
+    if (!mViewOptions.mRenderConnectorTiles)
+    {
+        tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = TileConnectorType::NONE;
     }
 }
 

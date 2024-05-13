@@ -22,6 +22,7 @@
 namespace scene
 {
     struct SceneObject;
+    class Scene;
 }
 
 class Editor final
@@ -39,6 +40,7 @@ public:
     
 private:
     void CreateGrid(const int gridRows, const int gridCols);
+    void UpdateTile(std::shared_ptr<scene::SceneObject> tile, std::shared_ptr<scene::Scene> scene, const int tileCol, const int tileRow);
     
 private:
     struct MapTileData
@@ -48,9 +50,17 @@ private:
         std::string mTileName;
     };
     
+    struct ViewOptions
+    {
+        bool mRenderConnectorTiles = true;
+        float mCameraZoom = 0.0f;
+        glm::vec3 mCameraPosition;
+    };
+    
     int mGridRows, mGridCols;
     int mSelectedPaletteTile;
     std::vector<MapTileData> mPaletteTileData;
+    ViewOptions mViewOptions;
 };
 
 ///------------------------------------------------------------------------------------------------
