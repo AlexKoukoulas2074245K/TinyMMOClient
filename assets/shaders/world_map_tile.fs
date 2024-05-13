@@ -16,7 +16,7 @@ uniform vec3 point_light_position;
 uniform float point_light_power;
 uniform float custom_alpha;
 uniform bool affected_by_light;
-uniform int connector_type; // 0=none  1=|  2=-  3=\  4=/ 5=invalid
+uniform int connector_type; // 0=none  1=|  2=-  3=topleft  4=topright 5=botright 6=botleft  7=invalid
 out vec4 frag_color;
 
 void main()
@@ -34,8 +34,10 @@ void main()
         case 1: frag_color = mix(frag_color_a, frag_color_b, final_uv_y); break;
         case 2: frag_color = mix(frag_color_a, frag_color_b, final_uv_x); break;
         case 3: frag_color = mix(frag_color_a, frag_color_b, min(final_uv_x, final_uv_y)); break;
-        case 4: frag_color = mix(frag_color_a, frag_color_b, min(final_uv_x, 1.0f - final_uv_y)); break;
-        case 5: frag_color *= vec4(1.0f, 0.0f, 0.0f, 1.0f); break;
+        case 4: frag_color = mix(frag_color_a, frag_color_b, max(final_uv_x, 1.0f - final_uv_y)); break;
+        case 5: frag_color = mix(frag_color_a, frag_color_b, max(final_uv_x, final_uv_y)); break;
+        case 6: frag_color = mix(frag_color_a, frag_color_b, min(final_uv_x, 1.0f - final_uv_y)); break;
+        case 7: frag_color *= vec4(1.0f, 0.0f, 0.0f, 1.0f); break;
         default: break;
     }
 }
