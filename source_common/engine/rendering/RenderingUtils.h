@@ -25,7 +25,9 @@ namespace rendering
 
 ///------------------------------------------------------------------------------------------------
 
-void CollateSceneObjectsIntoOne(const std::string& dynamicTextureResourceName, const glm::vec3& positionOffset, std::vector<std::shared_ptr<scene::SceneObject>>& sceneObjects, const std::string& exportFilePath, scene::Scene& scene);
+void ExportToPNG(const std::string& exportFilePath, std::vector<std::shared_ptr<scene::SceneObject>>& sceneObjects);
+
+///------------------------------------------------------------------------------------------------
 
 int GetDisplayRefreshRate();
 

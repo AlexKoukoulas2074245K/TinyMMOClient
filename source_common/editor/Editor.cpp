@@ -12,6 +12,7 @@
 #include <engine/rendering/Camera.h>
 #include <engine/rendering/Fonts.h>
 #include <engine/rendering/ParticleManager.h>
+#include <engine/rendering/RenderingUtils.h>
 #include <engine/resloading/ResourceLoadingService.h>
 #include <engine/resloading/ImageSurfaceResource.h>
 #include <engine/resloading/TextureResource.h>
@@ -41,7 +42,10 @@
 
 static const strutils::StringId EDITOR_SCENE = strutils::StringId("editor_scene");
 static const strutils::StringId TILE_CONNECTOR_TYPE_UNIFORM_NAME = strutils::StringId("connector_type");
+static const strutils::StringId TILE_HIGHLIGHTED_UNIFORM_NAME = strutils::StringId("highlighted");
+
 static const std::string NON_SANDBOXED_MAPS_FOLDER = "/Users/Code/TinyMMOClient/assets/data/world/maps/";
+static const std::string NON_SANDBOXED_MAP_TEXTURES_FOLDER = "/Users/Code/TinyMMOClient/assets/textures/world/maps/";
 static const std::string MAP_FILES_FOLDER = "world/maps/";
 static const std::string TILES_FOLDER = "world/map_tiles/";
 static const std::string ZERO_BLANK_TILE_FILE_NAME = "0_blank.png";
@@ -52,15 +56,20 @@ static const std::string ZERO_BOTLEFT_CONNECTOR_TILE_FILE_NAME = "0_botleft_conn
 static const std::string ZERO_HOR_CONNECTOR_TILE_FILE_NAME = "0_hor_connector.png";
 static const std::string ZERO_VER_CONNECTOR_TILE_FILE_NAME = "0_ver_connector.png";
 static const std::string WORLD_MAP_TILE_SHADER = "world_map_tile.vs";
+
 static constexpr int DEFAULT_GRID_ROWS = 32;
 static constexpr int DEFAULT_GRID_COLS = 32;
+static constexpr int MAX_GRID_ROWS = 64;
+static constexpr int MAX_GRID_COLS = 64;
+
 static const float TILE_SIZE = 0.013f;
-static const float HIGHLIGHTED_TILE_SIZE = 0.014f;
+//static const float HIGHLIGHTED_TILE_SIZE = 0.014f;
 static const float TILE_DEFAULT_Z = 0.1f;
-static const float TILE_HIGHLIGHTED_Z = 0.2f;
+//static const float TILE_HIGHLIGHTED_Z = 0.2f;
 static const float ZOOM_SPEED = 1.25f;
+
 static const glm::vec3 TILE_DEFAULT_SCALE = glm::vec3(TILE_SIZE);
-static const glm::vec3 TILE_HIGHLIGHTED_SCALE = glm::vec3(HIGHLIGHTED_TILE_SIZE);
+//static const glm::vec3 TILE_HIGHLIGHTED_SCALE = glm::vec3(HIGHLIGHTED_TILE_SIZE);
 
 static std::unordered_set<std::string> ZERO_SPECIAL_TILES =
 {
@@ -133,6 +142,11 @@ void Editor::Update(const float dtMillis)
     
     auto worldTouchPos = inputStateManager.VGetPointingPosInWorldSpace(scene->GetCamera().GetViewMatrix(), scene->GetCamera().GetProjMatrix());
     
+    // Skip input handling if ImGUI wants it
+    ImGuiIO& io = ImGui::GetIO();
+    bool imGuiMouseInput = io.WantCaptureMouse;
+    
+    
     std::vector<scene::SceneObject*> highlightedTileCandidates;
     
     for (auto y = 0; y < mGridRows; ++y)
@@ -144,9 +158,10 @@ void Editor::Update(const float dtMillis)
             
             tile->mPosition.z = TILE_DEFAULT_Z;
             tile->mScale = TILE_DEFAULT_SCALE;
+            tile->mShaderBoolUniformValues[TILE_HIGHLIGHTED_UNIFORM_NAME] = false;
             
             auto cursorInTile = math::IsPointInsideRectangle(rect.bottomLeft, rect.topRight, worldTouchPos);
-            if (cursorInTile)
+            if (cursorInTile && !imGuiMouseInput)
             {
                 highlightedTileCandidates.push_back(tile.get());
             }
@@ -158,8 +173,9 @@ void Editor::Update(const float dtMillis)
     if (!highlightedTileCandidates.empty())
     {
         std::sort(highlightedTileCandidates.begin(), highlightedTileCandidates.end(), [&](scene::SceneObject* lhs, scene::SceneObject* rhs){ return glm::distance(glm::vec2(lhs->mPosition.x, lhs->mPosition.y), worldTouchPos) < glm::distance(glm::vec2(rhs->mPosition.x, rhs->mPosition.y), worldTouchPos); });
-        highlightedTileCandidates.front()->mPosition.z = TILE_HIGHLIGHTED_Z;
-        highlightedTileCandidates.front()->mScale = TILE_HIGHLIGHTED_SCALE;
+//        highlightedTileCandidates.front()->mPosition.z = TILE_HIGHLIGHTED_Z;
+//        highlightedTileCandidates.front()->mScale = TILE_HIGHLIGHTED_SCALE;
+        highlightedTileCandidates.front()->mShaderBoolUniformValues[TILE_HIGHLIGHTED_UNIFORM_NAME] = true;
         
         if (inputStateManager.VButtonPressed(input::Button::MAIN_BUTTON))
         {
@@ -169,7 +185,7 @@ void Editor::Update(const float dtMillis)
     }
     
     auto scrollDelta = inputStateManager.VGetScrollDelta();
-    if (scrollDelta.y != 0)
+    if (scrollDelta.y != 0 && !imGuiMouseInput)
     {
         mViewOptions.mCameraZoom = mViewOptions.mCameraZoom * (scrollDelta.y > 0 ? ZOOM_SPEED : 1/ZOOM_SPEED);
         scene->GetCamera().SetZoomFactor(mViewOptions.mCameraZoom);
@@ -339,15 +355,56 @@ void Editor::CreateDebugWidgets()
             auto mapJsonString = mapJson.dump(4);
             outputMapJsonFile.write(mapJsonString.c_str(), mapJsonString.size());
             
+            rendering::ExportToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + fileutils::GetFileNameWithoutExtension(std::string(sMapNameBuffer)) + ".png", scene->GetSceneObjects());
             logging::Log(logging::LogType::ERROR, "Successfully saved %s", (NON_SANDBOXED_MAPS_FOLDER + std::string(sMapNameBuffer)).c_str());
+            
+            ospopups::ShowMessageBox(ospopups::MessageBoxType::INFO, "Export complete", "Finished saving map file and exporting texture for " + fileutils::GetFileNameWithoutExtension(std::string(sMapNameBuffer)) + ".");
         }
         
         ImGui::SeparatorText("Modify/Create");
         static int sDimensionsX = DEFAULT_GRID_COLS;
         static int sDimensionsY = DEFAULT_GRID_ROWS;
         
-        ImGui::InputInt("x", &sDimensionsX);
-        ImGui::InputInt("y", &sDimensionsY);
+        if (ImGui::InputInt("x", &sDimensionsX))
+        {
+            if (sDimensionsX > MAX_GRID_COLS)
+            {
+                sDimensionsX = MAX_GRID_COLS;
+            }
+            else if (sDimensionsX < 0)
+            {
+                sDimensionsX = 0;
+            }
+        }
+        
+        if (ImGui::InputInt("y", &sDimensionsY))
+        {
+            if (sDimensionsY > MAX_GRID_ROWS)
+            {
+                sDimensionsY = MAX_GRID_ROWS;
+            }
+            else if (sDimensionsY < 0)
+            {
+                sDimensionsY = 0;
+            }
+        }
+        
+        ImGui::Dummy(ImVec2(0.0f, 10.0f));
+        if (ImGui::Button("  Create  "))
+        {
+            auto& systemsEngine = CoreSystemsEngine::GetInstance();
+            auto scene = systemsEngine.GetSceneManager().FindScene(EDITOR_SCENE);
+            
+            for (auto y = 0; y < mGridRows; ++y)
+            {
+                for (auto x = 0; x < mGridCols; ++x)
+                {
+                    scene->RemoveSceneObject(strutils::StringId(std::to_string(x) + "," + std::to_string(y)));
+                }
+            }
+            
+            CreateGrid(sDimensionsX, sDimensionsY);
+        }
         
         ImGui::SeparatorText("View Options");
         ImGui::Checkbox("Render Tile Connectors", &mViewOptions.mRenderConnectorTiles);
