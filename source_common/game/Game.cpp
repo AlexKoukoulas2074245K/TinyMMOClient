@@ -32,6 +32,7 @@
 #include <game/PlayerController.h>
 #include <game/utils/NameGenerator.h>
 #include <imgui/imgui.h>
+#include <map/MapConstants.h>
 #include <mutex>
 #include <net_common/WorldObjectTypes.h>
 #include <net_common/WorldObjectStates.h>
@@ -96,10 +97,15 @@ void Game::Init()
     auto scene = systemsEngine.GetSceneManager().CreateScene(strutils::StringId("world"));
     scene->SetLoaded(true);
     
-    auto background = scene->CreateSceneObject(strutils::StringId("forest"));
-    background->mPosition.z = 0.0f;
-    background->mScale *= game_constants::MAP_SCALE;
-    background->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "world/maps/map_tower.png");
+    auto backgroundBottomLayer = scene->CreateSceneObject(strutils::StringId("map_tower_bottom"));
+    backgroundBottomLayer->mPosition.z = map_constants::TILE_BOTTOM_LAYER_Z;
+    backgroundBottomLayer->mScale *= game_constants::MAP_SCALE;
+    backgroundBottomLayer->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "world/maps/map_tower_bottom_layer.png");
+    
+    auto backgroundTopLayer = scene->CreateSceneObject(strutils::StringId("map_tower_top"));
+    backgroundTopLayer->mPosition.z = map_constants::TILE_TOP_LAYER_Z;
+    backgroundTopLayer->mScale *= game_constants::MAP_SCALE;
+    backgroundTopLayer->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "world/maps/map_tower_top_layer.png");
     
     auto navmapResourceID = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "world/maps/map_tower_navmap.png");
     sNavmapSurface = systemsEngine.GetResourceLoadingService().GetResource<resources::ImageSurfaceResource>(navmapResourceID).GetSurface();

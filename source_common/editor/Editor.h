@@ -42,8 +42,9 @@ public:
     void CreateDebugWidgets();
     
 private:
+    void DestroyMap();
     void CreateMap(const int gridRows, const int gridCols);
-    void UpdateTile(std::shared_ptr<scene::SceneObject> tile, std::shared_ptr<scene::Scene> scene, const int tileCol, const int tileRow);
+    void UpdateTile(std::shared_ptr<scene::SceneObject> tile, std::shared_ptr<scene::Scene> scene, const std::string& tileNamePostfix, const int tileCol, const int tileRow);
     void TryExecuteCommand(std::unique_ptr<commands::IEditorCommand> command);
     void TryUndoLastCommand();
     
@@ -64,8 +65,8 @@ private:
     
     int mGridRows, mGridCols;
     int mSelectedPaletteTile;
-    bool mBottomLayerVisible;
-    bool mTopLayerVisible;
+    float mBottomLayerVisibility;
+    float mTopLayerVisibility;
     std::vector<MapTileData> mPaletteTileData;
     std::stack<std::unique_ptr<commands::IEditorCommand>> mExecutedCommandHistory;
     ViewOptions mViewOptions;

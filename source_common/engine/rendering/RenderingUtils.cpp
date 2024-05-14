@@ -82,11 +82,17 @@ static void ApplyGaussianBlur(std::vector<Pixel>& pixels, int width, int height)
         kernel[i] /= sum;
     }
     
+    logging::Log(logging::LogType::INFO, "Starting blurring...");
+    
     // Perform horizontal blur
     std::vector<Pixel> tempPixels(pixels);
     for (int y = 0; y < height; ++y) 
     {
-        for (int x = 0; x < width; ++x) 
+        if (y % (NEW_TEXTURE_SIZE/10) == 0)
+        {
+            logging::Log(logging::LogType::INFO, "Blurring horizontally %d%% complete...", 1 + static_cast<int>(100.0f * y/static_cast<float>(height)));
+        }
+        for (int x = 0; x < width; ++x)
         {
             float r = 0.0f, g = 0.0f, b = 0.0f, a = 0.0f;
             for (int i = -kernelSize; i <= kernelSize; ++i) 
@@ -109,6 +115,10 @@ static void ApplyGaussianBlur(std::vector<Pixel>& pixels, int width, int height)
     tempPixels = pixels;
     for (int y = 0; y < height; ++y) 
     {
+        if (y % (NEW_TEXTURE_SIZE/10) == 0)
+        {
+            logging::Log(logging::LogType::INFO, "Blurring vertically %d%% complete...", 1 + static_cast<int>(100.0f * y/static_cast<float>(height)));
+        }
         for (int x = 0; x < width; ++x)
         {
             float r = 0.0f, g = 0.0f, b = 0.0f, a = 0.0f;

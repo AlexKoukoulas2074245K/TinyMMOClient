@@ -55,4 +55,6 @@ void main()
             frag_color = HIGHLIGHTED_EDGES_COLOR;
         }
     }
+    
+    frag_color.a *= custom_alpha;
 }

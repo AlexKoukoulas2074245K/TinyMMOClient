@@ -42,6 +42,7 @@
 
 static const strutils::StringId EDITOR_SCENE = strutils::StringId("editor_scene");
 static const strutils::StringId TILE_CONNECTOR_TYPE_UNIFORM_NAME = strutils::StringId("connector_type");
+static const strutils::StringId CUSTOM_ALPHA_UNIFORM_NAME = strutils::StringId("custom_alpha");
 static const strutils::StringId TILE_HIGHLIGHTED_UNIFORM_NAME = strutils::StringId("highlighted");
 static const strutils::StringId NAVMAP_TILE_COLOR_UNIFORM_NAME = strutils::StringId("navmap_tile_color");
 
@@ -50,6 +51,7 @@ static const std::string NON_SANDBOXED_MAP_TEXTURES_FOLDER = "/Users/Code/TinyMM
 static const std::string MAP_FILES_FOLDER = "world/maps/";
 static const std::string TILES_FOLDER = "world/map_tiles/";
 static const std::string ZERO_BLANK_TILE_FILE_NAME = "0_blank.png";
+static const std::string ZERO_BLANK_TRANSPARENT_TILE_FILE_NAME = "0_blank_transparent.png";
 static const std::string ZERO_TOPLEFT_CONNECTOR_TILE_FILE_NAME = "0_topleft_connector.png";
 static const std::string ZERO_TOPRIGHT_CONNECTOR_TILE_FILE_NAME = "0_topright_connector.png";
 static const std::string ZERO_BOTRIGHT_CONNECTOR_TILE_FILE_NAME = "0_botright_connector.png";
@@ -65,23 +67,11 @@ static constexpr int MAX_GRID_ROWS = 64;
 static constexpr int MAX_GRID_COLS = 64;
 
 static const float TILE_SIZE = 0.013f;
-static const float TILE_DEFAULT_Z = 0.1f;
 static const float ZOOM_SPEED = 1.25f;
 static const float MOVE_SPEED = 0.01f;
 
 static const glm::vec3 TILE_DEFAULT_SCALE = glm::vec3(TILE_SIZE);
 static const glm::vec3 EMPTY_NAVMAP_TILE_COLOR = {1.0f, 1.0f, 1.0f};
-
-static std::unordered_set<std::string> ZERO_SPECIAL_TILES =
-{
-    ZERO_BLANK_TILE_FILE_NAME,
-    ZERO_TOPRIGHT_CONNECTOR_TILE_FILE_NAME,
-    ZERO_TOPLEFT_CONNECTOR_TILE_FILE_NAME,
-    ZERO_BOTRIGHT_CONNECTOR_TILE_FILE_NAME,
-    ZERO_BOTLEFT_CONNECTOR_TILE_FILE_NAME,
-    ZERO_HOR_CONNECTOR_TILE_FILE_NAME,
-    ZERO_VER_CONNECTOR_TILE_FILE_NAME
-};
 
 static std::unordered_map<std::string, glm::vec3> SPECIAL_NAVMAP_TILES_TO_COLORS =
 {
@@ -105,8 +95,9 @@ namespace TileConnectorType
 ///------------------------------------------------------------------------------------------------
 
 Editor::Editor(const int argc, char** argv)
-    : mBottomLayerVisible(true)
-    , mTopLayerVisible(true)
+    : mBottomLayerVisibility(1.0f)
+    , mTopLayerVisibility(0.5f)
+    , mActiveLayer(map_constants::LayerType::BOTTOM_LAYER)
 {
     if (argc > 0)
     {
@@ -155,27 +146,42 @@ void Editor::Update(const float dtMillis)
     ImGuiIO& io = ImGui::GetIO();
     bool imGuiMouseInput = io.WantCaptureMouse;
     
-    
     std::vector<std::shared_ptr<scene::SceneObject>> highlightedTileCandidates;
     
     for (auto y = 0; y < mGridRows; ++y)
     {
         for (auto x = 0; x < mGridCols; ++x)
         {
-            auto tile = scene->FindSceneObject(strutils::StringId(std::to_string(x) + "," + std::to_string(y)));
-            auto rect = scene_object_utils::GetSceneObjectBoundingRect(*tile);
-            
-            tile->mPosition.z = TILE_DEFAULT_Z;
-            tile->mScale = TILE_DEFAULT_SCALE;
-            tile->mShaderBoolUniformValues[TILE_HIGHLIGHTED_UNIFORM_NAME] = false;
-            
-            auto cursorInTile = math::IsPointInsideRectangle(rect.bottomLeft, rect.topRight, worldTouchPos);
-            if (cursorInTile && !imGuiMouseInput)
             {
-                highlightedTileCandidates.push_back(tile);
+                auto bottomLayerTile = scene->FindSceneObject(strutils::StringId(std::to_string(x) + "," + std::to_string(y)));
+                auto rect = scene_object_utils::GetSceneObjectBoundingRect(*bottomLayerTile);
+                
+                bottomLayerTile->mShaderBoolUniformValues[TILE_HIGHLIGHTED_UNIFORM_NAME] = false;
+                
+                auto cursorInTile = math::IsPointInsideRectangle(rect.bottomLeft, rect.topRight, worldTouchPos);
+                if (mActiveLayer == map_constants::LayerType::BOTTOM_LAYER && cursorInTile && !imGuiMouseInput)
+                {
+                    highlightedTileCandidates.push_back(bottomLayerTile);
+                }
+                
+                UpdateTile(bottomLayerTile, scene, "", x, y);
             }
             
-            UpdateTile(tile, scene, x, y);
+            {
+                
+                auto topLayerTile = scene->FindSceneObject(strutils::StringId(std::to_string(x) + "," + std::to_string(y) + "_top"));
+                auto rect = scene_object_utils::GetSceneObjectBoundingRect(*topLayerTile);
+                
+                topLayerTile->mShaderBoolUniformValues[TILE_HIGHLIGHTED_UNIFORM_NAME] = false;
+                
+                auto cursorInTile = math::IsPointInsideRectangle(rect.bottomLeft, rect.topRight, worldTouchPos);
+                if (mActiveLayer == map_constants::LayerType::TOP_LAYER && cursorInTile && !imGuiMouseInput)
+                {
+                    highlightedTileCandidates.push_back(topLayerTile);
+                }
+                
+                UpdateTile(topLayerTile, scene, "_top", x, y);
+            }
         }
     }
     
@@ -188,6 +194,10 @@ void Editor::Update(const float dtMillis)
         {
             const auto& selectedPaletteTile = mPaletteTileData[mSelectedPaletteTile];
             TryExecuteCommand(std::make_unique<commands::PlaceTileCommand>(highlightedTileCandidates.front(), selectedPaletteTile.mResourceId));
+        }
+        else if (inputStateManager.VButtonTapped(input::Button::SECONDARY_BUTTON))
+        {
+            TryExecuteCommand(std::make_unique<commands::PlaceTileCommand>(highlightedTileCandidates.front(), mPaletteTileData[0].mResourceId));
         }
     }
  
@@ -224,7 +234,6 @@ void Editor::Update(const float dtMillis)
         }
     }
 
-    
     if (commandModifierDown && inputStateManager.VKeyTapped(input::Key::Z))
     {
         TryUndoLastCommand();
@@ -325,28 +334,43 @@ void Editor::CreateDebugWidgets()
                 auto& systemsEngine = CoreSystemsEngine::GetInstance();
                 auto scene = systemsEngine.GetSceneManager().FindScene(EDITOR_SCENE);
                 
-                for (auto y = 0; y < mGridRows; ++y)
+                DestroyMap();
+                CreateMap(mapJson["metadata"]["rows"].get<int>(), mapJson["metadata"]["cols"]);
+                
                 {
-                    for (auto x = 0; x < mGridCols; ++x)
+                    auto rowCounter = 0;
+                    auto colCounter = 0;
+                    for (auto rowJson: mapJson["tiledata"]["bottomlayer"])
                     {
-                        scene->RemoveSceneObject(strutils::StringId(std::to_string(x) + "," + std::to_string(y)));
+                        colCounter = 0;
+                        for (auto tileJson: rowJson)
+                        {
+                            auto tileSceneObject = scene->FindSceneObject(strutils::StringId(std::to_string(colCounter) + "," + std::to_string(rowCounter)));
+                            tileSceneObject->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_ROOT + tileJson["tile_texture"].get<std::string>());
+                            colCounter++;
+                        }
+                        rowCounter++;
                     }
                 }
                 
-                CreateMap(mapJson["metadata"]["rows"].get<int>(), mapJson["metadata"]["cols"]);
-                
-                auto rowCounter = 0;
-                auto colCounter = 0;
-                for (auto rowJson: mapJson["tiledata"])
                 {
-                    colCounter = 0;
-                    for (auto tileJson: rowJson)
+                    auto rowCounter = 0;
+                    auto colCounter = 0;
+                    
+                    if (mapJson["tiledata"].contains("toplayer") && !mapJson["tiledata"]["toplayer"].is_null())
                     {
-                        auto tileSceneObject = scene->FindSceneObject(strutils::StringId(std::to_string(colCounter) + "," + std::to_string(rowCounter)));
-                        tileSceneObject->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_ROOT + tileJson["tile_texture"].get<std::string>());
-                        colCounter++;
+                        for (auto rowJson: mapJson["tiledata"]["toplayer"])
+                        {
+                            colCounter = 0;
+                            for (auto tileJson: rowJson)
+                            {
+                                auto tileSceneObject = scene->FindSceneObject(strutils::StringId(std::to_string(colCounter) + "," + std::to_string(rowCounter) + "_top"));
+                                tileSceneObject->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_ROOT + tileJson["tile_texture"].get<std::string>());
+                                colCounter++;
+                            }
+                            rowCounter++;
+                        }
                     }
-                    rowCounter++;
                 }
                 
                 logging::Log(logging::LogType::ERROR, "Successfully loaded %s", (resources::ResourceLoadingService::RES_DATA_ROOT + MAP_FILES_FOLDER + sMapNameBuffer).c_str());
@@ -366,6 +390,8 @@ void Editor::CreateDebugWidgets()
             nlohmann::json mapJson;
             nlohmann::json mapMetaDataJson;
             nlohmann::json mapTileDataJson;
+            nlohmann::json bottomLayerMapTileDataJson;
+            nlohmann::json topLayerMapTileDataJson;
             
             mapMetaDataJson["rows"] = mGridRows;
             mapMetaDataJson["cols"] = mGridCols;
@@ -375,16 +401,30 @@ void Editor::CreateDebugWidgets()
             
             for (auto y = 0; y < mGridRows; ++y)
             {
-                nlohmann::json rowJson;
+                nlohmann::json bottomLayerRowJson;
+                nlohmann::json topLayerRowJson;
                 for (auto x = 0; x < mGridCols; ++x)
                 {
-                    auto tileSceneObject = scene->FindSceneObject(strutils::StringId(std::to_string(x) + "," + std::to_string(y)));
-                    nlohmann::json tileJson;
-                    tileJson["tile_texture"] = CoreSystemsEngine::GetInstance().GetResourceLoadingService().GetResourcePath(tileSceneObject->mTextureResourceId);
-                    rowJson.push_back(tileJson);
+                    {
+                        auto bottomLayerTileSceneObject = scene->FindSceneObject(strutils::StringId(std::to_string(x) + "," + std::to_string(y)));
+                        nlohmann::json tileJson;
+                        tileJson["tile_texture"] = CoreSystemsEngine::GetInstance().GetResourceLoadingService().GetResourcePath(bottomLayerTileSceneObject->mTextureResourceId);
+                        bottomLayerRowJson.push_back(tileJson);
+                    }
+                    
+                    {
+                        auto topLayerTileSceneObject = scene->FindSceneObject(strutils::StringId(std::to_string(x) + "," + std::to_string(y) + "_top"));
+                        nlohmann::json tileJson;
+                        tileJson["tile_texture"] = CoreSystemsEngine::GetInstance().GetResourceLoadingService().GetResourcePath(topLayerTileSceneObject->mTextureResourceId);
+                        topLayerRowJson.push_back(tileJson);
+                    }
                 }
-                mapTileDataJson.push_back(rowJson);
+                bottomLayerMapTileDataJson.push_back(bottomLayerRowJson);
+                topLayerMapTileDataJson.push_back(topLayerRowJson);
             }
+            
+            mapTileDataJson["bottomlayer"] = bottomLayerMapTileDataJson;
+            mapTileDataJson["toplayer"] = topLayerMapTileDataJson;
             mapJson["tiledata"] = mapTileDataJson;
             mapJson["metadata"] = mapMetaDataJson;
             
@@ -393,8 +433,26 @@ void Editor::CreateDebugWidgets()
             outputMapJsonFile.write(mapJsonString.c_str(), mapJsonString.size());
             outputMapJsonFile.close();
             
-            // Render map texture
-            rendering::ExportToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + fileutils::GetFileNameWithoutExtension(std::string(sMapNameBuffer)) + ".png", scene->GetSceneObjects(), rendering::BlurStep::DONT_BLUR);
+            // Render map textures
+            std::vector<std::shared_ptr<scene::SceneObject>> bottomLayerSceneObjects;
+            std::vector<std::shared_ptr<scene::SceneObject>> topLayerSceneObjects;
+            
+            for (auto y = 0; y < mGridRows; ++y)
+            {
+                for (auto x = 0; x < mGridCols; ++x)
+                {
+                    auto bottomLayerTileSceneObject = scene->FindSceneObject(strutils::StringId(std::to_string(x) + "," + std::to_string(y)));
+                    auto topLayerTileSceneObject = scene->FindSceneObject(strutils::StringId(std::to_string(x) + "," + std::to_string(y) + "_top"));
+                    
+                    bottomLayerTileSceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 1.0f;
+                    topLayerTileSceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 1.0f;
+                    
+                    bottomLayerSceneObjects.push_back(bottomLayerTileSceneObject);
+                    topLayerSceneObjects.push_back(topLayerTileSceneObject);
+                }
+            }
+            rendering::ExportToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + fileutils::GetFileNameWithoutExtension(std::string(sMapNameBuffer)) + "_bottom_layer.png", bottomLayerSceneObjects, rendering::BlurStep::DONT_BLUR);
+            rendering::ExportToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + fileutils::GetFileNameWithoutExtension(std::string(sMapNameBuffer)) + "_top_layer.png", topLayerSceneObjects, rendering::BlurStep::DONT_BLUR);
             
             // Render map navmap texture
             for (auto y = 0; y < mGridRows; ++y)
@@ -449,17 +507,7 @@ void Editor::CreateDebugWidgets()
         ImGui::Dummy(ImVec2(0.0f, 10.0f));
         if (ImGui::Button("  Create  "))
         {
-            auto& systemsEngine = CoreSystemsEngine::GetInstance();
-            auto scene = systemsEngine.GetSceneManager().FindScene(EDITOR_SCENE);
-            
-            for (auto y = 0; y < mGridRows; ++y)
-            {
-                for (auto x = 0; x < mGridCols; ++x)
-                {
-                    scene->RemoveSceneObject(strutils::StringId(std::to_string(x) + "," + std::to_string(y)));
-                }
-            }
-            
+            DestroyMap();
             CreateMap(sDimensionsY, sDimensionsX);
         }
         
@@ -507,7 +555,7 @@ void Editor::CreateDebugWidgets()
                 
                 if (tileTextureId)
                 {
-                    ImVec4 bg_col = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);             // Black background
+                    ImVec4 bg_col = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
                     ImVec4 tint_col = mSelectedPaletteTile == tileIndex ? ImVec4(1.0f, 1.0f, 1.0f, 1.0f) : ImVec4(0.8f, 0.8f, 0.8f, 0.8f);
                                         
                     if (ImGui::ImageButton(tileName.c_str(), reinterpret_cast<void*>(tileTextureId), ImVec2(64.0f, 64.0f), ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), bg_col, tint_col))
@@ -534,7 +582,8 @@ void Editor::CreateDebugWidgets()
         ImGui::Dummy(ImVec2(20.0f, 0.0f));
         ImGui::SameLine();
         ImGui::PushID("BotLayerVisible");
-        ImGui::Checkbox("Visible", &mBottomLayerVisible);
+        ImGui::SetNextItemWidth(100.0f);
+        ImGui::SliderFloat("Visibility", &mBottomLayerVisibility, 0.0f, 1.0f);
         ImGui::PopID();
         
         ImGui::Dummy(ImVec2(0.0f, 5.0f));
@@ -546,7 +595,8 @@ void Editor::CreateDebugWidgets()
         ImGui::Dummy(ImVec2(41.0f, 0.0f));
         ImGui::SameLine();
         ImGui::PushID("TopLayerVisible");
-        ImGui::Checkbox("Visible", &mTopLayerVisible);
+        ImGui::SetNextItemWidth(100.0f);
+        ImGui::SliderFloat("Visibility", &mTopLayerVisibility, 0.0f, 1.0f);
         ImGui::PopID();
         ImGui::End();
     }
@@ -558,6 +608,23 @@ void Editor::CreateDebugWidgets()
 {
 }
 #endif
+
+///------------------------------------------------------------------------------------------------
+
+void Editor::DestroyMap()
+{
+    auto& systemsEngine = CoreSystemsEngine::GetInstance();
+    auto scene = systemsEngine.GetSceneManager().FindScene(EDITOR_SCENE);
+    
+    for (auto y = 0; y < mGridRows; ++y)
+    {
+        for (auto x = 0; x < mGridCols; ++x)
+        {
+            scene->RemoveSceneObject(strutils::StringId(std::to_string(x) + "," + std::to_string(y)));
+            scene->RemoveSceneObject(strutils::StringId(std::to_string(x) + "," + std::to_string(y) + "_top"));
+        }
+    }
+}
 
 ///------------------------------------------------------------------------------------------------
 
@@ -580,21 +647,34 @@ void Editor::CreateMap(const int gridRows, const int gridCols)
     {
         for (auto x = 0; x < gridCols; ++x)
         {
-            auto tile = scene->CreateSceneObject(strutils::StringId(std::to_string(x) + "," + std::to_string(y)));
-            tile->mPosition.x = gridStartingX + x * TILE_SIZE;
-            tile->mPosition.y = gridStartingY - y * TILE_SIZE;
-            tile->mPosition.z = TILE_DEFAULT_Z;
-            tile->mScale = TILE_DEFAULT_SCALE;
-            tile->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + TILES_FOLDER + ZERO_BLANK_TILE_FILE_NAME);
-            tile->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + WORLD_MAP_TILE_SHADER);
-            tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = TileConnectorType::NONE;
+            {
+                auto tile = scene->CreateSceneObject(strutils::StringId(std::to_string(x) + "," + std::to_string(y)));
+                tile->mPosition.x = gridStartingX + x * TILE_SIZE;
+                tile->mPosition.y = gridStartingY - y * TILE_SIZE;
+                tile->mPosition.z = map_constants::TILE_BOTTOM_LAYER_Z;
+                tile->mScale = TILE_DEFAULT_SCALE;
+                tile->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + TILES_FOLDER + ZERO_BLANK_TILE_FILE_NAME);
+                tile->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + WORLD_MAP_TILE_SHADER);
+                tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = TileConnectorType::NONE;
+            }
+            
+            {
+                auto topLayerTile = scene->CreateSceneObject(strutils::StringId(std::to_string(x) + "," + std::to_string(y) + "_top"));
+                topLayerTile->mPosition.x = gridStartingX + x * TILE_SIZE;
+                topLayerTile->mPosition.y = gridStartingY - y * TILE_SIZE;
+                topLayerTile->mPosition.z = map_constants::TILE_TOP_LAYER_Z;
+                topLayerTile->mScale = TILE_DEFAULT_SCALE;
+                topLayerTile->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + TILES_FOLDER + ZERO_BLANK_TRANSPARENT_TILE_FILE_NAME);
+                topLayerTile->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + WORLD_MAP_TILE_SHADER);
+                topLayerTile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = TileConnectorType::NONE;
+            }
         }
     }
 }
 
 ///------------------------------------------------------------------------------------------------
 
-void Editor::UpdateTile(std::shared_ptr<scene::SceneObject> tile, std::shared_ptr<scene::Scene> scene, const int tileCol, const int tileRow)
+void Editor::UpdateTile(std::shared_ptr<scene::SceneObject> tile, std::shared_ptr<scene::Scene> scene, const std::string& tileNamePostfix, const int tileCol, const int tileRow)
 {
     auto& systemsEngine = CoreSystemsEngine::GetInstance();
     
@@ -608,8 +688,8 @@ void Editor::UpdateTile(std::shared_ptr<scene::SceneObject> tile, std::shared_pt
         else
         {
             tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = TileConnectorType::HOR;
-            tile->mEffectTextureResourceIds[0] = scene->FindSceneObject(strutils::StringId(std::to_string(tileCol - 1) + "," + std::to_string(tileRow)))->mTextureResourceId;
-            tile->mEffectTextureResourceIds[1] = scene->FindSceneObject(strutils::StringId(std::to_string(tileCol + 1) + "," + std::to_string(tileRow)))->mTextureResourceId;
+            tile->mEffectTextureResourceIds[0] = scene->FindSceneObject(strutils::StringId(std::to_string(tileCol - 1) + "," + std::to_string(tileRow) + tileNamePostfix))->mTextureResourceId;
+            tile->mEffectTextureResourceIds[1] = scene->FindSceneObject(strutils::StringId(std::to_string(tileCol + 1) + "," + std::to_string(tileRow) + tileNamePostfix))->mTextureResourceId;
         }
     }
     else if (tileTextureFileName == ZERO_VER_CONNECTOR_TILE_FILE_NAME)
@@ -621,8 +701,8 @@ void Editor::UpdateTile(std::shared_ptr<scene::SceneObject> tile, std::shared_pt
         else
         {
             tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = TileConnectorType::VER;
-            tile->mEffectTextureResourceIds[0] = scene->FindSceneObject(strutils::StringId(std::to_string(tileCol) + "," + std::to_string(tileRow - 1)))->mTextureResourceId;
-            tile->mEffectTextureResourceIds[1] = scene->FindSceneObject(strutils::StringId(std::to_string(tileCol) + "," + std::to_string(tileRow + 1)))->mTextureResourceId;
+            tile->mEffectTextureResourceIds[0] = scene->FindSceneObject(strutils::StringId(std::to_string(tileCol) + "," + std::to_string(tileRow - 1) + tileNamePostfix))->mTextureResourceId;
+            tile->mEffectTextureResourceIds[1] = scene->FindSceneObject(strutils::StringId(std::to_string(tileCol) + "," + std::to_string(tileRow + 1) + tileNamePostfix))->mTextureResourceId;
         }
     }
     else if (tileTextureFileName == ZERO_TOPLEFT_CONNECTOR_TILE_FILE_NAME || tileTextureFileName == ZERO_BOTRIGHT_CONNECTOR_TILE_FILE_NAME)
@@ -634,8 +714,8 @@ void Editor::UpdateTile(std::shared_ptr<scene::SceneObject> tile, std::shared_pt
         else
         {
             tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = tileTextureFileName == ZERO_TOPLEFT_CONNECTOR_TILE_FILE_NAME ? TileConnectorType::TOPLEFT : TileConnectorType::BOTRIGHT;
-            tile->mEffectTextureResourceIds[0] = scene->FindSceneObject(strutils::StringId(std::to_string(tileCol - 1) + "," + std::to_string(tileRow - 1)))->mTextureResourceId;
-            tile->mEffectTextureResourceIds[1] = scene->FindSceneObject(strutils::StringId(std::to_string(tileCol + 1) + "," + std::to_string(tileRow + 1)))->mTextureResourceId;
+            tile->mEffectTextureResourceIds[0] = scene->FindSceneObject(strutils::StringId(std::to_string(tileCol - 1) + "," + std::to_string(tileRow - 1) + tileNamePostfix))->mTextureResourceId;
+            tile->mEffectTextureResourceIds[1] = scene->FindSceneObject(strutils::StringId(std::to_string(tileCol + 1) + "," + std::to_string(tileRow + 1) + tileNamePostfix))->mTextureResourceId;
         }
     }
     else if (tileTextureFileName == ZERO_TOPRIGHT_CONNECTOR_TILE_FILE_NAME || tileTextureFileName == ZERO_BOTLEFT_CONNECTOR_TILE_FILE_NAME)
@@ -647,8 +727,8 @@ void Editor::UpdateTile(std::shared_ptr<scene::SceneObject> tile, std::shared_pt
         else
         {
             tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = tileTextureFileName == ZERO_TOPRIGHT_CONNECTOR_TILE_FILE_NAME ? TileConnectorType::TOPRIGHT : TileConnectorType::BOTLEFT;
-            tile->mEffectTextureResourceIds[0] = scene->FindSceneObject(strutils::StringId(std::to_string(tileCol - 1) + "," + std::to_string(tileRow + 1)))->mTextureResourceId;
-            tile->mEffectTextureResourceIds[1] = scene->FindSceneObject(strutils::StringId(std::to_string(tileCol + 1) + "," + std::to_string(tileRow - 1)))->mTextureResourceId;
+            tile->mEffectTextureResourceIds[0] = scene->FindSceneObject(strutils::StringId(std::to_string(tileCol - 1) + "," + std::to_string(tileRow + 1) + tileNamePostfix))->mTextureResourceId;
+            tile->mEffectTextureResourceIds[1] = scene->FindSceneObject(strutils::StringId(std::to_string(tileCol + 1) + "," + std::to_string(tileRow - 1) + tileNamePostfix))->mTextureResourceId;
         }
     }
     else
@@ -662,6 +742,7 @@ void Editor::UpdateTile(std::shared_ptr<scene::SceneObject> tile, std::shared_pt
     }
     
     tile->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + WORLD_MAP_TILE_SHADER);
+    tile->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = !tileNamePostfix.empty() ? mTopLayerVisibility : mBottomLayerVisibility;
 }
 
 ///------------------------------------------------------------------------------------------------
