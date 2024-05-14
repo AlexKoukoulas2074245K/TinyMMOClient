@@ -45,6 +45,10 @@ static const strutils::StringId TILE_CONNECTOR_TYPE_UNIFORM_NAME = strutils::Str
 static const strutils::StringId CUSTOM_ALPHA_UNIFORM_NAME = strutils::StringId("custom_alpha");
 static const strutils::StringId TILE_HIGHLIGHTED_UNIFORM_NAME = strutils::StringId("highlighted");
 static const strutils::StringId NAVMAP_TILE_COLOR_UNIFORM_NAME = strutils::StringId("navmap_tile_color");
+static const strutils::StringId TOP_REF_IMAGE_SCENE_OBJECT_NAME = strutils::StringId("top_ref_image");
+static const strutils::StringId RIGHT_REF_IMAGE_SCENE_OBJECT_NAME = strutils::StringId("right_ref_image");
+static const strutils::StringId BOTTOM_REF_IMAGE_SCENE_OBJECT_NAME = strutils::StringId("bottom_ref_image");
+static const strutils::StringId LEFT_REF_IMAGE_SCENE_OBJECT_NAME = strutils::StringId("left_ref_image");
 
 static const std::string NON_SANDBOXED_MAPS_FOLDER = "/Users/Code/TinyMMOClient/assets/data/world/maps/";
 static const std::string NON_SANDBOXED_MAP_TEXTURES_FOLDER = "/Users/Code/TinyMMOClient/assets/textures/world/maps/";
@@ -95,7 +99,11 @@ namespace TileConnectorType
 ///------------------------------------------------------------------------------------------------
 
 Editor::Editor(const int argc, char** argv)
-    : mBottomLayerVisibility(1.0f)
+    : mTopImageRefIndex(0)
+    , mRightImageRefIndex(0)
+    , mBottomImageRefIndex(0)
+    , mLeftImageRefIndex(0)
+    , mBottomLayerVisibility(1.0f)
     , mTopLayerVisibility(0.5f)
     , mActiveLayer(map_constants::LayerType::BOTTOM_LAYER)
 {
@@ -521,7 +529,120 @@ void Editor::CreateDebugWidgets()
             CreateMap(sDimensionsY, sDimensionsX);
         }
         
-        ImGui::SeparatorText("View Options");
+        ImGui::SeparatorText("Side Image References");
+        static std::vector<std::string> sOtherMapTextures {"None"};
+        static std::unordered_map<std::string, glm::vec2> sMapTextureNamesToDimensions;
+        
+        if (sOtherMapTextures.size() == 1)
+        {
+            auto mapTextureFileNames = fileutils::GetAllFilenamesInDirectory(resources::ResourceLoadingService::RES_TEXTURES_ROOT + MAP_FILES_FOLDER);
+            for (auto filePath: mapTextureFileNames)
+            {
+                if (strutils::StringEndsWith(filePath, "_bottom_layer.png"))
+                {
+                    auto fileName = fileutils::GetFileName(filePath);
+                    auto mapName = fileName.substr(0, fileName.find("_bottom_layer.png"));
+                    sOtherMapTextures.push_back(mapName);
+                    
+                    std::ifstream mapDataFile(NON_SANDBOXED_MAPS_FOLDER + mapName + ".json");
+                    if (mapDataFile.is_open())
+                    {
+                        std::stringstream buffer;
+                        buffer << mapDataFile.rdbuf();
+                        auto mapDataJson = nlohmann::json::parse(buffer.str());
+                        sMapTextureNamesToDimensions[mapName] = glm::vec2(mapDataJson["metadata"]["cols"].get<float>() * TILE_DEFAULT_SCALE.x, mapDataJson["metadata"]["rows"].get<float>() * TILE_DEFAULT_SCALE.y);
+                    }
+                }
+            }
+        }
+        
+        auto& systemsEngine = CoreSystemsEngine::GetInstance();
+        auto scene = systemsEngine.GetSceneManager().FindScene(EDITOR_SCENE);
+        
+        auto GetSideRefImageSceneObjectNameLambda = [&](const int& sideImageRefIndex)
+        {
+            if (&sideImageRefIndex == &mTopImageRefIndex)
+            {
+                return TOP_REF_IMAGE_SCENE_OBJECT_NAME;
+            }
+            else if (&sideImageRefIndex == &mRightImageRefIndex)
+            {
+                return RIGHT_REF_IMAGE_SCENE_OBJECT_NAME;
+            }
+            else if (&sideImageRefIndex == &mBottomImageRefIndex)
+            {
+                return BOTTOM_REF_IMAGE_SCENE_OBJECT_NAME;
+            }
+            else
+            {
+                return LEFT_REF_IMAGE_SCENE_OBJECT_NAME;
+            }
+        };
+        
+        auto ImageRefComboLambda = [&](const std::string& sideRefLable, int& sideImageRefIndex)
+        {
+            ImGui::PushID((sideRefLable + "combo").c_str());
+            if (ImGui::BeginCombo(" ", sOtherMapTextures.at(sideImageRefIndex).c_str()))
+            {
+                for (int n = 0; n < static_cast<int>(sOtherMapTextures.size()); n++)
+                {
+                    const bool isSelected = (sideImageRefIndex == n);
+                    if (ImGui::Selectable(sOtherMapTextures.at(n).c_str(), isSelected))
+                    {
+                        sideImageRefIndex = n;
+                        
+                        auto sideRefImageSceneObjectName = GetSideRefImageSceneObjectNameLambda(sideImageRefIndex);
+                        scene->RemoveSceneObject(sideRefImageSceneObjectName);
+                        
+                        if (sOtherMapTextures.at(sideImageRefIndex) != "None")
+                        {
+                            auto sideRefImageSceneObject = scene->CreateSceneObject(sideRefImageSceneObjectName);
+                            sideRefImageSceneObject->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + MAP_FILES_FOLDER + sOtherMapTextures.at(sideImageRefIndex) + "_bottom_layer.png");
+                            sideRefImageSceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 0.5f;
+                            sideRefImageSceneObject->mPosition.x = -0.013f;
+                            sideRefImageSceneObject->mPosition.y = 0.0115f;
+                            sideRefImageSceneObject->mPosition.z = map_constants::TILE_TOP_LAYER_Z;
+                            
+                            if (&sideImageRefIndex == &mTopImageRefIndex)
+                            {
+                                sideRefImageSceneObject->mPosition.y += (mGridRows * TILE_DEFAULT_SCALE.y)/2.0f + sMapTextureNamesToDimensions.at(sOtherMapTextures.at(sideImageRefIndex)).y/2.0f;
+                                sideRefImageSceneObject->mPosition.z += 0.1f;
+                            }
+                            else if (&sideImageRefIndex == &mRightImageRefIndex)
+                            {
+                                sideRefImageSceneObject->mPosition.x += (mGridCols * TILE_DEFAULT_SCALE.x)/2.0f + sMapTextureNamesToDimensions.at(sOtherMapTextures.at(sideImageRefIndex)).x/2.0f;
+                                sideRefImageSceneObject->mPosition.z += 0.2f;
+                            }
+                            else if (&sideImageRefIndex == &mBottomImageRefIndex)
+                            {
+                                sideRefImageSceneObject->mPosition.y -= (mGridRows * TILE_DEFAULT_SCALE.y)/2.0f + sMapTextureNamesToDimensions.at(sOtherMapTextures.at(sideImageRefIndex)).y/2.0f;
+                                sideRefImageSceneObject->mPosition.z += 0.3f;
+                            }
+                            else
+                            {
+                                sideRefImageSceneObject->mPosition.x -= (mGridCols * TILE_DEFAULT_SCALE.x)/2.0f + sMapTextureNamesToDimensions.at(sOtherMapTextures.at(sideImageRefIndex)).x/2.0f;
+                                sideRefImageSceneObject->mPosition.z += 0.4f;
+                            }
+                        }
+                    }
+                    if (isSelected)
+                    {
+                        ImGui::SetItemDefaultFocus();
+                    }
+                }
+                ImGui::EndCombo();
+            }
+            ImGui::PopID();
+            ImGui::SameLine();
+            ImGui::Text("%s", sideRefLable.c_str());
+        };
+            
+        ImageRefComboLambda("TopRef", mTopImageRefIndex);
+        ImageRefComboLambda("RightRef", mRightImageRefIndex);
+        ImageRefComboLambda("BottomRef", mBottomImageRefIndex);
+        ImageRefComboLambda("LeftRef", mLeftImageRefIndex);
+        
+        ImGui::SeparatorText("Render Options");
         ImGui::Checkbox("Render Tile Connectors", &mViewOptions.mRenderConnectorTiles);
         ImGui::End();
     }
@@ -625,6 +746,16 @@ void Editor::DestroyMap()
 {
     auto& systemsEngine = CoreSystemsEngine::GetInstance();
     auto scene = systemsEngine.GetSceneManager().FindScene(EDITOR_SCENE);
+    
+    mTopImageRefIndex = 0;
+    mRightImageRefIndex = 0;
+    mBottomImageRefIndex = 0;
+    mLeftImageRefIndex = 0;
+    
+    scene->RemoveSceneObject(TOP_REF_IMAGE_SCENE_OBJECT_NAME);
+    scene->RemoveSceneObject(RIGHT_REF_IMAGE_SCENE_OBJECT_NAME);
+    scene->RemoveSceneObject(BOTTOM_REF_IMAGE_SCENE_OBJECT_NAME);
+    scene->RemoveSceneObject(LEFT_REF_IMAGE_SCENE_OBJECT_NAME);
     
     for (auto y = 0; y < mGridRows; ++y)
     {

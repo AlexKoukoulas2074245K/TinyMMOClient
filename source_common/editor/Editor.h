@@ -63,8 +63,13 @@ private:
         glm::vec3 mCameraPosition;
     };
     
-    int mGridRows, mGridCols;
+    int mGridRows;
+    int mGridCols;
     int mSelectedPaletteTile;
+    int mTopImageRefIndex;
+    int mRightImageRefIndex;
+    int mBottomImageRefIndex;
+    int mLeftImageRefIndex;
     float mBottomLayerVisibility;
     float mTopLayerVisibility;
     std::vector<MapTileData> mPaletteTileData;
