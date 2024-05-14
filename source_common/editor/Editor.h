@@ -63,6 +63,13 @@ private:
         glm::vec3 mCameraPosition;
     };
     
+    enum class PaintingToolType
+    {
+        PENCIL,
+        BUCKET
+    };
+    
+private:
     int mGridRows;
     int mGridCols;
     int mSelectedPaletteTile;
@@ -75,6 +82,7 @@ private:
     std::vector<MapTileData> mPaletteTileData;
     std::stack<std::unique_ptr<commands::IEditorCommand>> mExecutedCommandHistory;
     ViewOptions mViewOptions;
+    PaintingToolType mPaintingToolType;
     map_constants::LayerType mActiveLayer;
 };
 

@@ -5,6 +5,7 @@
 ///  Created by Alex Koukoulas on 10/05/2024
 ///------------------------------------------------------------------------------------------------
 
+#include <editor/commands/FloodFillCommand.h>
 #include <editor/commands/PlaceTileCommand.h>
 #include <engine/CoreSystemsEngine.h>
 #include <engine/input/IInputStateManager.h>
@@ -105,6 +106,7 @@ Editor::Editor(const int argc, char** argv)
     , mLeftImageRefIndex(0)
     , mBottomLayerVisibility(1.0f)
     , mTopLayerVisibility(0.5f)
+    , mPaintingToolType(PaintingToolType::PENCIL)
     , mActiveLayer(map_constants::LayerType::BOTTOM_LAYER)
 {
     if (argc > 0)
@@ -201,7 +203,13 @@ void Editor::Update(const float dtMillis)
         if (inputStateManager.VButtonPressed(input::Button::MAIN_BUTTON))
         {
             const auto& selectedPaletteTile = mPaletteTileData[mSelectedPaletteTile];
-            TryExecuteCommand(std::make_unique<commands::PlaceTileCommand>(highlightedTileCandidates.front(), selectedPaletteTile.mResourceId));
+            
+            switch (mPaintingToolType)
+            {
+                case PaintingToolType::PENCIL: TryExecuteCommand(std::make_unique<commands::PlaceTileCommand>(highlightedTileCandidates.front(), selectedPaletteTile.mResourceId)); break;
+                case PaintingToolType::BUCKET: TryExecuteCommand(std::make_unique<commands::FloodFillCommand>(scene, highlightedTileCandidates.front(), selectedPaletteTile.mResourceId)); break;
+            }
+            
         }
         else if (inputStateManager.VButtonTapped(input::Button::SECONDARY_BUTTON))
         {
@@ -527,6 +535,8 @@ void Editor::CreateDebugWidgets()
         {
             DestroyMap();
             CreateMap(sDimensionsY, sDimensionsX);
+            memset(sMapNameBuffer, 0, TILEMAP_NAME_BUFFER_SIZE);
+            strcpy(sMapNameBuffer, "map.json");
         }
         
         ImGui::SeparatorText("Side Image References");
@@ -649,6 +659,47 @@ void Editor::CreateDebugWidgets()
     
     {
         ImGui::Begin("Tile Map Palette", nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
+        ImGui::SeparatorText("Painting Tools");
+        
+        static resources::GLuint sPencilIconGLTextureId = 0;
+        static resources::GLuint sBucketIconGLTextureId = 0;
+        
+        if (sPencilIconGLTextureId == 0)
+        {
+            auto pencilIconResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "editor/pencil_icon.png");
+            const auto& pencilTextureResource = CoreSystemsEngine::GetInstance().GetResourceLoadingService().GetResource<resources::TextureResource>(pencilIconResourceId);
+            sPencilIconGLTextureId = pencilTextureResource.GetGLTextureId();
+        }
+        if (sBucketIconGLTextureId == 0)
+        {
+            auto bucketIconResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "editor/bucket_icon.png");
+            const auto& bucketTextureResource = CoreSystemsEngine::GetInstance().GetResourceLoadingService().GetResource<resources::TextureResource>(bucketIconResourceId);
+            sBucketIconGLTextureId = bucketTextureResource.GetGLTextureId();
+        }
+        ImGui::PushID("Pencil");
+        {
+            ImVec4 bg_col = mPaintingToolType == PaintingToolType::PENCIL ? ImVec4(1.0f, 1.0f, 1.0f, 1.0f) : ImVec4(0.5f, 0.5f, 0.5f, 1.0f);
+            ImVec4 tint_col = mPaintingToolType == PaintingToolType::PENCIL ? ImVec4(1.0f, 1.0f, 1.0f, 1.0f) : ImVec4(0.8f, 0.8f, 0.8f, 0.8f);
+                                
+            if (ImGui::ImageButton("Pencil", reinterpret_cast<void*>(sPencilIconGLTextureId), ImVec2(64.0f, 64.0f), ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), bg_col, tint_col))
+            {
+                mPaintingToolType = PaintingToolType::PENCIL;
+            }
+        }
+        ImGui::PopID();
+        ImGui::SameLine();
+        ImGui::PushID("Bucket");
+        {
+            ImVec4 bg_col = mPaintingToolType == PaintingToolType::BUCKET ? ImVec4(1.0f, 1.0f, 1.0f, 1.0f) : ImVec4(0.5f, 0.5f, 0.5f, 1.0f);
+            ImVec4 tint_col = mPaintingToolType == PaintingToolType::BUCKET ? ImVec4(1.0f, 1.0f, 1.0f, 1.0f) : ImVec4(0.8f, 0.8f, 0.8f, 0.8f);
+                                
+            if (ImGui::ImageButton("Bucket", reinterpret_cast<void*>(sBucketIconGLTextureId), ImVec2(64.0f, 64.0f), ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), bg_col, tint_col))
+            {
+                mPaintingToolType = PaintingToolType::BUCKET;
+            }
+        }
+        ImGui::PopID();
+        
         ImGui::SeparatorText("Tiles");
         
         static constexpr int GRID_COLS = 4;
@@ -729,6 +780,12 @@ void Editor::CreateDebugWidgets()
         ImGui::SetNextItemWidth(100.0f);
         ImGui::SliderFloat("Visibility", &mTopLayerVisibility, 0.0f, 1.0f);
         ImGui::PopID();
+        ImGui::End();
+    }
+    
+    {
+        ImGui::Begin("Editor Debug", nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
+        ImGui::Text("Executed Command History size = %lu", mExecutedCommandHistory.size());
         ImGui::End();
     }
     

@@ -15,10 +15,10 @@ namespace commands
 
 ///------------------------------------------------------------------------------------------------
 
-PlaceTileCommand::PlaceTileCommand(std::shared_ptr<scene::SceneObject> targetTileSceneObject, resources::ResourceId newTileTextureresourceId)
+PlaceTileCommand::PlaceTileCommand(std::shared_ptr<scene::SceneObject> targetTileSceneObject, resources::ResourceId newTileTextureResourceId)
     : mTargetTileSceneObject(targetTileSceneObject)
-    , mNewTileTextureresourceId(newTileTextureresourceId)
-    , mOldTileTextureresourceId(targetTileSceneObject->mTextureResourceId)
+    , mNewTileTextureResourceId(newTileTextureResourceId)
+    , mOldTileTextureResourceId(targetTileSceneObject->mTextureResourceId)
 {
 }
 
@@ -26,21 +26,21 @@ PlaceTileCommand::PlaceTileCommand(std::shared_ptr<scene::SceneObject> targetTil
 
 void PlaceTileCommand::VExecute()
 {
-    mTargetTileSceneObject->mTextureResourceId = mNewTileTextureresourceId;
+    mTargetTileSceneObject->mTextureResourceId = mNewTileTextureResourceId;
 }
 
 ///------------------------------------------------------------------------------------------------
 
 void PlaceTileCommand::VUndo()
 {
-    mTargetTileSceneObject->mTextureResourceId = mOldTileTextureresourceId;
+    mTargetTileSceneObject->mTextureResourceId = mOldTileTextureResourceId;
 }
 
 ///------------------------------------------------------------------------------------------------
 
 bool PlaceTileCommand::VIsNoOp() const
 {
-    return mOldTileTextureresourceId == mNewTileTextureresourceId;
+    return mOldTileTextureResourceId == mNewTileTextureResourceId;
 }
 
 ///------------------------------------------------------------------------------------------------

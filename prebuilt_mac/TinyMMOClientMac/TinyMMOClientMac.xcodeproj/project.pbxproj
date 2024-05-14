@@ -17,6 +17,7 @@
 		120CF200D56449CFC3BD99AF /* AppleSoundUtils.h in Sources */ = {isa = PBXBuildFile; fileRef = D8216CC78F9B7DEB0BEC7678 /* AppleSoundUtils.h */; };
 		16092693C24E8507EFDFBB70 /* Editor.h in Sources */ = {isa = PBXBuildFile; fileRef = AB2400E817D39628656BEFF1 /* Editor.h */; };
 		174B1673DD1B94C2743829E9 /* Editor.h in Sources */ = {isa = PBXBuildFile; fileRef = AB2400E817D39628656BEFF1 /* Editor.h */; };
+		175C88F77B57F28B348DA89C /* FloodFillCommand.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB4FB5CB8DCA0CB3794336B2 /* FloodFillCommand.cpp */; };
 		1821BE0D6457687787E1571F /* Scene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6544FC0C6E5993C9E3957773 /* Scene.cpp */; };
 		191617E17721C2C19E20E920 /* IResource.h in Sources */ = {isa = PBXBuildFile; fileRef = 99B2042795EEDA27C28F2D84 /* IResource.h */; };
 		19AB2555F153D36FD08A7E15 /* MeshResource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DDD0E1D0B63F40D725F02A35 /* MeshResource.cpp */; };
@@ -38,6 +39,7 @@
 		3E3B65024B721F5CCC0D71E0 /* Animations.h in Sources */ = {isa = PBXBuildFile; fileRef = 82DFED0E0B1AB607780AED60 /* Animations.h */; };
 		3EA36356D5C26354DFB3108B /* PlaceTileCommand.h in Sources */ = {isa = PBXBuildFile; fileRef = 25E63A3AC781F75E7ADB7B74 /* PlaceTileCommand.h */; };
 		439E1551D25AB76A20A48BF5 /* IEditorCommand.h in Sources */ = {isa = PBXBuildFile; fileRef = 4FF1572465760B72632B0EB2 /* IEditorCommand.h */; };
+		44FFC60B6200211EEF7CD146 /* FloodFillCommand.h in Sources */ = {isa = PBXBuildFile; fileRef = 6C7D4A86D2B31B8B48D63CC0 /* FloodFillCommand.h */; };
 		45963ED9A5DA3C4EB9144646 /* TextureResource.h in Sources */ = {isa = PBXBuildFile; fileRef = 989BFF482B72A00F213431FE /* TextureResource.h */; };
 		4D0513581BFF046081AADA26 /* Editor.h in Sources */ = {isa = PBXBuildFile; fileRef = AB2400E817D39628656BEFF1 /* Editor.h */; };
 		4E1C869F5E339F8DC75015F7 /* IEditorCommand.h in Sources */ = {isa = PBXBuildFile; fileRef = 4FF1572465760B72632B0EB2 /* IEditorCommand.h */; };
@@ -62,12 +64,14 @@
 		77F8C741493973A71A6DBA22 /* ImageSurfaceResource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53CDE03B92A8F220738E44FE /* ImageSurfaceResource.cpp */; };
 		7A14147B43076FC43E6D5662 /* SoundManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F701DBE1A8A6D1664BEF16A3 /* SoundManager.cpp */; };
 		7A35378576E3FCE89E70ABA4 /* SceneManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FB79D70FA4FA614F184AFE40 /* SceneManager.cpp */; };
+		7AC0BAE68E78FCD4E0CB58F9 /* FloodFillCommand.h in Sources */ = {isa = PBXBuildFile; fileRef = 6C7D4A86D2B31B8B48D63CC0 /* FloodFillCommand.h */; };
 		7CA340B584BA7BDBF8857C4C /* OBJMeshLoader.h in Sources */ = {isa = PBXBuildFile; fileRef = 46BB489973B1ACFF46F552DB /* OBJMeshLoader.h */; };
 		7D32F5E3300A738E376BD851 /* PlaceTileCommand.h in Sources */ = {isa = PBXBuildFile; fileRef = 25E63A3AC781F75E7ADB7B74 /* PlaceTileCommand.h */; };
 		83967E1FB2D928FB436D80F0 /* PlayerController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7E5967F8A9CDBBB4D9C23C10 /* PlayerController.cpp */; };
 		851FBE54CFC3F1C7F292AD3D /* AnimationManager.h in Sources */ = {isa = PBXBuildFile; fileRef = F2FC1889E08EEFD36C0B6476 /* AnimationManager.h */; };
 		8C096F9D043616750BC963F8 /* TextureLoader.h in Sources */ = {isa = PBXBuildFile; fileRef = 05D038A4FFCF3C5AA2E85A75 /* TextureLoader.h */; };
 		920C54052B80E41A006F6743 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 920C54042B80E41A006F6743 /* OpenAL.framework */; };
+		925F6CD344A17B1A139FFDAF /* FloodFillCommand.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB4FB5CB8DCA0CB3794336B2 /* FloodFillCommand.cpp */; };
 		926C7C1E2B7239720028766E /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 926C7C1D2B7239720028766E /* AppKit.framework */; };
 		9272506B2B7D2CCC0010DF26 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9272506A2B7D2CCC0010DF26 /* AVFoundation.framework */; };
 		9272506D2B7D2CEF0010DF26 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9272506C2B7D2CEF0010DF26 /* AudioToolbox.framework */; };
@@ -389,6 +393,7 @@
 		92CA97412B65132C00B53B01 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92CA97402B65132B00B53B01 /* StoreKit.framework */; };
 		92D54EE22BDFA00800DA4EC7 /* NameGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 92D54EE02BDFA00800DA4EC7 /* NameGenerator.cpp */; };
 		95BF1C18A001B37A45C9BF9E /* IRenderer.h in Sources */ = {isa = PBXBuildFile; fileRef = E0599E67CDFA7350C55C73A5 /* IRenderer.h */; };
+		9D4CA157485CB7B2A8081670 /* FloodFillCommand.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB4FB5CB8DCA0CB3794336B2 /* FloodFillCommand.cpp */; };
 		9F60F6BEA7D20AB4B5EFA323 /* ResourceLoadingService.h in Sources */ = {isa = PBXBuildFile; fileRef = 7C92E4EC0FBCD6AFCA53FD77 /* ResourceLoadingService.h */; };
 		9FE4A0895085C4A710AF1FF6 /* SerializableNetworkObjects.h in Sources */ = {isa = PBXBuildFile; fileRef = A7F720915E74A51C6579763C /* SerializableNetworkObjects.h */; };
 		A190FCD102A510B7AF224622 /* AnimationManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E9824F6D620FAB012DF0BC78 /* AnimationManager.cpp */; };
@@ -421,6 +426,7 @@
 		DFC9D6A2B4A6F0AF0A0416C9 /* DataFileLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0106479588E4C78D4F938113 /* DataFileLoader.cpp */; };
 		E2240B574B476A510E0FEE8A /* AppleSoundUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = EFF6CA715340BD63F4562F60 /* AppleSoundUtils.mm */; };
 		E24F8BEB335EFB8866189742 /* BaseDataFileSerializer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 903005ABB6F4A9CB6247ABDC /* BaseDataFileSerializer.cpp */; };
+		E6DFA3B11E006007C6F292DD /* FloodFillCommand.h in Sources */ = {isa = PBXBuildFile; fileRef = 6C7D4A86D2B31B8B48D63CC0 /* FloodFillCommand.h */; };
 		E7F3EF85172DB9E9D9AF8321 /* ImageSurfaceLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B645F5160C1B36C70F708518 /* ImageSurfaceLoader.cpp */; };
 		F2C17A279E5E5256D4401C90 /* DataFileLoader.h in Sources */ = {isa = PBXBuildFile; fileRef = B83F90BE48846F5019309046 /* DataFileLoader.h */; };
 		F467390ABB511496E18AF585 /* SceneManager.h in Sources */ = {isa = PBXBuildFile; fileRef = 221289B3E3FA84B55F4C25E2 /* SceneManager.h */; };
@@ -507,6 +513,7 @@
 		6544FC0C6E5993C9E3957773 /* Scene.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = Scene.cpp; sourceTree = "<group>"; };
 		659D24C3A310C59893EE9475 /* Scene.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = Scene.h; sourceTree = "<group>"; };
 		68CBCF02480A4F7771578514 /* RendererPlatformImpl.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = RendererPlatformImpl.cpp; sourceTree = "<group>"; };
+		6C7D4A86D2B31B8B48D63CC0 /* FloodFillCommand.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = FloodFillCommand.h; path = FloodFillCommand.h; sourceTree = "<group>"; };
 		6D3F63C77D9E3CBD37931ADE /* CoreSystemsEnginePlatformImpl.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CoreSystemsEnginePlatformImpl.cpp; sourceTree = "<group>"; };
 		6E2183A368D71198F98D6738 /* TypeTraits.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = TypeTraits.h; sourceTree = "<group>"; };
 		70EE9661089211DACFF22288 /* Camera.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = Camera.h; sourceTree = "<group>"; };
@@ -619,6 +626,7 @@
 		BB91C0E56FB07D250ED0D766 /* MapConstants.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = MapConstants.h; path = MapConstants.h; sourceTree = "<group>"; };
 		BE806858C85634D9FB14B857 /* NetworkObjectDefinitions.inc */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.pascal; path = NetworkObjectDefinitions.inc; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		CAEF02928D06B177B1091C5F /* ImageSurfaceResource.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = ImageSurfaceResource.h; sourceTree = "<group>"; };
+		CB4FB5CB8DCA0CB3794336B2 /* FloodFillCommand.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = FloodFillCommand.cpp; path = FloodFillCommand.cpp; sourceTree = "<group>"; };
 		CDAECE46D2C1D56818BF9C25 /* PlayerController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = PlayerController.h; sourceTree = "<group>"; };
 		CF33F7C72612B80A9AB49895 /* InputStateManagerPlatformImpl.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = InputStateManagerPlatformImpl.cpp; sourceTree = "<group>"; };
 		D099CB93E6198C3BE5F73FDE /* IInputStateManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = IInputStateManager.h; sourceTree = "<group>"; };
@@ -698,6 +706,8 @@
 				4DB7732B61F25DE0737B1DF2 /* PlaceTileCommand.cpp */,
 				4FF1572465760B72632B0EB2 /* IEditorCommand.h */,
 				25E63A3AC781F75E7ADB7B74 /* PlaceTileCommand.h */,
+				CB4FB5CB8DCA0CB3794336B2 /* FloodFillCommand.cpp */,
+				6C7D4A86D2B31B8B48D63CC0 /* FloodFillCommand.h */,
 			);
 			name = commands;
 			path = commands;
@@ -1475,6 +1485,8 @@
 				4E1C869F5E339F8DC75015F7 /* IEditorCommand.h in Sources */,
 				3EA36356D5C26354DFB3108B /* PlaceTileCommand.h in Sources */,
 				5D6DCABBC78B4002D4BDF2E2 /* MapConstants.h in Sources */,
+				175C88F77B57F28B348DA89C /* FloodFillCommand.cpp in Sources */,
+				44FFC60B6200211EEF7CD146 /* FloodFillCommand.h in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1594,6 +1606,8 @@
 				439E1551D25AB76A20A48BF5 /* IEditorCommand.h in Sources */,
 				7D32F5E3300A738E376BD851 /* PlaceTileCommand.h in Sources */,
 				0E36ADD65CE3DFB12867FD14 /* MapConstants.h in Sources */,
+				9D4CA157485CB7B2A8081670 /* FloodFillCommand.cpp in Sources */,
+				E6DFA3B11E006007C6F292DD /* FloodFillCommand.h in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1713,6 +1727,8 @@
 				1B1B490E6EC3A5DF872931B9 /* IEditorCommand.h in Sources */,
 				A7F6660842E49F6EF52434CA /* PlaceTileCommand.h in Sources */,
 				D5D233B536F12C82833E37AB /* MapConstants.h in Sources */,
+				925F6CD344A17B1A139FFDAF /* FloodFillCommand.cpp in Sources */,
+				7AC0BAE68E78FCD4E0CB58F9 /* FloodFillCommand.h in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

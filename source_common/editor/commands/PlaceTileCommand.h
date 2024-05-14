@@ -32,7 +32,7 @@ namespace commands
 class PlaceTileCommand final: public IEditorCommand
 {
 public:
-    PlaceTileCommand(std::shared_ptr<scene::SceneObject> targetTileSceneObject, resources::ResourceId newTileTextureresourceId);
+    PlaceTileCommand(std::shared_ptr<scene::SceneObject> targetTileSceneObject, resources::ResourceId newTileTextureResourceId);
     
     void VExecute() override;
     void VUndo() override;
@@ -40,8 +40,8 @@ public:
     
 private:
     std::shared_ptr<scene::SceneObject> mTargetTileSceneObject;
-    const resources::ResourceId mNewTileTextureresourceId;
-    const resources::ResourceId mOldTileTextureresourceId;
+    const resources::ResourceId mNewTileTextureResourceId;
+    const resources::ResourceId mOldTileTextureResourceId;
 };
 
 ///------------------------------------------------------------------------------------------------
