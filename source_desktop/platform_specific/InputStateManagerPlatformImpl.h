@@ -48,8 +48,8 @@ private:
     glm::ivec2 mCurrentWheelDelta;
     uint8_t mCurrentFrameButtonState = 0U;
     uint8_t mPreviousFrameButtonState = 0U;
-    uint8_t mCurrentFrameKeyState = 0U;
-    uint8_t mPreviousFrameKeyState = 0U;
+    uint32_t mCurrentFrameKeyState = 0U;
+    uint32_t mPreviousFrameKeyState = 0U;
 };
 
 ///------------------------------------------------------------------------------------------------

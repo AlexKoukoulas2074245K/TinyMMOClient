@@ -10,12 +10,15 @@
 
 ///------------------------------------------------------------------------------------------------
 
+#include <editor/commands/IEditorCommand.h>
 #include <engine/resloading/ResourceLoadingService.h>
 #include <engine/resloading/ImageSurfaceResource.h>
 #include <engine/resloading/TextureResource.h>
 #include <engine/utils/MathUtils.h>
 #include <engine/utils/StringUtils.h>
+#include <map/MapConstants.h>
 #include <vector>
+#include <stack>
 
 ///------------------------------------------------------------------------------------------------
 
@@ -41,6 +44,8 @@ public:
 private:
     void CreateGrid(const int gridRows, const int gridCols);
     void UpdateTile(std::shared_ptr<scene::SceneObject> tile, std::shared_ptr<scene::Scene> scene, const int tileCol, const int tileRow);
+    void TryExecuteCommand(std::unique_ptr<commands::IEditorCommand> command);
+    void TryUndoLastCommand();
     
 private:
     struct MapTileData
@@ -59,8 +64,13 @@ private:
     
     int mGridRows, mGridCols;
     int mSelectedPaletteTile;
+    bool mBottomLayerVisible;
+    bool mTopLayerVisible;
     std::vector<MapTileData> mPaletteTileData;
+    std::stack<std::unique_ptr<commands::IEditorCommand>> mExecutedCommandHistory;
+    std::stack<std::unique_ptr<commands::IEditorCommand>> mUndoneCommandHistory;
     ViewOptions mViewOptions;
+    map_constants::LayerType mActiveLayer;
 };
 
 ///------------------------------------------------------------------------------------------------

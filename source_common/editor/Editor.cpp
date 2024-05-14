@@ -5,7 +5,7 @@
 ///  Created by Alex Koukoulas on 10/05/2024
 ///------------------------------------------------------------------------------------------------
 
-#include <bitset>
+#include <editor/commands/PlaceTileCommand.h>
 #include <engine/CoreSystemsEngine.h>
 #include <engine/input/IInputStateManager.h>
 #include <engine/rendering/AnimationManager.h>
@@ -104,6 +104,8 @@ namespace TileConnectorType
 ///------------------------------------------------------------------------------------------------
 
 Editor::Editor(const int argc, char** argv)
+    : mBottomLayerVisible(true)
+    , mTopLayerVisible(true)
 {
     if (argc > 0)
     {
@@ -153,7 +155,7 @@ void Editor::Update(const float dtMillis)
     bool imGuiMouseInput = io.WantCaptureMouse;
     
     
-    std::vector<scene::SceneObject*> highlightedTileCandidates;
+    std::vector<std::shared_ptr<scene::SceneObject>> highlightedTileCandidates;
     
     for (auto y = 0; y < mGridRows; ++y)
     {
@@ -169,7 +171,7 @@ void Editor::Update(const float dtMillis)
             auto cursorInTile = math::IsPointInsideRectangle(rect.bottomLeft, rect.topRight, worldTouchPos);
             if (cursorInTile && !imGuiMouseInput)
             {
-                highlightedTileCandidates.push_back(tile.get());
+                highlightedTileCandidates.push_back(tile);
             }
             
             UpdateTile(tile, scene, x, y);
@@ -178,27 +180,55 @@ void Editor::Update(const float dtMillis)
     
     if (!highlightedTileCandidates.empty())
     {
-        std::sort(highlightedTileCandidates.begin(), highlightedTileCandidates.end(), [&](scene::SceneObject* lhs, scene::SceneObject* rhs){ return glm::distance(glm::vec2(lhs->mPosition.x, lhs->mPosition.y), worldTouchPos) < glm::distance(glm::vec2(rhs->mPosition.x, rhs->mPosition.y), worldTouchPos); });
+        std::sort(highlightedTileCandidates.begin(), highlightedTileCandidates.end(), [&](std::shared_ptr<scene::SceneObject> lhs, std::shared_ptr<scene::SceneObject> rhs){ return glm::distance(glm::vec2(lhs->mPosition.x, lhs->mPosition.y), worldTouchPos) < glm::distance(glm::vec2(rhs->mPosition.x, rhs->mPosition.y), worldTouchPos); });
         highlightedTileCandidates.front()->mShaderBoolUniformValues[TILE_HIGHLIGHTED_UNIFORM_NAME] = true;
         
         if (inputStateManager.VButtonPressed(input::Button::MAIN_BUTTON))
         {
-            const auto& selectedTile = mPaletteTileData[mSelectedPaletteTile];
-            highlightedTileCandidates.front()->mTextureResourceId = selectedTile.mResourceId;
+            const auto& selectedPaletteTile = mPaletteTileData[mSelectedPaletteTile];
+            TryExecuteCommand(std::make_unique<commands::PlaceTileCommand>(highlightedTileCandidates.front(), selectedPaletteTile.mResourceId));
         }
     }
+ 
+    bool commandModifierDown =
+#if defined(MACOS)
+        (inputStateManager.VKeyPressed(input::Key::LCMD) || inputStateManager.VKeyPressed(input::Key::RCMD));
+#elif defined(WINDOWS)
+        (inputStateManager.VKeyPressed(input::Key::LCTL) || inputStateManager.VKeyPressed(input::Key::RCTL));
+#endif
+    bool shiftModifierDown = (inputStateManager.VKeyPressed(input::Key::LSFT) || inputStateManager.VKeyPressed(input::Key::RSFT));
     
     auto scrollDelta = inputStateManager.VGetScrollDelta();
-    if (scrollDelta.y != 0 && !imGuiMouseInput)
+    if ((scrollDelta.y != 0 || scrollDelta.x != 0) && !imGuiMouseInput)
     {
-        mViewOptions.mCameraZoom = mViewOptions.mCameraZoom * (scrollDelta.y > 0 ? ZOOM_SPEED : 1/ZOOM_SPEED);
-        scene->GetCamera().SetZoomFactor(mViewOptions.mCameraZoom);
-        
-        auto newWorldTouchPos = inputStateManager.VGetPointingPosInWorldSpace(scene->GetCamera().GetViewMatrix(), scene->GetCamera().GetProjMatrix());
-        mViewOptions.mCameraPosition.x -= newWorldTouchPos.x - worldTouchPos.x;
-        mViewOptions.mCameraPosition.y -= newWorldTouchPos.y - worldTouchPos.y;
+        // Cam zoom
+        if (commandModifierDown)
+        {
+            mViewOptions.mCameraZoom = mViewOptions.mCameraZoom * (scrollDelta.y > 0 ? ZOOM_SPEED : 1/ZOOM_SPEED);
+            scene->GetCamera().SetZoomFactor(mViewOptions.mCameraZoom);
+            
+            auto newWorldTouchPos = inputStateManager.VGetPointingPosInWorldSpace(scene->GetCamera().GetViewMatrix(), scene->GetCamera().GetProjMatrix());
+            mViewOptions.mCameraPosition.x -= newWorldTouchPos.x - worldTouchPos.x;
+            mViewOptions.mCameraPosition.y -= newWorldTouchPos.y - worldTouchPos.y;
+        }
+        // Horizontal cam translation
+        else if (shiftModifierDown)
+        {
+            mViewOptions.mCameraPosition.x -= scrollDelta.x * 0.01f;
+        }
+        // Vertical cam translation
+        else
+        {
+            mViewOptions.mCameraPosition.y += scrollDelta.y * 0.01f;
+        }
     }
 
+    
+    if (commandModifierDown && inputStateManager.VKeyTapped(input::Key::Z))
+    {
+        TryUndoLastCommand();
+    }
+    
     scene->GetCamera().SetPosition(mViewOptions.mCameraPosition);
 }
 
@@ -429,7 +459,7 @@ void Editor::CreateDebugWidgets()
                 }
             }
             
-            CreateGrid(sDimensionsX, sDimensionsY);
+            CreateGrid(sDimensionsY, sDimensionsX);
         }
         
         ImGui::SeparatorText("View Options");
@@ -489,6 +519,34 @@ void Editor::CreateDebugWidgets()
                 ImGui::PopID();
             }
         }
+        ImGui::End();
+    }
+    
+    {
+        static int layerIndex = 0;
+        ImGui::Begin("Layers", nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
+        if (ImGui::RadioButton("Bottom Layer", &layerIndex, static_cast<int>(map_constants::LayerType::BOTTOM_LAYER)))
+        {
+            mActiveLayer = static_cast<map_constants::LayerType>(layerIndex);
+        }
+        ImGui::SameLine();
+        ImGui::Dummy(ImVec2(20.0f, 0.0f));
+        ImGui::SameLine();
+        ImGui::PushID("BotLayerVisible");
+        ImGui::Checkbox("Visible", &mBottomLayerVisible);
+        ImGui::PopID();
+        
+        ImGui::Dummy(ImVec2(0.0f, 5.0f));
+        if (ImGui::RadioButton("Top Layer", &layerIndex, static_cast<int>(map_constants::LayerType::TOP_LAYER)))
+        {
+            mActiveLayer = static_cast<map_constants::LayerType>(layerIndex);
+        }
+        ImGui::SameLine();
+        ImGui::Dummy(ImVec2(41.0f, 0.0f));
+        ImGui::SameLine();
+        ImGui::PushID("TopLayerVisible");
+        ImGui::Checkbox("Visible", &mTopLayerVisible);
+        ImGui::PopID();
         ImGui::End();
     }
     
@@ -602,6 +660,30 @@ void Editor::UpdateTile(std::shared_ptr<scene::SceneObject> tile, std::shared_pt
     }
     
     tile->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + WORLD_MAP_TILE_SHADER);
+}
+
+///------------------------------------------------------------------------------------------------
+
+void Editor::TryExecuteCommand(std::unique_ptr<commands::IEditorCommand> command)
+{
+    if (!mExecutedCommandHistory.empty() && mExecutedCommandHistory.top()->VGetCommandStringId() == command->VGetCommandStringId())
+    {
+        return;
+    }
+    command->VExecute();
+    mExecutedCommandHistory.push(std::move(command));
+}
+
+///------------------------------------------------------------------------------------------------
+
+void Editor::TryUndoLastCommand()
+{
+    if (!mExecutedCommandHistory.empty())
+    {
+        auto poppedCommand = std::move(mExecutedCommandHistory.top());
+        mExecutedCommandHistory.pop();
+        poppedCommand->VUndo();
+    }
 }
 
 ///------------------------------------------------------------------------------------------------

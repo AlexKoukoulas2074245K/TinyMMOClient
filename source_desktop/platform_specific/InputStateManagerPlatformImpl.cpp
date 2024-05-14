@@ -121,10 +121,19 @@ void InputStateManagerPlatformImpl::VProcessInputEvent(const SDL_Event& event, b
         {
             switch (event.key.keysym.sym)
             {
-                case SDLK_w: mCurrentFrameKeyState |= (1 << static_cast<uint8_t>(Key::W)); break;
-                case SDLK_a: mCurrentFrameKeyState |= (1 << static_cast<uint8_t>(Key::A)); break;
-                case SDLK_s: mCurrentFrameKeyState |= (1 << static_cast<uint8_t>(Key::S)); break;
-                case SDLK_d: mCurrentFrameKeyState |= (1 << static_cast<uint8_t>(Key::D)); break;
+                case SDLK_w:      mCurrentFrameKeyState |= (1 << static_cast<uint8_t>(Key::W)); break;
+                case SDLK_a:      mCurrentFrameKeyState |= (1 << static_cast<uint8_t>(Key::A)); break;
+                case SDLK_s:      mCurrentFrameKeyState |= (1 << static_cast<uint8_t>(Key::S)); break;
+                case SDLK_d:      mCurrentFrameKeyState |= (1 << static_cast<uint8_t>(Key::D)); break;
+                case SDLK_z:      mCurrentFrameKeyState |= (1 << static_cast<uint8_t>(Key::Z)); break;
+                case SDLK_LALT:   mCurrentFrameKeyState |= (1 << static_cast<uint8_t>(Key::LALT)); break;
+                case SDLK_RALT:   mCurrentFrameKeyState |= (1 << static_cast<uint8_t>(Key::RALT)); break;
+                case SDLK_LCTRL:  mCurrentFrameKeyState |= (1 << static_cast<uint8_t>(Key::LCTL)); break;
+                case SDLK_RCTRL:  mCurrentFrameKeyState |= (1 << static_cast<uint8_t>(Key::RCTL)); break;
+                case SDLK_LGUI:   mCurrentFrameKeyState |= (1 << static_cast<uint8_t>(Key::LCMD)); break;
+                case SDLK_RGUI:   mCurrentFrameKeyState |= (1 << static_cast<uint8_t>(Key::RCMD)); break;
+                case SDLK_LSHIFT: mCurrentFrameKeyState |= (1 << static_cast<uint8_t>(Key::LSFT)); break;
+                case SDLK_RSHIFT: mCurrentFrameKeyState |= (1 << static_cast<uint8_t>(Key::RSFT)); break;
             }
             
         } break;
@@ -133,10 +142,19 @@ void InputStateManagerPlatformImpl::VProcessInputEvent(const SDL_Event& event, b
         {
             switch (event.key.keysym.sym)
             {
-                case SDLK_w: mCurrentFrameKeyState ^= (1 << static_cast<uint8_t>(Key::W)); break;
-                case SDLK_a: mCurrentFrameKeyState ^= (1 << static_cast<uint8_t>(Key::A)); break;
-                case SDLK_s: mCurrentFrameKeyState ^= (1 << static_cast<uint8_t>(Key::S)); break;
-                case SDLK_d: mCurrentFrameKeyState ^= (1 << static_cast<uint8_t>(Key::D)); break;
+                case SDLK_w:      mCurrentFrameKeyState ^= (1 << static_cast<uint8_t>(Key::W)); break;
+                case SDLK_a:      mCurrentFrameKeyState ^= (1 << static_cast<uint8_t>(Key::A)); break;
+                case SDLK_s:      mCurrentFrameKeyState ^= (1 << static_cast<uint8_t>(Key::S)); break;
+                case SDLK_d:      mCurrentFrameKeyState ^= (1 << static_cast<uint8_t>(Key::D)); break;
+                case SDLK_z:      mCurrentFrameKeyState ^= (1 << static_cast<uint8_t>(Key::Z)); break;
+                case SDLK_LALT:   mCurrentFrameKeyState ^= (1 << static_cast<uint8_t>(Key::LALT)); break;
+                case SDLK_RALT:   mCurrentFrameKeyState ^= (1 << static_cast<uint8_t>(Key::RALT)); break;
+                case SDLK_LCTRL:  mCurrentFrameKeyState ^= (1 << static_cast<uint8_t>(Key::LCTL)); break;
+                case SDLK_RCTRL:  mCurrentFrameKeyState ^= (1 << static_cast<uint8_t>(Key::RCTL)); break;
+                case SDLK_LGUI:   mCurrentFrameKeyState ^= (1 << static_cast<uint8_t>(Key::LCMD)); break;
+                case SDLK_RGUI:   mCurrentFrameKeyState ^= (1 << static_cast<uint8_t>(Key::RCMD)); break;
+                case SDLK_LSHIFT: mCurrentFrameKeyState ^= (1 << static_cast<uint8_t>(Key::LSFT)); break;
+                case SDLK_RSHIFT: mCurrentFrameKeyState ^= (1 << static_cast<uint8_t>(Key::RSFT)); break;
             }
         } break;
             
