@@ -42,7 +42,7 @@ public:
     void CreateDebugWidgets();
     
 private:
-    void CreateGrid(const int gridRows, const int gridCols);
+    void CreateMap(const int gridRows, const int gridCols);
     void UpdateTile(std::shared_ptr<scene::SceneObject> tile, std::shared_ptr<scene::Scene> scene, const int tileCol, const int tileRow);
     void TryExecuteCommand(std::unique_ptr<commands::IEditorCommand> command);
     void TryUndoLastCommand();
@@ -68,7 +68,6 @@ private:
     bool mTopLayerVisible;
     std::vector<MapTileData> mPaletteTileData;
     std::stack<std::unique_ptr<commands::IEditorCommand>> mExecutedCommandHistory;
-    std::stack<std::unique_ptr<commands::IEditorCommand>> mUndoneCommandHistory;
     ViewOptions mViewOptions;
     map_constants::LayerType mActiveLayer;
 };

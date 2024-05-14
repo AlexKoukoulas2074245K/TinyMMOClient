@@ -67,6 +67,7 @@ static constexpr int MAX_GRID_COLS = 64;
 static const float TILE_SIZE = 0.013f;
 static const float TILE_DEFAULT_Z = 0.1f;
 static const float ZOOM_SPEED = 1.25f;
+static const float MOVE_SPEED = 0.01f;
 
 static const glm::vec3 TILE_DEFAULT_SCALE = glm::vec3(TILE_SIZE);
 static const glm::vec3 EMPTY_NAVMAP_TILE_COLOR = {1.0f, 1.0f, 1.0f};
@@ -137,7 +138,7 @@ void Editor::Init()
     mSelectedPaletteTile = 0;
     mViewOptions.mCameraZoom = scene->GetCamera().GetZoomFactor();
     mViewOptions.mCameraPosition = scene->GetCamera().GetPosition();
-    CreateGrid(DEFAULT_GRID_ROWS, DEFAULT_GRID_COLS);
+    CreateMap(DEFAULT_GRID_ROWS, DEFAULT_GRID_COLS);
 }
 
 ///------------------------------------------------------------------------------------------------
@@ -214,12 +215,12 @@ void Editor::Update(const float dtMillis)
         // Horizontal cam translation
         else if (shiftModifierDown)
         {
-            mViewOptions.mCameraPosition.x -= scrollDelta.x * 0.01f;
+            mViewOptions.mCameraPosition.x -= scrollDelta.x * MOVE_SPEED;
         }
         // Vertical cam translation
         else
         {
-            mViewOptions.mCameraPosition.y += scrollDelta.y * 0.01f;
+            mViewOptions.mCameraPosition.y += scrollDelta.y * MOVE_SPEED;
         }
     }
 
@@ -332,7 +333,7 @@ void Editor::CreateDebugWidgets()
                     }
                 }
                 
-                CreateGrid(mapJson["metadata"]["rows"].get<int>(), mapJson["metadata"]["cols"]);
+                CreateMap(mapJson["metadata"]["rows"].get<int>(), mapJson["metadata"]["cols"]);
                 
                 auto rowCounter = 0;
                 auto colCounter = 0;
@@ -459,7 +460,7 @@ void Editor::CreateDebugWidgets()
                 }
             }
             
-            CreateGrid(sDimensionsY, sDimensionsX);
+            CreateMap(sDimensionsY, sDimensionsX);
         }
         
         ImGui::SeparatorText("View Options");
@@ -560,11 +561,12 @@ void Editor::CreateDebugWidgets()
 
 ///------------------------------------------------------------------------------------------------
 
-void Editor::CreateGrid(const int gridRows, const int gridCols)
+void Editor::CreateMap(const int gridRows, const int gridCols)
 {
     auto& systemsEngine = CoreSystemsEngine::GetInstance();
     auto scene = systemsEngine.GetSceneManager().FindScene(EDITOR_SCENE);
     
+    mExecutedCommandHistory = {};
     mGridRows = gridRows;
     mGridCols = gridCols;
     
@@ -666,12 +668,11 @@ void Editor::UpdateTile(std::shared_ptr<scene::SceneObject> tile, std::shared_pt
 
 void Editor::TryExecuteCommand(std::unique_ptr<commands::IEditorCommand> command)
 {
-    if (!mExecutedCommandHistory.empty() && mExecutedCommandHistory.top()->VGetCommandStringId() == command->VGetCommandStringId())
+    if (!command->VIsNoOp())
     {
-        return;
+        command->VExecute();
+        mExecutedCommandHistory.push(std::move(command));
     }
-    command->VExecute();
-    mExecutedCommandHistory.push(std::move(command));
 }
 
 ///------------------------------------------------------------------------------------------------

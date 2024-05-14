@@ -38,9 +38,9 @@ void PlaceTileCommand::VUndo()
 
 ///------------------------------------------------------------------------------------------------
 
-strutils::StringId PlaceTileCommand::VGetCommandStringId() const
+bool PlaceTileCommand::VIsNoOp() const
 {
-    return strutils::StringId("PlaceTileCommand_" + mTargetTileSceneObject->mName.GetString() + "_" + std::to_string(mNewTileTextureresourceId));
+    return mOldTileTextureresourceId == mNewTileTextureresourceId;
 }
 
 ///------------------------------------------------------------------------------------------------

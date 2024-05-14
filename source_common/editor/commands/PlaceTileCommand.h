@@ -36,7 +36,7 @@ public:
     
     void VExecute() override;
     void VUndo() override;
-    strutils::StringId VGetCommandStringId() const override;
+    bool VIsNoOp() const override;
     
 private:
     std::shared_ptr<scene::SceneObject> mTargetTileSceneObject;

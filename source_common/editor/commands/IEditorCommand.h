@@ -29,7 +29,7 @@ public:
     
     virtual void VExecute() = 0;
     virtual void VUndo() = 0;
-    virtual strutils::StringId VGetCommandStringId() const = 0;
+    virtual bool VIsNoOp() const = 0;
 };
 
 ///------------------------------------------------------------------------------------------------
