@@ -84,7 +84,7 @@ std::shared_ptr<IResource> ShaderLoader::VCreateAndLoadResource(const std::strin
         bool containsError = strutils::StringContains(std::string(vertexShaderInfoLog.c_str()), "ERROR:");
         if (containsError)
         {
-            ospopups::ShowMessageBox(ospopups::MessageBoxType::ERROR, "Error Compiling Vertex Shader: " +  std::string(resourcePath.c_str()), vertexShaderInfoLog.c_str());
+            ospopups::ShowInfoMessageBox(ospopups::MessageBoxType::ERROR, "Error Compiling Vertex Shader: " +  std::string(resourcePath.c_str()), vertexShaderInfoLog.c_str());
         }
         logging::Log((containsError ? logging::LogType::ERROR : logging::LogType::WARNING), "%s Compiling Vertex Shader: %s\n%s", (containsError ? "Error" : "Warning"), resourcePath.c_str(), vertexShaderInfoLog.c_str());
     }
@@ -119,7 +119,7 @@ std::shared_ptr<IResource> ShaderLoader::VCreateAndLoadResource(const std::strin
         bool containsError = strutils::StringContains(std::string(fragmentShaderInfoLog.c_str()), "ERROR:");
         if (containsError)
         {
-            ospopups::ShowMessageBox(ospopups::MessageBoxType::ERROR, "Error Compiling Fragment Shader: " +  std::string(resourcePath.c_str()), fragmentShaderInfoLog.c_str());
+            ospopups::ShowInfoMessageBox(ospopups::MessageBoxType::ERROR, "Error Compiling Fragment Shader: " +  std::string(resourcePath.c_str()), fragmentShaderInfoLog.c_str());
         }
         logging::Log((containsError ? logging::LogType::ERROR : logging::LogType::WARNING), "%s Compiling Fragment Shader: %s\n%s", (containsError ? "Error" : "Warning"), resourcePath.c_str(), fragmentShaderInfoLog.c_str());
     }
@@ -152,7 +152,7 @@ std::string ShaderLoader::ReadFileContents(const std::string& filePath) const
     
     if (!file.good())
     {
-        ospopups::ShowMessageBox(ospopups::MessageBoxType::ERROR, "File could not be found", filePath.c_str());
+        ospopups::ShowInfoMessageBox(ospopups::MessageBoxType::ERROR, "File could not be found", filePath.c_str());
         return "";
     }
     
@@ -272,7 +272,7 @@ void ExtractUniformFromLine(const std::string& line, const std::string& shaderNa
         
         if (strutils::StringIsInt(uniformNameSplitByLeftSquareBracket[1]) == false)
         {
-            ospopups::ShowMessageBox(ospopups::MessageBoxType::ERROR, "Error Extracting Uniform", "Could not parse array element count for uniform: " + uniformName);
+            ospopups::ShowInfoMessageBox(ospopups::MessageBoxType::ERROR, "Error Extracting Uniform", "Could not parse array element count for uniform: " + uniformName);
         }
         
         const auto numberOfElements = std::stoi(uniformNameSplitByLeftSquareBracket[1]);

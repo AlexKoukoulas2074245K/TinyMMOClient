@@ -438,7 +438,7 @@ void ResourceLoadingService::LoadResourceInternal(const std::string& resourcePat
     }
     else
     {
-        ospopups::ShowMessageBox(ospopups::MessageBoxType::ERROR, "Unable to find loader for given extension", "A loader could not be found for extension: " + fileExtension.GetString());
+        ospopups::ShowInfoMessageBox(ospopups::MessageBoxType::ERROR, "Unable to find loader for given extension", "A loader could not be found for extension: " + fileExtension.GetString());
     }
 }
 

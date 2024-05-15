@@ -113,7 +113,7 @@ void CoreSystemsEngine::Initialize()
     // Initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
-        ospopups::ShowMessageBox(ospopups::MessageBoxType::ERROR, "SDL could not initialize!", SDL_GetError());
+        ospopups::ShowInfoMessageBox(ospopups::MessageBoxType::ERROR, "SDL could not initialize!", SDL_GetError());
         return;
     }
 
@@ -126,7 +126,7 @@ void CoreSystemsEngine::Initialize()
         
     if (!mWindow)
     {
-        ospopups::ShowMessageBox(ospopups::MessageBoxType::ERROR, "SDL could not initialize!", SDL_GetError());
+        ospopups::ShowInfoMessageBox(ospopups::MessageBoxType::ERROR, "SDL could not initialize!", SDL_GetError());
         return;
     }
   
@@ -143,14 +143,14 @@ void CoreSystemsEngine::Initialize()
     mContext = SDL_GL_CreateContext(mWindow);
     if (!mContext || SDL_GL_MakeCurrent(mWindow, mContext) != 0)
     {
-        ospopups::ShowMessageBox(ospopups::MessageBoxType::ERROR, "SDL could not initialize!", SDL_GetError());
+        ospopups::ShowInfoMessageBox(ospopups::MessageBoxType::ERROR, "SDL could not initialize!", SDL_GetError());
         return;
     }
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
     if (glewInit() != GLEW_OK)
     {
-        ospopups::ShowMessageBox(ospopups::MessageBoxType::ERROR, "GLEW could not initialize!", "GLEW Fatal Error");
+        ospopups::ShowInfoMessageBox(ospopups::MessageBoxType::ERROR, "GLEW could not initialize!", "GLEW Fatal Error");
         return;
     }
 #endif

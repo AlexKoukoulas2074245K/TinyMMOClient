@@ -90,7 +90,7 @@ BaseDataFileDeserializer::BaseDataFileDeserializer(const std::string& fileNameWi
         {
             if (warnOnFnFBehavior == WarnOnFileNotFoundBehavior::WARN)
             {
-                ospopups::ShowMessageBox(ospopups::MessageBoxType::ERROR, "Corrupted file", ("Data File " + filePath + " is corrupted.").c_str());
+                ospopups::ShowInfoMessageBox(ospopups::MessageBoxType::ERROR, "Corrupted file", ("Data File " + filePath + " is corrupted.").c_str());
             }
             
             return;
@@ -103,7 +103,7 @@ BaseDataFileDeserializer::BaseDataFileDeserializer(const std::string& fileNameWi
     }
     else if (warnOnFnFBehavior == WarnOnFileNotFoundBehavior::WARN)
     {
-        ospopups::ShowMessageBox(ospopups::MessageBoxType::ERROR, "File not found", ("Data File " + filePath + " not found.").c_str());
+        ospopups::ShowInfoMessageBox(ospopups::MessageBoxType::ERROR, "File not found", ("Data File " + filePath + " not found.").c_str());
     }
             
     dataFile.close();

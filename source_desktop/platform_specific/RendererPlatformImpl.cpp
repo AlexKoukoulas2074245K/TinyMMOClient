@@ -475,9 +475,9 @@ void RendererPlatformImpl::CreateIMGuiWidgets()
         {
             static glm::vec3 cameraPos(0.0f);
             cameraPos = sceneRef.get().GetCamera().GetPosition();
-            if(ImGui::SliderFloat("camX", &cameraPos.x , -0.5f, 0.5f) ||
-               ImGui::SliderFloat("camY", &cameraPos.y, -0.5f, 0.5f) ||
-               ImGui::SliderFloat("camZ", &cameraPos.z, -0.5f, 0.5f))
+            if(ImGui::SliderFloat("camX", &cameraPos.x , -2.5f, 2.5f) ||
+               ImGui::SliderFloat("camY", &cameraPos.y, -2.5f, 2.5f) ||
+               ImGui::SliderFloat("camZ", &cameraPos.z, -2.5f, 2.5f))
             {
                 sceneRef.get().GetCamera().SetPosition(cameraPos);
             }

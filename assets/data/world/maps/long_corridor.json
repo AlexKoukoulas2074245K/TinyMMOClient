@@ -1,7 +1,7 @@
 {
     "metadata": {
-        "cols": 32,
-        "rows": 10
+        "cols": 7,
+        "rows": 32
     },
     "tiledata": {
         "bottomlayer": [
@@ -10,72 +10,6 @@
                     "tile_texture": "textures/world/map_tiles/wall_top.png"
                 },
                 {
-                    "tile_texture": "textures/world/map_tiles/wall_top.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/wall_top.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/wall_top.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/wall_top.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/wall_top.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/wall_top.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/wall_top.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/wall_top.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/wall_top.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/wall_top.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/wall_top.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/wall_top.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/wall_top.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/wall_top.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/wall_top.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/wall_top.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/wall_top.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/wall_top.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/wall_top.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/wall_top.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/wall_top.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/wall_top.png"
-                },
-                {
                     "tile_texture": "textures/world/map_tiles/grass.png"
                 },
                 {
@@ -88,16 +22,7 @@
                     "tile_texture": "textures/world/map_tiles/grass.png"
                 },
                 {
-                    "tile_texture": "textures/world/map_tiles/wall_top.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/wall_top.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/wall_top.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                    "tile_texture": "textures/world/map_tiles/grass.png"
                 },
                 {
                     "tile_texture": "textures/world/map_tiles/wall_top.png"
@@ -108,15 +33,6 @@
                     "tile_texture": "textures/world/map_tiles/wall_top.png"
                 },
                 {
-                    "tile_texture": "textures/world/map_tiles/desert.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/desert.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_hor_connector.png"
-                },
-                {
                     "tile_texture": "textures/world/map_tiles/grass.png"
                 },
                 {
@@ -132,73 +48,7 @@
                     "tile_texture": "textures/world/map_tiles/grass.png"
                 },
                 {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
+                    "tile_texture": "textures/world/map_tiles/wall_top.png"
                 }
             ],
             [
@@ -206,15 +56,6 @@
                     "tile_texture": "textures/world/map_tiles/wall_top.png"
                 },
                 {
-                    "tile_texture": "textures/world/map_tiles/desert.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/desert.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_hor_connector.png"
-                },
-                {
                     "tile_texture": "textures/world/map_tiles/grass.png"
                 },
                 {
@@ -230,73 +71,7 @@
                     "tile_texture": "textures/world/map_tiles/grass.png"
                 },
                 {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
+                    "tile_texture": "textures/world/map_tiles/wall_top.png"
                 }
             ],
             [
@@ -304,15 +79,6 @@
                     "tile_texture": "textures/world/map_tiles/wall_top.png"
                 },
                 {
-                    "tile_texture": "textures/world/map_tiles/desert.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/desert.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_hor_connector.png"
-                },
-                {
                     "tile_texture": "textures/world/map_tiles/grass.png"
                 },
                 {
@@ -328,73 +94,7 @@
                     "tile_texture": "textures/world/map_tiles/grass.png"
                 },
                 {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
+                    "tile_texture": "textures/world/map_tiles/wall_top.png"
                 }
             ],
             [
@@ -402,15 +102,6 @@
                     "tile_texture": "textures/world/map_tiles/wall_top.png"
                 },
                 {
-                    "tile_texture": "textures/world/map_tiles/desert.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/desert.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_hor_connector.png"
-                },
-                {
                     "tile_texture": "textures/world/map_tiles/grass.png"
                 },
                 {
@@ -426,73 +117,7 @@
                     "tile_texture": "textures/world/map_tiles/grass.png"
                 },
                 {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
+                    "tile_texture": "textures/world/map_tiles/wall_top.png"
                 }
             ],
             [
@@ -500,15 +125,6 @@
                     "tile_texture": "textures/world/map_tiles/wall_top.png"
                 },
                 {
-                    "tile_texture": "textures/world/map_tiles/desert.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/desert.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_hor_connector.png"
-                },
-                {
                     "tile_texture": "textures/world/map_tiles/grass.png"
                 },
                 {
@@ -524,73 +140,7 @@
                     "tile_texture": "textures/world/map_tiles/grass.png"
                 },
                 {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
+                    "tile_texture": "textures/world/map_tiles/wall_top.png"
                 }
             ],
             [
@@ -598,15 +148,6 @@
                     "tile_texture": "textures/world/map_tiles/wall_top.png"
                 },
                 {
-                    "tile_texture": "textures/world/map_tiles/desert.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/desert.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_hor_connector.png"
-                },
-                {
                     "tile_texture": "textures/world/map_tiles/grass.png"
                 },
                 {
@@ -622,73 +163,7 @@
                     "tile_texture": "textures/world/map_tiles/grass.png"
                 },
                 {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
+                    "tile_texture": "textures/world/map_tiles/wall_top.png"
                 }
             ],
             [
@@ -696,15 +171,6 @@
                     "tile_texture": "textures/world/map_tiles/wall_top.png"
                 },
                 {
-                    "tile_texture": "textures/world/map_tiles/desert.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/desert.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_hor_connector.png"
-                },
-                {
                     "tile_texture": "textures/world/map_tiles/grass.png"
                 },
                 {
@@ -720,73 +186,7 @@
                     "tile_texture": "textures/world/map_tiles/grass.png"
                 },
                 {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
+                    "tile_texture": "textures/world/map_tiles/wall_top.png"
                 }
             ],
             [
@@ -794,15 +194,6 @@
                     "tile_texture": "textures/world/map_tiles/wall_top.png"
                 },
                 {
-                    "tile_texture": "textures/world/map_tiles/desert.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/desert.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_hor_connector.png"
-                },
-                {
                     "tile_texture": "textures/world/map_tiles/grass.png"
                 },
                 {
@@ -818,73 +209,7 @@
                     "tile_texture": "textures/world/map_tiles/grass.png"
                 },
                 {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/grass.png"
+                    "tile_texture": "textures/world/map_tiles/wall_top.png"
                 }
             ],
             [
@@ -892,94 +217,525 @@
                     "tile_texture": "textures/world/map_tiles/wall_top.png"
                 },
                 {
-                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                    "tile_texture": "textures/world/map_tiles/grass.png"
                 },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                }
+            ],
+            [
                 {
                     "tile_texture": "textures/world/map_tiles/wall_top.png"
                 },
                 {
-                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                    "tile_texture": "textures/world/map_tiles/grass.png"
                 },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                }
+            ],
+            [
                 {
                     "tile_texture": "textures/world/map_tiles/wall_top.png"
                 },
                 {
-                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                    "tile_texture": "textures/world/map_tiles/grass.png"
                 },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                }
+            ],
+            [
                 {
                     "tile_texture": "textures/world/map_tiles/wall_top.png"
                 },
                 {
-                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                    "tile_texture": "textures/world/map_tiles/grass.png"
                 },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                }
+            ],
+            [
                 {
                     "tile_texture": "textures/world/map_tiles/wall_top.png"
                 },
                 {
-                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                    "tile_texture": "textures/world/map_tiles/grass.png"
                 },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                }
+            ],
+            [
                 {
                     "tile_texture": "textures/world/map_tiles/wall_top.png"
                 },
                 {
-                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                    "tile_texture": "textures/world/map_tiles/grass.png"
                 },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                }
+            ],
+            [
                 {
                     "tile_texture": "textures/world/map_tiles/wall_top.png"
                 },
                 {
-                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                    "tile_texture": "textures/world/map_tiles/grass.png"
                 },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                }
+            ],
+            [
                 {
                     "tile_texture": "textures/world/map_tiles/wall_top.png"
                 },
                 {
-                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                    "tile_texture": "textures/world/map_tiles/grass.png"
                 },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                }
+            ],
+            [
                 {
                     "tile_texture": "textures/world/map_tiles/wall_top.png"
                 },
                 {
-                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                    "tile_texture": "textures/world/map_tiles/grass.png"
                 },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                }
+            ],
+            [
                 {
                     "tile_texture": "textures/world/map_tiles/wall_top.png"
                 },
                 {
-                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                    "tile_texture": "textures/world/map_tiles/grass.png"
                 },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                }
+            ],
+            [
                 {
                     "tile_texture": "textures/world/map_tiles/wall_top.png"
                 },
                 {
-                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                    "tile_texture": "textures/world/map_tiles/grass.png"
                 },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                }
+            ],
+            [
                 {
                     "tile_texture": "textures/world/map_tiles/wall_top.png"
                 },
                 {
-                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                    "tile_texture": "textures/world/map_tiles/grass.png"
                 },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                }
+            ],
+            [
                 {
                     "tile_texture": "textures/world/map_tiles/wall_top.png"
                 },
                 {
-                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                    "tile_texture": "textures/world/map_tiles/grass.png"
                 },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                }
+            ],
+            [
                 {
                     "tile_texture": "textures/world/map_tiles/wall_top.png"
                 },
                 {
-                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                    "tile_texture": "textures/world/map_tiles/grass.png"
                 },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                }
+            ],
+            [
                 {
                     "tile_texture": "textures/world/map_tiles/wall_top.png"
                 },
                 {
-                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
                 },
                 {
                     "tile_texture": "textures/world/map_tiles/wall_top.png"
+                }
+            ],
+            [
+                {
+                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                }
+            ],
+            [
+                {
+                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                }
+            ],
+            [
+                {
+                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                }
+            ],
+            [
+                {
+                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                }
+            ],
+            [
+                {
+                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                }
+            ],
+            [
+                {
+                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                }
+            ],
+            [
+                {
+                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                }
+            ],
+            [
+                {
+                    "tile_texture": "textures/world/map_tiles/wall_top.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/grass.png"
                 },
                 {
                     "tile_texture": "textures/world/map_tiles/wall_top.png"
@@ -1008,61 +764,9 @@
                 },
                 {
                     "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
+                }
+            ],
+            [
                 {
                     "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
                 },
@@ -1106,61 +810,9 @@
                 },
                 {
                     "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
+                }
+            ],
+            [
                 {
                     "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
                 },
@@ -1204,61 +856,9 @@
                 },
                 {
                     "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
+                }
+            ],
+            [
                 {
                     "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
                 },
@@ -1302,61 +902,9 @@
                 },
                 {
                     "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
+                }
+            ],
+            [
                 {
                     "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
                 },
@@ -1400,61 +948,9 @@
                 },
                 {
                     "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
+                }
+            ],
+            [
                 {
                     "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
                 },
@@ -1498,61 +994,9 @@
                 },
                 {
                     "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
+                }
+            ],
+            [
                 {
                     "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
                 },
@@ -1596,61 +1040,9 @@
                 },
                 {
                     "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
+                }
+            ],
+            [
                 {
                     "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
                 },
@@ -1694,61 +1086,9 @@
                 },
                 {
                     "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
+                }
+            ],
+            [
                 {
                     "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
                 },
@@ -1792,61 +1132,9 @@
                 },
                 {
                     "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
-                {
-                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
+                }
+            ],
+            [
                 {
                     "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
                 },
@@ -1890,7 +1178,9 @@
                 },
                 {
                     "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
+                }
+            ],
+            [
                 {
                     "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
                 },
@@ -1911,7 +1201,9 @@
                 },
                 {
                     "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
+                }
+            ],
+            [
                 {
                     "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
                 },
@@ -1932,7 +1224,9 @@
                 },
                 {
                     "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
-                },
+                }
+            ],
+            [
                 {
                     "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
                 },
@@ -1945,6 +1239,224 @@
                 {
                     "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
                 },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                }
+            ],
+            [
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                }
+            ],
+            [
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                }
+            ],
+            [
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                }
+            ],
+            [
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                }
+            ],
+            [
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                }
+            ],
+            [
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                }
+            ],
+            [
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                }
+            ],
+            [
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                }
+            ],
+            [
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                },
+                {
+                    "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
+                }
+            ],
+            [
                 {
                     "tile_texture": "textures/world/map_tiles/0_blank_transparent.png"
                 },

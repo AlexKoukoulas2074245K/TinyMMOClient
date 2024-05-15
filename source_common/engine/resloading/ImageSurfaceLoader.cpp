@@ -62,7 +62,7 @@ std::shared_ptr<IResource> ImageSurfaceLoader::VCreateAndLoadResource(const std:
         
     if (!file.good())
     {
-        ospopups::ShowMessageBox(ospopups::MessageBoxType::ERROR, "File could not be found", resourcePath.c_str());
+        ospopups::ShowInfoMessageBox(ospopups::MessageBoxType::ERROR, "File could not be found", resourcePath.c_str());
         return nullptr;
     }
     
@@ -70,7 +70,7 @@ std::shared_ptr<IResource> ImageSurfaceLoader::VCreateAndLoadResource(const std:
     
     if (!sdlSurface)
     {
-        ospopups::ShowMessageBox(ospopups::MessageBoxType::ERROR, "SDL_image could not load texture", IMG_GetError());
+        ospopups::ShowInfoMessageBox(ospopups::MessageBoxType::ERROR, "SDL_image could not load texture", IMG_GetError());
         return nullptr;
     }
     

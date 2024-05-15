@@ -34,7 +34,7 @@ std::optional<std::reference_wrapper<const Font>> FontRepository::GetFont(const 
         return std::optional<std::reference_wrapper<const Font>>{findIter->second};
     }
     
-    ospopups::ShowMessageBox(ospopups::MessageBoxType::ERROR, "Cannot find font", fontName.GetString().c_str());
+    ospopups::ShowInfoMessageBox(ospopups::MessageBoxType::ERROR, "Cannot find font", fontName.GetString().c_str());
     return std::nullopt;
 }
 

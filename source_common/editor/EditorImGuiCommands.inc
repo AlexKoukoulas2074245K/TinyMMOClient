@@ -1,21 +1,97 @@
-
 #if defined(USE_IMGUI)
 void Editor::CreateDebugWidgets()
 {
+    static std::vector<std::string> sMapFileNames;
+    static std::vector<std::string> sMapFileNameOptions; // Mirrors above, includes "None"
+    static std::vector<std::string> sOtherMapTextures {"None"};
+    static std::unordered_map<std::string, glm::vec2> sMapTextureNamesToDimensions;
+    static std::unordered_map<std::string, std::unordered_map<std::string, std::pair<int, std::string>>> sMapConnections;
+    
+    auto RefreshGlobalMapFilesLambda = [&]()
+    {
+        sMapFileNames = fileutils::GetAllFilenamesInDirectory(NON_SANDBOXED_MAPS_FOLDER);
+        sMapFileNameOptions = sMapFileNames;
+        sMapFileNameOptions.insert(sMapFileNameOptions.begin(), "None");
+        
+        sOtherMapTextures = {"None"};
+        sMapTextureNamesToDimensions.clear();
+        
+        auto mapTextureFileNames = fileutils::GetAllFilenamesInDirectory(NON_SANDBOXED_MAP_TEXTURES_FOLDER);
+        for (auto filePath: mapTextureFileNames)
+        {
+            if (strutils::StringEndsWith(filePath, "_bottom_layer.png"))
+            {
+                auto fileName = fileutils::GetFileName(filePath);
+                auto mapName = fileName.substr(0, fileName.find("_bottom_layer.png"));
+                sOtherMapTextures.push_back(mapName);
+                
+                std::ifstream mapDataFile(NON_SANDBOXED_MAPS_FOLDER + mapName + ".json");
+                if (mapDataFile.is_open())
+                {
+                    std::stringstream buffer;
+                    buffer << mapDataFile.rdbuf();
+                    auto mapDataJson = nlohmann::json::parse(buffer.str());
+                    sMapTextureNamesToDimensions[mapName] = glm::vec2(mapDataJson["metadata"]["cols"].get<float>() * TILE_DEFAULT_SCALE.x, mapDataJson["metadata"]["rows"].get<float>() * TILE_DEFAULT_SCALE.y);
+                }
+            }
+        }
+        
+        sMapConnections.clear();
+        
+        for (auto mapFileNameConnection: sMapFileNames)
+        {
+            sMapConnections[mapFileNameConnection]["top"] = std::make_pair(0, "None");
+            sMapConnections[mapFileNameConnection]["right"] = std::make_pair(0, "None");
+            sMapConnections[mapFileNameConnection]["bottom"] = std::make_pair(0, "None");
+            sMapConnections[mapFileNameConnection]["left"] = std::make_pair(0, "None");
+        }
+        
+        std::ifstream globalMapDataFile(NON_SANDBOXED_MAP_GLOBAL_DATA_PATH);
+        
+        if (globalMapDataFile.is_open())
+        {
+            std::stringstream buffer;
+            buffer << globalMapDataFile.rdbuf();
+            auto globalMapDataJson = nlohmann::json::parse(buffer.str());
+            for (auto it = globalMapDataJson["map_connections"].begin(); it != globalMapDataJson["map_connections"].end(); ++it)
+            {
+                auto mapName = it.key();
+                if (std::find(sMapFileNames.begin(), sMapFileNames.end(), mapName) == sMapFileNames.end())
+                {
+                    continue;
+                }
+                    
+                auto mapConnectionEntry = it.value();
+                
+                auto topConnection = mapConnectionEntry["top"].get<std::string>();
+                auto rightConnection = mapConnectionEntry["right"].get<std::string>();
+                auto bottomConnection = mapConnectionEntry["bottom"].get<std::string>();
+                auto leftConnection = mapConnectionEntry["left"].get<std::string>();
+                
+                auto topConnectionNameFindIter = std::find(sMapFileNameOptions.begin(), sMapFileNameOptions.end(), topConnection);
+                auto rightConnectionNameFindIter = std::find(sMapFileNameOptions.begin(), sMapFileNameOptions.end(), rightConnection);
+                auto bottomConnectionNameFindIter = std::find(sMapFileNameOptions.begin(), sMapFileNameOptions.end(), bottomConnection);
+                auto leftConnectionNameFindIter = std::find(sMapFileNameOptions.begin(), sMapFileNameOptions.end(), leftConnection);
+                
+                sMapConnections[mapName]["top"] = topConnectionNameFindIter != sMapFileNameOptions.end() ? std::make_pair(std::distance(sMapFileNameOptions.begin(), topConnectionNameFindIter), topConnection) : std::make_pair(0, "None");
+                sMapConnections[mapName]["right"] = rightConnectionNameFindIter != sMapFileNameOptions.end() ? std::make_pair(std::distance(sMapFileNameOptions.begin(), rightConnectionNameFindIter), rightConnection) : std::make_pair(0, "None");
+                sMapConnections[mapName]["bottom"] = bottomConnectionNameFindIter != sMapFileNameOptions.end() ? std::make_pair(std::distance(sMapFileNameOptions.begin(), bottomConnectionNameFindIter), bottomConnection) : std::make_pair(0, "None");
+                sMapConnections[mapName]["left"] = leftConnectionNameFindIter != sMapFileNameOptions.end() ? std::make_pair(std::distance(sMapFileNameOptions.begin(), leftConnectionNameFindIter), leftConnection) : std::make_pair(0, "None");
+            }
+        }
+    };
+    
     {
         static constexpr int TILEMAP_NAME_BUFFER_SIZE = 64;
-        static char sMapNameBuffer[TILEMAP_NAME_BUFFER_SIZE] = {};
-        static std::vector<std::string> sMapFileNames;
+        static char sMapNameBuffer[TILEMAP_NAME_BUFFER_SIZE] = { "entry_map.json" };
         static size_t sSelectedMapFileIndex = 0;
         
         if (sMapFileNames.empty())
         {
-            sMapFileNames = fileutils::GetAllFilenamesInDirectory(resources::ResourceLoadingService::RES_DATA_ROOT + MAP_FILES_FOLDER);
+            RefreshGlobalMapFilesLambda();
         }
         
         ImGui::Begin("Tile Map File", nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
-        ImGui::SeparatorText("Import/Export");
-        
         if (!sMapFileNames.empty())
         {
             ImGui::PushID("ExistingMapFiles");
@@ -42,18 +118,6 @@ void Editor::CreateDebugWidgets()
             ImGui::Text("ExistingMaps");
         }
         
-        if (strlen(sMapNameBuffer) == 0)
-        {
-            if (sMapFileNames.empty())
-            {
-                strcpy(sMapNameBuffer, "map.json");
-            }
-            else
-            {
-                strcpy(sMapNameBuffer, sMapFileNames.front().c_str());
-            }
-        }
-        
         ImGui::SetNextItemWidth(150.0f);
         ImGui::InputText("MapName", &sMapNameBuffer[0], TILEMAP_NAME_BUFFER_SIZE);
         
@@ -61,7 +125,7 @@ void Editor::CreateDebugWidgets()
         if (ImGui::Button("  Load  "))
         {
             std::ifstream dataFile(NON_SANDBOXED_MAPS_FOLDER + sMapNameBuffer);
-            if (dataFile.is_open())
+            if (strlen(sMapNameBuffer) > 0 && dataFile.is_open())
             {
                 std::stringstream buffer;
                 buffer << dataFile.rdbuf();
@@ -122,105 +186,124 @@ void Editor::CreateDebugWidgets()
         ImGui::SameLine();
         if (ImGui::Button("  Save  "))
         {
-            auto beginTimePoint = std::chrono::high_resolution_clock::now();
-            
-            nlohmann::json mapJson;
-            nlohmann::json mapMetaDataJson;
-            nlohmann::json mapTileDataJson;
-            nlohmann::json bottomLayerMapTileDataJson;
-            nlohmann::json topLayerMapTileDataJson;
-            
-            mapMetaDataJson["rows"] = mGridRows;
-            mapMetaDataJson["cols"] = mGridCols;
-            
-            auto& systemsEngine = CoreSystemsEngine::GetInstance();
-            auto scene = systemsEngine.GetSceneManager().FindScene(EDITOR_SCENE);
-            
-            for (auto y = 0; y < mGridRows; ++y)
+            if (strlen(sMapNameBuffer) == 0 || std::string(sMapNameBuffer) == ".json")
             {
-                nlohmann::json bottomLayerRowJson;
-                nlohmann::json topLayerRowJson;
-                for (auto x = 0; x < mGridCols; ++x)
-                {
-                    {
-                        auto bottomLayerTileSceneObject = scene->FindSceneObject(strutils::StringId(std::to_string(x) + "," + std::to_string(y)));
-                        nlohmann::json tileJson;
-                        tileJson["tile_texture"] = CoreSystemsEngine::GetInstance().GetResourceLoadingService().GetResourcePath(bottomLayerTileSceneObject->mTextureResourceId);
-                        bottomLayerRowJson.push_back(tileJson);
-                    }
-                    
-                    {
-                        auto topLayerTileSceneObject = scene->FindSceneObject(strutils::StringId(std::to_string(x) + "," + std::to_string(y) + "_top"));
-                        nlohmann::json tileJson;
-                        tileJson["tile_texture"] = CoreSystemsEngine::GetInstance().GetResourceLoadingService().GetResourcePath(topLayerTileSceneObject->mTextureResourceId);
-                        topLayerRowJson.push_back(tileJson);
-                    }
-                }
-                bottomLayerMapTileDataJson.push_back(bottomLayerRowJson);
-                topLayerMapTileDataJson.push_back(topLayerRowJson);
+                ospopups::ShowInfoMessageBox(ospopups::MessageBoxType::ERROR, "A name for the map must be specified");
             }
-            
-            mapTileDataJson["bottomlayer"] = bottomLayerMapTileDataJson;
-            mapTileDataJson["toplayer"] = topLayerMapTileDataJson;
-            mapJson["tiledata"] = mapTileDataJson;
-            mapJson["metadata"] = mapMetaDataJson;
-            
-            std::ofstream outputMapJsonFile(NON_SANDBOXED_MAPS_FOLDER + std::string(sMapNameBuffer));
-            auto mapJsonString = mapJson.dump(4);
-            outputMapJsonFile.write(mapJsonString.c_str(), mapJsonString.size());
-            outputMapJsonFile.close();
-            
-            // Render map textures
-            std::vector<std::shared_ptr<scene::SceneObject>> bottomLayerSceneObjects;
-            std::vector<std::shared_ptr<scene::SceneObject>> topLayerSceneObjects;
-            
-            for (auto y = 0; y < mGridRows; ++y)
+            else
             {
-                for (auto x = 0; x < mGridCols; ++x)
+                bool shouldProceed = true;
+                
+                if (std::find(sMapFileNames.begin(), sMapFileNames.end(), std::string(sMapNameBuffer)) != sMapFileNames.end())
                 {
-                    auto bottomLayerTileSceneObject = scene->FindSceneObject(strutils::StringId(std::to_string(x) + "," + std::to_string(y)));
-                    auto topLayerTileSceneObject = scene->FindSceneObject(strutils::StringId(std::to_string(x) + "," + std::to_string(y) + "_top"));
-                    
-                    bottomLayerTileSceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 1.0f;
-                    topLayerTileSceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 1.0f;
-                    
-                    bottomLayerSceneObjects.push_back(bottomLayerTileSceneObject);
-                    topLayerSceneObjects.push_back(topLayerTileSceneObject);
+                    shouldProceed = ospopups::ShowOkayCancelMessageBox(ospopups::MessageBoxType::INFO, "Overwrite Confirmation", "The existing map data and textures for " + std::string(sMapNameBuffer) + " will be overwritten. Proceed?" ) == 1;
                 }
-            }
-            rendering::ExportToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + fileutils::GetFileNameWithoutExtension(std::string(sMapNameBuffer)) + "_bottom_layer.png", bottomLayerSceneObjects, rendering::BlurStep::DONT_BLUR);
-            rendering::ExportToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + fileutils::GetFileNameWithoutExtension(std::string(sMapNameBuffer)) + "_top_layer.png", topLayerSceneObjects, rendering::BlurStep::DONT_BLUR);
-            
-            // Render map navmap texture
-            for (auto y = 0; y < mGridRows; ++y)
-            {
-                nlohmann::json rowJson;
-                for (auto x = 0; x < mGridCols; ++x)
+                
+                if (shouldProceed)
                 {
+                    auto beginTimePoint = std::chrono::high_resolution_clock::now();
+                    
+                    nlohmann::json mapJson;
+                    nlohmann::json mapMetaDataJson;
+                    nlohmann::json mapTileDataJson;
+                    nlohmann::json bottomLayerMapTileDataJson;
+                    nlohmann::json topLayerMapTileDataJson;
+                    
+                    mapMetaDataJson["rows"] = mGridRows;
+                    mapMetaDataJson["cols"] = mGridCols;
+                    
+                    auto& systemsEngine = CoreSystemsEngine::GetInstance();
+                    auto scene = systemsEngine.GetSceneManager().FindScene(EDITOR_SCENE);
+                    
+                    for (auto y = 0; y < mGridRows; ++y)
                     {
-                        auto bottomLayerTileSceneObject = scene->FindSceneObject(strutils::StringId(std::to_string(x) + "," + std::to_string(y)));
-                        auto tileTextureResourcePath = fileutils::GetFileName(systemsEngine.GetResourceLoadingService().GetResourcePath(bottomLayerTileSceneObject->mTextureResourceId));
-                        
-                        bottomLayerTileSceneObject->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + WORLD_MAP_TILE_NAVMAP_GEN_SHADER);
-                        bottomLayerTileSceneObject->mShaderVec3UniformValues[NAVMAP_TILE_COLOR_UNIFORM_NAME] = SPECIAL_NAVMAP_TILES_TO_COLORS.count(tileTextureResourcePath) ? SPECIAL_NAVMAP_TILES_TO_COLORS.at(tileTextureResourcePath) : EMPTY_NAVMAP_TILE_COLOR;
+                        nlohmann::json bottomLayerRowJson;
+                        nlohmann::json topLayerRowJson;
+                        for (auto x = 0; x < mGridCols; ++x)
+                        {
+                            {
+                                auto bottomLayerTileSceneObject = scene->FindSceneObject(strutils::StringId(std::to_string(x) + "," + std::to_string(y)));
+                                nlohmann::json tileJson;
+                                tileJson["tile_texture"] = CoreSystemsEngine::GetInstance().GetResourceLoadingService().GetResourcePath(bottomLayerTileSceneObject->mTextureResourceId);
+                                bottomLayerRowJson.push_back(tileJson);
+                            }
+                            
+                            {
+                                auto topLayerTileSceneObject = scene->FindSceneObject(strutils::StringId(std::to_string(x) + "," + std::to_string(y) + "_top"));
+                                nlohmann::json tileJson;
+                                tileJson["tile_texture"] = CoreSystemsEngine::GetInstance().GetResourceLoadingService().GetResourcePath(topLayerTileSceneObject->mTextureResourceId);
+                                topLayerRowJson.push_back(tileJson);
+                            }
+                        }
+                        bottomLayerMapTileDataJson.push_back(bottomLayerRowJson);
+                        topLayerMapTileDataJson.push_back(topLayerRowJson);
                     }
                     
+                    mapTileDataJson["bottomlayer"] = bottomLayerMapTileDataJson;
+                    mapTileDataJson["toplayer"] = topLayerMapTileDataJson;
+                    mapJson["tiledata"] = mapTileDataJson;
+                    mapJson["metadata"] = mapMetaDataJson;
+                    
+                    std::ofstream outputMapJsonFile(NON_SANDBOXED_MAPS_FOLDER + std::string(sMapNameBuffer));
+                    auto mapJsonString = mapJson.dump(4);
+                    outputMapJsonFile.write(mapJsonString.c_str(), mapJsonString.size());
+                    outputMapJsonFile.close();
+                    
+                    // Render map textures
+                    std::vector<std::shared_ptr<scene::SceneObject>> bottomLayerSceneObjects;
+                    std::vector<std::shared_ptr<scene::SceneObject>> topLayerSceneObjects;
+                    
+                    for (auto y = 0; y < mGridRows; ++y)
                     {
-                        auto topLayerTileSceneObject = scene->FindSceneObject(strutils::StringId(std::to_string(x) + "," + std::to_string(y) + "_top"));
-                        auto tileTextureResourcePath = fileutils::GetFileName(systemsEngine.GetResourceLoadingService().GetResourcePath(topLayerTileSceneObject->mTextureResourceId));
-                        
-                        topLayerTileSceneObject->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + WORLD_MAP_TILE_NAVMAP_GEN_SHADER);
-                        topLayerTileSceneObject->mShaderVec3UniformValues[NAVMAP_TILE_COLOR_UNIFORM_NAME] = SPECIAL_NAVMAP_TILES_TO_COLORS.count(tileTextureResourcePath) ? SPECIAL_NAVMAP_TILES_TO_COLORS.at(tileTextureResourcePath) : EMPTY_NAVMAP_TILE_COLOR;
+                        for (auto x = 0; x < mGridCols; ++x)
+                        {
+                            auto bottomLayerTileSceneObject = scene->FindSceneObject(strutils::StringId(std::to_string(x) + "," + std::to_string(y)));
+                            auto topLayerTileSceneObject = scene->FindSceneObject(strutils::StringId(std::to_string(x) + "," + std::to_string(y) + "_top"));
+                            
+                            bottomLayerTileSceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 1.0f;
+                            topLayerTileSceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 1.0f;
+                            
+                            bottomLayerSceneObjects.push_back(bottomLayerTileSceneObject);
+                            topLayerSceneObjects.push_back(topLayerTileSceneObject);
+                        }
                     }
+                    rendering::ExportToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + fileutils::GetFileNameWithoutExtension(std::string(sMapNameBuffer)) + "_bottom_layer.png", bottomLayerSceneObjects, rendering::BlurStep::DONT_BLUR);
+                    rendering::ExportToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + fileutils::GetFileNameWithoutExtension(std::string(sMapNameBuffer)) + "_top_layer.png", topLayerSceneObjects, rendering::BlurStep::DONT_BLUR);
+                    
+                    // Render map navmap texture
+                    for (auto y = 0; y < mGridRows; ++y)
+                    {
+                        nlohmann::json rowJson;
+                        for (auto x = 0; x < mGridCols; ++x)
+                        {
+                            {
+                                auto bottomLayerTileSceneObject = scene->FindSceneObject(strutils::StringId(std::to_string(x) + "," + std::to_string(y)));
+                                auto tileTextureResourcePath = fileutils::GetFileName(systemsEngine.GetResourceLoadingService().GetResourcePath(bottomLayerTileSceneObject->mTextureResourceId));
+                                
+                                bottomLayerTileSceneObject->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + WORLD_MAP_TILE_NAVMAP_GEN_SHADER);
+                                bottomLayerTileSceneObject->mShaderVec3UniformValues[NAVMAP_TILE_COLOR_UNIFORM_NAME] = SPECIAL_NAVMAP_TILES_TO_COLORS.count(tileTextureResourcePath) ? SPECIAL_NAVMAP_TILES_TO_COLORS.at(tileTextureResourcePath) : EMPTY_NAVMAP_TILE_COLOR;
+                            }
+                            
+                            {
+                                auto topLayerTileSceneObject = scene->FindSceneObject(strutils::StringId(std::to_string(x) + "," + std::to_string(y) + "_top"));
+                                auto tileTextureResourcePath = fileutils::GetFileName(systemsEngine.GetResourceLoadingService().GetResourcePath(topLayerTileSceneObject->mTextureResourceId));
+                                
+                                topLayerTileSceneObject->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + WORLD_MAP_TILE_NAVMAP_GEN_SHADER);
+                                topLayerTileSceneObject->mShaderVec3UniformValues[NAVMAP_TILE_COLOR_UNIFORM_NAME] = SPECIAL_NAVMAP_TILES_TO_COLORS.count(tileTextureResourcePath) ? SPECIAL_NAVMAP_TILES_TO_COLORS.at(tileTextureResourcePath) : EMPTY_NAVMAP_TILE_COLOR;
+                            }
+                        }
+                    }
+                    rendering::ExportToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + fileutils::GetFileNameWithoutExtension(std::string(sMapNameBuffer)) + "_navmap.png", bottomLayerSceneObjects, rendering::BlurStep::DONT_BLUR);
+                    
+                    logging::Log(logging::LogType::ERROR, "Successfully saved %s", (NON_SANDBOXED_MAPS_FOLDER + std::string(sMapNameBuffer)).c_str());
+                    
+                    auto endTimePoint = std::chrono::high_resolution_clock::now();
+                    
+                    ospopups::ShowInfoMessageBox(ospopups::MessageBoxType::INFO, "Export complete", "Finished saving map file and exporting texture & navmap for " + fileutils::GetFileNameWithoutExtension(std::string(sMapNameBuffer)) + ". Operation took " + std::to_string(std::chrono::duration_cast<std::chrono::seconds>(endTimePoint - beginTimePoint).count()) + " secs");
+                    
+                    RefreshGlobalMapFilesLambda();
                 }
             }
-            rendering::ExportToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + fileutils::GetFileNameWithoutExtension(std::string(sMapNameBuffer)) + "_navmap.png", bottomLayerSceneObjects, rendering::BlurStep::BLUR);
-            
-            logging::Log(logging::LogType::ERROR, "Successfully saved %s", (NON_SANDBOXED_MAPS_FOLDER + std::string(sMapNameBuffer)).c_str());
-            
-            auto endTimePoint = std::chrono::high_resolution_clock::now();
-            
-            ospopups::ShowMessageBox(ospopups::MessageBoxType::INFO, "Export complete", "Finished saving map file and exporting texture & navmap for " + fileutils::GetFileNameWithoutExtension(std::string(sMapNameBuffer)) + ". Operation took " + std::to_string(std::chrono::duration_cast<std::chrono::seconds>(endTimePoint - beginTimePoint).count()) + " secs");
         }
         
         ImGui::SeparatorText("Modify/Create");
@@ -256,36 +339,9 @@ void Editor::CreateDebugWidgets()
         {
             DestroyMap();
             CreateMap(sDimensionsY, sDimensionsX);
-            memset(sMapNameBuffer, 0, TILEMAP_NAME_BUFFER_SIZE);
-            strcpy(sMapNameBuffer, "map.json");
         }
         
         ImGui::SeparatorText("Side Image References");
-        static std::vector<std::string> sOtherMapTextures {"None"};
-        static std::unordered_map<std::string, glm::vec2> sMapTextureNamesToDimensions;
-        
-        if (sOtherMapTextures.size() == 1)
-        {
-            auto mapTextureFileNames = fileutils::GetAllFilenamesInDirectory(resources::ResourceLoadingService::RES_TEXTURES_ROOT + MAP_FILES_FOLDER);
-            for (auto filePath: mapTextureFileNames)
-            {
-                if (strutils::StringEndsWith(filePath, "_bottom_layer.png"))
-                {
-                    auto fileName = fileutils::GetFileName(filePath);
-                    auto mapName = fileName.substr(0, fileName.find("_bottom_layer.png"));
-                    sOtherMapTextures.push_back(mapName);
-                    
-                    std::ifstream mapDataFile(NON_SANDBOXED_MAPS_FOLDER + mapName + ".json");
-                    if (mapDataFile.is_open())
-                    {
-                        std::stringstream buffer;
-                        buffer << mapDataFile.rdbuf();
-                        auto mapDataJson = nlohmann::json::parse(buffer.str());
-                        sMapTextureNamesToDimensions[mapName] = glm::vec2(mapDataJson["metadata"]["cols"].get<float>() * TILE_DEFAULT_SCALE.x, mapDataJson["metadata"]["rows"].get<float>() * TILE_DEFAULT_SCALE.y);
-                    }
-                }
-            }
-        }
         
         auto& systemsEngine = CoreSystemsEngine::GetInstance();
         auto scene = systemsEngine.GetSceneManager().FindScene(EDITOR_SCENE);
@@ -328,7 +384,12 @@ void Editor::CreateDebugWidgets()
                         if (sOtherMapTextures.at(sideImageRefIndex) != "None")
                         {
                             auto sideRefImageSceneObject = scene->CreateSceneObject(sideRefImageSceneObjectName);
-                            sideRefImageSceneObject->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + MAP_FILES_FOLDER + sOtherMapTextures.at(sideImageRefIndex) + "_bottom_layer.png");
+                            
+                            auto sideRefImagePath = NON_SANDBOXED_MAP_TEXTURES_FOLDER + sOtherMapTextures.at(sideImageRefIndex) + "_bottom_layer.png";
+                            
+                            systemsEngine.GetResourceLoadingService().UnloadResource(sideRefImagePath, resources::ResourceLoadingPathType::ABSOLUTE);
+                            sideRefImageSceneObject->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(sideRefImagePath, resources::ResourceReloadMode::DONT_RELOAD, resources::ResourceLoadingPathType::ABSOLUTE);
+                            
                             sideRefImageSceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 0.5f;
                             sideRefImageSceneObject->mPosition.x = -0.013f;
                             sideRefImageSceneObject->mPosition.y = 0.0115f;
@@ -511,31 +572,11 @@ void Editor::CreateDebugWidgets()
     }
     
     {
-        ImGui::Begin("Map Connections Editor", nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
-        static std::vector<std::string> sMapFileNames;
-        static std::vector<std::string> sMapFileNameConnections;
-        static std::vector<std::string> sMapFileNameConnections;
-        static std::unordered_map<std::string, std::unordered_map<std::string, std::string>> sMapConnections;
-        
-        auto RefreshMapFilesLambda = [&]()
-        {
-            sMapFileNames = fileutils::GetAllFilenamesInDirectory(NON_SANDBOXED_MAPS_FOLDER);
-            sMapFileNameConnections = sMapFileNames;
-            sMapFileNameConnections.insert(sMapFileNameConnections.begin(), "None");
-            
-            sMapConnections.clear();
-            
-        };
+        ImGui::Begin("Map Global Data Editor", nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
         
         if (sMapFileNames.empty())
         {
-            RefreshMapFilesLambda();
-        }
-        
-        ImGui::SeparatorText("Utilities");
-        if (ImGui::Button("Refresh Map Data"))
-        {
-            RefreshMapFilesLambda();
+            RefreshGlobalMapFilesLambda();
         }
         
         ImGui::SeparatorText("Map Connections");
@@ -545,15 +586,51 @@ void Editor::CreateDebugWidgets()
             {
                 auto connectionCreationLambda = [](const std::string& mapName, const std::string& direction)
                 {
+                    auto& mapConnections = sMapConnections.at(mapName);
+                    auto& mapDirectionConnections = mapConnections.at(direction);
+                    
                     ImGui::PushID((mapName + direction + "combo").c_str());
-                    if (ImGui::BeginCombo(" ", sMapFileNameConnections.at(sideImageRefIndex).c_str()))
+                    if (ImGui::BeginCombo(" ", sMapFileNameOptions.at(mapDirectionConnections.first).c_str()))
                     {
-                        for (int n = 0; n < static_cast<int>(sOtherMapTextures.size()); n++)
+                        for (int n = 0; n < static_cast<int>(sMapFileNameOptions.size()); n++)
                         {
-                            const bool isSelected = (sideImageRefIndex == n);
-                            if (ImGui::Selectable(sOtherMapTextures.at(n).c_str(), isSelected))
+                            const bool isSelected = (mapDirectionConnections.first == n);
+                            const auto& currentMapFileNameOption = sMapFileNameOptions.at(n);
+                            
+                            if (ImGui::Selectable(currentMapFileNameOption.c_str(), isSelected))
                             {
-                                sideImageRefIndex = n;
+                                const auto previousSelection = mapDirectionConnections.second;
+                                
+                                mapDirectionConnections.first = n;
+                                mapDirectionConnections.second = currentMapFileNameOption;
+                                
+                                std::string oppositeDirection = "";
+                                if (direction == "top")
+                                {
+                                    oppositeDirection = "bottom";
+                                }
+                                else if (direction == "right")
+                                {
+                                    oppositeDirection = "left";
+                                }
+                                else if (direction == "bottom")
+                                {
+                                    oppositeDirection = "top";
+                                }
+                                else
+                                {
+                                    oppositeDirection = "right";
+                                }
+                                
+                                if (currentMapFileNameOption != "None")
+                                {
+                                    sMapConnections.at(currentMapFileNameOption).at(oppositeDirection).first = static_cast<int>(std::distance(sMapFileNameOptions.begin(), std::find(sMapFileNameOptions.begin(), sMapFileNameOptions.end(), mapName)));
+                                    sMapConnections.at(currentMapFileNameOption).at(oppositeDirection).second = mapName;
+                                }
+                                else if (previousSelection != "None")
+                                {
+                                    sMapConnections.at(previousSelection).at(oppositeDirection) = std::make_pair(0, "None");
+                                }
                             }
                             if (isSelected)
                             {
@@ -567,13 +644,119 @@ void Editor::CreateDebugWidgets()
                     ImGui::Text("%s", direction.c_str());
                 };
                 
-                connectionCreationLambda("Top");
-                connectionCreationLambda("Right");
-                connectionCreationLambda("Bottom");
-                connectionCreationLambda("Left");
+                connectionCreationLambda(mapFileName, "top");
+                connectionCreationLambda(mapFileName, "right");
+                connectionCreationLambda(mapFileName, "bottom");
+                connectionCreationLambda(mapFileName, "left");
             }
         }
-        
+        ImGui::SeparatorText("Export");
+        if (ImGui::Button("Save Global Map Data"))
+        {
+            std::ofstream globalMapDataFile(NON_SANDBOXED_MAP_GLOBAL_DATA_PATH);
+            if (globalMapDataFile.is_open())
+            {
+                nlohmann::json globalMapDataJson;
+                
+                // Serialize map connections to other maps in all directions
+                nlohmann::json exportedConnectionsJson;
+                for (auto mapConnectionEntry: sMapConnections)
+                {
+                    nlohmann::json connectionEntryJson;
+                    connectionEntryJson["top"] = mapConnectionEntry.second["top"].second;
+                    connectionEntryJson["right"] = mapConnectionEntry.second["right"].second;
+                    connectionEntryJson["bottom"] = mapConnectionEntry.second["bottom"].second;
+                    connectionEntryJson["left"] = mapConnectionEntry.second["left"].second;
+                    exportedConnectionsJson[mapConnectionEntry.first] = connectionEntryJson;
+                }
+                
+                // Serialize map positions in a floodfill fashion starting from a set map
+                nlohmann::json mapTransformsJson;
+                std::function<void(const std::string&, const std::string&, const std::string&)> MapPositionCalculationLambda = [&](const std::string& mapName, const std::string& previousMapName, const std::string& previousToCurrentConnectionDirection) -> void
+                {
+                    if (mapTransformsJson.count(mapName))
+                    {
+                        return;
+                    }
+                    
+                    glm::vec3 previousMapPosition(0.0f, 0.0f, map_constants::TILE_BOTTOM_LAYER_Z);
+                    glm::vec2 previousMapDimensions(0.0f, 0.0f);
+                                        
+                    nlohmann::json currentMapTransformJson;
+                    const auto& mapDimensions = sMapTextureNamesToDimensions.at(mapName.substr(0, mapName.find(".json")));
+                    currentMapTransformJson["x"] = 0.0f;
+                    currentMapTransformJson["y"] = 0.0f;
+                    currentMapTransformJson["width"] = mapDimensions.x;
+                    currentMapTransformJson["height"] = mapDimensions.y;
+                                        
+                    if (!previousMapName.empty())
+                    {
+                        assert(mapTransformsJson.count(previousMapName));
+                        previousMapPosition.x = mapTransformsJson[previousMapName]["x"].get<float>();
+                        previousMapPosition.y = mapTransformsJson[previousMapName]["y"].get<float>();
+                        
+                        previousMapDimensions.x = mapTransformsJson[previousMapName]["width"].get<float>();
+                        previousMapDimensions.y = mapTransformsJson[previousMapName]["height"].get<float>();
+                        
+                        glm::vec3 updatedMapPosition = previousMapPosition;
+                                                
+                        if (previousToCurrentConnectionDirection == "top")
+                        {
+                            updatedMapPosition.y += (mapDimensions.y/2.0f + previousMapDimensions.y/2.0f);
+                        }
+                        else if (previousToCurrentConnectionDirection == "right")
+                        {
+                            updatedMapPosition.x += (mapDimensions.x/2.0f + previousMapDimensions.x/2.0f);
+                        }
+                        else if (previousToCurrentConnectionDirection == "bottom")
+                        {
+                            updatedMapPosition.y -= (mapDimensions.y/2.0f + previousMapDimensions.y/2.0f);
+                        }
+                        else if (previousToCurrentConnectionDirection == "left")
+                        {
+                            updatedMapPosition.x -= (mapDimensions.x/2.0f + previousMapDimensions.x/2.0f);
+                        }
+                        
+                        currentMapTransformJson["x"] = updatedMapPosition.x;
+                        currentMapTransformJson["y"] = updatedMapPosition.y;
+                    }
+                    
+                    mapTransformsJson[mapName] = currentMapTransformJson;
+                    
+                    const auto& currentMapConnections = sMapConnections.at(mapName);
+                    if (currentMapConnections.at("top").second != "None")
+                    {
+                        MapPositionCalculationLambda(currentMapConnections.at("top").second, mapName, "top");
+                    }
+                    
+                    if (currentMapConnections.at("right").second != "None")
+                    {
+                        MapPositionCalculationLambda(currentMapConnections.at("right").second, mapName, "right");
+                    }
+                    
+                    if (currentMapConnections.at("bottom").second != "None")
+                    {
+                        MapPositionCalculationLambda(currentMapConnections.at("bottom").second, mapName, "bottom");
+                    }
+                    
+                    if (currentMapConnections.at("left").second != "None")
+                    {
+                        MapPositionCalculationLambda(currentMapConnections.at("left").second, mapName, "left");
+                    }
+                };
+                
+                MapPositionCalculationLambda(ENTRY_MAP_NAME, "", "");
+                
+                globalMapDataJson["map_connections"] = exportedConnectionsJson;
+                globalMapDataJson["map_transforms"] = mapTransformsJson;
+                
+                
+                globalMapDataFile << globalMapDataJson.dump(4);
+                globalMapDataFile.close();
+            }
+            ospopups::ShowInfoMessageBox(ospopups::MessageBoxType::INFO, "Export complete", "Finished exporting global map data.");
+            RefreshGlobalMapFilesLambda();
+        }
         ImGui::End();
     }
     

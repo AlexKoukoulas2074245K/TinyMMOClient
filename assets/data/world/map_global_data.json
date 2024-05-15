@@ -3,13 +3,19 @@
         "entry_map.json": {
             "bottom": "None",
             "left": "None",
-            "right": "None",
+            "right": "small_corridor.json",
             "top": "map_tower.json"
+        },
+        "long_corridor.json": {
+            "bottom": "small_corridor.json",
+            "left": "None",
+            "right": "None",
+            "top": "top_corridor.json"
         },
         "map_top_tower.json": {
             "bottom": "map_tower.json",
             "left": "None",
-            "right": "None",
+            "right": "top_corridor.json",
             "top": "None"
         },
         "map_tower.json": {
@@ -17,7 +23,56 @@
             "left": "None",
             "right": "None",
             "top": "map_top_tower.json"
+        },
+        "small_corridor.json": {
+            "bottom": "None",
+            "left": "entry_map.json",
+            "right": "None",
+            "top": "long_corridor.json"
+        },
+        "top_corridor.json": {
+            "bottom": "long_corridor.json",
+            "left": "map_top_tower.json",
+            "right": "None",
+            "top": "None"
         }
     },
-    "map_positions": null
+    "map_transforms": {
+        "entry_map.json": {
+            "height": 0.12999999523162842,
+            "width": 0.41600000858306885,
+            "x": 0.0,
+            "y": 0.0
+        },
+        "long_corridor.json": {
+            "height": 0.41600000858306885,
+            "width": 0.09100000560283661,
+            "x": 0.30550000071525574,
+            "y": 0.27300000190734863
+        },
+        "map_top_tower.json": {
+            "height": 0.20800000429153442,
+            "width": 0.41600000858306885,
+            "x": 0.0,
+            "y": 0.5850000381469727
+        },
+        "map_tower.json": {
+            "height": 0.41600000858306885,
+            "width": 0.41600000858306885,
+            "x": 0.0,
+            "y": 0.273000031709671
+        },
+        "small_corridor.json": {
+            "height": 0.12999999523162842,
+            "width": 0.19500000774860382,
+            "x": 0.30550000071525574,
+            "y": 0.0
+        },
+        "top_corridor.json": {
+            "height": 0.20800000429153442,
+            "width": 0.19500000774860382,
+            "x": 0.30550000071525574,
+            "y": 0.5850000381469727
+        }
+    }
 }

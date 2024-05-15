@@ -37,7 +37,7 @@ std::shared_ptr<IResource> DataFileLoader::VCreateAndLoadResource(const std::str
     
     if (!file.good())
     {
-        ospopups::ShowMessageBox(ospopups::MessageBoxType::ERROR, "File could not be found", resourcePath.c_str());
+        ospopups::ShowInfoMessageBox(ospopups::MessageBoxType::ERROR, "File could not be found", resourcePath.c_str());
         return nullptr;
     }
     

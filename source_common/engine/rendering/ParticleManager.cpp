@@ -145,7 +145,7 @@ std::shared_ptr<scene::SceneObject> ParticleManager::CreateParticleEmitterAtPosi
 {
     if (!mParticleNamesToData.count(particleEmitterDefinitionName))
     {
-        ospopups::ShowMessageBox(ospopups::MessageBoxType::ERROR, "Unable to find particle definition", "Particle emitter definition: " + particleEmitterDefinitionName.GetString() + " could not be found.");
+        ospopups::ShowInfoMessageBox(ospopups::MessageBoxType::ERROR, "Unable to find particle definition", "Particle emitter definition: " + particleEmitterDefinitionName.GetString() + " could not be found.");
         return nullptr;
     }
     

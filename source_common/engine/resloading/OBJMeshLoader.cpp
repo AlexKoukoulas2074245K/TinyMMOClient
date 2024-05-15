@@ -62,7 +62,7 @@ std::shared_ptr<IResource> OBJMeshLoader::VCreateAndLoadResource(const std::stri
     
     if (!file)
     {
-        ospopups::ShowMessageBox(ospopups::MessageBoxType::ERROR, "File could not be found", path.c_str());
+        ospopups::ShowInfoMessageBox(ospopups::MessageBoxType::ERROR, "File could not be found", path.c_str());
         return nullptr;
     }
     

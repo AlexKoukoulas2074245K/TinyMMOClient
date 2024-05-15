@@ -97,17 +97,34 @@ void Game::Init()
     auto scene = systemsEngine.GetSceneManager().CreateScene(strutils::StringId("world"));
     scene->SetLoaded(true);
     
-    auto backgroundBottomLayer = scene->CreateSceneObject(strutils::StringId("map_tower_bottom"));
-    backgroundBottomLayer->mPosition.z = map_constants::TILE_BOTTOM_LAYER_Z;
-    backgroundBottomLayer->mScale *= game_constants::MAP_SCALE;
-    backgroundBottomLayer->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "world/maps/map_tower_bottom_layer.png");
+    std::ifstream globalMapDataFile(resources::ResourceLoadingService::RES_DATA_ROOT + "world/map_global_data.json");
+    if (globalMapDataFile.is_open())
+    {
+        std::stringstream buffer;
+        buffer << globalMapDataFile.rdbuf();
+        auto globalMapDataJson = nlohmann::json::parse(buffer.str());
+        
+        for (auto mapTransformIter = globalMapDataJson["map_transforms"].begin(); mapTransformIter != globalMapDataJson["map_transforms"].end(); ++mapTransformIter)
+        {
+            auto mapName = mapTransformIter.key().substr(0, mapTransformIter.key().find(".json"));
+            
+            auto mapBottomLayer = scene->CreateSceneObject(strutils::StringId(mapName  + "_bottom"));
+            mapBottomLayer->mPosition.x = mapTransformIter.value()["x"].get<float>() * game_constants::MAP_SCALE;
+            mapBottomLayer->mPosition.y = mapTransformIter.value()["y"].get<float>() * game_constants::MAP_SCALE;
+            mapBottomLayer->mPosition.z = map_constants::TILE_BOTTOM_LAYER_Z;// + math::RandomFloat(0.01f, 0.05f);
+            mapBottomLayer->mScale *= game_constants::MAP_SCALE;
+            mapBottomLayer->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "world/maps/" + mapName + "_bottom_layer.png");
+            
+            auto mapTopLayer = scene->CreateSceneObject(strutils::StringId(mapName  + "_top"));
+            mapTopLayer->mPosition.x = mapTransformIter.value()["x"].get<float>() * game_constants::MAP_SCALE;
+            mapTopLayer->mPosition.y = mapTransformIter.value()["y"].get<float>() * game_constants::MAP_SCALE;
+            mapTopLayer->mPosition.z = map_constants::TILE_TOP_LAYER_Z;// + math::RandomFloat(0.01f, 0.05f);
+            mapTopLayer->mScale *= game_constants::MAP_SCALE;
+            mapTopLayer->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "world/maps/" + mapName + "_top_layer.png");
+        }
+    }
     
-    auto backgroundTopLayer = scene->CreateSceneObject(strutils::StringId("map_tower_top"));
-    backgroundTopLayer->mPosition.z = map_constants::TILE_TOP_LAYER_Z;
-    backgroundTopLayer->mScale *= game_constants::MAP_SCALE;
-    backgroundTopLayer->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "world/maps/map_tower_top_layer.png");
-    
-    auto navmapResourceID = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "world/maps/map_tower_navmap.png");
+    auto navmapResourceID = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "world/maps/entry_map_navmap.png");
     sNavmapSurface = systemsEngine.GetResourceLoadingService().GetResource<resources::ImageSurfaceResource>(navmapResourceID).GetSurface();
     
     mLocalPlayerSceneObject = nullptr;
