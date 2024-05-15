@@ -8,7 +8,7 @@ project_path = '../prebuilt_ios/TinyMMOClientIOS/TinyMMOClientIOS.xcodeproj'
 project = Xcodeproj::Project.open(project_path)
 
 #find all relevant source files
-files = Dir.glob(["../source_common/**/*.cpp", "../source_common/**/*.h","../source_net_common/**/*.cpp", "../source_net_common/**/*.h","../source_net_common/**/*.inc","../source_ios/**/*.cpp", "../source_ios/**/*.h", "../source_ios/**/*.m", "../source_ios/**/*.mm", "../source_apple_utilities/**/*.cpp", "../source_apple_utilities/**/*.h", "../source_apple_utilities/**/*.m", "../source_apple_utilities/**/*.mm"]).select{|file| !file.include? "imgui" and !file.include? "main.cpp"}
+files = Dir.glob(["../source_common/**/*.cpp", "../source_common/**/*.inc", "../source_common/**/*.h","../source_net_common/**/*.cpp", "../source_net_common/**/*.h","../source_net_common/**/*.inc","../source_ios/**/*.cpp", "../source_ios/**/*.h", "../source_ios/**/*.m", "../source_ios/**/*.mm", "../source_apple_utilities/**/*.cpp", "../source_apple_utilities/**/*.h", "../source_apple_utilities/**/*.m", "../source_apple_utilities/**/*.mm"]).select{|file| !file.include? "imgui" and !file.include? "main.cpp"}
 
 #delete refs to non-existent files
 for f in project.files do

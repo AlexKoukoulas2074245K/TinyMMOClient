@@ -42,9 +42,17 @@ struct ResourceIdHasher
 ///------------------------------------------------------------------------------------------------
 /// Dictates whether a resource will be force reloaded from disk every second or not.
 /// (used for real time asset debugging)
-enum ResourceReloadMode
+enum class ResourceReloadMode
 {
     DONT_RELOAD, RELOAD_EVERY_SECOND
+};
+
+///------------------------------------------------------------------------------------------------
+/// Dictates whether a specified resource path should be treated as an absolute path or a relative resources folder one
+enum class ResourceLoadingPathType
+{
+    RELATIVE,
+    ABSOLUTE
 };
 
 ///------------------------------------------------------------------------------------------------
@@ -87,16 +95,19 @@ public:
     /// paths excluding the Resource Root are supported.
     /// @param[in] resourcePath the path of the resource file.
     /// @param[in] isDynamicallyGenerated whether or not the resource has been dynamically generated on runtime
+    /// @param[in] resourceLoadingPathType whether or not the resource path is relative (to the local assets folder) or absolute
     /// @returns the computed resource id.
-    ResourceId GetResourceIdFromPath(const std::string& resourcePath, const bool isDynamicallyGenerated);
+    ResourceId GetResourceIdFromPath(const std::string& resourcePath, const bool isDynamicallyGenerated, const ResourceLoadingPathType resourceLoadingPathType = ResourceLoadingPathType::RELATIVE);
 
     /// Loads and returns the resource id of the loaded resource that lives on the given path.
     ///
     /// Both full paths, relative paths including the Resource Root, and relative
     /// paths excluding the Resource Root are supported.
     /// @param[in] resourcePath the path of the resource file.
+    /// @param[in] resourceReloadingMode whether or not the resource should be periodically reloaded
+    /// @param[in] resourceLoadingPathType whether or not the resource path is relative (to the local assets folder) or absolute
     /// @returns the loaded resource's id.
-    ResourceId LoadResource(const std::string& resourcePath, const ResourceReloadMode resourceReloadingMode = ResourceReloadMode::DONT_RELOAD);
+    ResourceId LoadResource(const std::string& resourcePath, const ResourceReloadMode resourceReloadingMode = ResourceReloadMode::DONT_RELOAD, const ResourceLoadingPathType resourceLoadingPathType = ResourceLoadingPathType::RELATIVE);
 
     /// Loads a collection of resources based on a given vector with their paths.
     ///
@@ -119,8 +130,9 @@ public:
     /// Both full paths, relative paths including the Resource Root, and relative
     /// paths excluding the Resource Root are supported.
     /// @param[in] resourcePath the path of the resource file.
+    /// @param[in] resourceLoadingPathType whether or not the resource path is relative (to the local assets folder) or absolute
     /// @returns whether or not a physical file exists in the specified path.
-    bool DoesResourceExist(const std::string& resourcePath) const;
+    bool DoesResourceExist(const std::string& resourcePath, const ResourceLoadingPathType resourceLoadingPathType = ResourceLoadingPathType::RELATIVE) const;
     
     /// Checks whether a resource has been loaded based on a file that exists under the given path.
     ///
@@ -128,8 +140,9 @@ public:
     /// paths excluding the Resource Root are supported.
     /// @param[in] resourcePath the path of the resource file.
     /// @param[in] isDynamicallyGenerated whether or not the resource has been dynamically generated on runtime
+    /// @param[in] resourceLoadingPathType whether or not the resource path is relative (to the local assets folder) or absolute
     /// @returns whether or not the resource has been loaded.
-    bool HasLoadedResource(const std::string& resourcePath, const bool isDynamicallyGenerated) const;
+    bool HasLoadedResource(const std::string& resourcePath, const bool isDynamicallyGenerated, const ResourceLoadingPathType resourceLoadingPathType = ResourceLoadingPathType::RELATIVE) const;
     
     /// Unloads the specified resource loaded based on the given path.
     ///
@@ -139,14 +152,15 @@ public:
     /// Both full paths, relative paths including the Resource Root, and relative
     /// paths excluding the Resource Root are supported.
     /// @param[in] resourcePath the path of the resource file.        
-    void UnloadResource(const std::string& resourcePath);
+    /// @param[in] resourceLoadingPathType whether or not the resource path is relative (to the local assets folder) or absolute
+    void UnloadResource(const std::string& resourcePath, const ResourceLoadingPathType resourceLoadingPathType = ResourceLoadingPathType::RELATIVE);
     
     /// Unloads the specified resource loaded based on the given path.
     ///
     /// Any subsequent calls to get that
     /// resource will need to be preceeded by another Load to get the resource
     /// back to the map of resources held by this service.  
-    /// @param[in] resourceId the id of the resource to unload.    
+    /// @param[in] resourceId the id of the resource to unload.
     void UnloadResource(const ResourceId resourceId);
     
     /// Unloads all currently loaded dynamically created texture resources (i.e. via render to texture)
@@ -161,9 +175,10 @@ public:
     /// paths excluding the Resource Root are supported.
     /// @tparam ResourceType the derived type of the requested resource.
     /// @param[in] resourcePath the path of the resource file.  
+    /// @param[in] resourceLoadingPathType whether or not the resource path is relative (to the local assets folder) or absolute
     /// returns the derived type of the resource.
     template<class ResourceType>
-    inline ResourceType& GetResource(const std::string& resourcePath)
+    inline ResourceType& GetResource(const std::string& resourcePath, const ResourceLoadingPathType resourceLoadingPathType = ResourceLoadingPathType::RELATIVE)
     {
         return static_cast<ResourceType&>(GetResource(resourcePath));
     }
@@ -196,12 +211,12 @@ public:
 private:
     ResourceLoadingService();
     
-    IResource& GetResource(const std::string& resourceRelativePath);
+    IResource& GetResource(const std::string& resourceRelativePath, const ResourceLoadingPathType resourceLoadingPathType = ResourceLoadingPathType::RELATIVE);
     IResource& GetResource(const ResourceId resourceId);    
-    void LoadResourceInternal(const std::string& resourceRelativePath, const ResourceId resourceId);
+    void LoadResourceInternal(const std::string& resourceRelativePath, const ResourceId resourceId, const ResourceLoadingPathType resourceLoadingPathType);
    
     // Strips the leading RES_ROOT from the resourcePath given, if present
-    std::string AdjustResourcePath(const std::string& resourcePath) const;
+    std::string AdjustResourcePath(const std::string& resourcePath, const ResourceLoadingPathType resourceLoadingPathType) const;
     
     // Returns whether the file name implies a navmap image that doesn't need to be GL Texture-Loaded.
     bool IsNavmapImage(const std::string& fileName) const;

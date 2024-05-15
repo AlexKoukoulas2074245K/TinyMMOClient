@@ -224,16 +224,16 @@ void ResourceLoadingService::SetAsyncLoading(const bool asyncLoading)
 
 ///------------------------------------------------------------------------------------------------
 
-ResourceId ResourceLoadingService::GetResourceIdFromPath(const std::string& path, const bool isDynamicallyGenerated)
+ResourceId ResourceLoadingService::GetResourceIdFromPath(const std::string& path, const bool isDynamicallyGenerated, const ResourceLoadingPathType resourceLoadingPathType /* = ResourceLoadingPathType::RELATIVE */)
 {
-    return strutils::GetStringHash(isDynamicallyGenerated ? path : AdjustResourcePath(path));
+    return strutils::GetStringHash(isDynamicallyGenerated ? path : AdjustResourcePath(path, resourceLoadingPathType));
 }
 
 ///------------------------------------------------------------------------------------------------
 
-ResourceId ResourceLoadingService::LoadResource(const std::string& resourcePath, const ResourceReloadMode resourceReloadingMode /* = ResourceReloadMode::DONT_RELOAD */)
+ResourceId ResourceLoadingService::LoadResource(const std::string& resourcePath, const ResourceReloadMode resourceReloadingMode /* = ResourceReloadMode::DONT_RELOAD */, const ResourceLoadingPathType resourceLoadingPathType /* = ResourceLoadingPathType::RELATIVE */)
 {
-    const auto adjustedPath = AdjustResourcePath(resourcePath);
+    const auto adjustedPath = AdjustResourcePath(resourcePath, resourceLoadingPathType);
     const auto resourceId = strutils::GetStringHash(adjustedPath);
     
     if (resourceReloadingMode == ResourceReloadMode::RELOAD_EVERY_SECOND)
@@ -247,7 +247,7 @@ ResourceId ResourceLoadingService::LoadResource(const std::string& resourcePath,
     }
     else
     {
-        LoadResourceInternal(adjustedPath, resourceId);
+        LoadResourceInternal(adjustedPath, resourceId, resourceLoadingPathType);
         return resourceId;
     }
 }
@@ -278,18 +278,18 @@ ResourceId ResourceLoadingService::AddDynamicallyCreatedTextureResourceId(const 
 
 ///------------------------------------------------------------------------------------------------
 
-bool ResourceLoadingService::DoesResourceExist(const std::string& resourcePath) const
+bool ResourceLoadingService::DoesResourceExist(const std::string& resourcePath, const ResourceLoadingPathType resourceLoadingPathType /* = ResourceLoadingPathType::RELATIVE */) const
 {
-    const auto adjustedPath = AdjustResourcePath(resourcePath);
+    const auto adjustedPath = AdjustResourcePath(resourcePath, resourceLoadingPathType);
     std::fstream resourceFileCheck(resourcePath);
     return resourceFileCheck.operator bool();
 }
 
 ///------------------------------------------------------------------------------------------------
 
-bool ResourceLoadingService::HasLoadedResource(const std::string& resourcePath, const bool isDynamicallyGenerated) const
+bool ResourceLoadingService::HasLoadedResource(const std::string& resourcePath, const bool isDynamicallyGenerated, const ResourceLoadingPathType resourceLoadingPathType /* = ResourceLoadingPathType::RELATIVE */) const
 {
-    const auto adjustedPath = AdjustResourcePath(resourcePath);
+    const auto adjustedPath = AdjustResourcePath(resourcePath, resourceLoadingPathType);
     const auto resourceId = strutils::GetStringHash(isDynamicallyGenerated ? resourcePath : adjustedPath);
     
     return mResourceMap.count(resourceId) != 0;
@@ -297,9 +297,9 @@ bool ResourceLoadingService::HasLoadedResource(const std::string& resourcePath, 
 
 ///------------------------------------------------------------------------------------------------
 
-void ResourceLoadingService::UnloadResource(const std::string& resourcePath)
+void ResourceLoadingService::UnloadResource(const std::string& resourcePath, const ResourceLoadingPathType resourceLoadingPathType /* = ResourceLoadingPathType::RELATIVE */)
 {
-    const auto adjustedPath = AdjustResourcePath(resourcePath);
+    const auto adjustedPath = AdjustResourcePath(resourcePath, resourceLoadingPathType);
     const auto resourceId = strutils::GetStringHash(adjustedPath);
     mResourceMap.erase(resourceId);
 }
@@ -330,15 +330,15 @@ void ResourceLoadingService::ReloadMarkedResourcesFromDisk()
     for (auto [resourceId, relativePath]: mResourceIdMapToAutoReload)
     {
         UnloadResource(resourceId);
-        LoadResourceInternal(relativePath, resourceId);
+        LoadResourceInternal(relativePath, resourceId, ResourceLoadingPathType::RELATIVE);
     }
 }
 
 ///------------------------------------------------------------------------------------------------
 
-IResource& ResourceLoadingService::GetResource(const std::string& resourcePath)
+IResource& ResourceLoadingService::GetResource(const std::string& resourcePath, const ResourceLoadingPathType resourceLoadingPathType /* = ResourceLoadingPathType::RELATIVE */)
 {
-    const auto adjustedPath = AdjustResourcePath(resourcePath);
+    const auto adjustedPath = AdjustResourcePath(resourcePath, resourceLoadingPathType);
     const auto resourceId = strutils::GetStringHash(adjustedPath);
     return GetResource(resourceId);
 }
@@ -384,7 +384,7 @@ void ResourceLoadingService::AddArtificialLoadingJobCount(const int artificialLo
 
 ///------------------------------------------------------------------------------------------------
 
-void ResourceLoadingService::LoadResourceInternal(const std::string& resourcePath, const ResourceId resourceId)
+void ResourceLoadingService::LoadResourceInternal(const std::string& resourcePath, const ResourceId resourceId, const ResourceLoadingPathType resourceLoadingPathType)
 {
     // Get resource extension
     const auto resourceFileExtension = fileutils::GetFileExtension(resourcePath);
@@ -399,20 +399,36 @@ void ResourceLoadingService::LoadResourceInternal(const std::string& resourcePat
         
         if (mAsyncLoading && selectedLoader->VCanLoadAsync() && !mOutandingAsyncResourceIdsCurrentlyLoading.count(resourceId))
         {
-            mAsyncLoaderWorker->mJobs.enqueue(LoadingJob(selectedLoader, RES_ROOT + resourcePath, resourceId));
+            if (resourceLoadingPathType == ResourceLoadingPathType::RELATIVE)
+            {
+                mAsyncLoaderWorker->mJobs.enqueue(LoadingJob(selectedLoader, RES_ROOT + resourcePath, resourceId));
+            }
+            else
+            {
+                mAsyncLoaderWorker->mJobs.enqueue(LoadingJob(selectedLoader, resourcePath, resourceId));
+            }
+            
             mOutstandingLoadingJobCount++;
             mOutandingAsyncResourceIdsCurrentlyLoading.insert(resourceId);
         }
         else if (!mOutandingAsyncResourceIdsCurrentlyLoading.count(resourceId))
         {
-            auto loadedResource = selectedLoader->VCreateAndLoadResource(RES_ROOT + resourcePath);
+            auto loadedResource = resourceLoadingPathType == ResourceLoadingPathType::RELATIVE ? selectedLoader->VCreateAndLoadResource(RES_ROOT + resourcePath) : selectedLoader->VCreateAndLoadResource(resourcePath);
             mResourceMap[resourceId] = std::move(loadedResource);
             
             // Images are loaded in 2 steps so that we can separate the file I/O and GL part
             // for async loading
             if (dynamic_cast<ImageSurfaceLoader*>(selectedLoader) && !IsNavmapImage(resourceFileName))
             {
-                loadedResource = mResourceLoaders.back()->VCreateAndLoadResource(RES_ROOT + resourcePath);
+                if (resourceLoadingPathType == ResourceLoadingPathType::RELATIVE)
+                {
+                    loadedResource = mResourceLoaders.back()->VCreateAndLoadResource(RES_ROOT + resourcePath);
+                }
+                else
+                {
+                    loadedResource = mResourceLoaders.back()->VCreateAndLoadResource(resourcePath);
+                }
+                
                 mResourceMap[resourceId] = std::move(loadedResource);
             }
             
@@ -428,8 +444,13 @@ void ResourceLoadingService::LoadResourceInternal(const std::string& resourcePat
 
 ///------------------------------------------------------------------------------------------------
 
-std::string ResourceLoadingService::AdjustResourcePath(const std::string& resourcePath) const
+std::string ResourceLoadingService::AdjustResourcePath(const std::string& resourcePath, const ResourceLoadingPathType resourceLoadingPathType) const
 {
+    if (resourceLoadingPathType == ResourceLoadingPathType::ABSOLUTE)
+    {
+        return resourcePath;
+    }
+    
     return !strutils::StringStartsWith(resourcePath, RES_ROOT) ? resourcePath : resourcePath.substr(RES_ROOT.size(), resourcePath.size() - RES_ROOT.size());
 }
 

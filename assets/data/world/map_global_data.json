@@ -1,0 +1,23 @@
+{
+    "map_connections": {
+        "entry_map.json": {
+            "bottom": "None",
+            "left": "None",
+            "right": "None",
+            "top": "map_tower.json"
+        },
+        "map_top_tower.json": {
+            "bottom": "map_tower.json",
+            "left": "None",
+            "right": "None",
+            "top": "None"
+        },
+        "map_tower.json": {
+            "bottom": "entry_map.json",
+            "left": "None",
+            "right": "None",
+            "top": "map_top_tower.json"
+        }
+    },
+    "map_positions": null
+}

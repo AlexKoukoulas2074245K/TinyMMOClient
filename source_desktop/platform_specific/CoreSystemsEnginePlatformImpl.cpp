@@ -56,6 +56,12 @@ static float sLastGameLogicDtMillis = 0.0f;
 static bool sPrintFPS = false;
 static bool sShuttingDown = false;
 
+#if defined(USE_EDITOR)
+static const std::string WINDOW_TITLE = "TinyMMOEditor";
+#else
+static const std::string WINDOW_TITLE = "TinyMMOClient";
+#endif
+
 #if defined(USE_IMGUI)
 static const strutils::StringId PLAYGROUND_SCENE_NAME = strutils::StringId("playground_scene");
 static const int PROFILLING_SAMPLE_COUNT = 300;
@@ -112,7 +118,7 @@ void CoreSystemsEngine::Initialize()
     }
 
     // Create window
-    mWindow = SDL_CreateWindow("Realm of Beasts", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+    mWindow = SDL_CreateWindow(WINDOW_TITLE.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
 
     // Set minimum window size
     SDL_SetWindowMinimumSize(mWindow, MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT);

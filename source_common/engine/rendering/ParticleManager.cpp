@@ -348,7 +348,7 @@ void ParticleManager::LoadParticleData(const resources::ResourceReloadMode resou
 
 void ParticleManager::ReloadParticlesFromDisk()
 {
-    if (mResourceReloadMode)
+    if (mResourceReloadMode == resources::ResourceReloadMode::RELOAD_EVERY_SECOND)
     {
         LoadParticleData(mResourceReloadMode);
     }

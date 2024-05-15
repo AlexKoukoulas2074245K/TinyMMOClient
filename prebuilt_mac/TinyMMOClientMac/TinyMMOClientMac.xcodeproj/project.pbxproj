@@ -61,10 +61,12 @@
 		71319CF262B3FEA0241CE51E /* RendererPlatformImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68CBCF02480A4F7771578514 /* RendererPlatformImpl.cpp */; };
 		71DEABFBFD9A818B6DFD8412 /* TextureLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E0D05FD28DC001514531A214 /* TextureLoader.cpp */; };
 		74069A969F34BEBE941BF781 /* WorldObjectTypes.h in Sources */ = {isa = PBXBuildFile; fileRef = 4230154D7A5B45B2288322EE /* WorldObjectTypes.h */; };
+		755F10742FF09979BBBA9C58 /* EditorImGuiCommands.inc in Sources */ = {isa = PBXBuildFile; fileRef = 3A0B70DC7ADA228D909C7E71 /* EditorImGuiCommands.inc */; };
 		77F8C741493973A71A6DBA22 /* ImageSurfaceResource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53CDE03B92A8F220738E44FE /* ImageSurfaceResource.cpp */; };
 		7A14147B43076FC43E6D5662 /* SoundManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F701DBE1A8A6D1664BEF16A3 /* SoundManager.cpp */; };
 		7A35378576E3FCE89E70ABA4 /* SceneManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FB79D70FA4FA614F184AFE40 /* SceneManager.cpp */; };
 		7AC0BAE68E78FCD4E0CB58F9 /* FloodFillCommand.h in Sources */ = {isa = PBXBuildFile; fileRef = 6C7D4A86D2B31B8B48D63CC0 /* FloodFillCommand.h */; };
+		7C959AE38E5D848AF2C4A4BA /* EditorImGuiCommands.inc in Sources */ = {isa = PBXBuildFile; fileRef = 3A0B70DC7ADA228D909C7E71 /* EditorImGuiCommands.inc */; };
 		7CA340B584BA7BDBF8857C4C /* OBJMeshLoader.h in Sources */ = {isa = PBXBuildFile; fileRef = 46BB489973B1ACFF46F552DB /* OBJMeshLoader.h */; };
 		7D32F5E3300A738E376BD851 /* PlaceTileCommand.h in Sources */ = {isa = PBXBuildFile; fileRef = 25E63A3AC781F75E7ADB7B74 /* PlaceTileCommand.h */; };
 		83967E1FB2D928FB436D80F0 /* PlayerController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7E5967F8A9CDBBB4D9C23C10 /* PlayerController.cpp */; };
@@ -408,6 +410,7 @@
 		BE9038402F304B01BC7CAAB8 /* DataFileResource.h in Sources */ = {isa = PBXBuildFile; fileRef = 08AAC0562233A3F34613E310 /* DataFileResource.h */; };
 		C006C977BE7088F71FAC7329 /* Fonts.h in Sources */ = {isa = PBXBuildFile; fileRef = F3DCD97E5C6A637C6DD4BC0B /* Fonts.h */; };
 		C14FB694A5255B1DC21B4A13 /* SceneObjectUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F16121E2A49D2514A725F7AA /* SceneObjectUtils.cpp */; };
+		C2E83D8C714D1A35A7B1FC57 /* EditorImGuiCommands.inc in Sources */ = {isa = PBXBuildFile; fileRef = 3A0B70DC7ADA228D909C7E71 /* EditorImGuiCommands.inc */; };
 		C303F0F3781FE76FA4F0A754 /* Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EA3B9899242A079FE63DCD1E /* Camera.cpp */; };
 		C406B60810EC8EDBDDA519DA /* Scene.h in Sources */ = {isa = PBXBuildFile; fileRef = 659D24C3A310C59893EE9475 /* Scene.h */; };
 		C47AB43C912958FA00860801 /* ParticleManager.h in Sources */ = {isa = PBXBuildFile; fileRef = 3199A38C1A16A070A579BAB4 /* ParticleManager.h */; };
@@ -493,18 +496,19 @@
 		2096C38A74EAF730ECCA5E36 /* MathUtils.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = MathUtils.h; sourceTree = "<group>"; };
 		221289B3E3FA84B55F4C25E2 /* SceneManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = SceneManager.h; sourceTree = "<group>"; };
 		255CBE3395586957104E385D /* ShaderLoader.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = ShaderLoader.cpp; sourceTree = "<group>"; };
-		25E63A3AC781F75E7ADB7B74 /* PlaceTileCommand.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = PlaceTileCommand.h; path = PlaceTileCommand.h; sourceTree = "<group>"; };
+		25E63A3AC781F75E7ADB7B74 /* PlaceTileCommand.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = PlaceTileCommand.h; sourceTree = "<group>"; };
 		30D02CEC6861EBD7441E2004 /* BaseDataFileSerializer.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = BaseDataFileSerializer.h; sourceTree = "<group>"; };
 		3199A38C1A16A070A579BAB4 /* ParticleManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = ParticleManager.h; sourceTree = "<group>"; };
 		3714C4A3B069768E05DD0199 /* SfxPlayer.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = SfxPlayer.h; sourceTree = "<group>"; };
 		393520815AD90C67A6A6989C /* MathUtils.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = MathUtils.cpp; sourceTree = "<group>"; };
+		3A0B70DC7ADA228D909C7E71 /* EditorImGuiCommands.inc */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.pascal; path = EditorImGuiCommands.inc; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		3E13E4D3AA7809E3A06CFF75 /* stb_image_write.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = stb_image_write.h; sourceTree = "<group>"; };
 		4230154D7A5B45B2288322EE /* WorldObjectTypes.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = WorldObjectTypes.h; sourceTree = "<group>"; };
 		431D52A0E0BD619E5CEDBCA7 /* DataFileResource.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = DataFileResource.cpp; sourceTree = "<group>"; };
 		43A25A1E55390D38AC6A5742 /* Logging.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = Logging.h; sourceTree = "<group>"; };
 		46BB489973B1ACFF46F552DB /* OBJMeshLoader.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = OBJMeshLoader.h; sourceTree = "<group>"; };
-		4DB7732B61F25DE0737B1DF2 /* PlaceTileCommand.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = PlaceTileCommand.cpp; path = PlaceTileCommand.cpp; sourceTree = "<group>"; };
-		4FF1572465760B72632B0EB2 /* IEditorCommand.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = IEditorCommand.h; path = IEditorCommand.h; sourceTree = "<group>"; };
+		4DB7732B61F25DE0737B1DF2 /* PlaceTileCommand.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = PlaceTileCommand.cpp; sourceTree = "<group>"; };
+		4FF1572465760B72632B0EB2 /* IEditorCommand.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = IEditorCommand.h; sourceTree = "<group>"; };
 		53CDE03B92A8F220738E44FE /* ImageSurfaceResource.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = ImageSurfaceResource.cpp; sourceTree = "<group>"; };
 		543F0360AEBB87C61E32D84B /* ThreadSafeQueue.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = ThreadSafeQueue.h; sourceTree = "<group>"; };
 		59B053AEBDD62B4FCAB8E05D /* RenderingUtils.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = RenderingUtils.cpp; sourceTree = "<group>"; };
@@ -513,7 +517,7 @@
 		6544FC0C6E5993C9E3957773 /* Scene.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = Scene.cpp; sourceTree = "<group>"; };
 		659D24C3A310C59893EE9475 /* Scene.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = Scene.h; sourceTree = "<group>"; };
 		68CBCF02480A4F7771578514 /* RendererPlatformImpl.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = RendererPlatformImpl.cpp; sourceTree = "<group>"; };
-		6C7D4A86D2B31B8B48D63CC0 /* FloodFillCommand.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = FloodFillCommand.h; path = FloodFillCommand.h; sourceTree = "<group>"; };
+		6C7D4A86D2B31B8B48D63CC0 /* FloodFillCommand.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = FloodFillCommand.h; sourceTree = "<group>"; };
 		6D3F63C77D9E3CBD37931ADE /* CoreSystemsEnginePlatformImpl.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CoreSystemsEnginePlatformImpl.cpp; sourceTree = "<group>"; };
 		6E2183A368D71198F98D6738 /* TypeTraits.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = TypeTraits.h; sourceTree = "<group>"; };
 		70EE9661089211DACFF22288 /* Camera.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = Camera.h; sourceTree = "<group>"; };
@@ -623,10 +627,10 @@
 		B83F90BE48846F5019309046 /* DataFileLoader.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = DataFileLoader.h; sourceTree = "<group>"; };
 		BA4AC24CD1BEEBF435E7CA14 /* WorldObjectStates.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = WorldObjectStates.h; sourceTree = "<group>"; };
 		BB8C2E3FACC90180DAAE4F40 /* Fonts.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = Fonts.cpp; sourceTree = "<group>"; };
-		BB91C0E56FB07D250ED0D766 /* MapConstants.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = MapConstants.h; path = MapConstants.h; sourceTree = "<group>"; };
+		BB91C0E56FB07D250ED0D766 /* MapConstants.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = MapConstants.h; sourceTree = "<group>"; };
 		BE806858C85634D9FB14B857 /* NetworkObjectDefinitions.inc */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.pascal; path = NetworkObjectDefinitions.inc; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		CAEF02928D06B177B1091C5F /* ImageSurfaceResource.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = ImageSurfaceResource.h; sourceTree = "<group>"; };
-		CB4FB5CB8DCA0CB3794336B2 /* FloodFillCommand.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = FloodFillCommand.cpp; path = FloodFillCommand.cpp; sourceTree = "<group>"; };
+		CB4FB5CB8DCA0CB3794336B2 /* FloodFillCommand.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = FloodFillCommand.cpp; sourceTree = "<group>"; };
 		CDAECE46D2C1D56818BF9C25 /* PlayerController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = PlayerController.h; sourceTree = "<group>"; };
 		CF33F7C72612B80A9AB49895 /* InputStateManagerPlatformImpl.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = InputStateManagerPlatformImpl.cpp; sourceTree = "<group>"; };
 		D099CB93E6198C3BE5F73FDE /* IInputStateManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = IInputStateManager.h; sourceTree = "<group>"; };
@@ -709,7 +713,6 @@
 				CB4FB5CB8DCA0CB3794336B2 /* FloodFillCommand.cpp */,
 				6C7D4A86D2B31B8B48D63CC0 /* FloodFillCommand.h */,
 			);
-			name = commands;
 			path = commands;
 			sourceTree = "<group>";
 		};
@@ -805,6 +808,7 @@
 				A49D33C4F1B1DC1C02DB9E05 /* Editor.cpp */,
 				AB2400E817D39628656BEFF1 /* Editor.h */,
 				0D1DE524F0450EC29F265410 /* commands */,
+				3A0B70DC7ADA228D909C7E71 /* EditorImGuiCommands.inc */,
 			);
 			path = editor;
 			sourceTree = "<group>";
@@ -1165,7 +1169,6 @@
 			children = (
 				BB91C0E56FB07D250ED0D766 /* MapConstants.h */,
 			);
-			name = map;
 			path = map;
 			sourceTree = "<group>";
 		};
@@ -1487,6 +1490,7 @@
 				5D6DCABBC78B4002D4BDF2E2 /* MapConstants.h in Sources */,
 				175C88F77B57F28B348DA89C /* FloodFillCommand.cpp in Sources */,
 				44FFC60B6200211EEF7CD146 /* FloodFillCommand.h in Sources */,
+				7C959AE38E5D848AF2C4A4BA /* EditorImGuiCommands.inc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1608,6 +1612,7 @@
 				0E36ADD65CE3DFB12867FD14 /* MapConstants.h in Sources */,
 				9D4CA157485CB7B2A8081670 /* FloodFillCommand.cpp in Sources */,
 				E6DFA3B11E006007C6F292DD /* FloodFillCommand.h in Sources */,
+				C2E83D8C714D1A35A7B1FC57 /* EditorImGuiCommands.inc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1729,6 +1734,7 @@
 				D5D233B536F12C82833E37AB /* MapConstants.h in Sources */,
 				925F6CD344A17B1A139FFDAF /* FloodFillCommand.cpp in Sources */,
 				7AC0BAE68E78FCD4E0CB58F9 /* FloodFillCommand.h in Sources */,
+				755F10742FF09979BBBA9C58 /* EditorImGuiCommands.inc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
