@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <engine/CoreSystemsEngine.h>
 #include <engine/rendering/OpenGL.h>
+#include <engine/rendering/RenderingUtils.h>
 #include <engine/resloading/ImageSurfaceResource.h>
 #include <engine/resloading/ResourceLoadingService.h>
 #include <engine/resloading/TextureLoader.h>
@@ -49,43 +50,8 @@ std::shared_ptr<IResource> TextureLoader::VCreateAndLoadResource(const std::stri
     auto& surfaceResource = CoreSystemsEngine::GetInstance().GetResourceLoadingService().GetResource<ImageSurfaceResource>(resourcePath);
     auto* sdlSurface = surfaceResource.GetSurface();
     
-    GLuint glTextureId;
-    GL_CALL(glGenTextures(1, &glTextureId));
-    GL_CALL(glBindTexture(GL_TEXTURE_2D, glTextureId));
-    
-    int mode;
-    switch (sdlSurface->format->BytesPerPixel)
-    {
-        case 4:
-            mode = GL_RGBA;
-            break;
-        case 3:
-            mode = GL_RGB;
-            break;
-        default:
-            throw std::runtime_error("Image with unknown channel profile");
-            break;
-    }
-
-    GL_CALL(glTexImage2D
-    (
-        GL_TEXTURE_2D,
-        0,
-        mode,
-        sdlSurface->w,
-        sdlSurface->h,
-        0,
-        mode,
-        GL_UNSIGNED_BYTE,
-        sdlSurface->pixels
-     ));
-    
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT));
-    
-    GL_CALL(glGenerateMipmap(GL_TEXTURE_2D));
+    GLuint glTextureId; int mode;
+    rendering::CreateGLTextureFromSurface(sdlSurface, glTextureId, mode);
     
     const auto surfaceWidth = sdlSurface->w;
     const auto surfaceHeight = sdlSurface->h;

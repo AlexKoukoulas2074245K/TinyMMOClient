@@ -15,6 +15,7 @@
 #include <engine/scene/Scene.h>
 #include <engine/utils/Logging.h>
 #include <engine/utils/PlatformMacros.h>
+#include <SDL_surface.h>
 
 ///------------------------------------------------------------------------------------------------
 
@@ -136,6 +137,45 @@ static void ApplyGaussianBlur(std::vector<Pixel>& pixels, int width, int height)
             pixels[y * width + x].a = static_cast<GLubyte>(a);
         }
     }
+}
+
+///------------------------------------------------------------------------------------------------
+
+void CreateGLTextureFromSurface(SDL_Surface* surface, GLuint& glTextureId, int& mode)
+{
+    GL_CALL(glGenTextures(1, &glTextureId));
+    GL_CALL(glBindTexture(GL_TEXTURE_2D, glTextureId));
+    
+    switch (surface->format->BytesPerPixel)
+    {
+        case 4:
+            mode = GL_RGBA;
+            break;
+        case 3:
+            mode = GL_RGB;
+            break;
+        default:
+            throw std::runtime_error("Image with unknown channel profile");
+            break;
+    }
+
+    GL_CALL(glTexImage2D
+    (
+        GL_TEXTURE_2D,
+        0,
+        mode,
+        surface->w,
+        surface->h,
+        0,
+        mode,
+        GL_UNSIGNED_BYTE,
+        surface->pixels
+     ));
+    
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT));
 }
 
 ///------------------------------------------------------------------------------------------------

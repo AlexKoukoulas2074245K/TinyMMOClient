@@ -12,6 +12,7 @@
 #include <engine/rendering/Camera.h>
 #include <engine/rendering/Fonts.h>
 #include <engine/rendering/ParticleManager.h>
+#include <engine/rendering/RenderingUtils.h>
 #include <engine/resloading/ResourceLoadingService.h>
 #include <engine/resloading/ImageSurfaceResource.h>
 #include <engine/scene/SceneManager.h>
@@ -51,6 +52,7 @@
 
 static const strutils::StringId MAIN_MENU_SCENE = strutils::StringId("main_menu_scene");
 static const strutils::StringId PLAY_BUTTON_NAME = strutils::StringId("play_button");
+static const strutils::StringId NAVMAP_DEBUG_SCENE_OBJECT_NAME = strutils::StringId("navmap_debug");
 static const float ENEMY_SPEED = 0.0002f;
 static std::mutex sWorldMutex;
 
@@ -192,7 +194,7 @@ void Game::WindowResize()
 #if defined(USE_IMGUI)
 void Game::CreateDebugWidgets()
 {
-    //static float sPlayerSpeedMultiplier = 1.0f;
+    static bool sNavmapDebugMode = false;
     
     ImGui::Begin("Net Stats", nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
     ImGui::Text("Ping %d millis", mLastPingMillis.load());
@@ -206,6 +208,33 @@ void Game::CreateDebugWidgets()
 //    }
 //    ImGui::End();
     
+    ImGui::Begin("Map Debug", nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
+    if (ImGui::Checkbox("Navmap Debug Mode", &sNavmapDebugMode))
+    {
+        auto& systemsEngine = CoreSystemsEngine::GetInstance();
+        auto scene = systemsEngine.GetSceneManager().FindScene(strutils::StringId("world"));
+        
+        if (sNavmapDebugMode)
+        {
+            //TODO: This needs to move to the current map's origin
+            auto navmapSceneObject = scene->CreateSceneObject(NAVMAP_DEBUG_SCENE_OBJECT_NAME);
+            navmapSceneObject->mPosition.z = 15.0f;
+            navmapSceneObject->mScale *= game_constants::MAP_SCALE;
+            
+            GLuint glTextureId; int mode;
+            rendering::CreateGLTextureFromSurface(sNavmapSurface, glTextureId, mode);
+            
+            navmapSceneObject->mTextureResourceId = systemsEngine.GetResourceLoadingService().AddDynamicallyCreatedTextureResourceId("debug_navmap", glTextureId, 4096, 4096);
+            navmapSceneObject->mShaderFloatUniformValues[strutils::StringId("custom_alpha")] = 0.5f;
+        }
+        else
+        {
+            auto navmapSceneObject = scene->FindSceneObject(NAVMAP_DEBUG_SCENE_OBJECT_NAME);
+            systemsEngine.GetResourceLoadingService().UnloadResource(navmapSceneObject->mTextureResourceId);
+            scene->RemoveSceneObject(NAVMAP_DEBUG_SCENE_OBJECT_NAME);
+        }
+    }
+    ImGui::End();
     
     ImGui::Begin("Enemy NPC Data", nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
     std::lock_guard<std::mutex> worldGuard(sWorldMutex);
