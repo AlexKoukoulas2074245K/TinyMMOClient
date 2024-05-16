@@ -65,8 +65,8 @@ private:
     
     enum class PaintingToolType
     {
-        PENCIL,
-        BUCKET
+        PENCIL = 0,
+        BUCKET = 1
     };
     
 private:
@@ -77,6 +77,7 @@ private:
     int mRightImageRefIndex;
     int mBottomImageRefIndex;
     int mLeftImageRefIndex;
+    int mActivePanel;
     float mBottomLayerVisibility;
     float mTopLayerVisibility;
     std::vector<MapTileData> mPaletteTileData;

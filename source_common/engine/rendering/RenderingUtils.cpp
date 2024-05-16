@@ -226,6 +226,8 @@ void ExportToPNG(const std::string& exportFilePath, std::vector<std::shared_ptr<
         logging::Log(logging::LogType::INFO, "Wrote texture to file %s", exportFilePath.c_str());
         
         free(pixels);
+        
+        GL_CALL(glDeleteTextures(1, &textureId));
     }
     
     GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, oldFrameBuffer));

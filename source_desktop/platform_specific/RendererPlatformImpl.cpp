@@ -323,7 +323,7 @@ void RendererPlatformImpl::VBeginRenderPass()
     GL_CALL(glViewport(0, 0, w, h));
     
     // Set background color
-    GL_CALL(glClearColor(1.0f, 1.0f, 1.0f, 1.0f));
+    GL_CALL(glClearColor(1.0f, 0.0f, 0.0f, 1.0f));
     
     GL_CALL(glEnable(GL_DEPTH_TEST));
     GL_CALL(glEnable(GL_BLEND));

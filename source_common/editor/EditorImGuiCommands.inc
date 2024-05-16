@@ -1,3 +1,4 @@
+
 #if defined(USE_IMGUI)
 void Editor::CreateDebugWidgets()
 {
@@ -85,6 +86,7 @@ void Editor::CreateDebugWidgets()
         static constexpr int TILEMAP_NAME_BUFFER_SIZE = 64;
         static char sMapNameBuffer[TILEMAP_NAME_BUFFER_SIZE] = { "entry_map.json" };
         static size_t sSelectedMapFileIndex = 0;
+        static int sActivePanelType = 0;
         
         if (sMapFileNames.empty())
         {
@@ -341,6 +343,84 @@ void Editor::CreateDebugWidgets()
             CreateMap(sDimensionsY, sDimensionsX);
         }
         
+        ImGui::SeparatorText("Active Panel");
+        if (ImGui::RadioButton("Editor", &sActivePanelType, 0))
+        {
+            if (mActivePanel != sActivePanelType)
+            {
+                mActivePanel = sActivePanelType;
+                auto& systemsEngine = CoreSystemsEngine::GetInstance();
+                auto scene = systemsEngine.GetSceneManager().FindScene(EDITOR_SCENE);
+                
+                std::vector<strutils::StringId> sceneObjectNamesToRemove;
+                
+                // Destroy all new (map stiching textures & scene objects)
+                for (auto& sceneObject: scene->GetSceneObjects())
+                {
+                    if (sceneObject->mInvisible)
+                    {
+                        sceneObject->mInvisible = false;
+                    }
+                    else
+                    {
+                        systemsEngine.GetResourceLoadingService().UnloadResource(sceneObject->mTextureResourceId);
+                        sceneObjectNamesToRemove.push_back(sceneObject->mName);
+                    }
+                }
+                
+                for (const auto& sceneObjectName: sceneObjectNamesToRemove)
+                {
+                    scene->RemoveSceneObject(sceneObjectName);
+                }
+                
+                // Reset Camera Position
+                mViewOptions.mCameraPosition.x = 0.0f;
+                mViewOptions.mCameraPosition.y = 0.0f;
+            }
+        }
+        ImGui::SameLine();
+        if (ImGui::RadioButton("MapStiching", &sActivePanelType, 1))
+        {
+            if (mActivePanel != sActivePanelType)
+            {
+                mActivePanel = sActivePanelType;
+                auto& systemsEngine = CoreSystemsEngine::GetInstance();
+                auto scene = systemsEngine.GetSceneManager().FindScene(EDITOR_SCENE);
+                
+                for (auto& sceneObject: scene->GetSceneObjects())
+                {
+                    sceneObject->mInvisible = true;
+                }
+                
+                std::ifstream globalMapDataFile(NON_SANDBOXED_MAP_GLOBAL_DATA_PATH);
+                if (globalMapDataFile.is_open())
+                {
+                    std::stringstream buffer;
+                    buffer << globalMapDataFile.rdbuf();
+                    auto globalMapDataJson = nlohmann::json::parse(buffer.str());
+                    
+                    for (auto mapTransformIter = globalMapDataJson["map_transforms"].begin(); mapTransformIter != globalMapDataJson["map_transforms"].end(); ++mapTransformIter)
+                    {
+                        auto mapName = mapTransformIter.key().substr(0, mapTransformIter.key().find(".json"));
+                        
+                        auto mapBottomLayer = scene->CreateSceneObject(strutils::StringId(mapName  + "_bottom"));
+                        mapBottomLayer->mPosition.x = mapTransformIter.value()["x"].get<float>() * game_constants::MAP_SCALE;
+                        mapBottomLayer->mPosition.y = mapTransformIter.value()["y"].get<float>() * game_constants::MAP_SCALE;
+                        mapBottomLayer->mPosition.z = map_constants::TILE_BOTTOM_LAYER_Z;// + math::RandomFloat(0.01f, 0.05f);
+                        mapBottomLayer->mScale *= game_constants::MAP_SCALE;
+                        mapBottomLayer->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(NON_SANDBOXED_MAP_TEXTURES_FOLDER + mapName + "_bottom_layer.png", resources::ResourceReloadMode::DONT_RELOAD, resources::ResourceLoadingPathType::ABSOLUTE);
+                        
+                        auto mapTopLayer = scene->CreateSceneObject(strutils::StringId(mapName  + "_top"));
+                        mapTopLayer->mPosition.x = mapTransformIter.value()["x"].get<float>() * game_constants::MAP_SCALE;
+                        mapTopLayer->mPosition.y = mapTransformIter.value()["y"].get<float>() * game_constants::MAP_SCALE;
+                        mapTopLayer->mPosition.z = map_constants::TILE_TOP_LAYER_Z;// + math::RandomFloat(0.01f, 0.05f);
+                        mapTopLayer->mScale *= game_constants::MAP_SCALE;
+                        mapTopLayer->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(NON_SANDBOXED_MAP_TEXTURES_FOLDER + mapName + "_top_layer.png", resources::ResourceReloadMode::DONT_RELOAD, resources::ResourceLoadingPathType::ABSOLUTE);
+                    }
+                }
+            }
+        }
+        
         ImGui::SeparatorText("Side Image References");
         
         auto& systemsEngine = CoreSystemsEngine::GetInstance();
@@ -436,6 +516,7 @@ void Editor::CreateDebugWidgets()
         
         ImGui::SeparatorText("Render Options");
         ImGui::Checkbox("Render Tile Connectors", &mViewOptions.mRenderConnectorTiles);
+        
         ImGui::End();
     }
     
@@ -767,3 +848,5 @@ void Editor::CreateDebugWidgets()
 {
 }
 #endif
+
+
