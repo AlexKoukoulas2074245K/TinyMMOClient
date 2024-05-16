@@ -405,20 +405,20 @@ void Editor::CreateDebugWidgets()
                         auto mapName = mapTransformIter.key().substr(0, mapTransformIter.key().find(".json"));
                         
                         auto mapBottomLayer = scene->CreateSceneObject(strutils::StringId(mapName  + "_bottom"));
-                        mapBottomLayer->mPosition.x = mapTransformIter.value()["x"].get<float>() * game_constants::MAP_SCALE;
-                        mapBottomLayer->mPosition.y = mapTransformIter.value()["y"].get<float>() * game_constants::MAP_SCALE;
+                        mapBottomLayer->mPosition.x = mapTransformIter.value()["x"].get<float>() * game_constants::MAP_RENDERED_SCALE;
+                        mapBottomLayer->mPosition.y = mapTransformIter.value()["y"].get<float>() * game_constants::MAP_RENDERED_SCALE;
                         mapBottomLayer->mPosition.z = map_constants::TILE_TOP_LAYER_Z + math::RandomFloat(0.01f, 0.05f);
-                        mapBottomLayer->mScale *= game_constants::MAP_SCALE;
+                        mapBottomLayer->mScale *= game_constants::MAP_RENDERED_SCALE;
                         mapBottomLayer->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(NON_SANDBOXED_MAP_TEXTURES_FOLDER + mapName + "/" + mapName + "_bottom_layer.png", resources::ResourceReloadMode::DONT_RELOAD, resources::ResourceLoadingPathType::ABSOLUTE);
                         mapBottomLayer->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + "world_map.vs");
                         mapBottomLayer->mShaderFloatUniformValues[strutils::StringId("map_width")] = mapTransformIter.value()["width"].get<float>();
                         mapBottomLayer->mShaderFloatUniformValues[strutils::StringId("map_height")] = mapTransformIter.value()["height"].get<float>();
                         
                         auto mapTopLayer = scene->CreateSceneObject(strutils::StringId(mapName  + "_top"));
-                        mapTopLayer->mPosition.x = mapTransformIter.value()["x"].get<float>() * game_constants::MAP_SCALE;
-                        mapTopLayer->mPosition.y = mapTransformIter.value()["y"].get<float>() * game_constants::MAP_SCALE;
+                        mapTopLayer->mPosition.x = mapTransformIter.value()["x"].get<float>() * game_constants::MAP_RENDERED_SCALE;
+                        mapTopLayer->mPosition.y = mapTransformIter.value()["y"].get<float>() * game_constants::MAP_RENDERED_SCALE;
                         mapTopLayer->mPosition.z = map_constants::TILE_TOP_LAYER_Z + math::RandomFloat(0.1f, 0.5f);
-                        mapTopLayer->mScale *= game_constants::MAP_SCALE;
+                        mapTopLayer->mScale *= game_constants::MAP_RENDERED_SCALE;
                         mapTopLayer->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(NON_SANDBOXED_MAP_TEXTURES_FOLDER + mapName + "/" + mapName + "_top_layer.png", resources::ResourceReloadMode::DONT_RELOAD, resources::ResourceLoadingPathType::ABSOLUTE);
                         mapTopLayer->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + "world_map.vs");
                         mapTopLayer->mShaderFloatUniformValues[strutils::StringId("map_width")] = mapTransformIter.value()["width"].get<float>();

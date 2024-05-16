@@ -29,7 +29,7 @@ namespace game_constants
     // Game Constants
     //inline const float PLAYER_RUBBERBAND_SPEED = 0.002f;
     inline const glm::vec3 PLAYER_NAMEPLATE_OFFSET = {0.01f, 0.065f, 0.0f};
-    inline const float MAP_SCALE = 4.0f;
+    inline const float MAP_RENDERED_SCALE = 4.0f;
 
     // Networking
     inline const float STATE_SEND_MIN_DELAY_MILLIS = 16.6666f;
