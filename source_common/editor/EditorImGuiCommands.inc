@@ -10,20 +10,18 @@ void Editor::CreateDebugWidgets()
     
     auto RefreshGlobalMapFilesLambda = [&]()
     {
-        sMapFileNames = fileutils::GetAllFilenamesInDirectory(NON_SANDBOXED_MAPS_FOLDER);
+        sMapFileNames = fileutils::GetAllFilenamesAndFolderNamesInDirectory(NON_SANDBOXED_MAPS_FOLDER);
         sMapFileNameOptions = sMapFileNames;
         sMapFileNameOptions.insert(sMapFileNameOptions.begin(), "None");
         
         sOtherMapTextures = {"None"};
         sMapTextureNamesToDimensions.clear();
         
-        auto mapTextureFileNames = fileutils::GetAllFilenamesInDirectory(NON_SANDBOXED_MAP_TEXTURES_FOLDER);
-        for (auto filePath: mapTextureFileNames)
+        auto mapTextureFileNames = fileutils::GetAllFilenamesAndFolderNamesInDirectory(NON_SANDBOXED_MAP_TEXTURES_FOLDER);
+        for (auto mapName: mapTextureFileNames)
         {
-            if (strutils::StringEndsWith(filePath, "_bottom_layer.png"))
+            if (fileutils::IsDirectory(NON_SANDBOXED_MAP_TEXTURES_FOLDER + mapName))
             {
-                auto fileName = fileutils::GetFileName(filePath);
-                auto mapName = fileName.substr(0, fileName.find("_bottom_layer.png"));
                 sOtherMapTextures.push_back(mapName);
                 
                 std::ifstream mapDataFile(NON_SANDBOXED_MAPS_FOLDER + mapName + ".json");
@@ -269,8 +267,11 @@ void Editor::CreateDebugWidgets()
                             topLayerSceneObjects.push_back(topLayerTileSceneObject);
                         }
                     }
-                    rendering::ExportToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + fileutils::GetFileNameWithoutExtension(std::string(sMapNameBuffer)) + "_bottom_layer.png", bottomLayerSceneObjects, rendering::BlurStep::DONT_BLUR);
-                    rendering::ExportToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + fileutils::GetFileNameWithoutExtension(std::string(sMapNameBuffer)) + "_top_layer.png", topLayerSceneObjects, rendering::BlurStep::DONT_BLUR);
+                    
+                    auto mapName = fileutils::GetFileNameWithoutExtension(std::string(sMapNameBuffer));
+                    fileutils::CreateDirectory(NON_SANDBOXED_MAP_TEXTURES_FOLDER + mapName);
+                    rendering::ExportToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + mapName + "/" + mapName + "_bottom_layer.png", bottomLayerSceneObjects, rendering::BlurStep::DONT_BLUR);
+                    rendering::ExportToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + mapName + "/" + mapName + fileutils::GetFileNameWithoutExtension(std::string(sMapNameBuffer)) + "_top_layer.png", topLayerSceneObjects, rendering::BlurStep::DONT_BLUR);
                     
                     // Render map navmap texture
                     for (auto y = 0; y < mGridRows; ++y)
@@ -295,7 +296,7 @@ void Editor::CreateDebugWidgets()
                             }
                         }
                     }
-                    rendering::ExportToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + fileutils::GetFileNameWithoutExtension(std::string(sMapNameBuffer)) + "_navmap.png", bottomLayerSceneObjects, rendering::BlurStep::DONT_BLUR);
+                    rendering::ExportToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + mapName + "/" + mapName + "_navmap.png", bottomLayerSceneObjects, rendering::BlurStep::DONT_BLUR);
                     
                     logging::Log(logging::LogType::ERROR, "Successfully saved %s", (NON_SANDBOXED_MAPS_FOLDER + std::string(sMapNameBuffer)).c_str());
                     
@@ -408,14 +409,14 @@ void Editor::CreateDebugWidgets()
                         mapBottomLayer->mPosition.y = mapTransformIter.value()["y"].get<float>() * game_constants::MAP_SCALE;
                         mapBottomLayer->mPosition.z = map_constants::TILE_BOTTOM_LAYER_Z;// + math::RandomFloat(0.01f, 0.05f);
                         mapBottomLayer->mScale *= game_constants::MAP_SCALE;
-                        mapBottomLayer->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(NON_SANDBOXED_MAP_TEXTURES_FOLDER + mapName + "_bottom_layer.png", resources::ResourceReloadMode::DONT_RELOAD, resources::ResourceLoadingPathType::ABSOLUTE);
+                        mapBottomLayer->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(NON_SANDBOXED_MAP_TEXTURES_FOLDER + mapName + "/" + mapName + "_bottom_layer.png", resources::ResourceReloadMode::DONT_RELOAD, resources::ResourceLoadingPathType::ABSOLUTE);
                         
                         auto mapTopLayer = scene->CreateSceneObject(strutils::StringId(mapName  + "_top"));
                         mapTopLayer->mPosition.x = mapTransformIter.value()["x"].get<float>() * game_constants::MAP_SCALE;
                         mapTopLayer->mPosition.y = mapTransformIter.value()["y"].get<float>() * game_constants::MAP_SCALE;
                         mapTopLayer->mPosition.z = map_constants::TILE_TOP_LAYER_Z;// + math::RandomFloat(0.01f, 0.05f);
                         mapTopLayer->mScale *= game_constants::MAP_SCALE;
-                        mapTopLayer->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(NON_SANDBOXED_MAP_TEXTURES_FOLDER + mapName + "_top_layer.png", resources::ResourceReloadMode::DONT_RELOAD, resources::ResourceLoadingPathType::ABSOLUTE);
+                        mapTopLayer->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(NON_SANDBOXED_MAP_TEXTURES_FOLDER + mapName + "/" + mapName + "_top_layer.png", resources::ResourceReloadMode::DONT_RELOAD, resources::ResourceLoadingPathType::ABSOLUTE);
                     }
                 }
             }
@@ -465,7 +466,7 @@ void Editor::CreateDebugWidgets()
                         {
                             auto sideRefImageSceneObject = scene->CreateSceneObject(sideRefImageSceneObjectName);
                             
-                            auto sideRefImagePath = NON_SANDBOXED_MAP_TEXTURES_FOLDER + sOtherMapTextures.at(sideImageRefIndex) + "_bottom_layer.png";
+                            auto sideRefImagePath = NON_SANDBOXED_MAP_TEXTURES_FOLDER + sOtherMapTextures.at(sideImageRefIndex) + "/" + sOtherMapTextures.at(sideImageRefIndex) + "_bottom_layer.png";
                             
                             systemsEngine.GetResourceLoadingService().UnloadResource(sideRefImagePath, resources::ResourceLoadingPathType::ABSOLUTE);
                             sideRefImageSceneObject->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(sideRefImagePath, resources::ResourceReloadMode::DONT_RELOAD, resources::ResourceLoadingPathType::ABSOLUTE);
@@ -570,7 +571,7 @@ void Editor::CreateDebugWidgets()
         
         if (mPaletteTileData.empty())
         {
-            auto mapTileFileNames = fileutils::GetAllFilenamesInDirectory(resources::ResourceLoadingService::RES_TEXTURES_ROOT + TILES_FOLDER);
+            auto mapTileFileNames = fileutils::GetAllFilenamesAndFolderNamesInDirectory(resources::ResourceLoadingService::RES_TEXTURES_ROOT + TILES_FOLDER);
             
             for (const auto& mapTileFileName: mapTileFileNames)
             {
@@ -848,5 +849,4 @@ void Editor::CreateDebugWidgets()
 {
 }
 #endif
-
 

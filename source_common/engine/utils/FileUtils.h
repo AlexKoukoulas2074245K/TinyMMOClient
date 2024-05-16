@@ -10,15 +10,11 @@
 
 ///-----------------------------------------------------------------------------------------------
 
-#include <algorithm> 
+#include <engine/utils/StringUtils.h>
+#include <algorithm>
 #include <string>
 #include <vector>
-
-#ifndef _WIN32
-#include <dirent.h>
-#else
 #include <filesystem>
-#endif
 
 ///-----------------------------------------------------------------------------------------------
 
@@ -49,7 +45,7 @@ inline std::string GetFileExtension(const std::string& filePath)
 /// @param[in] filePath the input file path.
 /// @returns the file name (with the extension) from the file path given.
 inline std::string GetFileName(const std::string& filePath)
-{    
+{
     std::string fileName;
     
     auto reverseIter = filePath.rbegin();
@@ -91,37 +87,37 @@ inline std::string GetFileNameWithoutExtension(const std::string& filePath)
 }
 
 ///-----------------------------------------------------------------------------------------------
-/// Returns a vector of filenames (not absolute paths) in a given directory.
+/// Returns whether or not a filepath points to a directory.
+/// @param[in] filePath to assess whether or not is a directory.
+/// @returns whether or not a filepath points to a directory.
+inline bool IsDirectory(const std::string& filePath)
+{
+    return std::filesystem::is_directory(filePath);
+}
+
+///-----------------------------------------------------------------------------------------------
+/// Tries to create a directory from the given path.
+/// @param[in] path to attempt to create a directory at.
+inline void CreateDirectory(const std::string& path)
+{
+    std::filesystem::create_directory(path);
+}
+
+///-----------------------------------------------------------------------------------------------
+/// Returns a vector of filenames (not absolute paths) and directory names in a given directory.
 /// @param[in] directory to search in.
-/// @returns a vector of filenames found in the given directory.
-inline std::vector<std::string> GetAllFilenamesInDirectory(const std::string& directory)
+/// @returns a vector of filenames & directories found in the given directory.
+inline std::vector<std::string> GetAllFilenamesAndFolderNamesInDirectory(const std::string& directory)
 {
     std::vector<std::string> fileNames;
-    
-#ifndef _WIN32
-    DIR *dir;
-    struct dirent *ent;
-    
-    if ((dir = opendir(directory.c_str())) != nullptr)
-    {
-        while ((ent = readdir(dir)) != nullptr)
-        {
-            const std::string fileName(ent->d_name);
-            
-            if (fileName[0] != '.')
-            {
-                fileNames.push_back(fileName);
-            }
-        }
-        
-        closedir(dir);
-    }
-#else
     for (const auto& entry : std::filesystem::directory_iterator(directory))
     {
-        fileNames.push_back(GetFileName(entry.path().string()));
+        auto fileName = GetFileName(entry.path().string());
+        if (strutils::StringSplit(fileName, '.').size() > 1 || IsDirectory(entry.path().string()))
+        {
+            fileNames.push_back(fileName);
+        }
     }
-#endif
     
     std::sort(fileNames.begin(), fileNames.end());
     return fileNames;

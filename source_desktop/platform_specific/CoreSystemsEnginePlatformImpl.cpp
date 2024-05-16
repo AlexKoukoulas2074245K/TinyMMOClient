@@ -482,7 +482,7 @@ void CoreSystemsEngine::CreateEngineDebugWidgets()
     
     if (sAvailableSfx.empty())
     {
-        auto soundFiles = fileutils::GetAllFilenamesInDirectory(resources::ResourceLoadingService::RES_MUSIC_ROOT);
+        auto soundFiles = fileutils::GetAllFilenamesAndFolderNamesInDirectory(resources::ResourceLoadingService::RES_MUSIC_ROOT);
         for (const auto& soundFile: soundFiles)
         {
             auto fileName = strutils::StringSplit(soundFile, '/').back();
