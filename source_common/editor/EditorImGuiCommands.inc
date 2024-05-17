@@ -271,7 +271,7 @@ void Editor::CreateDebugWidgets()
                     auto mapName = fileutils::GetFileNameWithoutExtension(std::string(sMapNameBuffer));
                     fileutils::CreateDirectory(NON_SANDBOXED_MAP_TEXTURES_FOLDER + mapName);
                     rendering::ExportToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + mapName + "/" + mapName + "_bottom_layer.png", bottomLayerSceneObjects, rendering::BlurStep::DONT_BLUR);
-                    rendering::ExportToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + mapName + "/" + mapName + fileutils::GetFileNameWithoutExtension(std::string(sMapNameBuffer)) + "_top_layer.png", topLayerSceneObjects, rendering::BlurStep::DONT_BLUR);
+                    rendering::ExportToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + mapName + "/" + mapName + "_top_layer.png", topLayerSceneObjects, rendering::BlurStep::DONT_BLUR);
                     
                     // Render map navmap texture
                     for (auto y = 0; y < mGridRows; ++y)

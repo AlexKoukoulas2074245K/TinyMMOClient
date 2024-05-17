@@ -87,7 +87,7 @@ void Game::Init()
     systemsEngine.GetFontRepository().LoadFont(game_constants::DEFAULT_FONT_NAME.GetString(), resources::ResourceReloadMode::DONT_RELOAD);
     systemsEngine.GetSoundManager().SetAudioEnabled(false);
     
-    auto scene = systemsEngine.GetSceneManager().CreateScene(strutils::StringId("world"));
+    auto scene = systemsEngine.GetSceneManager().CreateScene(game_constants::WORLD_SCENE_NAME);
     scene->SetLoaded(true);
     
     GlobalMapDataRepository::GetInstance().LoadMapDefinitions();
@@ -148,7 +148,7 @@ void Game::UpdateCamera(const float)
     if (mLocalPlayerSceneObject)
     {
         auto& systemsEngine = CoreSystemsEngine::GetInstance();
-        auto scene = systemsEngine.GetSceneManager().FindScene(strutils::StringId("world"));
+        auto scene = systemsEngine.GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME);
         scene->GetCamera().SetPosition(glm::vec3(mLocalPlayerSceneObject->mPosition.x, mLocalPlayerSceneObject->mPosition.y, scene->GetCamera().GetPosition().z));
     }
 }
@@ -266,7 +266,7 @@ void Game::InterpolateLocalWorld(const float dtMillis)
     
     std::lock_guard<std::mutex> worldLockGuard(sWorldMutex);
 
-    auto scene = sceneManager.FindScene(strutils::StringId("world"));
+    auto scene = sceneManager.FindScene(game_constants::WORLD_SCENE_NAME);
     
     for (int worldObjectIDToCleanup: mWorldObjectIDsToCleanup)
     {
@@ -425,7 +425,7 @@ void Game::SendNetworkMessage(const nlohmann::json& message, const networking::M
 void Game::CreateWorldObject(const networking::WorldObjectData& worldObjectData)
 {
     auto& systemsEngine = CoreSystemsEngine::GetInstance();
-    auto scene = systemsEngine.GetSceneManager().FindScene(strutils::StringId("world"));
+    auto scene = systemsEngine.GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME);
     
     switch (worldObjectData.objectType)
     {
@@ -605,7 +605,7 @@ void Game::OnPlayButtonPressed()
 {
     auto& systemsEngine = CoreSystemsEngine::GetInstance();
     auto& sceneManager = systemsEngine.GetSceneManager();
-    auto scene = sceneManager.FindScene(strutils::StringId("world"));
+    auto scene = sceneManager.FindScene(game_constants::WORLD_SCENE_NAME);
     
     // Fade button out
     CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenValueAnimation>(mPlayButton->GetSceneObject()->mShaderFloatUniformValues[strutils::StringId("custom_alpha")], 0.0f, 0.2f), [=]()
@@ -630,7 +630,7 @@ void Game::OnMapChange(const events::MapChangeEvent& mapChangeEvent, const bool 
 void Game::CreateMapSceneObjects(const strutils::StringId& mapName)
 {
     auto& systemsEngine = CoreSystemsEngine::GetInstance();
-    auto scene = systemsEngine.GetSceneManager().FindScene(strutils::StringId("world"));
+    auto scene = systemsEngine.GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME);
     
     const auto& mapDefinition = GlobalMapDataRepository::GetInstance().GetMapDefinition(mapName);
     const auto& mapResources = mMapResourceController->GetMapResources(mapName);

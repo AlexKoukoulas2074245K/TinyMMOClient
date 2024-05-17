@@ -28,6 +28,7 @@ namespace game_constants
     
     // Game Constants
     //inline const float PLAYER_RUBBERBAND_SPEED = 0.002f;
+    inline const strutils::StringId WORLD_SCENE_NAME = strutils::StringId("world");
     inline const glm::vec3 PLAYER_NAMEPLATE_OFFSET = {0.01f, 0.065f, 0.0f};
     inline const float MAP_RENDERED_SCALE = 4.0f;
 

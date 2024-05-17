@@ -38,9 +38,14 @@ public:
     void SetNavmapResourceId(const resources::ResourceId navmapResourceId);
 
 private:
+    enum class MovementState
+    {
+        IDLE, MOVING, BUMPING
+    };
+    
     strutils::StringId mCurrentMapName;
     resources::ResourceId mNavmapResourceId;
-    glm::ivec2 mPreviousNavmapCoords;
+    MovementState mMovementState;
 };
 
 ///------------------------------------------------------------------------------------------------
