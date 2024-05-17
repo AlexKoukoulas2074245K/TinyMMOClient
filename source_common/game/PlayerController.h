@@ -36,16 +36,11 @@ public:
     void ShowNavmapDebugView();
     void HideNavmapDebugView();
     void SetNavmapResourceId(const resources::ResourceId navmapResourceId);
-
+    void TerrainCollisionHandlingPostMapChange(networking::WorldObjectData& objectData, std::shared_ptr<scene::SceneObject> playerSceneObject, std::shared_ptr<scene::SceneObject> playerNameSceneObject, glm::vec3 impulseVector, const float dtMillis);
+    void TerrainCollisionHandling(networking::WorldObjectData& objectData, std::shared_ptr<scene::SceneObject> playerSceneObject, std::shared_ptr<scene::SceneObject> playerNameSceneObject, glm::vec3 impulseVector, const float dtMillis);
 private:
-    enum class MovementState
-    {
-        IDLE, MOVING, BUMPING
-    };
-    
     strutils::StringId mCurrentMapName;
     resources::ResourceId mNavmapResourceId;
-    MovementState mMovementState;
 };
 
 ///------------------------------------------------------------------------------------------------
