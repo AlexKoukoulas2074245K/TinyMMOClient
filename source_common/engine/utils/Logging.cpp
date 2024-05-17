@@ -1,39 +1,48 @@
 ///------------------------------------------------------------------------------------------------
-///  MapConstants.h
+///  Logging.cpp
 ///  TinyMMOClient
-///                                                                                                
-///  Created by Alex Koukoulas on 14/05/2024
+///
+///  Created by Alex Koukoulas on 25/04/2024
 ///------------------------------------------------------------------------------------------------
 
-#ifndef MapConstants_h
-#define MapConstants_h
+#include <mutex>
+
+#include <engine/utils/Logging.h>
+#include <engine/utils/Date.h>
 
 ///------------------------------------------------------------------------------------------------
 
-namespace map_constants
+static std::mutex sLoggingMutex;
+
+///------------------------------------------------------------------------------------------------
+
+namespace logging
 {
 
 ///------------------------------------------------------------------------------------------------
 
-enum class LayerType
+void Log(const LogType logType, const char* message, ...)
 {
-    BOTTOM_LAYER = 0,
-    TOP_LAYER = 1
-};
-
-///------------------------------------------------------------------------------------------------
-
-inline const strutils::StringId NO_CONNECTION_NAME = strutils::StringId("None");
-
-///------------------------------------------------------------------------------------------------
-
-inline const float TILE_BOTTOM_LAYER_Z = 0.1f;
-inline const float TILE_TOP_LAYER_Z = 10.0f;
+    std::lock_guard<std::mutex> loggingGuard(sLoggingMutex);
+    switch(logType)
+    {
+        case LogType::INFO: printf("[INFO] "); break;
+        case LogType::WARNING: printf("[WARNING] "); break;
+        case LogType::ERROR: printf("[ERROR] "); break;
+    }
+    
+    va_list args;
+    va_start (args, message);
+    vprintf (message, args);
+    va_end (args);
+    
+    printf("\n");
+    
+    fflush(stdout);
+}
 
 ///------------------------------------------------------------------------------------------------
 
 }
 
 ///------------------------------------------------------------------------------------------------
-
-#endif /* MapConstants_h */

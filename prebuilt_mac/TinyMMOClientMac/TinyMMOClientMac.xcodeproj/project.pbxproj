@@ -23,6 +23,7 @@
 		1821BE0D6457687787E1571F /* Scene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6544FC0C6E5993C9E3957773 /* Scene.cpp */; };
 		191617E17721C2C19E20E920 /* IResource.h in Sources */ = {isa = PBXBuildFile; fileRef = 99B2042795EEDA27C28F2D84 /* IResource.h */; };
 		19AB2555F153D36FD08A7E15 /* MeshResource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DDD0E1D0B63F40D725F02A35 /* MeshResource.cpp */; };
+		1AB824A861C9720DB76855EE /* MapResourceController.h in Sources */ = {isa = PBXBuildFile; fileRef = 84B0FDBFCAAC116EB0005485 /* MapResourceController.h */; };
 		1AFC9A98EB4CEF5FA6491FA6 /* ResourceLoadingService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 052939A977343440F86F0858 /* ResourceLoadingService.cpp */; };
 		1B1B490E6EC3A5DF872931B9 /* IEditorCommand.h in Sources */ = {isa = PBXBuildFile; fileRef = 4FF1572465760B72632B0EB2 /* IEditorCommand.h */; };
 		1ECC3C6E351A36D1C71615E0 /* Logging.h in Sources */ = {isa = PBXBuildFile; fileRef = 43A25A1E55390D38AC6A5742 /* Logging.h */; };
@@ -52,7 +53,9 @@
 		514E39DF539500706F03EC42 /* WorldObjectStates.h in Sources */ = {isa = PBXBuildFile; fileRef = BA4AC24CD1BEEBF435E7CA14 /* WorldObjectStates.h */; };
 		5285724978640648FFD94960 /* TextureResource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93D83DB41AD868D09B2A3C94 /* TextureResource.cpp */; };
 		532521F009DF925259026C23 /* SerializationDefinitions.h in Sources */ = {isa = PBXBuildFile; fileRef = F05BCACB9D0D7193765BB311 /* SerializationDefinitions.h */; };
+		55A949B09D185B35C8B0D135 /* Logging.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3BF946C1B449BB4FE7DF288A /* Logging.cpp */; };
 		55B88F03ED55A2709BD2B704 /* SceneObjectUtils.h in Sources */ = {isa = PBXBuildFile; fileRef = FB0E9FCA60AD270C9B09FA51 /* SceneObjectUtils.h */; };
+		5796621A511BC4A566D8EE1B /* MapResourceController.h in Sources */ = {isa = PBXBuildFile; fileRef = 84B0FDBFCAAC116EB0005485 /* MapResourceController.h */; };
 		590BC49901179FB522AD2223 /* OSMessageBox.h in Sources */ = {isa = PBXBuildFile; fileRef = EEC2E35013E2E8B9B7A912C6 /* OSMessageBox.h */; };
 		5BEFD96D266F53B603C278C1 /* TypeTraits.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 988043F06556266668BE5677 /* TypeTraits.cpp */; };
 		5D6DCABBC78B4002D4BDF2E2 /* MapConstants.h in Sources */ = {isa = PBXBuildFile; fileRef = BB91C0E56FB07D250ED0D766 /* MapConstants.h */; };
@@ -67,6 +70,7 @@
 		71DEABFBFD9A818B6DFD8412 /* TextureLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E0D05FD28DC001514531A214 /* TextureLoader.cpp */; };
 		74069A969F34BEBE941BF781 /* WorldObjectTypes.h in Sources */ = {isa = PBXBuildFile; fileRef = 4230154D7A5B45B2288322EE /* WorldObjectTypes.h */; };
 		755F10742FF09979BBBA9C58 /* EditorImGuiCommands.inc in Sources */ = {isa = PBXBuildFile; fileRef = 3A0B70DC7ADA228D909C7E71 /* EditorImGuiCommands.inc */; };
+		75EE2B0108F81C433874AA35 /* MapResourceController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BE51A13F26D79F70EC7C10C1 /* MapResourceController.cpp */; };
 		77F8C741493973A71A6DBA22 /* ImageSurfaceResource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53CDE03B92A8F220738E44FE /* ImageSurfaceResource.cpp */; };
 		7A14147B43076FC43E6D5662 /* SoundManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F701DBE1A8A6D1664BEF16A3 /* SoundManager.cpp */; };
 		7A35378576E3FCE89E70ABA4 /* SceneManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FB79D70FA4FA614F184AFE40 /* SceneManager.cpp */; };
@@ -398,6 +402,7 @@
 		92CA97412B65132C00B53B01 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92CA97402B65132B00B53B01 /* StoreKit.framework */; };
 		92D54EE22BDFA00800DA4EC7 /* NameGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 92D54EE02BDFA00800DA4EC7 /* NameGenerator.cpp */; };
 		95BF1C18A001B37A45C9BF9E /* IRenderer.h in Sources */ = {isa = PBXBuildFile; fileRef = E0599E67CDFA7350C55C73A5 /* IRenderer.h */; };
+		9667A0C8E210F70AFD042027 /* MapResourceController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BE51A13F26D79F70EC7C10C1 /* MapResourceController.cpp */; };
 		9D4CA157485CB7B2A8081670 /* FloodFillCommand.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB4FB5CB8DCA0CB3794336B2 /* FloodFillCommand.cpp */; };
 		9F60F6BEA7D20AB4B5EFA323 /* ResourceLoadingService.h in Sources */ = {isa = PBXBuildFile; fileRef = 7C92E4EC0FBCD6AFCA53FD77 /* ResourceLoadingService.h */; };
 		9FE4A0895085C4A710AF1FF6 /* SerializableNetworkObjects.h in Sources */ = {isa = PBXBuildFile; fileRef = A7F720915E74A51C6579763C /* SerializableNetworkObjects.h */; };
@@ -418,6 +423,7 @@
 		C14FB694A5255B1DC21B4A13 /* SceneObjectUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F16121E2A49D2514A725F7AA /* SceneObjectUtils.cpp */; };
 		C2E83D8C714D1A35A7B1FC57 /* EditorImGuiCommands.inc in Sources */ = {isa = PBXBuildFile; fileRef = 3A0B70DC7ADA228D909C7E71 /* EditorImGuiCommands.inc */; };
 		C303F0F3781FE76FA4F0A754 /* Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EA3B9899242A079FE63DCD1E /* Camera.cpp */; };
+		C33700656B3EA0082E0A9289 /* MapResourceController.h in Sources */ = {isa = PBXBuildFile; fileRef = 84B0FDBFCAAC116EB0005485 /* MapResourceController.h */; };
 		C406B60810EC8EDBDDA519DA /* Scene.h in Sources */ = {isa = PBXBuildFile; fileRef = 659D24C3A310C59893EE9475 /* Scene.h */; };
 		C47AB43C912958FA00860801 /* ParticleManager.h in Sources */ = {isa = PBXBuildFile; fileRef = 3199A38C1A16A070A579BAB4 /* ParticleManager.h */; };
 		C729734CCEC807E5626787EB /* IResourceLoader.h in Sources */ = {isa = PBXBuildFile; fileRef = AD86196C948CE14DCBBE5446 /* IResourceLoader.h */; };
@@ -426,6 +432,7 @@
 		CA9897BC57F466630194BFE8 /* MeshResource.h in Sources */ = {isa = PBXBuildFile; fileRef = 88B55A70915E2429F0F03C71 /* MeshResource.h */; };
 		CB1B337E51727F74A3851A0E /* BackgroundMusicPlayer.h in Sources */ = {isa = PBXBuildFile; fileRef = 9A0A1CFEB31EB9D7990F0B4B /* BackgroundMusicPlayer.h */; };
 		CCE13A87F90CB8EB69073CD1 /* FileUtils.h in Sources */ = {isa = PBXBuildFile; fileRef = 0D09AB023B7A329D725F2F2F /* FileUtils.h */; };
+		D21664D760A3220A78231910 /* Logging.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3BF946C1B449BB4FE7DF288A /* Logging.cpp */; };
 		D44276B3AAC7224FC2221FC6 /* ImageSurfaceResource.h in Sources */ = {isa = PBXBuildFile; fileRef = CAEF02928D06B177B1091C5F /* ImageSurfaceResource.h */; };
 		D5D233B536F12C82833E37AB /* MapConstants.h in Sources */ = {isa = PBXBuildFile; fileRef = BB91C0E56FB07D250ED0D766 /* MapConstants.h */; };
 		D6B3BDD48999F9AF32D62641 /* NetworkMessages.h in Sources */ = {isa = PBXBuildFile; fileRef = 83294548BB5AEF7EB30C76DC /* NetworkMessages.h */; };
@@ -440,11 +447,13 @@
 		F2C17A279E5E5256D4401C90 /* DataFileLoader.h in Sources */ = {isa = PBXBuildFile; fileRef = B83F90BE48846F5019309046 /* DataFileLoader.h */; };
 		F467390ABB511496E18AF585 /* SceneManager.h in Sources */ = {isa = PBXBuildFile; fileRef = 221289B3E3FA84B55F4C25E2 /* SceneManager.h */; };
 		F51ECBEA53C3E1BE870B0612 /* ShaderResource.h in Sources */ = {isa = PBXBuildFile; fileRef = 13FDFD19955883B3085E4725 /* ShaderResource.h */; };
+		F6CDB708C135B3C4D6D0AFDD /* MapResourceController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BE51A13F26D79F70EC7C10C1 /* MapResourceController.cpp */; };
 		F7A5A5A1C07E56B0E105A3E2 /* CoreSystemsEngine.h in Sources */ = {isa = PBXBuildFile; fileRef = 1B15A1EEB522F75EE7E24E55 /* CoreSystemsEngine.h */; };
 		F9DA16800D685DE43C29BCDE /* Animations.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A4ADBD10E11C136014CDB469 /* Animations.cpp */; };
 		FC7CB5DD2DD48F46BC3CAF9D /* MathUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 393520815AD90C67A6A6989C /* MathUtils.cpp */; };
 		FE081503D7B9E0EE6A0752EC /* Date.h in Sources */ = {isa = PBXBuildFile; fileRef = E20949AA76405DC09B2C07EC /* Date.h */; };
 		FF10C06D59F9228C0A2C9E43 /* ShaderLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 255CBE3395586957104E385D /* ShaderLoader.cpp */; };
+		FFC2DBB68CE0D48497767EEC /* Logging.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3BF946C1B449BB4FE7DF288A /* Logging.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -508,6 +517,7 @@
 		3714C4A3B069768E05DD0199 /* SfxPlayer.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = SfxPlayer.h; sourceTree = "<group>"; };
 		393520815AD90C67A6A6989C /* MathUtils.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = MathUtils.cpp; sourceTree = "<group>"; };
 		3A0B70DC7ADA228D909C7E71 /* EditorImGuiCommands.inc */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.pascal; path = EditorImGuiCommands.inc; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
+		3BF946C1B449BB4FE7DF288A /* Logging.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = Logging.cpp; path = Logging.cpp; sourceTree = "<group>"; };
 		3E13E4D3AA7809E3A06CFF75 /* stb_image_write.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = stb_image_write.h; sourceTree = "<group>"; };
 		4230154D7A5B45B2288322EE /* WorldObjectTypes.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = WorldObjectTypes.h; sourceTree = "<group>"; };
 		431D52A0E0BD619E5CEDBCA7 /* DataFileResource.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = DataFileResource.cpp; sourceTree = "<group>"; };
@@ -534,6 +544,7 @@
 		7F068929D88F95729D0195E3 /* BackgroundMusicPlayer.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; path = BackgroundMusicPlayer.mm; sourceTree = "<group>"; };
 		82DFED0E0B1AB607780AED60 /* Animations.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = Animations.h; sourceTree = "<group>"; };
 		83294548BB5AEF7EB30C76DC /* NetworkMessages.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = NetworkMessages.h; sourceTree = "<group>"; };
+		84B0FDBFCAAC116EB0005485 /* MapResourceController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = MapResourceController.h; path = MapResourceController.h; sourceTree = "<group>"; };
 		88B55A70915E2429F0F03C71 /* MeshResource.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = MeshResource.h; sourceTree = "<group>"; };
 		8AE4C68818CCB619974358E0 /* RenderingUtils.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = RenderingUtils.h; sourceTree = "<group>"; };
 		8D6E209DDF4F577F8C87C6A0 /* BaseDataFileDeserializer.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = BaseDataFileDeserializer.h; sourceTree = "<group>"; };
@@ -635,6 +646,7 @@
 		BA4AC24CD1BEEBF435E7CA14 /* WorldObjectStates.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = WorldObjectStates.h; sourceTree = "<group>"; };
 		BB8C2E3FACC90180DAAE4F40 /* Fonts.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = Fonts.cpp; sourceTree = "<group>"; };
 		BB91C0E56FB07D250ED0D766 /* MapConstants.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = MapConstants.h; sourceTree = "<group>"; };
+		BE51A13F26D79F70EC7C10C1 /* MapResourceController.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = MapResourceController.cpp; path = MapResourceController.cpp; sourceTree = "<group>"; };
 		BE806858C85634D9FB14B857 /* NetworkObjectDefinitions.inc */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.pascal; path = NetworkObjectDefinitions.inc; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		CAEF02928D06B177B1091C5F /* ImageSurfaceResource.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = ImageSurfaceResource.h; sourceTree = "<group>"; };
 		CB4FB5CB8DCA0CB3794336B2 /* FloodFillCommand.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = FloodFillCommand.cpp; sourceTree = "<group>"; };
@@ -783,6 +795,7 @@
 				543F0360AEBB87C61E32D84B /* ThreadSafeQueue.h */,
 				2096C38A74EAF730ECCA5E36 /* MathUtils.h */,
 				E20949AA76405DC09B2C07EC /* Date.h */,
+				3BF946C1B449BB4FE7DF288A /* Logging.cpp */,
 			);
 			path = utils;
 			sourceTree = "<group>";
@@ -1178,6 +1191,8 @@
 				BB91C0E56FB07D250ED0D766 /* MapConstants.h */,
 				48DB18BE22C3E3BF657F80FC /* GlobalMapDataRepository.cpp */,
 				D3E5F321CD72AE2525A7F946 /* GlobalMapDataRepository.h */,
+				BE51A13F26D79F70EC7C10C1 /* MapResourceController.cpp */,
+				84B0FDBFCAAC116EB0005485 /* MapResourceController.h */,
 			);
 			path = map;
 			sourceTree = "<group>";
@@ -1503,6 +1518,9 @@
 				A0FB8C200367DE8CC95A5DEA /* PlayerController.cpp in Sources */,
 				2E2A20E128C6828EF016F776 /* GlobalMapDataRepository.cpp in Sources */,
 				17B2340BCD04105F71052715 /* GlobalMapDataRepository.h in Sources */,
+				75EE2B0108F81C433874AA35 /* MapResourceController.cpp in Sources */,
+				C33700656B3EA0082E0A9289 /* MapResourceController.h in Sources */,
+				FFC2DBB68CE0D48497767EEC /* Logging.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1627,6 +1645,9 @@
 				B8E5A8B09C9A4DCA4FC7A63D /* PlayerController.cpp in Sources */,
 				8BF376AB3834A1CF293B8B1C /* GlobalMapDataRepository.cpp in Sources */,
 				4957CBEF0D3D7B14A49CC983 /* GlobalMapDataRepository.h in Sources */,
+				9667A0C8E210F70AFD042027 /* MapResourceController.cpp in Sources */,
+				5796621A511BC4A566D8EE1B /* MapResourceController.h in Sources */,
+				D21664D760A3220A78231910 /* Logging.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1751,6 +1772,9 @@
 				036F7E277CEF6542122913A9 /* PlayerController.cpp in Sources */,
 				2EB941D1C4943FBB60F4524D /* GlobalMapDataRepository.cpp in Sources */,
 				A0DC0AE864A5D55E7FE17E09 /* GlobalMapDataRepository.h in Sources */,
+				F6CDB708C135B3C4D6D0AFDD /* MapResourceController.cpp in Sources */,
+				1AB824A861C9720DB76855EE /* MapResourceController.h in Sources */,
+				55A949B09D185B35C8B0D135 /* Logging.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

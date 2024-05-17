@@ -134,6 +134,12 @@ public:
     /// @returns whether or not a physical file exists in the specified path.
     bool DoesResourceExist(const std::string& resourcePath, const ResourceLoadingPathType resourceLoadingPathType = ResourceLoadingPathType::RELATIVE) const;
     
+    /// Checks whether a resource has been loaded based on a resourceId (to check when async loading is enabled).
+    ///
+    /// @param[in] resourceId the resourceId to check.
+    /// @returns whether or not the resource related to this resourceId has been loaded.
+    bool HasLoadedResource(const ResourceId resourceId) const;
+    
     /// Checks whether a resource has been loaded based on a file that exists under the given path.
     ///
     /// Both full paths, relative paths including the Resource Root, and relative

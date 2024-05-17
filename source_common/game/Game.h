@@ -28,6 +28,7 @@ namespace scene
 
 class AnimatedButton;
 class PlayerController;
+class MapResourceController;
 class Game final
 {
 public:
@@ -53,12 +54,18 @@ private:
     void OnServerPlayerStateResponse(const nlohmann::json& responseJson);
     void OnServerLoginResponse(const nlohmann::json& responseJson);
     void OnPlayButtonPressed();
+    void OnMapChange(const events::MapChangeEvent& mapChangeEvent, const bool shouldLoadNeighbourMapResourcesAsync);
+    void CreateMapSceneObjects(const strutils::StringId& mapName);
     
 private:
     std::atomic<int> mLastPingMillis = 0;
-    std::unique_ptr<AnimatedButton> mPlayButton;
+    std::unique_ptr<MapResourceController> mMapResourceController;
     std::unique_ptr<PlayerController> mPlayerController;
+    std::unique_ptr<AnimatedButton> mPlayButton;
     std::unique_ptr<events::IListener> mSendNetworkMessageEventListener;
+    std::unique_ptr<events::IListener> mMapChangeEventListener;
+    std::unique_ptr<events::IListener> mMapSupersessionEventListener;
+    std::unique_ptr<events::IListener> mMapResourcesReadyEventListener;
     std::shared_ptr<scene::SceneObject> mLocalPlayerSceneObject;
     std::vector<int> mWorldObjectIDsToCleanup;
     std::vector<networking::WorldObjectData> mWorldObjectData;

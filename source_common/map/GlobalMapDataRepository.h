@@ -13,7 +13,6 @@
 #include <engine/utils/MathUtils.h>
 #include <engine/utils/StringUtils.h>
 #include <unordered_map>
-#include <variant>
 
 ///------------------------------------------------------------------------------------------------
 
@@ -62,6 +61,7 @@ public:
     GlobalMapDataRepository& operator = (GlobalMapDataRepository&&) = delete;
     
     const std::unordered_map<strutils::StringId, MapDefinition, strutils::StringIdHasher> GetMapDefinitions() const;
+    bool HasMapDefinition(const strutils::StringId& mapName) const;
     const MapDefinition& GetMapDefinition(const strutils::StringId& mapName) const;
     const strutils::StringId& GetConnectedMapName(const strutils::StringId& mapName, const MapConnectionDirection direction) const;
     void LoadMapDefinitions();

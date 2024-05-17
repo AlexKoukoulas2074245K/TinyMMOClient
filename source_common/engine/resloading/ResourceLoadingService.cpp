@@ -199,7 +199,7 @@ void ResourceLoadingService::Update()
         auto finishedJob = mAsyncLoaderWorker->mResults.dequeue();
         mResourceMap[finishedJob.mTargetResourceId] = finishedJob.mResource;
         
-        if (dynamic_cast<const ImageSurfaceLoader*>(finishedJob.mLoader))
+        if (dynamic_cast<const ImageSurfaceLoader*>(finishedJob.mLoader) && !IsNavmapImage(finishedJob.mResourcePath))
         {
             mResourceMap[finishedJob.mTargetResourceId] = mResourceLoaders.back()->VCreateAndLoadResource(finishedJob.mResourcePath);
         }
@@ -287,12 +287,19 @@ bool ResourceLoadingService::DoesResourceExist(const std::string& resourcePath, 
 
 ///------------------------------------------------------------------------------------------------
 
+bool ResourceLoadingService::HasLoadedResource(const ResourceId resourceId) const
+{
+    return mResourceMap.contains(resourceId);
+}
+
+///------------------------------------------------------------------------------------------------
+
 bool ResourceLoadingService::HasLoadedResource(const std::string& resourcePath, const bool isDynamicallyGenerated, const ResourceLoadingPathType resourceLoadingPathType /* = ResourceLoadingPathType::RELATIVE */) const
 {
     const auto adjustedPath = AdjustResourcePath(resourcePath, resourceLoadingPathType);
     const auto resourceId = strutils::GetStringHash(isDynamicallyGenerated ? resourcePath : adjustedPath);
     
-    return mResourceMap.count(resourceId) != 0;
+    return HasLoadedResource(resourceId);
 }
 
 ///------------------------------------------------------------------------------------------------

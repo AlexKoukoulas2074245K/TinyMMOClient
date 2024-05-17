@@ -10,9 +10,12 @@
 
 ///-----------------------------------------------------------------------------------------------
 
+#include "Date.h"
 #include <stdarg.h>
-#include <stdio.h>  
+#include <stdio.h>
 #include <string>
+#include <sstream>
+#include <chrono>
 
 ///-----------------------------------------------------------------------------------------------
 
@@ -32,28 +35,12 @@ enum class LogType
 
 ///-----------------------------------------------------------------------------------------------
 /// Logs a message to the std out, with a custom log type tag \see LogType
-/// @param[in] logType the category of logging message 
+/// @param[in] logType the category of logging message
 /// @param[in] message the message itself as a c-string
 #if !defined(NDEBUG) || defined(LOG_IN_RELEASE)
-inline void Log(const LogType logType, const char* message, ...)
-{
-    
-    switch(logType)
-    {
-        case LogType::INFO: printf("[INFO] "); break;
-        case LogType::WARNING: printf("[WARNING] "); break;
-        case LogType::ERROR: printf("[ERROR] "); break;
-    }
-    
-    va_list args;
-    va_start (args, message);
-    vprintf (message, args);
-    va_end (args);
-    
-    printf("\n");
-}
+void Log(const LogType logType, const char* message, ...);
 #else
-inline void Log(const LogType, const char*, ...) {}
+void Log(const LogType, const char*, ...) {}
 #endif /* not NDEBUG */
 
 ///-----------------------------------------------------------------------------------------------

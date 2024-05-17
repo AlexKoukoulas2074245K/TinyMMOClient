@@ -42,8 +42,13 @@ glm::vec4 GetRGBAAt(SDL_Surface* surface, const int x, const int y)
 PlayerController::PlayerController(const strutils::StringId& mapName)
     : mCurrentMapName(mapName)
 {
-    auto& systemsEngine = CoreSystemsEngine::GetInstance();
-    mNavmapResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "world/maps/" + mapName.GetString() + "/" + mapName.GetString() + "_navmap.png");
+}
+
+///------------------------------------------------------------------------------------------------
+
+const strutils::StringId& PlayerController::GetCurrentMapName() const
+{
+    return mCurrentMapName;
 }
 
 ///------------------------------------------------------------------------------------------------
@@ -118,7 +123,7 @@ void PlayerController::Update(const float dtMillis, const strutils::StringId& pl
         {
             strutils::StringId nextMapName;
             
-            // Determine movement direction
+            // Determine map change direction
             if (playerSceneObject->mPosition.x > currentMapDefinition.mMapPosition.x * game_constants::MAP_RENDERED_SCALE + (currentMapDefinition.mMapDimensions.x * game_constants::MAP_RENDERED_SCALE)/2.0f - MAP_TRANSITION_THRESHOLD)
             {
                 nextMapName = globalMapDataRepo.GetConnectedMapName(mCurrentMapName, MapConnectionDirection::EAST);
@@ -140,11 +145,9 @@ void PlayerController::Update(const float dtMillis, const strutils::StringId& pl
             // into the next navmap
             playerSceneObject->mPosition += objectData.objectVelocity;
             playerNameSceneObject->mPosition += objectData.objectVelocity;
-            
-            auto& systemsEngine = CoreSystemsEngine::GetInstance();
-            systemsEngine.GetResourceLoadingService().UnloadResource(mNavmapResourceId);
-            mNavmapResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "world/maps/" + nextMapName.GetString() + "/" + nextMapName.GetString() + "_navmap.png");
+
             mCurrentMapName = nextMapName;
+            events::EventSystem::GetInstance().DispatchEvent<events::MapChangeEvent>(mCurrentMapName);
             
             if (scene.FindSceneObject(NAVMAP_DEBUG_SCENE_OBJECT_NAME))
             {
@@ -216,6 +219,13 @@ void PlayerController::HideNavmapDebugView()
     auto navmapSceneObject = scene->FindSceneObject(NAVMAP_DEBUG_SCENE_OBJECT_NAME);
     systemsEngine.GetResourceLoadingService().UnloadResource(navmapSceneObject->mTextureResourceId);
     scene->RemoveSceneObject(NAVMAP_DEBUG_SCENE_OBJECT_NAME);
+}
+
+///------------------------------------------------------------------------------------------------
+
+void PlayerController::SetNavmapResourceId(const resources::ResourceId navmapResourceId)
+{
+    mNavmapResourceId = navmapResourceId;
 }
 
 ///------------------------------------------------------------------------------------------------

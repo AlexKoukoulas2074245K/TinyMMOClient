@@ -41,6 +41,13 @@ const std::unordered_map<strutils::StringId, MapDefinition, strutils::StringIdHa
 
 ///------------------------------------------------------------------------------------------------
 
+bool GlobalMapDataRepository::HasMapDefinition(const strutils::StringId& mapName) const
+{
+    return mMapDefinitions.contains(mapName);
+}
+
+///------------------------------------------------------------------------------------------------
+
 const MapDefinition& GlobalMapDataRepository::GetMapDefinition(const strutils::StringId& mapDefinition) const
 {
     auto foundIter = mMapDefinitions.find(mapDefinition);

@@ -34,6 +34,7 @@
 #include <game/utils/NameGenerator.h>
 #include <imgui/imgui.h>
 #include <map/MapConstants.h>
+#include <map/MapResourceController.h>
 #include <map/GlobalMapDataRepository.h>
 #include <mutex>
 #include <net_common/WorldObjectTypes.h>
@@ -79,7 +80,6 @@ Game::Game(const int argc, char** argv)
 Game::~Game(){}
 
 ///------------------------------------------------------------------------------------------------
-SDL_Surface* sNavmapSurface = nullptr;
 
 void Game::Init()
 {
@@ -91,41 +91,41 @@ void Game::Init()
     scene->SetLoaded(true);
     
     GlobalMapDataRepository::GetInstance().LoadMapDefinitions();
+    mMapResourceController = std::make_unique<MapResourceController>(strutils::StringId("entry_map"));
+    mPlayerController = std::make_unique<PlayerController>(strutils::StringId("entry_map"));
+    mPlayerController->SetNavmapResourceId(mMapResourceController->GetMapResources(strutils::StringId("entry_map")).mNavmapImageResourceId);
     
-    for (const auto& mapDefinitionEntry: GlobalMapDataRepository::GetInstance().GetMapDefinitions())
+    auto loadedMapResources = mMapResourceController->GetAllLoadedMapResources();
+    
+    for (const auto& mapResources: loadedMapResources)
     {
-        const auto& mapDefinition = mapDefinitionEntry.second;
-        auto mapBottomLayer = scene->CreateSceneObject(strutils::StringId(mapDefinition.mMapName.GetString()  + "_bottom"));
-        mapBottomLayer->mPosition.x = mapDefinition.mMapPosition.x * game_constants::MAP_RENDERED_SCALE;
-        mapBottomLayer->mPosition.y = mapDefinition.mMapPosition.y * game_constants::MAP_RENDERED_SCALE;
-        mapBottomLayer->mPosition.z = map_constants::TILE_BOTTOM_LAYER_Z;
-        mapBottomLayer->mScale *= game_constants::MAP_RENDERED_SCALE;
-        mapBottomLayer->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "world/maps/" + mapDefinition.mMapName.GetString() + "/" + mapDefinition.mMapName.GetString() + "_bottom_layer.png");
-        mapBottomLayer->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + "world_map.vs");
-        mapBottomLayer->mShaderFloatUniformValues[strutils::StringId("map_width")] = mapDefinition.mMapDimensions.x;
-        mapBottomLayer->mShaderFloatUniformValues[strutils::StringId("map_height")] = mapDefinition.mMapDimensions.y;
-        
-        auto mapTopLayer = scene->CreateSceneObject(strutils::StringId(mapDefinition.mMapName.GetString()  + "_top"));
-        mapTopLayer->mPosition.x = mapDefinition.mMapPosition.x * game_constants::MAP_RENDERED_SCALE;
-        mapTopLayer->mPosition.y = mapDefinition.mMapPosition.y * game_constants::MAP_RENDERED_SCALE;
-        mapTopLayer->mPosition.z = map_constants::TILE_TOP_LAYER_Z;
-        mapTopLayer->mScale *= game_constants::MAP_RENDERED_SCALE;
-        mapTopLayer->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "world/maps/" + mapDefinition.mMapName.GetString() +  "/" + mapDefinition.mMapName.GetString() + "_top_layer.png");
-        mapTopLayer->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + "world_map.vs");
-        mapTopLayer->mShaderFloatUniformValues[strutils::StringId("map_width")] = mapDefinition.mMapDimensions.x;
-        mapTopLayer->mShaderFloatUniformValues[strutils::StringId("map_height")] = mapDefinition.mMapDimensions.y;
+        CreateMapSceneObjects(mapResources.first);
     }
     
     mLocalPlayerSceneObject = nullptr;
     mPlayButton = std::make_unique<AnimatedButton>(glm::vec3(-0.057f, 0.038f, 1.0f), glm::vec3(0.001f, 0.001f, 0.001f), game_constants::DEFAULT_FONT_NAME, "Play", PLAY_BUTTON_NAME, [&](){ OnPlayButtonPressed(); }, *scene);
     mPlayButton->GetSceneObject()->mShaderFloatUniformValues[strutils::StringId("custom_alpha")] = 1.0f;
     
-    mPlayerController = std::make_unique<PlayerController>(strutils::StringId("entry_map"));
-    
     auto& eventSystem = events::EventSystem::GetInstance();
     mSendNetworkMessageEventListener = eventSystem.RegisterForEvent<events::SendNetworkMessageEvent>([=](const events::SendNetworkMessageEvent& event)
     {
         SendNetworkMessage(event.mMessageJson, event.mMessageType, event.mIsHighPriority);
+    });
+    
+    mMapChangeEventListener = eventSystem.RegisterForEvent<events::MapChangeEvent>([=](const events::MapChangeEvent& event)
+    {
+        OnMapChange(event, true);
+    });
+    
+    mMapSupersessionEventListener = eventSystem.RegisterForEvent<events::MapSupersessionEvent>([=](const events::MapSupersessionEvent& event)
+    {
+        scene->RemoveSceneObject(strutils::StringId(event.mSupersededMapName.GetString() + "_top"));
+        scene->RemoveSceneObject(strutils::StringId(event.mSupersededMapName.GetString() + "_bottom"));
+    });
+    
+    mMapResourcesReadyEventListener = eventSystem.RegisterForEvent<events::MapResourcesReadyEvent>([=](const events::MapResourcesReadyEvent& event)
+    {
+        CreateMapSceneObjects(event.mMapName);
     });
 }
 
@@ -138,6 +138,7 @@ void Game::Update(const float dtMillis)
     InterpolateLocalWorld(dtMillis);
     CheckForStateSending(dtMillis);
     UpdateCamera(dtMillis);
+    mMapResourceController->Update(mPlayerController->GetCurrentMapName());
 }
 
 ///------------------------------------------------------------------------------------------------
@@ -615,6 +616,46 @@ void Game::OnPlayButtonPressed()
     
     // Request login details
     SendNetworkMessage(nlohmann::json(), networking::MessageType::CS_REQUEST_LOGIN, true);
+}
+
+///------------------------------------------------------------------------------------------------
+
+void Game::OnMapChange(const events::MapChangeEvent& mapChangeEvent, const bool shouldLoadNeighbourMapResourcesAsync)
+{
+    mPlayerController->SetNavmapResourceId(mMapResourceController->GetMapResources(mapChangeEvent.mNewMapName).mNavmapImageResourceId);
+}
+
+///------------------------------------------------------------------------------------------------
+
+void Game::CreateMapSceneObjects(const strutils::StringId& mapName)
+{
+    auto& systemsEngine = CoreSystemsEngine::GetInstance();
+    auto scene = systemsEngine.GetSceneManager().FindScene(strutils::StringId("world"));
+    
+    const auto& mapDefinition = GlobalMapDataRepository::GetInstance().GetMapDefinition(mapName);
+    const auto& mapResources = mMapResourceController->GetMapResources(mapName);
+    
+    assert(mapResources.mMapResourcesState == MapResourcesState::LOADED);
+    
+    auto mapBottomLayer = scene->CreateSceneObject(strutils::StringId(mapDefinition.mMapName.GetString()  + "_bottom"));
+    mapBottomLayer->mPosition.x = mapDefinition.mMapPosition.x * game_constants::MAP_RENDERED_SCALE;
+    mapBottomLayer->mPosition.y = mapDefinition.mMapPosition.y * game_constants::MAP_RENDERED_SCALE;
+    mapBottomLayer->mPosition.z = map_constants::TILE_BOTTOM_LAYER_Z;
+    mapBottomLayer->mScale *= game_constants::MAP_RENDERED_SCALE;
+    mapBottomLayer->mTextureResourceId = mapResources.mBottomLayerTextureResourceId;
+    mapBottomLayer->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + "world_map.vs");
+    mapBottomLayer->mShaderFloatUniformValues[strutils::StringId("map_width")] = mapDefinition.mMapDimensions.x;
+    mapBottomLayer->mShaderFloatUniformValues[strutils::StringId("map_height")] = mapDefinition.mMapDimensions.y;
+    
+    auto mapTopLayer = scene->CreateSceneObject(strutils::StringId(mapDefinition.mMapName.GetString()  + "_top"));
+    mapTopLayer->mPosition.x = mapDefinition.mMapPosition.x * game_constants::MAP_RENDERED_SCALE;
+    mapTopLayer->mPosition.y = mapDefinition.mMapPosition.y * game_constants::MAP_RENDERED_SCALE;
+    mapTopLayer->mPosition.z = map_constants::TILE_TOP_LAYER_Z;
+    mapTopLayer->mScale *= game_constants::MAP_RENDERED_SCALE;
+    mapTopLayer->mTextureResourceId = mapResources.mTopLayerTextureResourceId;
+    mapTopLayer->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + "world_map.vs");
+    mapTopLayer->mShaderFloatUniformValues[strutils::StringId("map_width")] = mapDefinition.mMapDimensions.x;
+    mapTopLayer->mShaderFloatUniformValues[strutils::StringId("map_height")] = mapDefinition.mMapDimensions.y;
 }
 
 ///------------------------------------------------------------------------------------------------
