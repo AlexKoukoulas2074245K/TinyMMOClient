@@ -55,7 +55,7 @@
 static const strutils::StringId MAIN_MENU_SCENE = strutils::StringId("main_menu_scene");
 static const strutils::StringId PLAY_BUTTON_NAME = strutils::StringId("play_button");
 static const strutils::StringId NAVMAP_DEBUG_SCENE_OBJECT_NAME = strutils::StringId("navmap_debug");
-static const float ENEMY_SPEED = 0.0002f;
+static const float ENEMY_SPEED = 0.0001f;
 static std::mutex sWorldMutex;
 
 ///------------------------------------------------------------------------------------------------
