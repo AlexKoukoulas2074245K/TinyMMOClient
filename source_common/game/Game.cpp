@@ -215,6 +215,12 @@ void Game::CreateDebugWidgets()
                         ImGui::Text("Speed: %.4f, %.4f", objectData.objectVelocity.x, objectData.objectVelocity.y);
                     } break;
                         
+                    case networking::OBJ_STATE_RETREATING:
+                    {
+                        ImGui::Text("State: Retreating");
+                        ImGui::Text("Speed: %.4f, %.4f", objectData.objectVelocity.x, objectData.objectVelocity.y);
+                    } break;
+                        
                     case networking::OBJ_STATE_DEAD:
                     {
                         ImGui::Text("State: Dead");
@@ -333,6 +339,20 @@ void Game::InterpolateLocalWorld(const float dtMillis)
                     else
                     {
                         npcSceneObject->mPosition = objectData.objectPosition;
+                    }
+                }
+                else if (objectData.objectState == networking::OBJ_STATE_RETREATING)
+                {
+                    auto directionToTarget = objectData.objectPosition - npcSceneObject->mPosition;
+                    auto distanceToTarget = glm::length(directionToTarget);
+
+                    if (distanceToTarget <= 0.0f || distanceToTarget < glm::length(glm::normalize(directionToTarget) * ENEMY_SPEED * dtMillis))
+                    {
+                        npcSceneObject->mPosition = objectData.objectPosition;
+                    }
+                    else
+                    {
+                        npcSceneObject->mPosition += glm::normalize(directionToTarget) * ENEMY_SPEED * dtMillis;
                     }
                 }
             } break;
@@ -590,6 +610,7 @@ void Game::OnServerLoginResponse(const nlohmann::json& responseJson)
         worldObjectData.objectId = loginResponse.playerId;
         worldObjectData.objectName = loginResponse.playerName;
         worldObjectData.objectPosition = loginResponse.playerPosition;
+        worldObjectData.objectCurrentMapName = loginResponse.playerCurrentMapName;
         worldObjectData.color = loginResponse.color;
         worldObjectData.objectType = networking::OBJ_TYPE_PLAYER;
         worldObjectData.objectState = networking::OBJ_STATE_ALIVE;

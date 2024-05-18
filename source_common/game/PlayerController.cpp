@@ -166,6 +166,8 @@ void PlayerController::Update(const float dtMillis, const strutils::StringId& pl
                 playerNameSceneObject->mPosition += objectData.objectVelocity;
 
                 mCurrentMapName = nextMapName;
+                objectData.objectCurrentMapName = nextMapName;
+                
                 events::EventSystem::GetInstance().DispatchEvent<events::MapChangeEvent>(mCurrentMapName);
                 
                 if (scene.FindSceneObject(NAVMAP_DEBUG_SCENE_OBJECT_NAME))
