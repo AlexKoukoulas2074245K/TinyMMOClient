@@ -270,8 +270,8 @@ void Editor::CreateDebugWidgets()
                     
                     auto mapName = fileutils::GetFileNameWithoutExtension(std::string(sMapNameBuffer));
                     fileutils::CreateDirectory(NON_SANDBOXED_MAP_TEXTURES_FOLDER + mapName);
-                    rendering::ExportToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + mapName + "/" + mapName + "_bottom_layer.png", bottomLayerSceneObjects, rendering::BlurStep::DONT_BLUR);
-                    rendering::ExportToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + mapName + "/" + mapName + "_top_layer.png", topLayerSceneObjects, rendering::BlurStep::DONT_BLUR);
+                    rendering::ExportToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + mapName + "/" + mapName + "_bottom_layer.png", "", bottomLayerSceneObjects, rendering::BlurStep::DONT_BLUR);
+                    rendering::ExportToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + mapName + "/" + mapName + "_top_layer.png", "", topLayerSceneObjects, rendering::BlurStep::DONT_BLUR);
                     
                     // Render map navmap texture
                     for (auto y = 0; y < mGridRows; ++y)
@@ -296,7 +296,8 @@ void Editor::CreateDebugWidgets()
                             }
                         }
                     }
-                    rendering::ExportToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + mapName + "/" + mapName + "_navmap.png", bottomLayerSceneObjects, rendering::BlurStep::DONT_BLUR);
+                    
+                    rendering::ExportToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + mapName + "/" + mapName + "_navmap.png", NON_SANDBOXED_NET_ASSETS_NAVMAPS_FOLDER + mapName + "_navmap.png", bottomLayerSceneObjects, rendering::BlurStep::DONT_BLUR);
                     
                     logging::Log(logging::LogType::ERROR, "Successfully saved %s", (NON_SANDBOXED_MAPS_FOLDER + std::string(sMapNameBuffer)).c_str());
                     
@@ -742,8 +743,10 @@ void Editor::CreateDebugWidgets()
         ImGui::SeparatorText("Export");
         if (ImGui::Button("Save Global Map Data"))
         {
+            std::ofstream netAssetsGlobalMapDataFile(NON_SANDBOXED_NET_ASSETS_MAP_GLOBAL_DATA_PATH);
             std::ofstream globalMapDataFile(NON_SANDBOXED_MAP_GLOBAL_DATA_PATH);
-            if (globalMapDataFile.is_open())
+            
+            if (globalMapDataFile.is_open() && netAssetsGlobalMapDataFile.is_open())
             {
                 nlohmann::json globalMapDataJson;
                 
@@ -839,9 +842,12 @@ void Editor::CreateDebugWidgets()
                 globalMapDataJson["map_connections"] = exportedConnectionsJson;
                 globalMapDataJson["map_transforms"] = mapTransformsJson;
                 
-                
+
                 globalMapDataFile << globalMapDataJson.dump(4);
                 globalMapDataFile.close();
+                
+                netAssetsGlobalMapDataFile << globalMapDataJson.dump(4);
+                netAssetsGlobalMapDataFile.close();
             }
             ospopups::ShowInfoMessageBox(ospopups::MessageBoxType::INFO, "Export complete", "Finished exporting global map data.");
             RefreshGlobalMapFilesLambda();

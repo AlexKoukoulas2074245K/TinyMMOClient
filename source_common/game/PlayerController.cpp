@@ -28,6 +28,7 @@
 
 static const strutils::StringId NAVMAP_DEBUG_SCENE_OBJECT_NAME = strutils::StringId("navmap_debug");
 static const float MAP_TRANSITION_THRESHOLD = 0.03f;
+static constexpr int CLIENT_NAVMAP_SIZE = 4096;
 
 ///------------------------------------------------------------------------------------------------
 
@@ -224,9 +225,9 @@ void PlayerController::ShowNavmapDebugView()
     auto navmapSurface = CoreSystemsEngine::GetInstance().GetResourceLoadingService().GetResource<resources::ImageSurfaceResource>(mNavmapResourceId).GetSurface();
     
     GLuint glTextureId; int mode;
-    rendering::CreateGLTextureFromSurface(navmapSurface, glTextureId, mode);
+    rendering::CreateGLTextureFromSurface(navmapSurface, glTextureId, mode, true);
     
-    navmapSceneObject->mTextureResourceId = systemsEngine.GetResourceLoadingService().AddDynamicallyCreatedTextureResourceId("debug_navmap", glTextureId, 4096, 4096);
+    navmapSceneObject->mTextureResourceId = systemsEngine.GetResourceLoadingService().AddDynamicallyCreatedTextureResourceId("debug_navmap", glTextureId, CLIENT_NAVMAP_SIZE, CLIENT_NAVMAP_SIZE);
     navmapSceneObject->mShaderFloatUniformValues[strutils::StringId("custom_alpha")] = 0.5f;
 }
 

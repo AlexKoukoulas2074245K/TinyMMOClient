@@ -20,6 +20,7 @@
 ///------------------------------------------------------------------------------------------------
 
 static constexpr int NEW_TEXTURE_SIZE = 4096;
+static constexpr int DOWNSCALED_NAVMAP_IMAGE_SIZE = 128;
 
 ///------------------------------------------------------------------------------------------------
 
@@ -32,6 +33,12 @@ struct Pixel
 {
     GLubyte r, g, b, a;
 };
+
+// Function to assess whether a path represents a navmap or not
+static bool IsNavmapImage(const std::string& fileName)
+{
+    return strutils::StringEndsWith(fileName, "_navmap.png");
+}
 
 // Function to convert GLubyte array to vector of pixels
 static std::vector<Pixel> ConvertToPixels(GLubyte* pixelData, int width, int height)
@@ -56,6 +63,25 @@ static void ConvertToGLubyte(std::vector<Pixel>& pixels, GLubyte* pixelData, int
         pixelData[i * 4 + 1] = pixels[i].g;
         pixelData[i * 4 + 2] = pixels[i].b;
         pixelData[i * 4 + 3] = pixels[i].a;
+    }
+}
+
+static void DownscaleToNN(const std::vector<Pixel>& original, int originalWidth, int originalHeight, GLubyte* downscaled, int downscaledWidth, int downscaledHeight)
+{
+    int scaleFactor = originalWidth / downscaledWidth;
+
+    for (int y = 0; y < downscaledHeight; ++y)
+    {
+        for (int x = 0; x < downscaledWidth; ++x)
+        {
+            int srcY = y * scaleFactor;
+            int srcX = x * scaleFactor;
+            const Pixel& pixel = original[srcY * originalWidth + srcX];
+            downscaled[(y * downscaledWidth + x) * 4 + 0] = pixel.r;
+            downscaled[(y * downscaledWidth + x) * 4 + 1] = pixel.g;
+            downscaled[(y * downscaledWidth + x) * 4 + 2] = pixel.b;
+            downscaled[(y * downscaledWidth + x) * 4 + 3] = pixel.a;
+        }
     }
 }
 
@@ -141,7 +167,7 @@ static void ApplyGaussianBlur(std::vector<Pixel>& pixels, int width, int height)
 
 ///------------------------------------------------------------------------------------------------
 
-void CreateGLTextureFromSurface(SDL_Surface* surface, GLuint& glTextureId, int& mode)
+void CreateGLTextureFromSurface(SDL_Surface* surface, GLuint& glTextureId, int& mode, const bool nnFiltering)
 {
     GL_CALL(glGenTextures(1, &glTextureId));
     GL_CALL(glBindTexture(GL_TEXTURE_2D, glTextureId));
@@ -172,15 +198,15 @@ void CreateGLTextureFromSurface(SDL_Surface* surface, GLuint& glTextureId, int& 
         surface->pixels
      ));
     
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, nnFiltering ? GL_NEAREST : GL_LINEAR));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, nnFiltering ? GL_NEAREST : GL_LINEAR));
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT));
 }
 
 ///------------------------------------------------------------------------------------------------
 
-void ExportToPNG(const std::string& exportFilePath, std::vector<std::shared_ptr<scene::SceneObject>>& sceneObjects, const BlurStep blurStep)
+void ExportToPNG(const std::string& exportFilePath, const std::string& secondayExportFilePath, std::vector<std::shared_ptr<scene::SceneObject>>& sceneObjects, const BlurStep blurStep)
 {
     GLint oldFrameBuffer;
     GLint oldRenderBuffer;
@@ -260,8 +286,19 @@ void ExportToPNG(const std::string& exportFilePath, std::vector<std::shared_ptr<
             ConvertToGLubyte(pixelVector, pixels, width, height);
         }
         
-        
         stbi_write_png(exportFilePath.c_str(), width, height, 4, pixels, width * 4);
+        
+        // We also write a donwscaled navmap texture for the net assets in the case of navmaps
+        if (IsNavmapImage(exportFilePath))
+        {
+            std::vector<Pixel> pixelVector = ConvertToPixels(pixels, width, height);
+            free(pixels);
+            
+            // Downscale to 64x64
+            pixels = static_cast<GLubyte*>(malloc(sizeof(GLubyte) * DOWNSCALED_NAVMAP_IMAGE_SIZE * DOWNSCALED_NAVMAP_IMAGE_SIZE * 4));
+            DownscaleToNN(pixelVector, width, height, pixels, DOWNSCALED_NAVMAP_IMAGE_SIZE, DOWNSCALED_NAVMAP_IMAGE_SIZE);
+            stbi_write_png(secondayExportFilePath.c_str(), DOWNSCALED_NAVMAP_IMAGE_SIZE, DOWNSCALED_NAVMAP_IMAGE_SIZE, 4, pixels, DOWNSCALED_NAVMAP_IMAGE_SIZE * 4);
+        }
         
         logging::Log(logging::LogType::INFO, "Wrote texture to file %s", exportFilePath.c_str());
         

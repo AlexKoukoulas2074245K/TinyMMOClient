@@ -51,7 +51,7 @@ std::shared_ptr<IResource> TextureLoader::VCreateAndLoadResource(const std::stri
     auto* sdlSurface = surfaceResource.GetSurface();
     
     GLuint glTextureId; int mode;
-    rendering::CreateGLTextureFromSurface(sdlSurface, glTextureId, mode);
+    rendering::CreateGLTextureFromSurface(sdlSurface, glTextureId, mode, false);
     
     const auto surfaceWidth = sdlSurface->w;
     const auto surfaceHeight = sdlSurface->h;

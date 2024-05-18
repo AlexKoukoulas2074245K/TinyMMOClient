@@ -38,11 +38,11 @@ enum class BlurStep
 
 ///------------------------------------------------------------------------------------------------
 
-void CreateGLTextureFromSurface(SDL_Surface* surface, GLuint& glTextureId, int& mode);
+void CreateGLTextureFromSurface(SDL_Surface* surface, GLuint& glTextureId, int& mode, const bool nnFiltering);
 
 ///------------------------------------------------------------------------------------------------
 
-void ExportToPNG(const std::string& exportFilePath, std::vector<std::shared_ptr<scene::SceneObject>>& sceneObjects, const BlurStep blurStep);
+void ExportToPNG(const std::string& exportFilePath, const std::string& secondayExportFilePath, std::vector<std::shared_ptr<scene::SceneObject>>& sceneObjects, const BlurStep blurStep);
 
 ///------------------------------------------------------------------------------------------------
 
