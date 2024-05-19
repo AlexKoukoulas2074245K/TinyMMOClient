@@ -324,39 +324,41 @@ void Game::InterpolateLocalWorld(const float dtMillis)
             case networking::OBJ_TYPE_NPC_ENEMY:
             {
                 auto npcSceneObject = scene->FindSceneObject(strutils::StringId(objectData.objectId));
-                if (objectData.objectState == networking::OBJ_STATE_ALIVE)
-                {
-                    npcSceneObject->mPosition = objectData.objectPosition;
-                }
-                else if (objectData.objectState == networking::OBJ_STATE_CHASING)
-                {
-                    auto playerObjectDataIter = std::find_if(mWorldObjectData.begin(), mWorldObjectData.end(), [&](const networking::WorldObjectData& otherObjectData){ return otherObjectData.objectId == objectData.parentObjectId; });
-                    if (playerObjectDataIter != mWorldObjectData.end() && playerObjectDataIter->objectState == networking::OBJ_STATE_ALIVE)
-                    {
-                        auto& playerObjectData = *playerObjectDataIter;
-                        objectData.objectVelocity = glm::normalize(playerObjectData.objectPosition - npcSceneObject->mPosition) * ENEMY_SPEED;
-                        objectData.objectVelocity.z = 0.0f;
-                        npcSceneObject->mPosition += objectData.objectVelocity * dtMillis;
-                    }
-                    else
-                    {
-                        npcSceneObject->mPosition = objectData.objectPosition;
-                    }
-                }
-                else if (objectData.objectState == networking::OBJ_STATE_RETREATING)
-                {
-                    auto directionToTarget = objectData.objectPosition - npcSceneObject->mPosition;
-                    auto distanceToTarget = glm::length(directionToTarget);
-
-                    if (distanceToTarget <= 0.0f || distanceToTarget < glm::length(glm::normalize(directionToTarget) * ENEMY_SPEED * dtMillis))
-                    {
-                        npcSceneObject->mPosition = objectData.objectPosition;
-                    }
-                    else
-                    {
-                        npcSceneObject->mPosition += glm::normalize(directionToTarget) * ENEMY_SPEED * dtMillis;
-                    }
-                }
+                npcSceneObject->mPosition = objectData.objectPosition;
+                (void)ENEMY_SPEED;
+//                if (objectData.objectState == networking::OBJ_STATE_ALIVE)
+//                {
+//                    npcSceneObject->mPosition = objectData.objectPosition;
+//                }
+//                else if (objectData.objectState == networking::OBJ_STATE_CHASING)
+//                {
+//                    auto playerObjectDataIter = std::find_if(mWorldObjectData.begin(), mWorldObjectData.end(), [&](const networking::WorldObjectData& otherObjectData){ return otherObjectData.objectId == objectData.parentObjectId; });
+//                    if (playerObjectDataIter != mWorldObjectData.end() && playerObjectDataIter->objectState == networking::OBJ_STATE_ALIVE)
+//                    {
+//                        auto& playerObjectData = *playerObjectDataIter;
+//                        objectData.objectVelocity = glm::normalize(playerObjectData.objectPosition - npcSceneObject->mPosition) * ENEMY_SPEED;
+//                        objectData.objectVelocity.z = 0.0f;
+//                        npcSceneObject->mPosition += objectData.objectVelocity * dtMillis;
+//                    }
+//                    else
+//                    {
+//                        npcSceneObject->mPosition = objectData.objectPosition;
+//                    }
+//                }
+//                else if (objectData.objectState == networking::OBJ_STATE_RETREATING)
+//                {
+//                    auto directionToTarget = objectData.objectPosition - npcSceneObject->mPosition;
+//                    auto distanceToTarget = glm::length(directionToTarget);
+//
+//                    if (distanceToTarget <= 0.0f || distanceToTarget < glm::length(glm::normalize(directionToTarget) * ENEMY_SPEED * dtMillis))
+//                    {
+//                        npcSceneObject->mPosition = objectData.objectPosition;
+//                    }
+//                    else
+//                    {
+//                        npcSceneObject->mPosition += glm::normalize(directionToTarget) * ENEMY_SPEED * dtMillis;
+//                    }
+//                }
             } break;
                 
                 
