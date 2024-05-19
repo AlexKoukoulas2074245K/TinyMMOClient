@@ -28,38 +28,7 @@
 
 static const strutils::StringId NAVMAP_DEBUG_SCENE_OBJECT_NAME = strutils::StringId("navmap_debug");
 static const float MAP_TRANSITION_THRESHOLD = 0.03f;
-static constexpr int CLIENT_NAVMAP_SIZE = 4096;
-
-///------------------------------------------------------------------------------------------------
-
-glm::vec4 GetRGBAAt(SDL_Surface* surface, const int x, const int y)
-{
-    Uint8 r,g,b,a;
-    auto pixel = *(Uint32*)((Uint8*)surface->pixels + y * surface->pitch + x * surface->format->BytesPerPixel);
-    SDL_GetRGBA(pixel, surface->format, &r, &g, &b, &a);
-    return glm::vec4(r/255.0f, g/255.0f, b/255.0f, a/255.0f);
-}
-
-///------------------------------------------------------------------------------------------------
-
-map_constants::TileType GetTileType(const glm::vec4& navmapColor)
-{
-    if (navmapColor.a <= 0.0f)
-    {
-        return map_constants::TileType::VOID;
-    }
-    
-    if (navmapColor.r <= 0.0f && navmapColor.g <= 0.0f && navmapColor.b > 0.0f)
-    {
-        return map_constants::TileType::WATER;
-    }
-    else if (navmapColor.r > 0.0f && navmapColor.g > 0.0f && navmapColor.b > 0.0f)
-    {
-        return map_constants::TileType::EMPTY;
-    }
-    
-    return map_constants::TileType::SOLID;
-}
+static constexpr int CLIENT_NAVMAP_IMAGE_SIZE = 4096;
 
 ///------------------------------------------------------------------------------------------------
 
@@ -115,9 +84,7 @@ void PlayerController::Update(const float dtMillis, const strutils::StringId& pl
         
         events::EventSystem::GetInstance().DispatchEvent<events::SendNetworkMessageEvent>(throwRangedWeaponRequest.SerializeToJson(), networking::MessageType::CS_THROW_RANGED_WEAPON, true);
     }
-    
-    auto navmapSurface = CoreSystemsEngine::GetInstance().GetResourceLoadingService().GetResource<resources::ImageSurfaceResource>(mNavmapResourceId).GetSurface();
-    
+
     objectData.objectVelocity = {};
     auto length = glm::length(impulseVector);
     if (length > 0.0f)
@@ -131,11 +98,11 @@ void PlayerController::Update(const float dtMillis, const strutils::StringId& pl
         playerSceneObject->mPosition += objectData.objectVelocity;
         playerNameSceneObject->mPosition += objectData.objectVelocity;
         
-        auto nextNavmapCoords = glm::ivec2(static_cast<int>(((playerSceneObject->mPosition.x - (currentMapDefinition.mMapPosition.x * game_constants::MAP_RENDERED_SCALE))/game_constants::MAP_RENDERED_SCALE + 0.5f) * navmapSurface->w), static_cast<int>((1.0f - ((playerSceneObject->mPosition.y - (currentMapDefinition.mMapPosition.y * game_constants::MAP_RENDERED_SCALE))/game_constants::MAP_RENDERED_SCALE + 0.5f)) * navmapSurface->h));
-        auto nextNavmapColor = GetRGBAAt(navmapSurface, nextNavmapCoords.x, nextNavmapCoords.y);
+        auto nextNavmapCoords = glm::ivec2(static_cast<int>(((playerSceneObject->mPosition.x - (currentMapDefinition.mMapPosition.x * game_constants::MAP_RENDERED_SCALE))/game_constants::MAP_RENDERED_SCALE + 0.5f) * CLIENT_NAVMAP_IMAGE_SIZE), static_cast<int>((1.0f - ((playerSceneObject->mPosition.y - (currentMapDefinition.mMapPosition.y * game_constants::MAP_RENDERED_SCALE))/game_constants::MAP_RENDERED_SCALE + 0.5f)) * CLIENT_NAVMAP_IMAGE_SIZE));
+        auto nextNavmapTileType = mCurrentNavmap->GetNavmapTileAt(nextNavmapCoords);
         
         // Map Transition
-        if (GetTileType(nextNavmapColor) == map_constants::TileType::VOID)
+        if (nextNavmapTileType == networking::NavmapTileType::VOID)
         {
             strutils::StringId nextMapName;
             
@@ -224,12 +191,12 @@ void PlayerController::ShowNavmapDebugView()
     navmapSceneObject->mPosition.z = 15.0f;
     navmapSceneObject->mScale *= game_constants::MAP_RENDERED_SCALE;
     
-    auto navmapSurface = CoreSystemsEngine::GetInstance().GetResourceLoadingService().GetResource<resources::ImageSurfaceResource>(mNavmapResourceId).GetSurface();
+    auto navmapSurface = CoreSystemsEngine::GetInstance().GetResourceLoadingService().GetResource<resources::ImageSurfaceResource>(mCurrentNavmapResourceId).GetSurface();
     
     GLuint glTextureId; int mode;
     rendering::CreateGLTextureFromSurface(navmapSurface, glTextureId, mode, true);
     
-    navmapSceneObject->mTextureResourceId = systemsEngine.GetResourceLoadingService().AddDynamicallyCreatedTextureResourceId("debug_navmap", glTextureId, CLIENT_NAVMAP_SIZE, CLIENT_NAVMAP_SIZE);
+    navmapSceneObject->mTextureResourceId = systemsEngine.GetResourceLoadingService().AddDynamicallyCreatedTextureResourceId("debug_navmap", glTextureId, CLIENT_NAVMAP_IMAGE_SIZE, CLIENT_NAVMAP_IMAGE_SIZE);
     navmapSceneObject->mShaderFloatUniformValues[strutils::StringId("custom_alpha")] = 0.5f;
 }
 
@@ -247,9 +214,10 @@ void PlayerController::HideNavmapDebugView()
 
 ///------------------------------------------------------------------------------------------------
 
-void PlayerController::SetNavmapResourceId(const resources::ResourceId navmapResourceId)
+void PlayerController::SetNavmap(const resources::ResourceId navmapImageResourceId, std::shared_ptr<networking::Navmap> navmap)
 {
-    mNavmapResourceId = navmapResourceId;
+    mCurrentNavmapResourceId = navmapImageResourceId;
+    mCurrentNavmap = navmap;
 }
 
 ///------------------------------------------------------------------------------------------------
@@ -259,29 +227,24 @@ void PlayerController::TerrainCollisionHandlingPostMapChange(networking::WorldOb
     const auto& globalMapDataRepo = GlobalMapDataRepository::GetInstance();
     const auto& currentMapDefinition = globalMapDataRepo.GetMapDefinition(mCurrentMapName);
     
-    auto navmapSurface = CoreSystemsEngine::GetInstance().GetResourceLoadingService().GetResource<resources::ImageSurfaceResource>(mNavmapResourceId).GetSurface();
+    auto nextNavmapCoords = mCurrentNavmap->GetNavmapCoord(playerSceneObject->mPosition, currentMapDefinition.mMapPosition, game_constants::MAP_RENDERED_SCALE);
+    auto nextNavmapTileType = mCurrentNavmap->GetNavmapTileAt(nextNavmapCoords);
     
-    auto nextNavmapCoords = glm::ivec2(static_cast<int>(((playerSceneObject->mPosition.x - (currentMapDefinition.mMapPosition.x * game_constants::MAP_RENDERED_SCALE))/game_constants::MAP_RENDERED_SCALE + 0.5f) * navmapSurface->w), static_cast<int>((1.0f - ((playerSceneObject->mPosition.y - (currentMapDefinition.mMapPosition.y * game_constants::MAP_RENDERED_SCALE))/game_constants::MAP_RENDERED_SCALE + 0.5f)) * navmapSurface->h));
-    auto nextNavmapColor = GetRGBAAt(navmapSurface, nextNavmapCoords.x, nextNavmapCoords.y);
-    
-    if (GetTileType(nextNavmapColor) != map_constants::TileType::EMPTY)
+    if (nextNavmapTileType != networking::NavmapTileType::EMPTY)
     {
         objectData.objectPosition.x -= objectData.objectVelocity.x;
         playerSceneObject->mPosition.x -= objectData.objectVelocity.x;
         playerNameSceneObject->mPosition.x -= objectData.objectVelocity.x;
         
-        nextNavmapCoords = glm::ivec2(static_cast<int>(((playerSceneObject->mPosition.x - (currentMapDefinition.mMapPosition.x * game_constants::MAP_RENDERED_SCALE))/game_constants::MAP_RENDERED_SCALE + 0.5f) * navmapSurface->w), static_cast<int>((1.0f - ((playerSceneObject->mPosition.y - (currentMapDefinition.mMapPosition.y * game_constants::MAP_RENDERED_SCALE))/game_constants::MAP_RENDERED_SCALE + 0.5f)) * navmapSurface->h));
-        nextNavmapColor = GetRGBAAt(navmapSurface, nextNavmapCoords.x, nextNavmapCoords.y);
+        nextNavmapCoords = mCurrentNavmap->GetNavmapCoord(playerSceneObject->mPosition, currentMapDefinition.mMapPosition, game_constants::MAP_RENDERED_SCALE);
+        nextNavmapTileType = mCurrentNavmap->GetNavmapTileAt(nextNavmapCoords);
     }
     
-    if (GetTileType(nextNavmapColor) != map_constants::TileType::EMPTY)
+    if (nextNavmapTileType != networking::NavmapTileType::EMPTY)
     {
         objectData.objectPosition.y -= objectData.objectVelocity.y;
         playerSceneObject->mPosition.y -= objectData.objectVelocity.y;
         playerNameSceneObject->mPosition.y -= objectData.objectVelocity.y;
-        
-        nextNavmapCoords = glm::ivec2(static_cast<int>(((playerSceneObject->mPosition.x - (currentMapDefinition.mMapPosition.x * game_constants::MAP_RENDERED_SCALE))/game_constants::MAP_RENDERED_SCALE + 0.5f) * navmapSurface->w), static_cast<int>((1.0f - ((playerSceneObject->mPosition.y - (currentMapDefinition.mMapPosition.y * game_constants::MAP_RENDERED_SCALE))/game_constants::MAP_RENDERED_SCALE + 0.5f)) * navmapSurface->h));
-        nextNavmapColor = GetRGBAAt(navmapSurface, nextNavmapCoords.x, nextNavmapCoords.y);
     }
 }
 
@@ -292,13 +255,11 @@ void PlayerController::TerrainCollisionHandling(networking::WorldObjectData& obj
     const auto& globalMapDataRepo = GlobalMapDataRepository::GetInstance();
     const auto& currentMapDefinition = globalMapDataRepo.GetMapDefinition(mCurrentMapName);
     
-    auto navmapSurface = CoreSystemsEngine::GetInstance().GetResourceLoadingService().GetResource<resources::ImageSurfaceResource>(mNavmapResourceId).GetSurface();
-    
-    auto nextNavmapCoords = glm::ivec2(static_cast<int>(((playerSceneObject->mPosition.x - (currentMapDefinition.mMapPosition.x * game_constants::MAP_RENDERED_SCALE))/game_constants::MAP_RENDERED_SCALE + 0.5f) * navmapSurface->w), static_cast<int>((1.0f - ((playerSceneObject->mPosition.y - (currentMapDefinition.mMapPosition.y * game_constants::MAP_RENDERED_SCALE))/game_constants::MAP_RENDERED_SCALE + 0.5f)) * navmapSurface->h));
-    auto nextNavmapColor = GetRGBAAt(navmapSurface, nextNavmapCoords.x, nextNavmapCoords.y);
+    auto nextNavmapCoords = mCurrentNavmap->GetNavmapCoord(playerSceneObject->mPosition, currentMapDefinition.mMapPosition, game_constants::MAP_RENDERED_SCALE);
+    auto nextNavmapTileType = mCurrentNavmap->GetNavmapTileAt(nextNavmapCoords);
     
     // Solid
-    if (GetTileType(nextNavmapColor) != map_constants::TileType::EMPTY)
+    if (nextNavmapTileType != networking::NavmapTileType::EMPTY)
     {
         // Backtrack
         objectData.objectPosition -= objectData.objectVelocity;
@@ -318,11 +279,11 @@ void PlayerController::TerrainCollisionHandling(networking::WorldObjectData& obj
             objectData.objectPosition.x += objectData.objectVelocity.x;
             playerSceneObject->mPosition.x += objectData.objectVelocity.x;
             playerNameSceneObject->mPosition.x += objectData.objectVelocity.x;
+
+            auto nextHorizontalNavmapCoords = mCurrentNavmap->GetNavmapCoord(playerSceneObject->mPosition, currentMapDefinition.mMapPosition, game_constants::MAP_RENDERED_SCALE);
+            auto nextHorizontalNavmapTileType = mCurrentNavmap->GetNavmapTileAt(nextHorizontalNavmapCoords);
             
-            auto nextHorizontalNavmapCoords = glm::ivec2(static_cast<int>(((playerSceneObject->mPosition.x - (currentMapDefinition.mMapPosition.x * game_constants::MAP_RENDERED_SCALE))/game_constants::MAP_RENDERED_SCALE + 0.5f) * navmapSurface->w), static_cast<int>((1.0f - ((playerSceneObject->mPosition.y - (currentMapDefinition.mMapPosition.y * game_constants::MAP_RENDERED_SCALE))/game_constants::MAP_RENDERED_SCALE + 0.5f)) * navmapSurface->h));
-            auto nextHorizontalNavmapColor = GetRGBAAt(navmapSurface, nextHorizontalNavmapCoords.x, nextHorizontalNavmapCoords.y);
-            
-            if (GetTileType(nextHorizontalNavmapColor) != map_constants::TileType::EMPTY)
+            if (nextHorizontalNavmapTileType != networking::NavmapTileType::EMPTY)
             {
                 objectData.objectPosition.x -= objectData.objectVelocity.x;
                 playerSceneObject->mPosition.x -= objectData.objectVelocity.x;
@@ -342,10 +303,10 @@ void PlayerController::TerrainCollisionHandling(networking::WorldObjectData& obj
             playerSceneObject->mPosition.y += objectData.objectVelocity.y;
             playerNameSceneObject->mPosition.y += objectData.objectVelocity.y;
             
-            auto nextVerticalNavmapCoords = glm::ivec2(static_cast<int>(((playerSceneObject->mPosition.x - (currentMapDefinition.mMapPosition.x * game_constants::MAP_RENDERED_SCALE))/game_constants::MAP_RENDERED_SCALE + 0.5f) * navmapSurface->w), static_cast<int>((1.0f - ((playerSceneObject->mPosition.y - (currentMapDefinition.mMapPosition.y * game_constants::MAP_RENDERED_SCALE))/game_constants::MAP_RENDERED_SCALE + 0.5f)) * navmapSurface->h));
-            auto nextVerticalNavmapColor = GetRGBAAt(navmapSurface, nextVerticalNavmapCoords.x, nextVerticalNavmapCoords.y);
+            auto nextVerticalNavmapCoords = mCurrentNavmap->GetNavmapCoord(playerSceneObject->mPosition, currentMapDefinition.mMapPosition, game_constants::MAP_RENDERED_SCALE);
+            auto nextVerticalNavmapTileType = mCurrentNavmap->GetNavmapTileAt(nextVerticalNavmapCoords);
                 
-            if (GetTileType(nextVerticalNavmapColor) != map_constants::TileType::EMPTY)
+            if (nextVerticalNavmapTileType != networking::NavmapTileType::EMPTY)
             {
                 objectData.objectPosition.y -= objectData.objectVelocity.y;
                 playerSceneObject->mPosition.y -= objectData.objectVelocity.y;

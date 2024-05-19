@@ -11,12 +11,22 @@
 #include <map/MapResourceController.h>
 #include <engine/CoreSystemsEngine.h>
 #include <engine/resloading/DataFileResource.h>
+#include <engine/resloading/ImageSurfaceResource.h>
 #include <engine/resloading/ResourceLoadingService.h>
 #include <nlohmann/json.hpp>
 
 ///------------------------------------------------------------------------------------------------
 
 static constexpr int MAX_MAP_LOADING_RECURSE_LEVEL = 2;
+static constexpr int CLIENT_NAVMAP_IMAGE_SIZE = 4096;
+
+///------------------------------------------------------------------------------------------------
+
+static std::shared_ptr<networking::Navmap> CreateNavmap(resources::ResourceId navmapImageResourceId)
+{
+    auto surface = CoreSystemsEngine::GetInstance().GetResourceLoadingService().GetResource<resources::ImageSurfaceResource>(navmapImageResourceId).GetSurface();
+    return std::make_shared<networking::Navmap>(static_cast<unsigned char*>(surface->pixels), CLIENT_NAVMAP_IMAGE_SIZE);
+}
 
 ///------------------------------------------------------------------------------------------------
 
@@ -91,6 +101,7 @@ void MapResourceController::Update(const strutils::StringId& currentMapName)
                 resourceService.HasLoadedResource(mapResourceEntry.second.mTopLayerTextureResourceId) &&
                 resourceService.HasLoadedResource(mapResourceEntry.second.mNavmapImageResourceId))
             {
+                mapResourceEntry.second.mNavmap = CreateNavmap(mapResourceEntry.second.mNavmapImageResourceId);
                 mapResourceEntry.second.mMapResourcesState = MapResourcesState::LOADED;
                 events::EventSystem::GetInstance().DispatchEvent<events::MapResourcesReadyEvent>(mapResourceEntry.first);
             }
@@ -137,6 +148,6 @@ void MapResourceController::LoadMapResources(const strutils::StringId& mapName, 
     auto mapBottomLayerTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(mapTexturesPath + "_bottom_layer.png");
     auto mapNavmapTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(mapTexturesPath + "_navmap.png");
     
-    MapResources mapResources = { asyncLoading ? MapResourcesState::PENDING : MapResourcesState::LOADED, mapTopLayerTextureResourceId, mapBottomLayerTextureResourceId, mapNavmapTextureResourceId };
+    MapResources mapResources = { asyncLoading ? MapResourcesState::PENDING : MapResourcesState::LOADED, mapTopLayerTextureResourceId, mapBottomLayerTextureResourceId, mapNavmapTextureResourceId, asyncLoading ? nullptr : CreateNavmap(mapNavmapTextureResourceId) };
     mLoadedMapResourceTree.emplace(std::make_pair(mapName, std::move(mapResources)));
 }

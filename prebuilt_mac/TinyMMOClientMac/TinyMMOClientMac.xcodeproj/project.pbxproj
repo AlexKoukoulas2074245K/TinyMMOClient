@@ -221,7 +221,6 @@
 		92B0F2BC2BEE230700007ABE /* BackgroundMusicPlayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 7F068929D88F95729D0195E3 /* BackgroundMusicPlayer.mm */; };
 		92B0F2BD2BEE230700007ABE /* SoundManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F701DBE1A8A6D1664BEF16A3 /* SoundManager.cpp */; };
 		92B0F2BE2BEE230700007ABE /* SoundManager.h in Sources */ = {isa = PBXBuildFile; fileRef = 7AC3E452BAA560B6D8B1349E /* SoundManager.h */; };
-		92B0F2BF2BEE230700007ABE /* NetworkMessages.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 92B8A5982BE131DD006EC56F /* NetworkMessages.cpp */; };
 		92B0F2C02BEE230700007ABE /* NameGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 92D54EE02BDFA00800DA4EC7 /* NameGenerator.cpp */; };
 		92B0F2C12BEE230700007ABE /* SfxPlayer.h in Sources */ = {isa = PBXBuildFile; fileRef = 3714C4A3B069768E05DD0199 /* SfxPlayer.h */; };
 		92B0F2C22BEE230700007ABE /* SfxPlayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5B33DAF295D4E7E164154510 /* SfxPlayer.mm */; };
@@ -355,7 +354,6 @@
 		92B0F34D2BEE24CB00007ABE /* BackgroundMusicPlayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 7F068929D88F95729D0195E3 /* BackgroundMusicPlayer.mm */; };
 		92B0F34E2BEE24CB00007ABE /* SoundManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F701DBE1A8A6D1664BEF16A3 /* SoundManager.cpp */; };
 		92B0F34F2BEE24CB00007ABE /* SoundManager.h in Sources */ = {isa = PBXBuildFile; fileRef = 7AC3E452BAA560B6D8B1349E /* SoundManager.h */; };
-		92B0F3502BEE24CB00007ABE /* NetworkMessages.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 92B8A5982BE131DD006EC56F /* NetworkMessages.cpp */; };
 		92B0F3512BEE24CB00007ABE /* NameGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 92D54EE02BDFA00800DA4EC7 /* NameGenerator.cpp */; };
 		92B0F3522BEE24CB00007ABE /* SfxPlayer.h in Sources */ = {isa = PBXBuildFile; fileRef = 3714C4A3B069768E05DD0199 /* SfxPlayer.h */; };
 		92B0F3532BEE24CB00007ABE /* SfxPlayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5B33DAF295D4E7E164154510 /* SfxPlayer.mm */; };
@@ -397,7 +395,6 @@
 		92B0F37B2BEE24CB00007ABE /* SDL2_image.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 928B0D4B2B5D7B7E0025DF3F /* SDL2_image.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		92B8A5892BE0F547006EC56F /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 92B8A5832BE0F547006EC56F /* .gitignore */; };
 		92B8A58B2BE0F547006EC56F /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 92B8A5842BE0F547006EC56F /* LICENSE */; };
-		92B8A5992BE131DD006EC56F /* NetworkMessages.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 92B8A5982BE131DD006EC56F /* NetworkMessages.cpp */; };
 		92B8A59F2BE13B00006EC56F /* AnimatedButton.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 92B8A59E2BE13B00006EC56F /* AnimatedButton.cpp */; };
 		92CA97412B65132C00B53B01 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92CA97402B65132B00B53B01 /* StoreKit.framework */; };
 		92D54EE22BDFA00800DA4EC7 /* NameGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 92D54EE02BDFA00800DA4EC7 /* NameGenerator.cpp */; };
@@ -413,7 +410,9 @@
 		A50C73CD4B3C9E1668BFADDD /* SfxPlayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5B33DAF295D4E7E164154510 /* SfxPlayer.mm */; };
 		A7B97E4491771F3812AD0124 /* ParticleManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 14207B709EC0713AAB9C29C8 /* ParticleManager.cpp */; };
 		A7F6660842E49F6EF52434CA /* PlaceTileCommand.h in Sources */ = {isa = PBXBuildFile; fileRef = 25E63A3AC781F75E7ADB7B74 /* PlaceTileCommand.h */; };
+		AE93368B167B703ACA57853B /* Navmap.h in Sources */ = {isa = PBXBuildFile; fileRef = 2FA9719D8A203833CB1139D8 /* Navmap.h */; };
 		AEBAABE4C4BC0F6D887BFBCB /* ImageSurfaceLoader.h in Sources */ = {isa = PBXBuildFile; fileRef = D979EC9B74F12857F47E4007 /* ImageSurfaceLoader.h */; };
+		B0D0C129C2A7A66C9A1BB8B1 /* Navmap.h in Sources */ = {isa = PBXBuildFile; fileRef = 2FA9719D8A203833CB1139D8 /* Navmap.h */; };
 		B84BE22378D028B49AEB70B5 /* PlayerController.h in Sources */ = {isa = PBXBuildFile; fileRef = CDAECE46D2C1D56818BF9C25 /* PlayerController.h */; };
 		B8E5A8B09C9A4DCA4FC7A63D /* PlayerController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9B9CF9DA5EFB4BD4C1DCC528 /* PlayerController.cpp */; };
 		BC81826A579566F5CA5790E9 /* BaseDataFileDeserializer.h in Sources */ = {isa = PBXBuildFile; fileRef = 8D6E209DDF4F577F8C87C6A0 /* BaseDataFileDeserializer.h */; };
@@ -432,6 +431,7 @@
 		CA9897BC57F466630194BFE8 /* MeshResource.h in Sources */ = {isa = PBXBuildFile; fileRef = 88B55A70915E2429F0F03C71 /* MeshResource.h */; };
 		CB1B337E51727F74A3851A0E /* BackgroundMusicPlayer.h in Sources */ = {isa = PBXBuildFile; fileRef = 9A0A1CFEB31EB9D7990F0B4B /* BackgroundMusicPlayer.h */; };
 		CCE13A87F90CB8EB69073CD1 /* FileUtils.h in Sources */ = {isa = PBXBuildFile; fileRef = 0D09AB023B7A329D725F2F2F /* FileUtils.h */; };
+		D0FB8FE94DA4EB875BE0ADD5 /* Navmap.h in Sources */ = {isa = PBXBuildFile; fileRef = 2FA9719D8A203833CB1139D8 /* Navmap.h */; };
 		D21664D760A3220A78231910 /* Logging.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3BF946C1B449BB4FE7DF288A /* Logging.cpp */; };
 		D44276B3AAC7224FC2221FC6 /* ImageSurfaceResource.h in Sources */ = {isa = PBXBuildFile; fileRef = CAEF02928D06B177B1091C5F /* ImageSurfaceResource.h */; };
 		D5D233B536F12C82833E37AB /* MapConstants.h in Sources */ = {isa = PBXBuildFile; fileRef = BB91C0E56FB07D250ED0D766 /* MapConstants.h */; };
@@ -512,6 +512,7 @@
 		221289B3E3FA84B55F4C25E2 /* SceneManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = SceneManager.h; sourceTree = "<group>"; };
 		255CBE3395586957104E385D /* ShaderLoader.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = ShaderLoader.cpp; sourceTree = "<group>"; };
 		25E63A3AC781F75E7ADB7B74 /* PlaceTileCommand.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = PlaceTileCommand.h; sourceTree = "<group>"; };
+		2FA9719D8A203833CB1139D8 /* Navmap.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = Navmap.h; path = Navmap.h; sourceTree = "<group>"; };
 		30D02CEC6861EBD7441E2004 /* BaseDataFileSerializer.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = BaseDataFileSerializer.h; sourceTree = "<group>"; };
 		3199A38C1A16A070A579BAB4 /* ParticleManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = ParticleManager.h; sourceTree = "<group>"; };
 		3714C4A3B069768E05DD0199 /* SfxPlayer.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = SfxPlayer.h; sourceTree = "<group>"; };
@@ -622,7 +623,6 @@
 		92B0F3802BEE24CB00007ABE /* TinyMMOClientMac copy2-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "TinyMMOClientMac copy2-Info.plist"; path = "/Users/Code/TinyMMOClient/prebuilt_mac/TinyMMOClientMac/TinyMMOClientMac copy2-Info.plist"; sourceTree = "<absolute>"; };
 		92B8A5832BE0F547006EC56F /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		92B8A5842BE0F547006EC56F /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
-		92B8A5982BE131DD006EC56F /* NetworkMessages.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = NetworkMessages.cpp; sourceTree = "<group>"; };
 		92B8A59D2BE13B00006EC56F /* AnimatedButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AnimatedButton.h; sourceTree = "<group>"; };
 		92B8A59E2BE13B00006EC56F /* AnimatedButton.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AnimatedButton.cpp; sourceTree = "<group>"; };
 		92CA97402B65132B00B53B01 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
@@ -1203,9 +1203,9 @@
 				A7F720915E74A51C6579763C /* SerializableNetworkObjects.h */,
 				BE806858C85634D9FB14B857 /* NetworkObjectDefinitions.inc */,
 				83294548BB5AEF7EB30C76DC /* NetworkMessages.h */,
-				92B8A5982BE131DD006EC56F /* NetworkMessages.cpp */,
 				4230154D7A5B45B2288322EE /* WorldObjectTypes.h */,
 				BA4AC24CD1BEEBF435E7CA14 /* WorldObjectStates.h */,
+				2FA9719D8A203833CB1139D8 /* Navmap.h */,
 			);
 			path = net_common;
 			sourceTree = "<group>";
@@ -1495,7 +1495,6 @@
 				005DDF1CA71A424F880BFF85 /* BackgroundMusicPlayer.mm in Sources */,
 				7A14147B43076FC43E6D5662 /* SoundManager.cpp in Sources */,
 				69A3B6CA894565C4F51E1123 /* SoundManager.h in Sources */,
-				92B8A5992BE131DD006EC56F /* NetworkMessages.cpp in Sources */,
 				92D54EE22BDFA00800DA4EC7 /* NameGenerator.cpp in Sources */,
 				2CCF496499DF11B16C0F2C43 /* SfxPlayer.h in Sources */,
 				A50C73CD4B3C9E1668BFADDD /* SfxPlayer.mm in Sources */,
@@ -1521,6 +1520,7 @@
 				75EE2B0108F81C433874AA35 /* MapResourceController.cpp in Sources */,
 				C33700656B3EA0082E0A9289 /* MapResourceController.h in Sources */,
 				FFC2DBB68CE0D48497767EEC /* Logging.cpp in Sources */,
+				AE93368B167B703ACA57853B /* Navmap.h in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1622,7 +1622,6 @@
 				92B0F2BC2BEE230700007ABE /* BackgroundMusicPlayer.mm in Sources */,
 				92B0F2BD2BEE230700007ABE /* SoundManager.cpp in Sources */,
 				92B0F2BE2BEE230700007ABE /* SoundManager.h in Sources */,
-				92B0F2BF2BEE230700007ABE /* NetworkMessages.cpp in Sources */,
 				92B0F2C02BEE230700007ABE /* NameGenerator.cpp in Sources */,
 				92B0F2C12BEE230700007ABE /* SfxPlayer.h in Sources */,
 				92B0F2C22BEE230700007ABE /* SfxPlayer.mm in Sources */,
@@ -1648,6 +1647,7 @@
 				9667A0C8E210F70AFD042027 /* MapResourceController.cpp in Sources */,
 				5796621A511BC4A566D8EE1B /* MapResourceController.h in Sources */,
 				D21664D760A3220A78231910 /* Logging.cpp in Sources */,
+				B0D0C129C2A7A66C9A1BB8B1 /* Navmap.h in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1749,7 +1749,6 @@
 				92B0F34D2BEE24CB00007ABE /* BackgroundMusicPlayer.mm in Sources */,
 				92B0F34E2BEE24CB00007ABE /* SoundManager.cpp in Sources */,
 				92B0F34F2BEE24CB00007ABE /* SoundManager.h in Sources */,
-				92B0F3502BEE24CB00007ABE /* NetworkMessages.cpp in Sources */,
 				92B0F3512BEE24CB00007ABE /* NameGenerator.cpp in Sources */,
 				92B0F3522BEE24CB00007ABE /* SfxPlayer.h in Sources */,
 				92B0F3532BEE24CB00007ABE /* SfxPlayer.mm in Sources */,
@@ -1775,6 +1774,7 @@
 				F6CDB708C135B3C4D6D0AFDD /* MapResourceController.cpp in Sources */,
 				1AB824A861C9720DB76855EE /* MapResourceController.h in Sources */,
 				55A949B09D185B35C8B0D135 /* Logging.cpp in Sources */,
+				D0FB8FE94DA4EB875BE0ADD5 /* Navmap.h in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

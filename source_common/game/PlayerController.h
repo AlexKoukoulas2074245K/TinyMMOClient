@@ -14,6 +14,7 @@
 #include <engine/utils/MathUtils.h>
 #include <engine/utils/StringUtils.h>
 #include <engine/resloading/ResourceLoadingService.h>
+#include <net_common/Navmap.h>
 
 ///------------------------------------------------------------------------------------------------
 
@@ -35,12 +36,13 @@ public:
     void CreateDebugWidgets();
     void ShowNavmapDebugView();
     void HideNavmapDebugView();
-    void SetNavmapResourceId(const resources::ResourceId navmapResourceId);
+    void SetNavmap(const resources::ResourceId navmapImageResourceId, std::shared_ptr<networking::Navmap> navmap);
     void TerrainCollisionHandlingPostMapChange(networking::WorldObjectData& objectData, std::shared_ptr<scene::SceneObject> playerSceneObject, std::shared_ptr<scene::SceneObject> playerNameSceneObject, glm::vec3 impulseVector, const float dtMillis);
     void TerrainCollisionHandling(networking::WorldObjectData& objectData, std::shared_ptr<scene::SceneObject> playerSceneObject, std::shared_ptr<scene::SceneObject> playerNameSceneObject, glm::vec3 impulseVector, const float dtMillis);
 private:
     strutils::StringId mCurrentMapName;
-    resources::ResourceId mNavmapResourceId;
+    std::shared_ptr<networking::Navmap> mCurrentNavmap;
+    resources::ResourceId mCurrentNavmapResourceId;
 };
 
 ///------------------------------------------------------------------------------------------------

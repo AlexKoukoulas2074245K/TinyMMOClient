@@ -93,7 +93,9 @@ void Game::Init()
     GlobalMapDataRepository::GetInstance().LoadMapDefinitions();
     mMapResourceController = std::make_unique<MapResourceController>(strutils::StringId("entry_map"));
     mPlayerController = std::make_unique<PlayerController>(strutils::StringId("entry_map"));
-    mPlayerController->SetNavmapResourceId(mMapResourceController->GetMapResources(strutils::StringId("entry_map")).mNavmapImageResourceId);
+    
+    const auto& mapResources = mMapResourceController->GetMapResources(strutils::StringId("entry_map"));
+    mPlayerController->SetNavmap(mapResources.mNavmapImageResourceId, mapResources.mNavmap);
     
     auto loadedMapResources = mMapResourceController->GetAllLoadedMapResources();
     
@@ -643,7 +645,8 @@ void Game::OnPlayButtonPressed()
 
 void Game::OnMapChange(const events::MapChangeEvent& mapChangeEvent, const bool shouldLoadNeighbourMapResourcesAsync)
 {
-    mPlayerController->SetNavmapResourceId(mMapResourceController->GetMapResources(mapChangeEvent.mNewMapName).mNavmapImageResourceId);
+    const auto& mapResources = mMapResourceController->GetMapResources(mapChangeEvent.mNewMapName);
+    mPlayerController->SetNavmap(mapResources.mNavmapImageResourceId, mapResources.mNavmap);
 }
 
 ///------------------------------------------------------------------------------------------------

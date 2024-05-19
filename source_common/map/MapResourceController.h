@@ -11,7 +11,9 @@
 ///------------------------------------------------------------------------------------------------
 
 #include <engine/resloading/ResourceLoadingService.h>
+#include <memory>
 #include <mutex>
+#include <net_common/Navmap.h>
 #include <unordered_map>
 
 ///------------------------------------------------------------------------------------------------
@@ -31,6 +33,7 @@ struct MapResources
     resources::ResourceId mTopLayerTextureResourceId = 0;
     resources::ResourceId mBottomLayerTextureResourceId = 0;
     resources::ResourceId mNavmapImageResourceId = 0;
+    std::shared_ptr<networking::Navmap> mNavmap = nullptr;
 };
 
 ///------------------------------------------------------------------------------------------------
