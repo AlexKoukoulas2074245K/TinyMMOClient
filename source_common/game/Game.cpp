@@ -292,6 +292,11 @@ void Game::InterpolateLocalWorld(const float dtMillis)
                 auto playerSceneObject = scene->FindSceneObject(strutils::StringId(objectData.objectId));
                 auto playerNameSceneObject = scene->FindSceneObject(strutils::StringId(std::to_string(objectData.objectId) + "_name"));
                 
+                if (!playerSceneObject || !playerNameSceneObject)
+                {
+                    continue;
+                }
+                
                 if (objectData.isLocal)
                 {
                     mPlayerController->Update(dtMillis, strutils::StringId(objectData.objectId), objectData, *scene);
@@ -324,28 +329,12 @@ void Game::InterpolateLocalWorld(const float dtMillis)
             case networking::OBJ_TYPE_NPC_ENEMY:
             {
                 auto npcSceneObject = scene->FindSceneObject(strutils::StringId(objectData.objectId));
-                npcSceneObject->mPosition = objectData.objectPosition;
-                (void)ENEMY_SPEED;
 //                if (objectData.objectState == networking::OBJ_STATE_ALIVE)
 //                {
-//                    npcSceneObject->mPosition = objectData.objectPosition;
+                    npcSceneObject->mPosition = objectData.objectPosition;
+                (void)ENEMY_SPEED;
 //                }
-//                else if (objectData.objectState == networking::OBJ_STATE_CHASING)
-//                {
-//                    auto playerObjectDataIter = std::find_if(mWorldObjectData.begin(), mWorldObjectData.end(), [&](const networking::WorldObjectData& otherObjectData){ return otherObjectData.objectId == objectData.parentObjectId; });
-//                    if (playerObjectDataIter != mWorldObjectData.end() && playerObjectDataIter->objectState == networking::OBJ_STATE_ALIVE)
-//                    {
-//                        auto& playerObjectData = *playerObjectDataIter;
-//                        objectData.objectVelocity = glm::normalize(playerObjectData.objectPosition - npcSceneObject->mPosition) * ENEMY_SPEED;
-//                        objectData.objectVelocity.z = 0.0f;
-//                        npcSceneObject->mPosition += objectData.objectVelocity * dtMillis;
-//                    }
-//                    else
-//                    {
-//                        npcSceneObject->mPosition = objectData.objectPosition;
-//                    }
-//                }
-//                else if (objectData.objectState == networking::OBJ_STATE_RETREATING)
+//                else
 //                {
 //                    auto directionToTarget = objectData.objectPosition - npcSceneObject->mPosition;
 //                    auto distanceToTarget = glm::length(directionToTarget);
@@ -358,7 +347,9 @@ void Game::InterpolateLocalWorld(const float dtMillis)
 //                    {
 //                        npcSceneObject->mPosition += glm::normalize(directionToTarget) * ENEMY_SPEED * dtMillis;
 //                    }
+//
 //                }
+                
             } break;
                 
                 

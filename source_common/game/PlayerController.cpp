@@ -193,7 +193,7 @@ void PlayerController::ShowNavmapDebugView()
     auto navmapSurface = CoreSystemsEngine::GetInstance().GetResourceLoadingService().GetResource<resources::ImageSurfaceResource>(mCurrentNavmapResourceId).GetSurface();
     
     GLuint glTextureId; int mode;
-    rendering::CreateGLTextureFromSurface(navmapSurface, glTextureId, mode, false);
+    rendering::CreateGLTextureFromSurface(navmapSurface, glTextureId, mode, true);
     
     navmapSceneObject->mTextureResourceId = systemsEngine.GetResourceLoadingService().AddDynamicallyCreatedTextureResourceId("debug_navmap", glTextureId, map_constants::CLIENT_NAVMAP_IMAGE_SIZE, map_constants::CLIENT_NAVMAP_IMAGE_SIZE);
     navmapSceneObject->mShaderFloatUniformValues[strutils::StringId("custom_alpha")] = 0.5f;

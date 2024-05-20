@@ -250,8 +250,13 @@ void Editor::CreateDebugWidgets()
                     outputMapJsonFile.close();
                     
                     // Render map textures
-                    std::vector<std::shared_ptr<scene::SceneObject>> bottomLayerSceneObjects;
-                    std::vector<std::shared_ptr<scene::SceneObject>> topLayerSceneObjects;
+                    std::vector<unsigned char> topLayerPixels(map_constants::CLIENT_WORLD_MAP_IMAGE_SIZE * map_constants::CLIENT_WORLD_MAP_IMAGE_SIZE * 4);
+                    std::vector<unsigned char> botLayerPixels(map_constants::CLIENT_WORLD_MAP_IMAGE_SIZE * map_constants::CLIENT_WORLD_MAP_IMAGE_SIZE * 4);
+                    
+                    auto colOffset = (MAX_GRID_COLS - mGridCols)/2;
+                    auto rowOffset = (MAX_GRID_ROWS - mGridRows)/2;
+                    
+                    std::unordered_map<std::string, SDL_Surface*> cachedTileImages;
                     
                     for (auto y = 0; y < mGridRows; ++y)
                     {
@@ -260,44 +265,71 @@ void Editor::CreateDebugWidgets()
                             auto bottomLayerTileSceneObject = scene->FindSceneObject(strutils::StringId(std::to_string(x) + "," + std::to_string(y)));
                             auto topLayerTileSceneObject = scene->FindSceneObject(strutils::StringId(std::to_string(x) + "," + std::to_string(y) + "_top"));
                             
-                            bottomLayerTileSceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 1.0f;
-                            topLayerTileSceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 1.0f;
+                            auto botTileTexturePath = systemsEngine.GetResourceLoadingService().GetResourcePath(bottomLayerTileSceneObject->mTextureResourceId);
+                            auto topTileTexturePath = systemsEngine.GetResourceLoadingService().GetResourcePath(topLayerTileSceneObject->mTextureResourceId);
                             
-                            bottomLayerSceneObjects.push_back(bottomLayerTileSceneObject);
-                            topLayerSceneObjects.push_back(topLayerTileSceneObject);
+                            SDL_Surface* topTileSurface = cachedTileImages.contains(topTileTexturePath) ? cachedTileImages.at(topTileTexturePath) : IMG_Load((resources::ResourceLoadingService::RES_ROOT + topTileTexturePath).c_str());
+                            SDL_Surface* botTileSurface = cachedTileImages.contains(botTileTexturePath) ? cachedTileImages.at(botTileTexturePath) : IMG_Load((resources::ResourceLoadingService::RES_ROOT + botTileTexturePath).c_str());
+                            
+                            cachedTileImages[topTileTexturePath] = topTileSurface;
+                            cachedTileImages[botTileTexturePath] = botTileSurface;
+                            
+                            auto RenderTileOnSurface = [](SDL_Surface* surface, unsigned char* pixels, int x, int y, int colOffset, int rowOffset)
+                            {
+                                SDL_LockSurface(surface);
+                                for (auto tileImageY = 0; tileImageY < surface->h; ++tileImageY)
+                                {
+                                    for (auto tileImageX = 0; tileImageX < surface->w; ++tileImageX)
+                                    {
+                                        Uint8 r,g,b,a;
+                                        auto pixel = *(Uint32*)((Uint8*)surface->pixels + tileImageY * surface->pitch + tileImageX * surface->format->BytesPerPixel);
+                                        SDL_GetRGBA(pixel, surface->format, &r, &g, &b, &a);
+                                        
+                                        pixels[(((y + rowOffset) * 64 + tileImageY) * map_constants::CLIENT_WORLD_MAP_IMAGE_SIZE * 4) + ((x + colOffset) * 64 + tileImageX) * 4 + 0] = r;
+                                        pixels[(((y + rowOffset) * 64 + tileImageY) * map_constants::CLIENT_WORLD_MAP_IMAGE_SIZE * 4) + ((x + colOffset) * 64 + tileImageX) * 4 + 1] = g;
+                                        pixels[(((y + rowOffset) * 64 + tileImageY) * map_constants::CLIENT_WORLD_MAP_IMAGE_SIZE * 4) + ((x + colOffset) * 64 + tileImageX) * 4 + 2] = b;
+                                        pixels[(((y + rowOffset) * 64 + tileImageY) * map_constants::CLIENT_WORLD_MAP_IMAGE_SIZE * 4) + ((x + colOffset) * 64 + tileImageX) * 4 + 3] = a;
+                                    }
+                                }
+                                SDL_UnlockSurface(surface);
+                            };
+                            
+                            RenderTileOnSurface(topTileSurface, &topLayerPixels[0], x, y, colOffset, rowOffset);
+                            RenderTileOnSurface(botTileSurface, &botLayerPixels[0], x, y, colOffset, rowOffset);
                         }
                     }
+                    
+                    for (const auto& cachedTileImageEntry: cachedTileImages)
+                    {
+                        SDL_FreeSurface(cachedTileImageEntry.second);
+                    }
+                    cachedTileImages.clear();
                     
                     auto mapName = fileutils::GetFileNameWithoutExtension(std::string(sMapNameBuffer));
                     fileutils::CreateDirectory(NON_SANDBOXED_MAP_TEXTURES_FOLDER + mapName);
-                    rendering::ExportToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + mapName + "/" + mapName + "_bottom_layer.png", "", bottomLayerSceneObjects, rendering::BlurStep::DONT_BLUR);
-                    rendering::ExportToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + mapName + "/" + mapName + "_top_layer.png", "", topLayerSceneObjects, rendering::BlurStep::DONT_BLUR);
+                    rendering::ExportPixelsToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + mapName + "/" + mapName + "_bottom_layer.png", &botLayerPixels[0], map_constants::CLIENT_WORLD_MAP_IMAGE_SIZE);
+                    rendering::ExportPixelsToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + mapName + "/" + mapName + "_top_layer.png", &topLayerPixels[0], map_constants::CLIENT_WORLD_MAP_IMAGE_SIZE);
                     
                     // Render map navmap texture
+                    unsigned char navmapPixels[map_constants::CLIENT_NAVMAP_IMAGE_SIZE * map_constants::CLIENT_NAVMAP_IMAGE_SIZE * 4] = { 0 };
+                    
                     for (auto y = 0; y < mGridRows; ++y)
                     {
-                        nlohmann::json rowJson;
                         for (auto x = 0; x < mGridCols; ++x)
                         {
-                            {
-                                auto bottomLayerTileSceneObject = scene->FindSceneObject(strutils::StringId(std::to_string(x) + "," + std::to_string(y)));
-                                auto tileTextureResourcePath = fileutils::GetFileName(systemsEngine.GetResourceLoadingService().GetResourcePath(bottomLayerTileSceneObject->mTextureResourceId));
-                                
-                                bottomLayerTileSceneObject->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + WORLD_MAP_TILE_NAVMAP_GEN_SHADER);
-                                bottomLayerTileSceneObject->mShaderVec3UniformValues[NAVMAP_TILE_COLOR_UNIFORM_NAME] = SPECIAL_NAVMAP_TILES_TO_COLORS.count(tileTextureResourcePath) ? SPECIAL_NAVMAP_TILES_TO_COLORS.at(tileTextureResourcePath) : EMPTY_NAVMAP_TILE_COLOR;
-                            }
+                            auto bottomLayerTileSceneObject = scene->FindSceneObject(strutils::StringId(std::to_string(x) + "," + std::to_string(y)));
+                            auto tileTextureResourcePath = fileutils::GetFileName(systemsEngine.GetResourceLoadingService().GetResourcePath(bottomLayerTileSceneObject->mTextureResourceId));
+                            auto navmapTileTypeColor = networking::GetColorFromNavmapTileType(TILE_TEXTURES_TO_NAVMAP_TILE_TYPES.count(tileTextureResourcePath) ? TILE_TEXTURES_TO_NAVMAP_TILE_TYPES.at(tileTextureResourcePath) : networking::NavmapTileType::EMPTY);
                             
-                            {
-                                auto topLayerTileSceneObject = scene->FindSceneObject(strutils::StringId(std::to_string(x) + "," + std::to_string(y) + "_top"));
-                                auto tileTextureResourcePath = fileutils::GetFileName(systemsEngine.GetResourceLoadingService().GetResourcePath(topLayerTileSceneObject->mTextureResourceId));
-                                
-                                topLayerTileSceneObject->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + WORLD_MAP_TILE_NAVMAP_GEN_SHADER);
-                                topLayerTileSceneObject->mShaderVec3UniformValues[NAVMAP_TILE_COLOR_UNIFORM_NAME] = SPECIAL_NAVMAP_TILES_TO_COLORS.count(tileTextureResourcePath) ? SPECIAL_NAVMAP_TILES_TO_COLORS.at(tileTextureResourcePath) : EMPTY_NAVMAP_TILE_COLOR;
-                            }
+                            navmapPixels[((y + rowOffset) * map_constants::CLIENT_NAVMAP_IMAGE_SIZE * 4) + (x + colOffset) * 4 + 0] = navmapTileTypeColor.r;
+                            navmapPixels[((y + rowOffset) * map_constants::CLIENT_NAVMAP_IMAGE_SIZE * 4) + (x + colOffset) * 4 + 1] = navmapTileTypeColor.g;
+                            navmapPixels[((y + rowOffset) * map_constants::CLIENT_NAVMAP_IMAGE_SIZE * 4) + (x + colOffset) * 4 + 2] = navmapTileTypeColor.b;
+                            navmapPixels[((y + rowOffset) * map_constants::CLIENT_NAVMAP_IMAGE_SIZE * 4) + (x + colOffset) * 4 + 3] = navmapTileTypeColor.a;
                         }
                     }
-                    
-                    rendering::ExportToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + mapName + "/" + mapName + "_navmap.png", NON_SANDBOXED_NET_ASSETS_NAVMAPS_FOLDER + mapName + "_navmap.png", bottomLayerSceneObjects, rendering::BlurStep::DONT_BLUR);
+        
+                    rendering::ExportPixelsToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + mapName + "/" + mapName + "_navmap.png", navmapPixels, map_constants::CLIENT_NAVMAP_IMAGE_SIZE);
+                    rendering::ExportPixelsToPNG(NON_SANDBOXED_NET_ASSETS_NAVMAPS_FOLDER + mapName + "_navmap.png", navmapPixels, map_constants::CLIENT_NAVMAP_IMAGE_SIZE);
                     
                     logging::Log(logging::LogType::ERROR, "Successfully saved %s", (NON_SANDBOXED_MAPS_FOLDER + std::string(sMapNameBuffer)).c_str());
                     
@@ -480,8 +512,6 @@ void Editor::CreateDebugWidgets()
                             sideRefImageSceneObject->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(sideRefImagePath, resources::ResourceReloadMode::DONT_RELOAD, resources::ResourceLoadingPathType::ABSOLUTE);
                             
                             sideRefImageSceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 0.5f;
-                            sideRefImageSceneObject->mPosition.x = -0.013f;
-                            sideRefImageSceneObject->mPosition.y = 0.0115f;
                             sideRefImageSceneObject->mPosition.z = map_constants::TILE_TOP_LAYER_Z;
                             
                             if (&sideImageRefIndex == &mTopImageRefIndex)
@@ -489,7 +519,7 @@ void Editor::CreateDebugWidgets()
                                 sideRefImageSceneObject->mPosition.y += (mGridRows * TILE_DEFAULT_SCALE.y)/2.0f + sMapTextureNamesToDimensions.at(sOtherMapTextures.at(sideImageRefIndex)).y/2.0f;
                                 sideRefImageSceneObject->mPosition.z += 0.1f;
                             }
-                            else if (&sideImageRefIndex == &mRightImageRefIndex)
+                            if (&sideImageRefIndex == &mRightImageRefIndex)
                             {
                                 sideRefImageSceneObject->mPosition.x += (mGridCols * TILE_DEFAULT_SCALE.x)/2.0f + sMapTextureNamesToDimensions.at(sOtherMapTextures.at(sideImageRefIndex)).x/2.0f;
                                 sideRefImageSceneObject->mPosition.z += 0.2f;
@@ -522,9 +552,6 @@ void Editor::CreateDebugWidgets()
         ImageRefComboLambda("RightRef", mRightImageRefIndex);
         ImageRefComboLambda("BottomRef", mBottomImageRefIndex);
         ImageRefComboLambda("LeftRef", mLeftImageRefIndex);
-        
-        ImGui::SeparatorText("Render Options");
-        ImGui::Checkbox("Render Tile Connectors", &mViewOptions.mRenderConnectorTiles);
         
         ImGui::End();
     }
@@ -841,7 +868,6 @@ void Editor::CreateDebugWidgets()
                 
                 globalMapDataJson["map_connections"] = exportedConnectionsJson;
                 globalMapDataJson["map_transforms"] = mapTransformsJson;
-                
 
                 globalMapDataFile << globalMapDataJson.dump(4);
                 globalMapDataFile.close();

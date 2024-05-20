@@ -58,7 +58,6 @@ private:
     
     struct ViewOptions
     {
-        bool mRenderConnectorTiles = true;
         float mCameraZoom = 0.0f;
         glm::vec3 mCameraPosition;
     };

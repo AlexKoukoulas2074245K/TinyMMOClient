@@ -31,7 +31,9 @@
 #include <fstream>
 #include <editor/Editor.h>
 #include <imgui/imgui.h>
+#include <net_common/Navmap.h>
 #include <mutex>
+#include <SDL_image.h>
 
 #if defined(MACOS) || defined(MOBILE_FLOW)
 #include <platform_utilities/AppleUtils.h>
@@ -42,7 +44,6 @@
 ///------------------------------------------------------------------------------------------------
 
 static const strutils::StringId EDITOR_SCENE = strutils::StringId("editor_scene");
-static const strutils::StringId TILE_CONNECTOR_TYPE_UNIFORM_NAME = strutils::StringId("connector_type");
 static const strutils::StringId CUSTOM_ALPHA_UNIFORM_NAME = strutils::StringId("custom_alpha");
 static const strutils::StringId TILE_HIGHLIGHTED_UNIFORM_NAME = strutils::StringId("highlighted");
 static const strutils::StringId NAVMAP_TILE_COLOR_UNIFORM_NAME = strutils::StringId("navmap_tile_color");
@@ -61,12 +62,6 @@ static const std::string MAP_FILES_FOLDER = "world/maps/";
 static const std::string TILES_FOLDER = "world/map_tiles/";
 static const std::string ZERO_BLANK_TILE_FILE_NAME = "0_blank.png";
 static const std::string ZERO_BLANK_TRANSPARENT_TILE_FILE_NAME = "0_blank_transparent.png";
-static const std::string ZERO_TOPLEFT_CONNECTOR_TILE_FILE_NAME = "0_topleft_connector.png";
-static const std::string ZERO_TOPRIGHT_CONNECTOR_TILE_FILE_NAME = "0_topright_connector.png";
-static const std::string ZERO_BOTRIGHT_CONNECTOR_TILE_FILE_NAME = "0_botright_connector.png";
-static const std::string ZERO_BOTLEFT_CONNECTOR_TILE_FILE_NAME = "0_botleft_connector.png";
-static const std::string ZERO_HOR_CONNECTOR_TILE_FILE_NAME = "0_hor_connector.png";
-static const std::string ZERO_VER_CONNECTOR_TILE_FILE_NAME = "0_ver_connector.png";
 static const std::string WORLD_MAP_TILE_SHADER = "world_map_tile.vs";
 static const std::string WORLD_MAP_TILE_NAVMAP_GEN_SHADER = "world_map_tile_navmap_gen.vs";
 
@@ -75,30 +70,17 @@ static constexpr int DEFAULT_GRID_COLS = 32;
 static constexpr int MAX_GRID_ROWS = 64;
 static constexpr int MAX_GRID_COLS = 64;
 
-static const float TILE_SIZE = 0.013f;
+static const float TILE_SIZE = 0.015625f;
 static const float ZOOM_SPEED = 1.25f;
 static const float MOVE_SPEED = 0.01f;
 
 static const glm::vec3 TILE_DEFAULT_SCALE = glm::vec3(TILE_SIZE);
-static const glm::vec3 EMPTY_NAVMAP_TILE_COLOR = {1.0f, 1.0f, 1.0f};
 
-static std::unordered_map<std::string, glm::vec3> SPECIAL_NAVMAP_TILES_TO_COLORS =
+static std::unordered_map<std::string, networking::NavmapTileType> TILE_TEXTURES_TO_NAVMAP_TILE_TYPES =
 {
-    { "wall_top.png", { 0.0f, 0.0f, 0.0f } },
-    { "wall_body.png", { 0.0f, 0.0f, 0.0f } },
-    { "water.png", { 0.0f, 0.0f, 1.0f } }
-};
-
-namespace TileConnectorType
-{
-    static constexpr int NONE     = 0;
-    static constexpr int VER      = 1;
-    static constexpr int HOR      = 2;
-    static constexpr int TOPLEFT  = 3;
-    static constexpr int TOPRIGHT = 4;
-    static constexpr int BOTRIGHT = 5;
-    static constexpr int BOTLEFT  = 6;
-    static constexpr int INVALID  = 7;
+    { "wall_top.png", networking::NavmapTileType::SOLID },
+    { "wall_body.png", networking::NavmapTileType::SOLID },
+    { "water.png", networking::NavmapTileType::WATER }
 };
 
 ///------------------------------------------------------------------------------------------------
@@ -337,7 +319,6 @@ void Editor::CreateMap(const int gridRows, const int gridCols)
                 tile->mScale = TILE_DEFAULT_SCALE;
                 tile->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + TILES_FOLDER + ZERO_BLANK_TILE_FILE_NAME);
                 tile->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + WORLD_MAP_TILE_SHADER);
-                tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = TileConnectorType::NONE;
             }
             
             {
@@ -348,7 +329,6 @@ void Editor::CreateMap(const int gridRows, const int gridCols)
                 topLayerTile->mScale = TILE_DEFAULT_SCALE;
                 topLayerTile->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + TILES_FOLDER + ZERO_BLANK_TRANSPARENT_TILE_FILE_NAME);
                 topLayerTile->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + WORLD_MAP_TILE_SHADER);
-                topLayerTile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = TileConnectorType::NONE;
             }
         }
     }
@@ -359,69 +339,6 @@ void Editor::CreateMap(const int gridRows, const int gridCols)
 void Editor::UpdateTile(std::shared_ptr<scene::SceneObject> tile, std::shared_ptr<scene::Scene> scene, const std::string& tileNamePostfix, const int tileCol, const int tileRow)
 {
     auto& systemsEngine = CoreSystemsEngine::GetInstance();
-    
-    auto tileTextureFileName = fileutils::GetFileName(systemsEngine.GetResourceLoadingService().GetResourcePath(tile->mTextureResourceId));
-    if (tileTextureFileName == ZERO_HOR_CONNECTOR_TILE_FILE_NAME)
-    {
-        if (tileCol == 0 || tileCol == mGridCols - 1)
-        {
-            tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = TileConnectorType::INVALID;
-        }
-        else
-        {
-            tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = TileConnectorType::HOR;
-            tile->mEffectTextureResourceIds[0] = scene->FindSceneObject(strutils::StringId(std::to_string(tileCol - 1) + "," + std::to_string(tileRow) + tileNamePostfix))->mTextureResourceId;
-            tile->mEffectTextureResourceIds[1] = scene->FindSceneObject(strutils::StringId(std::to_string(tileCol + 1) + "," + std::to_string(tileRow) + tileNamePostfix))->mTextureResourceId;
-        }
-    }
-    else if (tileTextureFileName == ZERO_VER_CONNECTOR_TILE_FILE_NAME)
-    {
-        if (tileRow == 0 || tileRow == mGridRows - 1)
-        {
-            tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = TileConnectorType::INVALID;
-        }
-        else
-        {
-            tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = TileConnectorType::VER;
-            tile->mEffectTextureResourceIds[0] = scene->FindSceneObject(strutils::StringId(std::to_string(tileCol) + "," + std::to_string(tileRow - 1) + tileNamePostfix))->mTextureResourceId;
-            tile->mEffectTextureResourceIds[1] = scene->FindSceneObject(strutils::StringId(std::to_string(tileCol) + "," + std::to_string(tileRow + 1) + tileNamePostfix))->mTextureResourceId;
-        }
-    }
-    else if (tileTextureFileName == ZERO_TOPLEFT_CONNECTOR_TILE_FILE_NAME || tileTextureFileName == ZERO_BOTRIGHT_CONNECTOR_TILE_FILE_NAME)
-    {
-        if (tileRow == 0 || tileRow == mGridRows - 1 || tileCol == 0 || tileCol == mGridCols - 1)
-        {
-            tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = TileConnectorType::INVALID;
-        }
-        else
-        {
-            tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = tileTextureFileName == ZERO_TOPLEFT_CONNECTOR_TILE_FILE_NAME ? TileConnectorType::TOPLEFT : TileConnectorType::BOTRIGHT;
-            tile->mEffectTextureResourceIds[0] = scene->FindSceneObject(strutils::StringId(std::to_string(tileCol - 1) + "," + std::to_string(tileRow - 1) + tileNamePostfix))->mTextureResourceId;
-            tile->mEffectTextureResourceIds[1] = scene->FindSceneObject(strutils::StringId(std::to_string(tileCol + 1) + "," + std::to_string(tileRow + 1) + tileNamePostfix))->mTextureResourceId;
-        }
-    }
-    else if (tileTextureFileName == ZERO_TOPRIGHT_CONNECTOR_TILE_FILE_NAME || tileTextureFileName == ZERO_BOTLEFT_CONNECTOR_TILE_FILE_NAME)
-    {
-        if (tileRow == 0 || tileRow == mGridRows - 1 || tileCol == 0 || tileCol == mGridCols - 1)
-        {
-            tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = TileConnectorType::INVALID;
-        }
-        else
-        {
-            tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = tileTextureFileName == ZERO_TOPRIGHT_CONNECTOR_TILE_FILE_NAME ? TileConnectorType::TOPRIGHT : TileConnectorType::BOTLEFT;
-            tile->mEffectTextureResourceIds[0] = scene->FindSceneObject(strutils::StringId(std::to_string(tileCol - 1) + "," + std::to_string(tileRow + 1) + tileNamePostfix))->mTextureResourceId;
-            tile->mEffectTextureResourceIds[1] = scene->FindSceneObject(strutils::StringId(std::to_string(tileCol + 1) + "," + std::to_string(tileRow - 1) + tileNamePostfix))->mTextureResourceId;
-        }
-    }
-    else
-    {
-        tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = TileConnectorType::NONE;
-    }
-    
-    if (!mViewOptions.mRenderConnectorTiles && tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] != TileConnectorType::INVALID)
-    {
-        tile->mShaderIntUniformValues[TILE_CONNECTOR_TYPE_UNIFORM_NAME] = TileConnectorType::NONE;
-    }
     
     tile->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + WORLD_MAP_TILE_SHADER);
     tile->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = !tileNamePostfix.empty() ? mTopLayerVisibility : mBottomLayerVisibility;
