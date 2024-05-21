@@ -48,7 +48,7 @@ private:
     void InterpolateLocalWorld(const float dtMillis);
     void CheckForStateSending(const float dtMillis);
     void UpdateCamera(const float dtMillis);
-    void SendNetworkMessage(const nlohmann::json& message, const networking::MessageType messageType, const bool highPriority);
+    void SendNetworkMessage(const nlohmann::json& message, const networking::MessageType messageType, const networking::MessagePriority messagePriority);
     void CreateWorldObject(const networking::WorldObjectData& worldObjectData);
     void OnServerResponse(const std::string& response);
     void OnServerPlayerStateResponse(const nlohmann::json& responseJson);

@@ -114,7 +114,7 @@ void Game::Init()
     auto& eventSystem = events::EventSystem::GetInstance();
     mSendNetworkMessageEventListener = eventSystem.RegisterForEvent<events::SendNetworkMessageEvent>([=](const events::SendNetworkMessageEvent& event)
     {
-        SendNetworkMessage(event.mMessageJson, event.mMessageType, event.mIsHighPriority);
+        SendNetworkMessage(event.mMessageJson, event.mMessageType, event.mMessagePriority);
     });
     
     mMapChangeEventListener = eventSystem.RegisterForEvent<events::MapChangeEvent>([=](const events::MapChangeEvent& event)
@@ -203,7 +203,7 @@ void Game::CreateDebugWidgets()
     {
         networking::SetPathfindingDebugModeRequest request = {};
         request.enabled = mPathfindingDebugMode;
-        SendNetworkMessage(request.SerializeToJson(), networking::MessageType::CS_SET_PATHFINDING_DEBUG_MODE, false);
+        SendNetworkMessage(request.SerializeToJson(), networking::MessageType::CS_SET_PATHFINDING_DEBUG_MODE, networking::MessagePriority::HIGH);
     }
     
     ImGui::SeparatorText("Enemy Data");
@@ -427,12 +427,12 @@ void Game::CheckForStateSending(const float dtMillis)
         // Send an empty state just to request other world entities
         if (localPlayerFoundIter == mWorldObjectData.end())
         {
-            SendNetworkMessage(nlohmann::json(), networking::MessageType::CS_PLAYER_STATE, false);
+            SendNetworkMessage(nlohmann::json(), networking::MessageType::CS_PLAYER_STATE, networking::MessagePriority::NORMAL);
         }
         // Local player found in world data. Send its updated state
         else
         {
-            SendNetworkMessage(localPlayerFoundIter->SerializeToJson(), networking::MessageType::CS_PLAYER_STATE, false);
+            SendNetworkMessage(localPlayerFoundIter->SerializeToJson(), networking::MessageType::CS_PLAYER_STATE, networking::MessagePriority::NORMAL);
         }
         
     }
@@ -440,10 +440,10 @@ void Game::CheckForStateSending(const float dtMillis)
 
 ///------------------------------------------------------------------------------------------------
 
-void Game::SendNetworkMessage(const nlohmann::json& message, const networking::MessageType messageType, const bool highPriority)
+void Game::SendNetworkMessage(const nlohmann::json& message, const networking::MessageType messageType, const networking::MessagePriority messagePriority)
 {
 #if defined(MACOS) || defined(MOBILE_FLOW)
-    apple_utils::SendNetworkMessage(message, messageType, highPriority, [&](const networking::ServerResponseData& responseData)
+    apple_utils::SendNetworkMessage(message, messageType, messagePriority, [&](const networking::ServerResponseData& responseData)
     {
         if (!responseData.mError.empty())
         {
@@ -456,7 +456,7 @@ void Game::SendNetworkMessage(const nlohmann::json& message, const networking::M
         }
     });
 #elif defined(WINDOWS)
-    windows_utils::SendNetworkMessage(message, messageType, highPriority, [&](const networking::ServerResponseData& responseData)
+    windows_utils::SendNetworkMessage(message, messageType, messagePriority, [&](const networking::ServerResponseData& responseData)
     {
         if (!responseData.mError.empty())
         {
@@ -667,7 +667,7 @@ void Game::OnPlayButtonPressed()
     });
     
     // Request login details
-    SendNetworkMessage(nlohmann::json(), networking::MessageType::CS_REQUEST_LOGIN, true);
+    SendNetworkMessage(nlohmann::json(), networking::MessageType::CS_REQUEST_LOGIN, networking::MessagePriority::HIGH);
 }
 
 ///------------------------------------------------------------------------------------------------

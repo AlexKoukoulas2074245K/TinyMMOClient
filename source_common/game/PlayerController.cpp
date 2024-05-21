@@ -81,7 +81,7 @@ void PlayerController::Update(const float dtMillis, const strutils::StringId& pl
         throwRangedWeaponRequest.playerId = objectData.objectId;
         throwRangedWeaponRequest.targetPosition = glm::vec3(worldTouchPos.x, worldTouchPos.y, objectData.objectPosition.z);
         
-        events::EventSystem::GetInstance().DispatchEvent<events::SendNetworkMessageEvent>(throwRangedWeaponRequest.SerializeToJson(), networking::MessageType::CS_THROW_RANGED_WEAPON, true);
+        events::EventSystem::GetInstance().DispatchEvent<events::SendNetworkMessageEvent>(throwRangedWeaponRequest.SerializeToJson(), networking::MessageType::CS_THROW_RANGED_WEAPON, networking::MessagePriority::HIGH);
     }
 
     objectData.objectVelocity = {};

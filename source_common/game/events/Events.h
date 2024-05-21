@@ -71,16 +71,16 @@ public:
 class SendNetworkMessageEvent
 {
 public:
-    SendNetworkMessageEvent(const nlohmann::json& messageJson, const networking::MessageType messageType, const bool isHighPriority)
+    SendNetworkMessageEvent(const nlohmann::json& messageJson, const networking::MessageType messageType, const networking::MessagePriority messagePriority)
         : mMessageJson(messageJson)
         , mMessageType(messageType)
-        , mIsHighPriority(isHighPriority)
+        , mMessagePriority(messagePriority)
     {
     }
     
     const nlohmann::json mMessageJson;
     const networking::MessageType mMessageType;
-    const bool mIsHighPriority;
+    const networking::MessagePriority mMessagePriority;
 };
 
 ///------------------------------------------------------------------------------------------------

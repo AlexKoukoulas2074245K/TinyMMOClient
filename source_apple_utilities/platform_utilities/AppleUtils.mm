@@ -428,9 +428,9 @@ void RequestReview()
 ///-----------------------------------------------------------------------------------------------
 
 static bool canSendNetworkMessage = true;
-void SendNetworkMessage(const nlohmann::json& networkMessage, const networking::MessageType messageType, const bool highPriority, std::function<void(const networking::ServerResponseData&)> serverResponseCallback)
+void SendNetworkMessage(const nlohmann::json& networkMessage, const networking::MessageType messageType, const networking::MessagePriority messaggePriority, std::function<void(const networking::ServerResponseData&)> serverResponseCallback)
 {
-    if (!canSendNetworkMessage && !highPriority)
+    if (!canSendNetworkMessage && messaggePriority != networking::MessagePriority::HIGH)
     {
         return;
     }
