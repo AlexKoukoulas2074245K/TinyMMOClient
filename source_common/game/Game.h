@@ -72,6 +72,7 @@ private:
     std::vector<networking::WorldObjectData> mPendingWorldObjectDataToCreate;
     
     float mStateSendingDelayMillis;
+    bool mPathfindingDebugMode;
 };
 
 ///------------------------------------------------------------------------------------------------

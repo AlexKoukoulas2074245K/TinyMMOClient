@@ -10,12 +10,9 @@ in vec3 frag_pos;
 in vec3 normal_interp;
 
 uniform sampler2D tex;
-uniform vec3 point_light_position;
-uniform float point_light_power;
 uniform float custom_alpha;
 uniform float map_width;
 uniform float map_height;
-uniform bool affected_by_light;
 out vec4 frag_color;
 
 const float MAP_SEAM_OFFSET_X = 0.0f;

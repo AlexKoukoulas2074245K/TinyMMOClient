@@ -55,13 +55,16 @@
 static const strutils::StringId MAIN_MENU_SCENE = strutils::StringId("main_menu_scene");
 static const strutils::StringId PLAY_BUTTON_NAME = strutils::StringId("play_button");
 static const strutils::StringId NAVMAP_DEBUG_SCENE_OBJECT_NAME = strutils::StringId("navmap_debug");
+static const strutils::StringId DEBUG_PATH_SEGMENT_SCENE_OBJECT_NAME = strutils::StringId("debug_pathfinding_segment");
 static const float ENEMY_SPEED = 0.0001f;
+static const float DEBUG_PATH_SEGMENT_SIZE = 0.015625f * 4.0f;
 static std::mutex sWorldMutex;
 
 ///------------------------------------------------------------------------------------------------
 
 Game::Game(const int argc, char** argv)
     : mStateSendingDelayMillis(game_constants::STATE_SEND_MAX_DELAY_MILLIS)
+    , mPathfindingDebugMode(false)
 {
     if (argc > 0)
     {
@@ -195,6 +198,15 @@ void Game::CreateDebugWidgets()
     ImGui::Begin("Enemy NPC Data", nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
     std::lock_guard<std::mutex> worldGuard(sWorldMutex);
     
+    ImGui::SeparatorText("Debug");
+    if (ImGui::Checkbox("Pathfinding Debug Mode", &mPathfindingDebugMode))
+    {
+        networking::SetPathfindingDebugModeRequest request = {};
+        request.enabled = mPathfindingDebugMode;
+        SendNetworkMessage(request.SerializeToJson(), networking::MessageType::CS_SET_PATHFINDING_DEBUG_MODE, false);
+    }
+    
+    ImGui::SeparatorText("Enemy Data");
     for (auto& objectData: mWorldObjectData)
     {
         if (objectData.objectType == networking::OBJ_TYPE_NPC_ENEMY)
@@ -329,27 +341,51 @@ void Game::InterpolateLocalWorld(const float dtMillis)
             case networking::OBJ_TYPE_NPC_ENEMY:
             {
                 auto npcSceneObject = scene->FindSceneObject(strutils::StringId(objectData.objectId));
-//                if (objectData.objectState == networking::OBJ_STATE_ALIVE)
-//                {
+                if (objectData.objectState == networking::OBJ_STATE_ALIVE)
+                {
                     npcSceneObject->mPosition = objectData.objectPosition;
-                (void)ENEMY_SPEED;
-//                }
-//                else
-//                {
-//                    auto directionToTarget = objectData.objectPosition - npcSceneObject->mPosition;
-//                    auto distanceToTarget = glm::length(directionToTarget);
-//
-//                    if (distanceToTarget <= 0.0f || distanceToTarget < glm::length(glm::normalize(directionToTarget) * ENEMY_SPEED * dtMillis))
-//                    {
-//                        npcSceneObject->mPosition = objectData.objectPosition;
-//                    }
-//                    else
-//                    {
-//                        npcSceneObject->mPosition += glm::normalize(directionToTarget) * ENEMY_SPEED * dtMillis;
-//                    }
-//
-//                }
+                }
+                else
+                {
+                    auto directionToTarget = objectData.objectPosition - npcSceneObject->mPosition;
+                    auto distanceToTarget = glm::length(directionToTarget);
+
+                    if (distanceToTarget <= 0.0f || distanceToTarget < glm::length(glm::normalize(directionToTarget) * ENEMY_SPEED * dtMillis))
+                    {
+                        npcSceneObject->mPosition = objectData.objectPosition;
+                    }
+                    else
+                    {
+                        npcSceneObject->mPosition += glm::normalize(directionToTarget) * ENEMY_SPEED * dtMillis;
+                    }
+                }
                 
+                while (scene->FindSceneObject(DEBUG_PATH_SEGMENT_SCENE_OBJECT_NAME))
+                {
+                    scene->RemoveSceneObject(DEBUG_PATH_SEGMENT_SCENE_OBJECT_NAME);
+                }
+                
+                if (mPathfindingDebugMode)
+                {
+                    if (!objectData.objectName.GetString().empty() && objectData.objectName.GetString()[0] != '\0')
+                    {
+                        auto pathStringComponents = strutils::StringSplit(objectData.objectName.GetString(), ' ');
+                        for (const auto& pathStringComponent: pathStringComponents)
+                        {
+                            if (pathStringComponent.empty())
+                            {
+                                continue;
+                            }
+                            
+                            auto pathPosition = scene->CreateSceneObject(DEBUG_PATH_SEGMENT_SCENE_OBJECT_NAME);
+                            pathPosition->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "debug/debug_cross.png");
+                            pathPosition->mScale = glm::vec3(DEBUG_PATH_SEGMENT_SIZE);
+                            pathPosition->mPosition.x = std::stof(strutils::StringSplit(pathStringComponent, ',')[0]);
+                            pathPosition->mPosition.y = std::stof(strutils::StringSplit(pathStringComponent, ',')[1]);
+                            pathPosition->mPosition.z = 10.0f;
+                        }
+                    }
+                }
             } break;
                 
                 
@@ -561,13 +597,13 @@ void Game::OnServerPlayerStateResponse(const nlohmann::json& responseJson)
         {
             auto& worldObjectData = *worldObjectIter;
             
-            // Local position is not updated (for now)
             if (worldObjectData.objectType != networking::OBJ_TYPE_PLAYER || !worldObjectData.isLocal)
             {
                 worldObjectData.objectPosition = remoteWorldObjectData.objectPosition;
                 worldObjectData.objectVelocity = remoteWorldObjectData.objectVelocity;
             }
             
+            worldObjectData.objectName = remoteWorldObjectData.objectName;
             worldObjectData.parentObjectId = remoteWorldObjectData.parentObjectId;
             worldObjectData.objectState = remoteWorldObjectData.objectState;
             worldObjectData.invalidated = false;
