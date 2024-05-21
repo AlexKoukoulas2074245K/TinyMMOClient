@@ -15,13 +15,11 @@ uniform float point_light_power;
 uniform float custom_alpha;
 uniform float map_width;
 uniform float map_height;
-uniform float map_seam_offset_x;
-uniform float map_seam_offset_y;
 uniform bool affected_by_light;
 out vec4 frag_color;
 
-const float MAP_SEAM_OFFSET_X = -0.0061f;
-const float MAP_SEAM_OFFSET_Y = -0.0051f;
+const float MAP_SEAM_OFFSET_X = 0.0f;
+const float MAP_SEAM_OFFSET_Y = 0.0f;
 const float MAP_SEAM_SIZE = 0.0002f;
 const float MAP_TEXTURE_SIZE = 4096.0f;
 

@@ -1,10 +1,16 @@
 {
     "map_connections": {
         "entry_map.json": {
-            "bottom": "None",
+            "bottom": "entry_map_dungeon.json",
             "left": "None",
             "right": "small_corridor.json",
             "top": "map_tower.json"
+        },
+        "entry_map_dungeon.json": {
+            "bottom": "None",
+            "left": "None",
+            "right": "None",
+            "top": "entry_map.json"
         },
         "long_corridor.json": {
             "bottom": "small_corridor.json",
@@ -43,6 +49,12 @@
             "width": 0.5,
             "x": 0.0,
             "y": 0.0
+        },
+        "entry_map_dungeon.json": {
+            "height": 0.078125,
+            "width": 0.5,
+            "x": 0.0,
+            "y": -0.1171875
         },
         "long_corridor.json": {
             "height": 0.5,

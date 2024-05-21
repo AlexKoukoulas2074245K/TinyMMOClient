@@ -1,4 +1,3 @@
-
 #if defined(USE_IMGUI)
 void Editor::CreateDebugWidgets()
 {
@@ -7,6 +6,8 @@ void Editor::CreateDebugWidgets()
     static std::vector<std::string> sOtherMapTextures {"None"};
     static std::unordered_map<std::string, glm::vec2> sMapTextureNamesToDimensions;
     static std::unordered_map<std::string, std::unordered_map<std::string, std::pair<int, std::string>>> sMapConnections;
+    static int sDimensionsX = DEFAULT_GRID_COLS;
+    static int sDimensionsY = DEFAULT_GRID_ROWS;
     
     auto RefreshGlobalMapFilesLambda = [&]()
     {
@@ -136,7 +137,10 @@ void Editor::CreateDebugWidgets()
                 auto scene = systemsEngine.GetSceneManager().FindScene(EDITOR_SCENE);
                 
                 DestroyMap();
-                CreateMap(mapJson["metadata"]["rows"].get<int>(), mapJson["metadata"]["cols"]);
+                
+                sDimensionsY = mapJson["metadata"]["rows"].get<int>();
+                sDimensionsX = mapJson["metadata"]["cols"].get<int>();
+                CreateMap(sDimensionsY, sDimensionsX);
                 
                 {
                     auto rowCounter = 0;
@@ -255,6 +259,8 @@ void Editor::CreateDebugWidgets()
                     
                     auto colOffset = (MAX_GRID_COLS - mGridCols)/2;
                     auto rowOffset = (MAX_GRID_ROWS - mGridRows)/2;
+                    auto oddWidth = mGridCols % 2 != 0;
+                    auto oddHeight = mGridRows % 2 != 0;
                     
                     std::unordered_map<std::string, SDL_Surface*> cachedTileImages;
                     
@@ -274,7 +280,7 @@ void Editor::CreateDebugWidgets()
                             cachedTileImages[topTileTexturePath] = topTileSurface;
                             cachedTileImages[botTileTexturePath] = botTileSurface;
                             
-                            auto RenderTileOnSurface = [](SDL_Surface* surface, unsigned char* pixels, int x, int y, int colOffset, int rowOffset)
+                            auto RenderTileOnSurface = [](SDL_Surface* surface, unsigned char* pixels, int x, int y, int colOffset, int rowOffset, bool oddWidth, bool oddHeight)
                             {
                                 SDL_LockSurface(surface);
                                 for (auto tileImageY = 0; tileImageY < surface->h; ++tileImageY)
@@ -285,17 +291,17 @@ void Editor::CreateDebugWidgets()
                                         auto pixel = *(Uint32*)((Uint8*)surface->pixels + tileImageY * surface->pitch + tileImageX * surface->format->BytesPerPixel);
                                         SDL_GetRGBA(pixel, surface->format, &r, &g, &b, &a);
                                         
-                                        pixels[(((y + rowOffset) * 64 + tileImageY) * map_constants::CLIENT_WORLD_MAP_IMAGE_SIZE * 4) + ((x + colOffset) * 64 + tileImageX) * 4 + 0] = r;
-                                        pixels[(((y + rowOffset) * 64 + tileImageY) * map_constants::CLIENT_WORLD_MAP_IMAGE_SIZE * 4) + ((x + colOffset) * 64 + tileImageX) * 4 + 1] = g;
-                                        pixels[(((y + rowOffset) * 64 + tileImageY) * map_constants::CLIENT_WORLD_MAP_IMAGE_SIZE * 4) + ((x + colOffset) * 64 + tileImageX) * 4 + 2] = b;
-                                        pixels[(((y + rowOffset) * 64 + tileImageY) * map_constants::CLIENT_WORLD_MAP_IMAGE_SIZE * 4) + ((x + colOffset) * 64 + tileImageX) * 4 + 3] = a;
+                                        pixels[(((y + rowOffset) * 64 + (oddHeight ? 32 : 0) + tileImageY) * map_constants::CLIENT_WORLD_MAP_IMAGE_SIZE * 4) + ((x + colOffset) * 64 + (oddWidth ? 32 : 0) + tileImageX) * 4 + 0] = r;
+                                        pixels[(((y + rowOffset) * 64 + (oddHeight ? 32 : 0) + tileImageY) * map_constants::CLIENT_WORLD_MAP_IMAGE_SIZE * 4) + ((x + colOffset) * 64 + (oddWidth ? 32 : 0) + tileImageX) * 4 + 1] = g;
+                                        pixels[(((y + rowOffset) * 64 + (oddHeight ? 32 : 0) + tileImageY) * map_constants::CLIENT_WORLD_MAP_IMAGE_SIZE * 4) + ((x + colOffset) * 64 + (oddWidth ? 32 : 0) + tileImageX) * 4 + 2] = b;
+                                        pixels[(((y + rowOffset) * 64 + (oddHeight ? 32 : 0) + tileImageY) * map_constants::CLIENT_WORLD_MAP_IMAGE_SIZE * 4) + ((x + colOffset) * 64 + (oddWidth ? 32 : 0) + tileImageX) * 4 + 3] = a;
                                     }
                                 }
                                 SDL_UnlockSurface(surface);
                             };
                             
-                            RenderTileOnSurface(topTileSurface, &topLayerPixels[0], x, y, colOffset, rowOffset);
-                            RenderTileOnSurface(botTileSurface, &botLayerPixels[0], x, y, colOffset, rowOffset);
+                            RenderTileOnSurface(topTileSurface, &topLayerPixels[0], x, y, colOffset, rowOffset, oddWidth, oddHeight);
+                            RenderTileOnSurface(botTileSurface, &botLayerPixels[0], x, y, colOffset, rowOffset, oddWidth, oddHeight);
                         }
                     }
                     
@@ -312,7 +318,7 @@ void Editor::CreateDebugWidgets()
                     
                     // Render map navmap texture
                     unsigned char navmapPixels[map_constants::CLIENT_NAVMAP_IMAGE_SIZE * map_constants::CLIENT_NAVMAP_IMAGE_SIZE * 4] = { 0 };
-                    
+                
                     for (auto y = 0; y < mGridRows; ++y)
                     {
                         for (auto x = 0; x < mGridCols; ++x)
@@ -321,10 +327,16 @@ void Editor::CreateDebugWidgets()
                             auto tileTextureResourcePath = fileutils::GetFileName(systemsEngine.GetResourceLoadingService().GetResourcePath(bottomLayerTileSceneObject->mTextureResourceId));
                             auto navmapTileTypeColor = networking::GetColorFromNavmapTileType(TILE_TEXTURES_TO_NAVMAP_TILE_TYPES.count(tileTextureResourcePath) ? TILE_TEXTURES_TO_NAVMAP_TILE_TYPES.at(tileTextureResourcePath) : networking::NavmapTileType::EMPTY);
                             
-                            navmapPixels[((y + rowOffset) * map_constants::CLIENT_NAVMAP_IMAGE_SIZE * 4) + (x + colOffset) * 4 + 0] = navmapTileTypeColor.r;
-                            navmapPixels[((y + rowOffset) * map_constants::CLIENT_NAVMAP_IMAGE_SIZE * 4) + (x + colOffset) * 4 + 1] = navmapTileTypeColor.g;
-                            navmapPixels[((y + rowOffset) * map_constants::CLIENT_NAVMAP_IMAGE_SIZE * 4) + (x + colOffset) * 4 + 2] = navmapTileTypeColor.b;
-                            navmapPixels[((y + rowOffset) * map_constants::CLIENT_NAVMAP_IMAGE_SIZE * 4) + (x + colOffset) * 4 + 3] = navmapTileTypeColor.a;
+                            for (auto tileImageY = 0; tileImageY < map_constants::CLIENT_NAVMAP_IMAGE_SIZE/64; ++tileImageY)
+                            {
+                                for (auto tileImageX = 0; tileImageX < map_constants::CLIENT_NAVMAP_IMAGE_SIZE/64; ++tileImageX)
+                                {
+                                    navmapPixels[(((y + rowOffset) * 2 + (oddHeight ? 1 : 0) + tileImageY) * map_constants::CLIENT_NAVMAP_IMAGE_SIZE * 4) + ((x + colOffset) * 2 + (oddWidth ? 1 : 0) + tileImageX) * 4 + 0] = navmapTileTypeColor.r;
+                                    navmapPixels[(((y + rowOffset) * 2 + (oddHeight ? 1 : 0) + tileImageY) * map_constants::CLIENT_NAVMAP_IMAGE_SIZE * 4) + ((x + colOffset) * 2 + (oddWidth ? 1 : 0) + tileImageX) * 4 + 1] = navmapTileTypeColor.g;
+                                    navmapPixels[(((y + rowOffset) * 2 + (oddHeight ? 1 : 0) + tileImageY) * map_constants::CLIENT_NAVMAP_IMAGE_SIZE * 4) + ((x + colOffset) * 2 + (oddWidth ? 1 : 0) + tileImageX) * 4 + 2] = navmapTileTypeColor.b;
+                                    navmapPixels[(((y + rowOffset) * 2 + (oddHeight ? 1 : 0) + tileImageY) * map_constants::CLIENT_NAVMAP_IMAGE_SIZE * 4) + ((x + colOffset) * 2 + (oddWidth ? 1 : 0) + tileImageX) * 4 + 3] = navmapTileTypeColor.a;
+                                }
+                            }
                         }
                     }
         
@@ -343,8 +355,6 @@ void Editor::CreateDebugWidgets()
         }
         
         ImGui::SeparatorText("Modify/Create");
-        static int sDimensionsX = DEFAULT_GRID_COLS;
-        static int sDimensionsY = DEFAULT_GRID_ROWS;
         
         if (ImGui::InputInt("x", &sDimensionsX))
         {
@@ -388,17 +398,24 @@ void Editor::CreateDebugWidgets()
                 
                 std::vector<strutils::StringId> sceneObjectNamesToRemove;
                 
+                scene->RemoveSceneObject(TOP_REF_IMAGE_SCENE_OBJECT_NAME);
+                scene->RemoveSceneObject(RIGHT_REF_IMAGE_SCENE_OBJECT_NAME);
+                scene->RemoveSceneObject(BOTTOM_REF_IMAGE_SCENE_OBJECT_NAME);
+                scene->RemoveSceneObject(LEFT_REF_IMAGE_SCENE_OBJECT_NAME);
+                
+                mTopImageRefIndex = mRightImageRefIndex = mBottomImageRefIndex = mLeftImageRefIndex = 0;
+                
                 // Destroy all new (map stiching textures & scene objects)
                 for (auto& sceneObject: scene->GetSceneObjects())
                 {
-                    if (sceneObject->mInvisible)
-                    {
-                        sceneObject->mInvisible = false;
-                    }
-                    else
+                    if (strutils::StringEndsWith(sceneObject->mName.GetString(), "_stich"))
                     {
                         systemsEngine.GetResourceLoadingService().UnloadResource(sceneObject->mTextureResourceId);
                         sceneObjectNamesToRemove.push_back(sceneObject->mName);
+                    }
+                    else
+                    {
+                        sceneObject->mInvisible = false;
                     }
                 }
                 
@@ -426,6 +443,13 @@ void Editor::CreateDebugWidgets()
                     sceneObject->mInvisible = true;
                 }
                 
+                scene->RemoveSceneObject(TOP_REF_IMAGE_SCENE_OBJECT_NAME);
+                scene->RemoveSceneObject(RIGHT_REF_IMAGE_SCENE_OBJECT_NAME);
+                scene->RemoveSceneObject(BOTTOM_REF_IMAGE_SCENE_OBJECT_NAME);
+                scene->RemoveSceneObject(LEFT_REF_IMAGE_SCENE_OBJECT_NAME);
+                
+                mTopImageRefIndex = mRightImageRefIndex = mBottomImageRefIndex = mLeftImageRefIndex = 0;
+                
                 std::ifstream globalMapDataFile(NON_SANDBOXED_MAP_GLOBAL_DATA_PATH);
                 if (globalMapDataFile.is_open())
                 {
@@ -437,7 +461,7 @@ void Editor::CreateDebugWidgets()
                     {
                         auto mapName = mapTransformIter.key().substr(0, mapTransformIter.key().find(".json"));
                         
-                        auto mapBottomLayer = scene->CreateSceneObject(strutils::StringId(mapName  + "_bottom"));
+                        auto mapBottomLayer = scene->CreateSceneObject(strutils::StringId(mapName  + "_bottom_stich"));
                         mapBottomLayer->mPosition.x = mapTransformIter.value()["x"].get<float>() * game_constants::MAP_RENDERED_SCALE;
                         mapBottomLayer->mPosition.y = mapTransformIter.value()["y"].get<float>() * game_constants::MAP_RENDERED_SCALE;
                         mapBottomLayer->mPosition.z = map_constants::TILE_TOP_LAYER_Z + math::RandomFloat(0.01f, 0.05f);
@@ -447,7 +471,7 @@ void Editor::CreateDebugWidgets()
                         mapBottomLayer->mShaderFloatUniformValues[strutils::StringId("map_width")] = mapTransformIter.value()["width"].get<float>();
                         mapBottomLayer->mShaderFloatUniformValues[strutils::StringId("map_height")] = mapTransformIter.value()["height"].get<float>();
                         
-                        auto mapTopLayer = scene->CreateSceneObject(strutils::StringId(mapName  + "_top"));
+                        auto mapTopLayer = scene->CreateSceneObject(strutils::StringId(mapName  + "_top_stich"));
                         mapTopLayer->mPosition.x = mapTransformIter.value()["x"].get<float>() * game_constants::MAP_RENDERED_SCALE;
                         mapTopLayer->mPosition.y = mapTransformIter.value()["y"].get<float>() * game_constants::MAP_RENDERED_SCALE;
                         mapTopLayer->mPosition.z = map_constants::TILE_TOP_LAYER_Z + math::RandomFloat(0.1f, 0.5f);
@@ -513,13 +537,15 @@ void Editor::CreateDebugWidgets()
                             
                             sideRefImageSceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 0.5f;
                             sideRefImageSceneObject->mPosition.z = map_constants::TILE_TOP_LAYER_Z;
+                            sideRefImageSceneObject->mPosition.x -= TILE_SIZE/2.0f;
+                            sideRefImageSceneObject->mPosition.y += TILE_SIZE/2.0f;
                             
                             if (&sideImageRefIndex == &mTopImageRefIndex)
                             {
                                 sideRefImageSceneObject->mPosition.y += (mGridRows * TILE_DEFAULT_SCALE.y)/2.0f + sMapTextureNamesToDimensions.at(sOtherMapTextures.at(sideImageRefIndex)).y/2.0f;
                                 sideRefImageSceneObject->mPosition.z += 0.1f;
                             }
-                            if (&sideImageRefIndex == &mRightImageRefIndex)
+                            else if (&sideImageRefIndex == &mRightImageRefIndex)
                             {
                                 sideRefImageSceneObject->mPosition.x += (mGridCols * TILE_DEFAULT_SCALE.x)/2.0f + sMapTextureNamesToDimensions.at(sOtherMapTextures.at(sideImageRefIndex)).x/2.0f;
                                 sideRefImageSceneObject->mPosition.z += 0.2f;
@@ -818,7 +844,9 @@ void Editor::CreateDebugWidgets()
                         previousMapDimensions.y = mapTransformsJson[previousMapName]["height"].get<float>();
                         
                         glm::vec3 updatedMapPosition = previousMapPosition;
-                                                
+                        
+                        logging::Log(logging::LogType::INFO, "Processing %s", mapName.c_str());
+                        
                         if (previousToCurrentConnectionDirection == "top")
                         {
                             updatedMapPosition.y += (mapDimensions.y/2.0f + previousMapDimensions.y/2.0f);
@@ -888,4 +916,3 @@ void Editor::CreateDebugWidgets()
 {
 }
 #endif
-

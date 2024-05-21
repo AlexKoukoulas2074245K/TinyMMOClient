@@ -297,6 +297,9 @@ void Editor::CreateMap(const int gridRows, const int gridCols)
     auto& systemsEngine = CoreSystemsEngine::GetInstance();
     auto scene = systemsEngine.GetSceneManager().FindScene(EDITOR_SCENE);
     
+    mViewOptions.mCameraPosition.x = 0.0f;
+    mViewOptions.mCameraPosition.y = 0.0f;
+    
     mExecutedCommandHistory = {};
     mGridRows = gridRows;
     mGridCols = gridCols;
