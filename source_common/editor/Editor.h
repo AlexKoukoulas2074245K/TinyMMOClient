@@ -10,13 +10,11 @@
 
 ///------------------------------------------------------------------------------------------------
 
-#include <editor/commands/IEditorCommand.h>
 #include <engine/resloading/ResourceLoadingService.h>
 #include <engine/resloading/ImageSurfaceResource.h>
 #include <engine/resloading/TextureResource.h>
 #include <engine/utils/MathUtils.h>
 #include <engine/utils/StringUtils.h>
-#include <map/MapConstants.h>
 #include <vector>
 #include <stack>
 
@@ -40,50 +38,6 @@ public:
     void WindowResize();
     void OnOneSecondElapsed();
     void CreateDebugWidgets();
-    
-private:
-    void DestroyMap();
-    void CreateMap(const int gridRows, const int gridCols);
-    void UpdateTile(std::shared_ptr<scene::SceneObject> tile, std::shared_ptr<scene::Scene> scene, const std::string& tileNamePostfix, const int tileCol, const int tileRow);
-    void TryExecuteCommand(std::unique_ptr<commands::IEditorCommand> command);
-    void TryUndoLastCommand();
-    
-private:
-    struct MapTileData
-    {
-        resources::ResourceId mResourceId;
-        resources::GLuint mTextureId;
-        std::string mTileName;
-    };
-    
-    struct ViewOptions
-    {
-        float mCameraZoom = 0.0f;
-        glm::vec3 mCameraPosition;
-    };
-    
-    enum class PaintingToolType
-    {
-        PENCIL = 0,
-        BUCKET = 1
-    };
-    
-private:
-    int mGridRows;
-    int mGridCols;
-    int mSelectedPaletteTile;
-    int mTopImageRefIndex;
-    int mRightImageRefIndex;
-    int mBottomImageRefIndex;
-    int mLeftImageRefIndex;
-    int mActivePanel;
-    float mBottomLayerVisibility;
-    float mTopLayerVisibility;
-    std::vector<MapTileData> mPaletteTileData;
-    std::stack<std::unique_ptr<commands::IEditorCommand>> mExecutedCommandHistory;
-    ViewOptions mViewOptions;
-    PaintingToolType mPaintingToolType;
-    map_constants::LayerType mActiveLayer;
 };
 
 ///------------------------------------------------------------------------------------------------

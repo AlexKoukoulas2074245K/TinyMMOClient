@@ -27,8 +27,6 @@ namespace scene
 }
 
 class AnimatedButton;
-class PlayerController;
-class MapResourceController;
 class Game final
 {
 public:
@@ -44,35 +42,15 @@ public:
     
 private:
     void UpdateGUI(const float dtMillis);
-    void CheckForPendingWorldObjectsToBeCreated();
-    void InterpolateLocalWorld(const float dtMillis);
-    void CheckForStateSending(const float dtMillis);
-    void UpdateCamera(const float dtMillis);
     void SendNetworkMessage(const nlohmann::json& message, const networking::MessageType messageType, const networking::MessagePriority messagePriority);
-    void CreateWorldObject(const networking::WorldObjectData& worldObjectData);
     void OnServerResponse(const std::string& response);
-    void OnServerPlayerStateResponse(const nlohmann::json& responseJson);
     void OnServerLoginResponse(const nlohmann::json& responseJson);
     void OnPlayButtonPressed();
-    void OnMapChange(const events::MapChangeEvent& mapChangeEvent, const bool shouldLoadNeighbourMapResourcesAsync);
-    void CreateMapSceneObjects(const strutils::StringId& mapName);
-    
+
 private:
     std::atomic<int> mLastPingMillis = 0;
-    std::unique_ptr<MapResourceController> mMapResourceController;
-    std::unique_ptr<PlayerController> mPlayerController;
     std::unique_ptr<AnimatedButton> mPlayButton;
     std::unique_ptr<events::IListener> mSendNetworkMessageEventListener;
-    std::unique_ptr<events::IListener> mMapChangeEventListener;
-    std::unique_ptr<events::IListener> mMapSupersessionEventListener;
-    std::unique_ptr<events::IListener> mMapResourcesReadyEventListener;
-    std::shared_ptr<scene::SceneObject> mLocalPlayerSceneObject;
-    std::vector<int> mWorldObjectIDsToCleanup;
-    std::vector<networking::WorldObjectData> mWorldObjectData;
-    std::vector<networking::WorldObjectData> mPendingWorldObjectDataToCreate;
-    
-    float mStateSendingDelayMillis;
-    bool mPathfindingDebugMode;
 };
 
 ///------------------------------------------------------------------------------------------------

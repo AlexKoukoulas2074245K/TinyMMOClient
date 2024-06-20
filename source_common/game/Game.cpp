@@ -30,15 +30,8 @@
 #include <game/AnimatedButton.h>
 #include <game/Game.h>
 #include <game/events/EventSystem.h>
-#include <game/PlayerController.h>
-#include <game/utils/NameGenerator.h>
 #include <imgui/imgui.h>
-#include <map/MapConstants.h>
-#include <map/MapResourceController.h>
-#include <map/GlobalMapDataRepository.h>
 #include <mutex>
-#include <net_common/WorldObjectTypes.h>
-#include <net_common/WorldObjectStates.h>
 
 #if defined(MOBILE_FLOW)
 #include <platform_specific/IOSUtils.h>
@@ -52,19 +45,11 @@
 
 ///------------------------------------------------------------------------------------------------
 
-static const strutils::StringId MAIN_MENU_SCENE = strutils::StringId("main_menu_scene");
 static const strutils::StringId PLAY_BUTTON_NAME = strutils::StringId("play_button");
-static const strutils::StringId NAVMAP_DEBUG_SCENE_OBJECT_NAME = strutils::StringId("navmap_debug");
-static const strutils::StringId DEBUG_PATH_SEGMENT_SCENE_OBJECT_NAME = strutils::StringId("debug_pathfinding_segment");
-static const float ENEMY_SPEED = 0.0001f;
-static const float DEBUG_PATH_SEGMENT_SIZE = 0.015625f * 4.0f;
-static std::mutex sWorldMutex;
 
 ///------------------------------------------------------------------------------------------------
 
 Game::Game(const int argc, char** argv)
-    : mStateSendingDelayMillis(game_constants::STATE_SEND_MAX_DELAY_MILLIS)
-    , mPathfindingDebugMode(false)
 {
     if (argc > 0)
     {
@@ -93,21 +78,6 @@ void Game::Init()
     auto scene = systemsEngine.GetSceneManager().CreateScene(game_constants::WORLD_SCENE_NAME);
     scene->SetLoaded(true);
     
-    GlobalMapDataRepository::GetInstance().LoadMapDefinitions();
-    mMapResourceController = std::make_unique<MapResourceController>(strutils::StringId("entry_map"));
-    mPlayerController = std::make_unique<PlayerController>(strutils::StringId("entry_map"));
-    
-    const auto& mapResources = mMapResourceController->GetMapResources(strutils::StringId("entry_map"));
-    mPlayerController->SetNavmap(mapResources.mNavmapImageResourceId, mapResources.mNavmap);
-    
-    auto loadedMapResources = mMapResourceController->GetAllLoadedMapResources();
-    
-    for (const auto& mapResources: loadedMapResources)
-    {
-        CreateMapSceneObjects(mapResources.first);
-    }
-    
-    mLocalPlayerSceneObject = nullptr;
     mPlayButton = std::make_unique<AnimatedButton>(glm::vec3(-0.057f, 0.038f, 1.0f), glm::vec3(0.001f, 0.001f, 0.001f), game_constants::DEFAULT_FONT_NAME, "Play", PLAY_BUTTON_NAME, [&](){ OnPlayButtonPressed(); }, *scene);
     mPlayButton->GetSceneObject()->mShaderFloatUniformValues[strutils::StringId("custom_alpha")] = 1.0f;
     
@@ -116,22 +86,6 @@ void Game::Init()
     {
         SendNetworkMessage(event.mMessageJson, event.mMessageType, event.mMessagePriority);
     });
-    
-    mMapChangeEventListener = eventSystem.RegisterForEvent<events::MapChangeEvent>([=](const events::MapChangeEvent& event)
-    {
-        OnMapChange(event, true);
-    });
-    
-    mMapSupersessionEventListener = eventSystem.RegisterForEvent<events::MapSupersessionEvent>([=](const events::MapSupersessionEvent& event)
-    {
-        scene->RemoveSceneObject(strutils::StringId(event.mSupersededMapName.GetString() + "_top"));
-        scene->RemoveSceneObject(strutils::StringId(event.mSupersededMapName.GetString() + "_bottom"));
-    });
-    
-    mMapResourcesReadyEventListener = eventSystem.RegisterForEvent<events::MapResourcesReadyEvent>([=](const events::MapResourcesReadyEvent& event)
-    {
-        CreateMapSceneObjects(event.mMapName);
-    });
 }
 
 ///------------------------------------------------------------------------------------------------
@@ -139,23 +93,6 @@ void Game::Init()
 void Game::Update(const float dtMillis)
 {
     UpdateGUI(dtMillis);
-    CheckForPendingWorldObjectsToBeCreated();
-    InterpolateLocalWorld(dtMillis);
-    CheckForStateSending(dtMillis);
-    UpdateCamera(dtMillis);
-    mMapResourceController->Update(mPlayerController->GetCurrentMapName());
-}
-
-///------------------------------------------------------------------------------------------------
-
-void Game::UpdateCamera(const float)
-{
-    if (mLocalPlayerSceneObject)
-    {
-        auto& systemsEngine = CoreSystemsEngine::GetInstance();
-        auto scene = systemsEngine.GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME);
-        scene->GetCamera().SetPosition(glm::vec3(mLocalPlayerSceneObject->mPosition.x, mLocalPlayerSceneObject->mPosition.y, scene->GetCamera().GetPosition().z));
-    }
 }
 
 ///------------------------------------------------------------------------------------------------
@@ -183,7 +120,6 @@ void Game::CreateDebugWidgets()
 { 
     ImGui::Begin("Net Stats", nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
     ImGui::Text("Ping %d millis", mLastPingMillis.load());
-    ImGui::Text("State sending %d millis", static_cast<int>(mStateSendingDelayMillis));
     ImGui::End();
 //    
 //    ImGui::Begin("Game Hacks", nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
@@ -192,59 +128,6 @@ void Game::CreateDebugWidgets()
 //        PLAYER_SPEED = 0.0002f * sPlayerSpeedMultiplier;
 //    }
 //    ImGui::End();
-    
-    mPlayerController->CreateDebugWidgets();
-    
-    ImGui::Begin("Enemy NPC Data", nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
-    std::lock_guard<std::mutex> worldGuard(sWorldMutex);
-    
-    ImGui::SeparatorText("Debug");
-    if (ImGui::Checkbox("Pathfinding Debug Mode", &mPathfindingDebugMode))
-    {
-        networking::SetPathfindingDebugModeRequest request = {};
-        request.enabled = mPathfindingDebugMode;
-        SendNetworkMessage(request.SerializeToJson(), networking::MessageType::CS_SET_PATHFINDING_DEBUG_MODE, networking::MessagePriority::HIGH);
-    }
-    
-    ImGui::SeparatorText("Enemy Data");
-    for (auto& objectData: mWorldObjectData)
-    {
-        if (objectData.objectType == networking::OBJ_TYPE_NPC_ENEMY)
-        {
-            if (ImGui::CollapsingHeader(std::to_string(objectData.objectId).c_str(), ImGuiTreeNodeFlags_None))
-            {
-                ImGui::PushID(std::to_string(objectData.objectId).c_str());
-                
-                switch (objectData.objectState)
-                {
-                    case networking::OBJ_STATE_ALIVE:
-                    {
-                        ImGui::Text("State: Alive");
-                        ImGui::Text("Speed: %.4f, %.4f", objectData.objectVelocity.x, objectData.objectVelocity.y);
-                    } break;
-                        
-                    case networking::OBJ_STATE_CHASING:
-                    {
-                        ImGui::Text("State: Chasing %llu", objectData.parentObjectId);
-                        ImGui::Text("Speed: %.4f, %.4f", objectData.objectVelocity.x, objectData.objectVelocity.y);
-                    } break;
-                        
-                    case networking::OBJ_STATE_RETREATING:
-                    {
-                        ImGui::Text("State: Retreating");
-                        ImGui::Text("Speed: %.4f, %.4f", objectData.objectVelocity.x, objectData.objectVelocity.y);
-                    } break;
-                        
-                    case networking::OBJ_STATE_DEAD:
-                    {
-                        ImGui::Text("State: Dead");
-                    } break;
-                }
-                ImGui::PopID();
-            }
-        }
-    }
-    ImGui::End();
 }
 #else
 void Game::CreateDebugWidgets()
@@ -259,182 +142,6 @@ void Game::UpdateGUI(const float dtMillis)
     if (mPlayButton)
     {
         mPlayButton->Update(dtMillis);
-    }
-}
-
-///------------------------------------------------------------------------------------------------
-
-void Game::CheckForPendingWorldObjectsToBeCreated()
-{
-    // Pending world object creation
-    std::lock_guard<std::mutex> worldGuard(sWorldMutex);
-
-    for (auto worldObjectData: mPendingWorldObjectDataToCreate)
-    {
-        worldObjectData.invalidated = false;
-        CreateWorldObject(worldObjectData);
-    }
-    mPendingWorldObjectDataToCreate.clear();
-}
-
-///------------------------------------------------------------------------------------------------
-
-void Game::InterpolateLocalWorld(const float dtMillis)
-{
-    auto& systemsEngine = CoreSystemsEngine::GetInstance();
-    auto& sceneManager = systemsEngine.GetSceneManager();
-    
-    std::lock_guard<std::mutex> worldLockGuard(sWorldMutex);
-
-    auto scene = sceneManager.FindScene(game_constants::WORLD_SCENE_NAME);
-    
-    for (int worldObjectIDToCleanup: mWorldObjectIDsToCleanup)
-    {
-        scene->RemoveSceneObject(strutils::StringId(worldObjectIDToCleanup));
-        scene->RemoveSceneObject(strutils::StringId(std::to_string(worldObjectIDToCleanup) + "_name"));
-    }
-    mWorldObjectIDsToCleanup.clear();
-    
-    for (auto& objectData: mWorldObjectData)
-    {
-        switch (objectData.objectType)
-        {
-            case networking::OBJ_TYPE_PLAYER:
-            {
-                auto playerSceneObject = scene->FindSceneObject(strutils::StringId(objectData.objectId));
-                auto playerNameSceneObject = scene->FindSceneObject(strutils::StringId(std::to_string(objectData.objectId) + "_name"));
-                
-                if (!playerSceneObject || !playerNameSceneObject)
-                {
-                    continue;
-                }
-                
-                if (objectData.isLocal)
-                {
-                    mPlayerController->Update(dtMillis, strutils::StringId(objectData.objectId), objectData, *scene);
-                }
-                else
-                {
-                    auto directionToTarget = objectData.objectPosition - playerSceneObject->mPosition;
-                    auto distanceToTarget = glm::length(directionToTarget);
-                    
-                    // If (unlikely) we the player is exactly on target, or if
-                    // the player's movement delta vector length exceeds the distance to target
-                    // we teleport to target
-                    if (distanceToTarget <= 0.0f || distanceToTarget < glm::length(glm::normalize(directionToTarget) * game_constants::PLAYER_SPEED * dtMillis))
-                    {
-                        playerSceneObject->mPosition = objectData.objectPosition;
-                        playerNameSceneObject->mPosition = playerSceneObject->mPosition + game_constants::PLAYER_NAMEPLATE_OFFSET;
-                        
-                        auto boundingRect = scene_object_utils::GetSceneObjectBoundingRect(*playerNameSceneObject);
-                        auto textLength = boundingRect.topRight.x - boundingRect.bottomLeft.x;
-                        playerNameSceneObject->mPosition.x -= textLength/2.0f;
-                    }
-                    else
-                    {
-                        playerSceneObject->mPosition += glm::normalize(directionToTarget) * game_constants::PLAYER_SPEED * dtMillis;
-                        playerNameSceneObject->mPosition += glm::normalize(directionToTarget) * game_constants::PLAYER_SPEED * dtMillis;
-                    }
-                }
-            } break;
-                 
-            case networking::OBJ_TYPE_NPC_ENEMY:
-            {
-                auto npcSceneObject = scene->FindSceneObject(strutils::StringId(objectData.objectId));
-                if (objectData.objectState == networking::OBJ_STATE_ALIVE)
-                {
-                    npcSceneObject->mPosition = objectData.objectPosition;
-                }
-                else
-                {
-                    auto directionToTarget = objectData.objectPosition - npcSceneObject->mPosition;
-                    auto distanceToTarget = glm::length(directionToTarget);
-
-                    if (distanceToTarget <= 0.0f || distanceToTarget < glm::length(glm::normalize(directionToTarget) * ENEMY_SPEED * dtMillis))
-                    {
-                        npcSceneObject->mPosition = objectData.objectPosition;
-                    }
-                    else
-                    {
-                        npcSceneObject->mPosition += glm::normalize(directionToTarget) * ENEMY_SPEED * dtMillis;
-                    }
-                }
-                
-                while (scene->FindSceneObject(DEBUG_PATH_SEGMENT_SCENE_OBJECT_NAME))
-                {
-                    scene->RemoveSceneObject(DEBUG_PATH_SEGMENT_SCENE_OBJECT_NAME);
-                }
-                
-                if (mPathfindingDebugMode)
-                {
-                    if (!objectData.objectName.GetString().empty() && objectData.objectName.GetString()[0] != '\0')
-                    {
-                        auto pathStringComponents = strutils::StringSplit(objectData.objectName.GetString(), ' ');
-                        for (const auto& pathStringComponent: pathStringComponents)
-                        {
-                            if (pathStringComponent.empty())
-                            {
-                                continue;
-                            }
-                            
-                            auto pathPosition = scene->CreateSceneObject(DEBUG_PATH_SEGMENT_SCENE_OBJECT_NAME);
-                            pathPosition->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "debug/debug_cross.png");
-                            pathPosition->mScale = glm::vec3(DEBUG_PATH_SEGMENT_SIZE);
-                            pathPosition->mPosition.x = std::stof(strutils::StringSplit(pathStringComponent, ',')[0]);
-                            pathPosition->mPosition.y = std::stof(strutils::StringSplit(pathStringComponent, ',')[1]);
-                            pathPosition->mPosition.z = 10.0f;
-                        }
-                    }
-                }
-            } break;
-                
-                
-            case networking::OBJ_TYPE_NPC_SHURIKEN:
-            {
-                if (objectData.objectState != networking::OBJ_STATE_DEAD)
-                {
-                    auto npcSceneObject = scene->FindSceneObject(strutils::StringId(objectData.objectId));
-                    
-                    objectData.objectPosition += objectData.objectVelocity * dtMillis;
-                    npcSceneObject->mPosition = objectData.objectPosition;
-                }
-            } break;
-                
-            default:
-            {
-                assert(false);
-            } break;
-        }
-    }
-}
-
-///------------------------------------------------------------------------------------------------
-
-void Game::CheckForStateSending(const float dtMillis)
-{
-    static float stateSendingTimer = 0.0f;
-    mStateSendingDelayMillis = mLastPingMillis.load() < game_constants::STATE_SEND_MIN_DELAY_MILLIS ? game_constants::STATE_SEND_MIN_DELAY_MILLIS : game_constants::STATE_SEND_MAX_DELAY_MILLIS;
-
-    stateSendingTimer += dtMillis;
-    if (stateSendingTimer > mStateSendingDelayMillis)
-    {
-        stateSendingTimer -= mStateSendingDelayMillis;
-        
-        std::lock_guard<std::mutex> worldLockGuard(sWorldMutex);
-        auto localPlayerFoundIter = std::find_if(mWorldObjectData.begin(), mWorldObjectData.end(), [&](networking::WorldObjectData& worldObjectEntry){ return worldObjectEntry.objectType == networking::OBJ_TYPE_PLAYER && worldObjectEntry.isLocal; });
-        
-        // Local player is not found in local world data.
-        // Send an empty state just to request other world entities
-        if (localPlayerFoundIter == mWorldObjectData.end())
-        {
-            SendNetworkMessage(nlohmann::json(), networking::MessageType::CS_PLAYER_STATE, networking::MessagePriority::NORMAL);
-        }
-        // Local player found in world data. Send its updated state
-        else
-        {
-            SendNetworkMessage(localPlayerFoundIter->SerializeToJson(), networking::MessageType::CS_PLAYER_STATE, networking::MessagePriority::NORMAL);
-        }
-        
     }
 }
 
@@ -473,71 +180,6 @@ void Game::SendNetworkMessage(const nlohmann::json& message, const networking::M
 
 ///------------------------------------------------------------------------------------------------
 
-void Game::CreateWorldObject(const networking::WorldObjectData& worldObjectData)
-{
-    auto& systemsEngine = CoreSystemsEngine::GetInstance();
-    auto scene = systemsEngine.GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME);
-    
-    switch (worldObjectData.objectType)
-    {
-        case networking::OBJ_TYPE_PLAYER:
-        {
-            auto ninja = scene->CreateSceneObject(strutils::StringId(worldObjectData.objectId));
-            ninja->mPosition = worldObjectData.objectPosition;
-            ninja->mScale /= 10.0f;
-            ninja->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + "portrait.vs");
-            ninja->mTextureResourceId =  systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "world/portrait.png");
-            ninja->mShaderFloatUniformValues[strutils::StringId("portrait_value")] = worldObjectData.color;
-            
-            auto ninjaName = scene->CreateSceneObject(strutils::StringId(std::to_string(worldObjectData.objectId) + "_name"));
-            scene::TextSceneObjectData textSceneObjectData;
-            textSceneObjectData.mFontName = game_constants::DEFAULT_FONT_NAME;
-            textSceneObjectData.mText = worldObjectData.objectName.GetString();
-            
-            ninjaName->mScale /= 3000.0f;
-            ninjaName->mPosition = ninja->mPosition;
-            ninjaName->mSceneObjectTypeData = std::move(textSceneObjectData);
-            ninjaName->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + "portrait.vs");
-            ninjaName->mShaderFloatUniformValues[strutils::StringId("portrait_value")] = worldObjectData.color;
-            
-            auto boundingRect = scene_object_utils::GetSceneObjectBoundingRect(*ninjaName);
-            auto textLength = boundingRect.topRight.x - boundingRect.bottomLeft.x;
-            ninjaName->mPosition += game_constants::PLAYER_NAMEPLATE_OFFSET;
-            ninjaName->mPosition.x -= textLength/2.0f;
-            
-            if (worldObjectData.isLocal)
-            {
-                mLocalPlayerSceneObject = ninja;
-            }
-        } break;
-          
-        case networking::OBJ_TYPE_NPC_ENEMY:
-        {
-            auto worldObject = scene->CreateSceneObject(strutils::StringId(worldObjectData.objectId));
-            worldObject->mPosition = worldObjectData.objectPosition;
-            worldObject->mScale /= 13.0f;
-            worldObject->mTextureResourceId =  systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "world/portrait_enemy.png");
-        } break;
-            
-        case networking::OBJ_TYPE_NPC_SHURIKEN:
-        {
-            auto worldObject = scene->CreateSceneObject(strutils::StringId(worldObjectData.objectId));
-            worldObject->mPosition = worldObjectData.objectPosition;
-            worldObject->mScale /= 30.0f;
-            worldObject->mTextureResourceId =  systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "world/shuriken.png");
-        } break;
-            
-        default:
-        {
-            assert(false);
-        } break;
-    }
-    
-    mWorldObjectData.emplace_back(worldObjectData);
-}
-
-///------------------------------------------------------------------------------------------------
-
 void Game::OnServerResponse(const std::string& response)
 {
     if (nlohmann::json::accept(response))
@@ -545,16 +187,9 @@ void Game::OnServerResponse(const std::string& response)
         auto responseJson = nlohmann::json::parse(response);
         //logging::Log(logging::LogType::INFO, responseJson.dump(4).c_str());
         
-        if (networking::IsMessageOfType(responseJson, networking::MessageType::SC_PLAYER_STATE_RESPONSE))
-        {
-            OnServerPlayerStateResponse(responseJson);
-        }
-        else if (networking::IsMessageOfType(responseJson, networking::MessageType::SC_REQUEST_LOGIN_RESPONSE))
+        if (networking::IsMessageOfType(responseJson, networking::MessageType::SC_REQUEST_LOGIN_RESPONSE))
         {
             OnServerLoginResponse(responseJson);
-        }
-        else if (networking::IsMessageOfType(responseJson, networking::MessageType::SC_THROW_RANGED_WEAPON_RESPONSE))
-        {
         }
         else
         {
@@ -568,64 +203,6 @@ void Game::OnServerResponse(const std::string& response)
     
 }
 
-void Game::OnServerPlayerStateResponse(const nlohmann::json& responseJson)
-{
-    std::lock_guard<std::mutex> worldLockGuard(sWorldMutex);
-    
-    // Invalidate all local world object data
-    for (auto& worldObjectData: mWorldObjectData)
-    {
-        worldObjectData.invalidated = true;
-    }
-    
-    // Parse and update local world object data validating them
-    for (const auto& worldObjectJson: responseJson[networking::WorldObjectData::ObjectCollectionHeader()])
-    {
-        networking::WorldObjectData remoteWorldObjectData;
-        remoteWorldObjectData.DeserializeFromJson(worldObjectJson);
-        
-        auto worldObjectIter = std::find_if(mWorldObjectData.begin(), mWorldObjectData.end(), [&](networking::WorldObjectData& worldObjectData)
-        {
-            return worldObjectData.objectId == remoteWorldObjectData.objectId;
-        });
-        
-        if (worldObjectIter == mWorldObjectData.end())
-        {
-            mPendingWorldObjectDataToCreate.push_back(remoteWorldObjectData);
-        }
-        else
-        {
-            auto& worldObjectData = *worldObjectIter;
-            
-            if (worldObjectData.objectType != networking::OBJ_TYPE_PLAYER || !worldObjectData.isLocal)
-            {
-                worldObjectData.objectPosition = remoteWorldObjectData.objectPosition;
-                worldObjectData.objectVelocity = remoteWorldObjectData.objectVelocity;
-            }
-            
-            worldObjectData.objectName = remoteWorldObjectData.objectName;
-            worldObjectData.parentObjectId = remoteWorldObjectData.parentObjectId;
-            worldObjectData.objectState = remoteWorldObjectData.objectState;
-            worldObjectData.invalidated = false;
-        }
-    }
-    
-    // Clean up all player data entries that the server does not know of (anymore)
-    for (auto worldObjectIter = mWorldObjectData.begin(); worldObjectIter != mWorldObjectData.end();)
-    {
-        auto& worldObjectData = *worldObjectIter;
-        if (worldObjectData.invalidated)
-        {
-            mWorldObjectIDsToCleanup.push_back(strutils::StringId(worldObjectData.objectId));
-            worldObjectIter = mWorldObjectData.erase(worldObjectIter);
-        }
-        else
-        {
-            worldObjectIter++;
-        }
-    }
-}
-
 ///------------------------------------------------------------------------------------------------
 
 void Game::OnServerLoginResponse(const nlohmann::json& responseJson)
@@ -635,19 +212,7 @@ void Game::OnServerLoginResponse(const nlohmann::json& responseJson)
     
     if (loginResponse.allowed)
     {
-        std::lock_guard<std::mutex> worldLockGuard(sWorldMutex);
         
-        networking::WorldObjectData worldObjectData = {};
-        worldObjectData.objectId = loginResponse.playerId;
-        worldObjectData.objectName = loginResponse.playerName;
-        worldObjectData.objectPosition = loginResponse.playerPosition;
-        worldObjectData.objectCurrentMapName = loginResponse.playerCurrentMapName;
-        worldObjectData.color = loginResponse.color;
-        worldObjectData.objectType = networking::OBJ_TYPE_PLAYER;
-        worldObjectData.objectState = networking::OBJ_STATE_ALIVE;
-        worldObjectData.isLocal = true;
-        worldObjectData.invalidated = false;
-        mPendingWorldObjectDataToCreate.push_back(worldObjectData);
     }
 }
 
@@ -668,47 +233,6 @@ void Game::OnPlayButtonPressed()
     
     // Request login details
     SendNetworkMessage(nlohmann::json(), networking::MessageType::CS_REQUEST_LOGIN, networking::MessagePriority::HIGH);
-}
-
-///------------------------------------------------------------------------------------------------
-
-void Game::OnMapChange(const events::MapChangeEvent& mapChangeEvent, const bool shouldLoadNeighbourMapResourcesAsync)
-{
-    const auto& mapResources = mMapResourceController->GetMapResources(mapChangeEvent.mNewMapName);
-    mPlayerController->SetNavmap(mapResources.mNavmapImageResourceId, mapResources.mNavmap);
-}
-
-///------------------------------------------------------------------------------------------------
-
-void Game::CreateMapSceneObjects(const strutils::StringId& mapName)
-{
-    auto& systemsEngine = CoreSystemsEngine::GetInstance();
-    auto scene = systemsEngine.GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME);
-    
-    const auto& mapDefinition = GlobalMapDataRepository::GetInstance().GetMapDefinition(mapName);
-    const auto& mapResources = mMapResourceController->GetMapResources(mapName);
-    
-    assert(mapResources.mMapResourcesState == MapResourcesState::LOADED);
-    
-    auto mapBottomLayer = scene->CreateSceneObject(strutils::StringId(mapDefinition.mMapName.GetString()  + "_bottom"));
-    mapBottomLayer->mPosition.x = mapDefinition.mMapPosition.x * game_constants::MAP_RENDERED_SCALE;
-    mapBottomLayer->mPosition.y = mapDefinition.mMapPosition.y * game_constants::MAP_RENDERED_SCALE;
-    mapBottomLayer->mPosition.z = map_constants::TILE_BOTTOM_LAYER_Z;
-    mapBottomLayer->mScale *= game_constants::MAP_RENDERED_SCALE;
-    mapBottomLayer->mTextureResourceId = mapResources.mBottomLayerTextureResourceId;
-    mapBottomLayer->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + "world_map.vs");
-    mapBottomLayer->mShaderFloatUniformValues[strutils::StringId("map_width")] = mapDefinition.mMapDimensions.x;
-    mapBottomLayer->mShaderFloatUniformValues[strutils::StringId("map_height")] = mapDefinition.mMapDimensions.y;
-    
-    auto mapTopLayer = scene->CreateSceneObject(strutils::StringId(mapDefinition.mMapName.GetString()  + "_top"));
-    mapTopLayer->mPosition.x = mapDefinition.mMapPosition.x * game_constants::MAP_RENDERED_SCALE;
-    mapTopLayer->mPosition.y = mapDefinition.mMapPosition.y * game_constants::MAP_RENDERED_SCALE;
-    mapTopLayer->mPosition.z = map_constants::TILE_TOP_LAYER_Z;
-    mapTopLayer->mScale *= game_constants::MAP_RENDERED_SCALE;
-    mapTopLayer->mTextureResourceId = mapResources.mTopLayerTextureResourceId;
-    mapTopLayer->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + "world_map.vs");
-    mapTopLayer->mShaderFloatUniformValues[strutils::StringId("map_width")] = mapDefinition.mMapDimensions.x;
-    mapTopLayer->mShaderFloatUniformValues[strutils::StringId("map_height")] = mapDefinition.mMapDimensions.y;
 }
 
 ///------------------------------------------------------------------------------------------------
