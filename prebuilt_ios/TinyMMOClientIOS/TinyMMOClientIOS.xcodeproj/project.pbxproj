@@ -7,18 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		078BCD5037ED7BA43F90F5D2 /* BackgroundMusicPlayer.h in Sources */ = {isa = PBXBuildFile; fileRef = 977F8E7B3CD8B07CF742FF36 /* BackgroundMusicPlayer.h */; };
 		081A9A06DFDB6D2DCCCAE343 /* AnimationManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EBF846548488DC5997004413 /* AnimationManager.cpp */; };
 		08AE236E40150C6D07B7AF70 /* BaseDataFileSerializer.h in Sources */ = {isa = PBXBuildFile; fileRef = 3F2663D4D8A6185959494E12 /* BaseDataFileSerializer.h */; };
 		0BBF6683EF819A4D125B98A0 /* ThreadSafeQueue.h in Sources */ = {isa = PBXBuildFile; fileRef = 989D5D93E995723F377B2323 /* ThreadSafeQueue.h */; };
-		184764CEA45E8103AB5053DA /* AppleUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4A6DDE15E3BA94F6E014EFF /* AppleUtils.mm */; };
 		1EB158AD6807266C96047A69 /* SerializationDefinitions.h in Sources */ = {isa = PBXBuildFile; fileRef = FCD986CB07334B2433EB426D /* SerializationDefinitions.h */; };
-		27EBB117D38FD5C44627896A /* SfxPlayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = A27D8C2596AF7ECA17A6F2DA /* SfxPlayer.mm */; };
+		29126AABDF932B273DF5D906 /* Editor.h in Sources */ = {isa = PBXBuildFile; fileRef = 88F1CBB8FE5D806DABB02E53 /* Editor.h */; };
 		2DEEC97E3FA3C0533CF8B865 /* AnimationManager.h in Sources */ = {isa = PBXBuildFile; fileRef = 36BA43D12A116F9CEDEEC5BB /* AnimationManager.h */; };
 		3932349844F41A87BC153A8B /* TypeTraits.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EEE04C21CA0FF05632F35BB0 /* TypeTraits.cpp */; };
 		3BF66DE631A90A5B18DAA6D7 /* ImageSurfaceLoader.h in Sources */ = {isa = PBXBuildFile; fileRef = 809A245389B128D782E60C07 /* ImageSurfaceLoader.h */; };
 		46F6BCE0E0E5C698199D1767 /* BaseDataFileDeserializer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F0FFCD7AE0C78521E3B1DFF2 /* BaseDataFileDeserializer.cpp */; };
-		474475A8D3C563AE4E3E2FD8 /* TinyMMOClientReachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 563EB320E94CA42BA6BDCCC5 /* TinyMMOClientReachability.m */; };
 		4806A612F0016F3AA933D2E6 /* Events.h in Sources */ = {isa = PBXBuildFile; fileRef = B44A455E0B720A9A63FF5AA4 /* Events.h */; };
 		4B4CF9850E3F8C1AC25DA9BE /* stb_image_write.h in Sources */ = {isa = PBXBuildFile; fileRef = AD91490AA01CC7CAB71ABD60 /* stb_image_write.h */; };
 		4E71A19BB3DA7B87946D19C7 /* Date.h in Sources */ = {isa = PBXBuildFile; fileRef = E641ED7689F0E595A6995C4C /* Date.h */; };
@@ -28,12 +25,15 @@
 		63ACAC4B14C52F77FD898EB9 /* SceneManager.h in Sources */ = {isa = PBXBuildFile; fileRef = 2D9F44C3DC0B2CD50A891B5D /* SceneManager.h */; };
 		66AB165A307A903CD1E44358 /* SoundManager.h in Sources */ = {isa = PBXBuildFile; fileRef = 4E45BF6E91E8A78C5D531D26 /* SoundManager.h */; };
 		67B1455F17EDD453F49F14AA /* ImageSurfaceResource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E3503F93D9327A645A426E67 /* ImageSurfaceResource.cpp */; };
-		7295151C8C9D6DD7D7BD4BC1 /* TinyMMOClientReachability.h in Sources */ = {isa = PBXBuildFile; fileRef = 780FB7B3F748E48B3EEBE7CD /* TinyMMOClientReachability.h */; };
 		786063C15D9206FCF4754A11 /* Animations.h in Sources */ = {isa = PBXBuildFile; fileRef = 64A0A7BE4A8B84A02E685B42 /* Animations.h */; };
+		7BECC45C550A56F588DCE95C /* AnimatedButton.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8E40F678855DDE41F3D1BE93 /* AnimatedButton.cpp */; };
 		7FF61324BBA1F6D4E1EC3F71 /* RenderingUtils.h in Sources */ = {isa = PBXBuildFile; fileRef = 9185C9CB0C297CF483484A21 /* RenderingUtils.h */; };
+		822FE0D9B0F43ABCCA670AEE /* Logging.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0495EBE27B4909681DD3349B /* Logging.cpp */; };
+		84315642A814819314A60879 /* Editor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 388256D6EE42CBA74550DE48 /* Editor.cpp */; };
 		860EB71A433096C480955728 /* SceneObjectUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 737A7BF42484F5DE03FA7A46 /* SceneObjectUtils.cpp */; };
 		87A8C87B81C696FE66FCCA16 /* ImageSurfaceResource.h in Sources */ = {isa = PBXBuildFile; fileRef = BFEE31CB1C81B110DF5D5525 /* ImageSurfaceResource.h */; };
 		8F23093EE098A3EBA8E96C18 /* ImageSurfaceLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 59DF82D26A3BD281A3C982D8 /* ImageSurfaceLoader.cpp */; };
+		8FBAC0DD7391D92D6B27696D /* AnimatedButton.h in Sources */ = {isa = PBXBuildFile; fileRef = E2A734A6C5AA972D47A61036 /* AnimatedButton.h */; };
 		92043B0E2A0947A4007CC7DE /* AVFAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92043B022A0947A4007CC7DE /* AVFAudio.framework */; };
 		9206EBCE2ACDC3FF00198337 /* Game.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9206EB012ACDC3FE00198337 /* Game.cpp */; };
 		9206EBCF2ACDC3FF00198337 /* TextureResource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9206EB072ACDC3FE00198337 /* TextureResource.cpp */; };
@@ -61,26 +61,36 @@
 		92678D5E2BC6975F0077C215 /* SDL2_image.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 925592C42BA09F3E001D7B97 /* SDL2_image.framework */; };
 		92678D622BC6CA6A0077C215 /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92678D612BC6CA6A0077C215 /* SDL2.framework */; };
 		92678D632BC6CA6A0077C215 /* SDL2.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 92678D612BC6CA6A0077C215 /* SDL2.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		92C536D12C245161008CD2BF /* AppleSoundUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 92C536C42C245161008CD2BF /* AppleSoundUtils.h */; };
+		92C536D22C245161008CD2BF /* AppleSoundUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = 92C536C52C245161008CD2BF /* AppleSoundUtils.mm */; };
+		92C536D32C245161008CD2BF /* AppleUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 92C536C62C245161008CD2BF /* AppleUtils.h */; };
+		92C536D42C245161008CD2BF /* AppleUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = 92C536C72C245161008CD2BF /* AppleUtils.mm */; };
+		92C536D52C245161008CD2BF /* BackgroundMusicPlayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 92C536C82C245161008CD2BF /* BackgroundMusicPlayer.h */; };
+		92C536D62C245161008CD2BF /* BackgroundMusicPlayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 92C536C92C245161008CD2BF /* BackgroundMusicPlayer.mm */; };
+		92C536D72C245161008CD2BF /* SfxPlayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 92C536CA2C245161008CD2BF /* SfxPlayer.h */; };
+		92C536D82C245161008CD2BF /* SfxPlayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 92C536CB2C245161008CD2BF /* SfxPlayer.mm */; };
+		92C536D92C245161008CD2BF /* TinyMMOClientReachability.h in Headers */ = {isa = PBXBuildFile; fileRef = 92C536CC2C245161008CD2BF /* TinyMMOClientReachability.h */; };
+		92C536DA2C245161008CD2BF /* TinyMMOClientReachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 92C536CD2C245161008CD2BF /* TinyMMOClientReachability.m */; };
+		92C536E62C245170008CD2BF /* NetworkMessages.h in Headers */ = {isa = PBXBuildFile; fileRef = 92C536DD2C245170008CD2BF /* NetworkMessages.h */; };
+		92C536E72C245170008CD2BF /* NetworkObjectDefinitions.inc in Sources */ = {isa = PBXBuildFile; fileRef = 92C536DE2C245170008CD2BF /* NetworkObjectDefinitions.inc */; };
+		92C536E82C245170008CD2BF /* SerializableNetworkObjects.h in Headers */ = {isa = PBXBuildFile; fileRef = 92C536DF2C245170008CD2BF /* SerializableNetworkObjects.h */; };
+		92C536E92C245170008CD2BF /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 92C536E12C245170008CD2BF /* .gitignore */; };
+		92C536EB2C245170008CD2BF /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 92C536E32C245170008CD2BF /* LICENSE */; };
 		92C7FC462B06794C008568C6 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92C7FC372B06794C008568C6 /* UIKit.framework */; };
 		92C851692969A7CB0021923F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 92C851682969A7CB0021923F /* Assets.xcassets */; };
 		92C8516C2969A7CB0021923F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 92C8516A2969A7CB0021923F /* LaunchScreen.storyboard */; };
 		92C851BA2969A9D70021923F /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 92C851B92969A9D70021923F /* main.cpp */; };
 		92CA975B2B653BC000B53B01 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92CA974C2B653BBF00B53B01 /* StoreKit.framework */; };
 		92E96A6B29803597004A3120 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92E96A5F29803597004A3120 /* OpenGLES.framework */; };
-		97D5D6B8347443288B8ABA12 /* BackgroundMusicPlayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = F9EB4E0575AF02884C3ED019 /* BackgroundMusicPlayer.mm */; };
 		A06267DC99AA41180FEEC5E7 /* IOSUtils.h in Sources */ = {isa = PBXBuildFile; fileRef = 70EAA9FFECCEE753A4D14AFF /* IOSUtils.h */; };
 		A2D77982E2E1A21D9C1F22E3 /* EventSystem.h in Sources */ = {isa = PBXBuildFile; fileRef = E3A1C56ACA5ABB18A5A59BA3 /* EventSystem.h */; };
-		ABDC5333E2E95E5AB630A5E4 /* AppleSoundUtils.h in Sources */ = {isa = PBXBuildFile; fileRef = 7E513C82D2D95E4836EDE63C /* AppleSoundUtils.h */; };
 		AD7BB55992EC6177BB3DE6B1 /* RenderingUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 484A6A1B1B0D7ADC1BEEF99A /* RenderingUtils.cpp */; };
 		AE22507215A89C5059C9B6E4 /* ParticleManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E765BE8BAD6EAAC5948DFB99 /* ParticleManager.cpp */; };
-		B209DCA09AE5D2ECDCEB382C /* AppleUtils.h in Sources */ = {isa = PBXBuildFile; fileRef = 6A2B9146BB3700AB6F103DBE /* AppleUtils.h */; };
 		B4646BE5AB02E3828791D61E /* SceneObjectUtils.h in Sources */ = {isa = PBXBuildFile; fileRef = 4D44F8A7427AB83EA69F0455 /* SceneObjectUtils.h */; };
 		CB369EDB3723CEDB16D2A2FE /* BaseDataFileSerializer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 289376069695D28346FCC23A /* BaseDataFileSerializer.cpp */; };
 		DE60B65371427753F78EFC38 /* BaseDataFileDeserializer.h in Sources */ = {isa = PBXBuildFile; fileRef = CA46016D2047CEE613C0ED43 /* BaseDataFileDeserializer.h */; };
-		E026EEAFC052B55D49EBCADF /* SfxPlayer.h in Sources */ = {isa = PBXBuildFile; fileRef = E81CAC27FFDEA19501246552 /* SfxPlayer.h */; };
 		E5D592440AA9DF7D9C7BBDE5 /* IOSUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = EEA5D60503CEF24015859459 /* IOSUtils.mm */; };
 		E822BAEB6AFB1F91FA785FA4 /* ParticleManager.h in Sources */ = {isa = PBXBuildFile; fileRef = 07E6A4152BAC640B7D892FEF /* ParticleManager.h */; };
-		EAD29D4944FA967EBE7A3F02 /* AppleSoundUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = 671D233B7E849F2BBBC15370 /* AppleSoundUtils.mm */; };
 		F387EFF89C4B3BB095B1E15E /* PlatformMacros.h in Sources */ = {isa = PBXBuildFile; fileRef = 7AACE80E9655088BE13935FF /* PlatformMacros.h */; };
 		F5518A662447F238CCCAFE51 /* Animations.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C6B01E95D9ABF46EECA93F96 /* Animations.cpp */; };
 		FBD1FF1BF1985E3606DD20ED /* GameConstants.h in Sources */ = {isa = PBXBuildFile; fileRef = B3A902E2D8B1AD656D561A89 /* GameConstants.h */; };
@@ -119,27 +129,26 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0495EBE27B4909681DD3349B /* Logging.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = Logging.cpp; sourceTree = "<group>"; };
 		07E6A4152BAC640B7D892FEF /* ParticleManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = ParticleManager.h; sourceTree = "<group>"; };
 		289376069695D28346FCC23A /* BaseDataFileSerializer.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = BaseDataFileSerializer.cpp; sourceTree = "<group>"; };
 		2D9F44C3DC0B2CD50A891B5D /* SceneManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = SceneManager.h; sourceTree = "<group>"; };
 		36BA43D12A116F9CEDEEC5BB /* AnimationManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = AnimationManager.h; sourceTree = "<group>"; };
+		388256D6EE42CBA74550DE48 /* Editor.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = Editor.cpp; sourceTree = "<group>"; };
 		3F2663D4D8A6185959494E12 /* BaseDataFileSerializer.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = BaseDataFileSerializer.h; sourceTree = "<group>"; };
 		484A6A1B1B0D7ADC1BEEF99A /* RenderingUtils.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = RenderingUtils.cpp; sourceTree = "<group>"; };
 		4D44F8A7427AB83EA69F0455 /* SceneObjectUtils.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = SceneObjectUtils.h; sourceTree = "<group>"; };
 		4E45BF6E91E8A78C5D531D26 /* SoundManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = SoundManager.h; sourceTree = "<group>"; };
 		549C84D3FE6BA93E39F0B406 /* EventSystem.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = EventSystem.cpp; sourceTree = "<group>"; };
-		563EB320E94CA42BA6BDCCC5 /* TinyMMOClientReachability.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = TinyMMOClientReachability.m; sourceTree = "<group>"; };
 		59DF82D26A3BD281A3C982D8 /* ImageSurfaceLoader.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = ImageSurfaceLoader.cpp; sourceTree = "<group>"; };
 		64A0A7BE4A8B84A02E685B42 /* Animations.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = Animations.h; sourceTree = "<group>"; };
-		671D233B7E849F2BBBC15370 /* AppleSoundUtils.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; path = AppleSoundUtils.mm; sourceTree = "<group>"; };
-		6A2B9146BB3700AB6F103DBE /* AppleUtils.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = AppleUtils.h; sourceTree = "<group>"; };
 		7002E4E05285B676C7910C17 /* SoundManager.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = SoundManager.cpp; sourceTree = "<group>"; };
 		70EAA9FFECCEE753A4D14AFF /* IOSUtils.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = IOSUtils.h; sourceTree = "<group>"; };
 		737A7BF42484F5DE03FA7A46 /* SceneObjectUtils.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = SceneObjectUtils.cpp; sourceTree = "<group>"; };
-		780FB7B3F748E48B3EEBE7CD /* TinyMMOClientReachability.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = TinyMMOClientReachability.h; sourceTree = "<group>"; };
 		7AACE80E9655088BE13935FF /* PlatformMacros.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = PlatformMacros.h; sourceTree = "<group>"; };
-		7E513C82D2D95E4836EDE63C /* AppleSoundUtils.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = AppleSoundUtils.h; sourceTree = "<group>"; };
 		809A245389B128D782E60C07 /* ImageSurfaceLoader.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = ImageSurfaceLoader.h; sourceTree = "<group>"; };
+		88F1CBB8FE5D806DABB02E53 /* Editor.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = Editor.h; sourceTree = "<group>"; };
+		8E40F678855DDE41F3D1BE93 /* AnimatedButton.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = AnimatedButton.cpp; sourceTree = "<group>"; };
 		9185C9CB0C297CF483484A21 /* RenderingUtils.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = RenderingUtils.h; sourceTree = "<group>"; };
 		92043B022A0947A4007CC7DE /* AVFAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFAudio.framework; path = System/Library/Frameworks/AVFAudio.framework; sourceTree = SDKROOT; };
 		9206EB002ACDC3FE00198337 /* Game.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Game.h; sourceTree = "<group>"; };
@@ -201,6 +210,21 @@
 		92678D112BC693A60077C215 /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
 		92678D612BC6CA6A0077C215 /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = "../../../SDL-ios-frameworks/SDL2.framework"; sourceTree = "<group>"; };
 		9285241629A9095A007EA0D9 /* GameController.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameController.framework; path = System/Library/Frameworks/GameController.framework; sourceTree = SDKROOT; };
+		92C536C42C245161008CD2BF /* AppleSoundUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppleSoundUtils.h; sourceTree = "<group>"; };
+		92C536C52C245161008CD2BF /* AppleSoundUtils.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AppleSoundUtils.mm; sourceTree = "<group>"; };
+		92C536C62C245161008CD2BF /* AppleUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppleUtils.h; sourceTree = "<group>"; };
+		92C536C72C245161008CD2BF /* AppleUtils.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AppleUtils.mm; sourceTree = "<group>"; };
+		92C536C82C245161008CD2BF /* BackgroundMusicPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BackgroundMusicPlayer.h; sourceTree = "<group>"; };
+		92C536C92C245161008CD2BF /* BackgroundMusicPlayer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = BackgroundMusicPlayer.mm; sourceTree = "<group>"; };
+		92C536CA2C245161008CD2BF /* SfxPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SfxPlayer.h; sourceTree = "<group>"; };
+		92C536CB2C245161008CD2BF /* SfxPlayer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SfxPlayer.mm; sourceTree = "<group>"; };
+		92C536CC2C245161008CD2BF /* TinyMMOClientReachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TinyMMOClientReachability.h; sourceTree = "<group>"; };
+		92C536CD2C245161008CD2BF /* TinyMMOClientReachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TinyMMOClientReachability.m; sourceTree = "<group>"; };
+		92C536DD2C245170008CD2BF /* NetworkMessages.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NetworkMessages.h; sourceTree = "<group>"; };
+		92C536DE2C245170008CD2BF /* NetworkObjectDefinitions.inc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.pascal; path = NetworkObjectDefinitions.inc; sourceTree = "<group>"; };
+		92C536DF2C245170008CD2BF /* SerializableNetworkObjects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SerializableNetworkObjects.h; sourceTree = "<group>"; };
+		92C536E12C245170008CD2BF /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
+		92C536E32C245170008CD2BF /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		92C7FC372B06794C008568C6 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		92C851562969A7CA0021923F /* TinyMMOClient.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TinyMMOClient.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		92C851682969A7CB0021923F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -210,27 +234,23 @@
 		92C851B92969A9D70021923F /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		92CA974C2B653BBF00B53B01 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		92E96A5F29803597004A3120 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
-		977F8E7B3CD8B07CF742FF36 /* BackgroundMusicPlayer.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = BackgroundMusicPlayer.h; sourceTree = "<group>"; };
 		989D5D93E995723F377B2323 /* ThreadSafeQueue.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = ThreadSafeQueue.h; sourceTree = "<group>"; };
-		A27D8C2596AF7ECA17A6F2DA /* SfxPlayer.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; path = SfxPlayer.mm; sourceTree = "<group>"; };
 		AD91490AA01CC7CAB71ABD60 /* stb_image_write.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = stb_image_write.h; sourceTree = "<group>"; };
 		B0E40336BF3CCBB53A0B7053 /* SceneManager.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = SceneManager.cpp; sourceTree = "<group>"; };
 		B3A902E2D8B1AD656D561A89 /* GameConstants.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = GameConstants.h; sourceTree = "<group>"; };
 		B44A455E0B720A9A63FF5AA4 /* Events.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = Events.h; sourceTree = "<group>"; };
-		B4A6DDE15E3BA94F6E014EFF /* AppleUtils.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; path = AppleUtils.mm; sourceTree = "<group>"; };
 		BFEE31CB1C81B110DF5D5525 /* ImageSurfaceResource.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = ImageSurfaceResource.h; sourceTree = "<group>"; };
 		C6B01E95D9ABF46EECA93F96 /* Animations.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = Animations.cpp; sourceTree = "<group>"; };
 		CA46016D2047CEE613C0ED43 /* BaseDataFileDeserializer.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = BaseDataFileDeserializer.h; sourceTree = "<group>"; };
+		E2A734A6C5AA972D47A61036 /* AnimatedButton.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = AnimatedButton.h; sourceTree = "<group>"; };
 		E3503F93D9327A645A426E67 /* ImageSurfaceResource.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = ImageSurfaceResource.cpp; sourceTree = "<group>"; };
 		E3A1C56ACA5ABB18A5A59BA3 /* EventSystem.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = EventSystem.h; sourceTree = "<group>"; };
 		E641ED7689F0E595A6995C4C /* Date.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = Date.h; sourceTree = "<group>"; };
 		E765BE8BAD6EAAC5948DFB99 /* ParticleManager.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = ParticleManager.cpp; sourceTree = "<group>"; };
-		E81CAC27FFDEA19501246552 /* SfxPlayer.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = SfxPlayer.h; sourceTree = "<group>"; };
 		EBF846548488DC5997004413 /* AnimationManager.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = AnimationManager.cpp; sourceTree = "<group>"; };
 		EEA5D60503CEF24015859459 /* IOSUtils.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; path = IOSUtils.mm; sourceTree = "<group>"; };
 		EEE04C21CA0FF05632F35BB0 /* TypeTraits.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = TypeTraits.cpp; sourceTree = "<group>"; };
 		F0FFCD7AE0C78521E3B1DFF2 /* BaseDataFileDeserializer.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = BaseDataFileDeserializer.cpp; sourceTree = "<group>"; };
-		F9EB4E0575AF02884C3ED019 /* BackgroundMusicPlayer.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; path = BackgroundMusicPlayer.mm; sourceTree = "<group>"; };
 		FCD986CB07334B2433EB426D /* SerializationDefinitions.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = SerializationDefinitions.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -267,30 +287,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		462B0CD2A2F0BFBE9EDEF0E5 /* source_apple_utilities */ = {
+		732B052F1137002F798156E8 /* editor */ = {
 			isa = PBXGroup;
 			children = (
-				46F64BC5A96470745D8C0A42 /* platform_utilities */,
+				388256D6EE42CBA74550DE48 /* Editor.cpp */,
+				88F1CBB8FE5D806DABB02E53 /* Editor.h */,
 			);
-			name = source_apple_utilities;
-			path = ../../../source_apple_utilities;
-			sourceTree = "<group>";
-		};
-		46F64BC5A96470745D8C0A42 /* platform_utilities */ = {
-			isa = PBXGroup;
-			children = (
-				6A2B9146BB3700AB6F103DBE /* AppleUtils.h */,
-				B4A6DDE15E3BA94F6E014EFF /* AppleUtils.mm */,
-				7E513C82D2D95E4836EDE63C /* AppleSoundUtils.h */,
-				671D233B7E849F2BBBC15370 /* AppleSoundUtils.mm */,
-				E81CAC27FFDEA19501246552 /* SfxPlayer.h */,
-				977F8E7B3CD8B07CF742FF36 /* BackgroundMusicPlayer.h */,
-				A27D8C2596AF7ECA17A6F2DA /* SfxPlayer.mm */,
-				F9EB4E0575AF02884C3ED019 /* BackgroundMusicPlayer.mm */,
-				780FB7B3F748E48B3EEBE7CD /* TinyMMOClientReachability.h */,
-				563EB320E94CA42BA6BDCCC5 /* TinyMMOClientReachability.m */,
-			);
-			path = platform_utilities;
+			path = editor;
 			sourceTree = "<group>";
 		};
 		9206EA1F2ACDC3FE00198337 /* source_ios */ = {
@@ -307,6 +310,7 @@
 			children = (
 				9206EAEE2ACDC3FE00198337 /* game */,
 				9206EB022ACDC3FE00198337 /* engine */,
+				732B052F1137002F798156E8 /* editor */,
 			);
 			name = source_common;
 			path = ../../../source_common;
@@ -319,6 +323,8 @@
 				9206EB012ACDC3FE00198337 /* Game.cpp */,
 				B3A902E2D8B1AD656D561A89 /* GameConstants.h */,
 				E9B34BDC795E6602450C2817 /* events */,
+				8E40F678855DDE41F3D1BE93 /* AnimatedButton.cpp */,
+				E2A734A6C5AA972D47A61036 /* AnimatedButton.h */,
 			);
 			path = game;
 			sourceTree = "<group>";
@@ -395,6 +401,7 @@
 				3F2663D4D8A6185959494E12 /* BaseDataFileSerializer.h */,
 				FCD986CB07334B2433EB426D /* SerializationDefinitions.h */,
 				E641ED7689F0E595A6995C4C /* Date.h */,
+				0495EBE27B4909681DD3349B /* Logging.cpp */,
 			);
 			path = utils;
 			sourceTree = "<group>";
@@ -461,6 +468,61 @@
 			path = platform_specific;
 			sourceTree = "<group>";
 		};
+		92C536CE2C245161008CD2BF /* platform_utilities */ = {
+			isa = PBXGroup;
+			children = (
+				92C536C42C245161008CD2BF /* AppleSoundUtils.h */,
+				92C536C52C245161008CD2BF /* AppleSoundUtils.mm */,
+				92C536C62C245161008CD2BF /* AppleUtils.h */,
+				92C536C72C245161008CD2BF /* AppleUtils.mm */,
+				92C536C82C245161008CD2BF /* BackgroundMusicPlayer.h */,
+				92C536C92C245161008CD2BF /* BackgroundMusicPlayer.mm */,
+				92C536CA2C245161008CD2BF /* SfxPlayer.h */,
+				92C536CB2C245161008CD2BF /* SfxPlayer.mm */,
+				92C536CC2C245161008CD2BF /* TinyMMOClientReachability.h */,
+				92C536CD2C245161008CD2BF /* TinyMMOClientReachability.m */,
+			);
+			path = platform_utilities;
+			sourceTree = "<group>";
+		};
+		92C536D02C245161008CD2BF /* source_apple_utilities */ = {
+			isa = PBXGroup;
+			children = (
+				92C536CE2C245161008CD2BF /* platform_utilities */,
+			);
+			name = source_apple_utilities;
+			path = ../../../source_apple_utilities;
+			sourceTree = "<group>";
+		};
+		92C536DC2C245170008CD2BF /* net_assets */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = net_assets;
+			sourceTree = "<group>";
+		};
+		92C536E02C245170008CD2BF /* net_common */ = {
+			isa = PBXGroup;
+			children = (
+				92C536DD2C245170008CD2BF /* NetworkMessages.h */,
+				92C536DE2C245170008CD2BF /* NetworkObjectDefinitions.inc */,
+				92C536DF2C245170008CD2BF /* SerializableNetworkObjects.h */,
+			);
+			path = net_common;
+			sourceTree = "<group>";
+		};
+		92C536E52C245170008CD2BF /* source_net_common */ = {
+			isa = PBXGroup;
+			children = (
+				92C536DC2C245170008CD2BF /* net_assets */,
+				92C536E02C245170008CD2BF /* net_common */,
+				92C536E12C245170008CD2BF /* .gitignore */,
+				92C536E32C245170008CD2BF /* LICENSE */,
+			);
+			name = source_net_common;
+			path = ../../../source_net_common;
+			sourceTree = "<group>";
+		};
 		92C8514D2969A7CA0021923F = {
 			isa = PBXGroup;
 			children = (
@@ -488,10 +550,11 @@
 				9206EC3C2ACDCD9100198337 /* assets */,
 				9206EA262ACDC3FE00198337 /* source_common */,
 				9206EA1F2ACDC3FE00198337 /* source_ios */,
+				92C536E52C245170008CD2BF /* source_net_common */,
+				92C536D02C245161008CD2BF /* source_apple_utilities */,
 				92C851682969A7CB0021923F /* Assets.xcassets */,
 				92C8516A2969A7CB0021923F /* LaunchScreen.storyboard */,
 				92C851B92969A9D70021923F /* main.cpp */,
-				462B0CD2A2F0BFBE9EDEF0E5 /* source_apple_utilities */,
 			);
 			path = TinyMMOClientIOS;
 			sourceTree = "<group>";
@@ -540,6 +603,13 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				92C536D12C245161008CD2BF /* AppleSoundUtils.h in Headers */,
+				92C536D32C245161008CD2BF /* AppleUtils.h in Headers */,
+				92C536D92C245161008CD2BF /* TinyMMOClientReachability.h in Headers */,
+				92C536E82C245170008CD2BF /* SerializableNetworkObjects.h in Headers */,
+				92C536D52C245161008CD2BF /* BackgroundMusicPlayer.h in Headers */,
+				92C536D72C245161008CD2BF /* SfxPlayer.h in Headers */,
+				92C536E62C245170008CD2BF /* NetworkMessages.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -648,6 +718,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				92C536E92C245170008CD2BF /* .gitignore in Resources */,
+				92C536EB2C245170008CD2BF /* LICENSE in Resources */,
 				9206EC3D2ACDCD9100198337 /* assets in Resources */,
 				92C8516C2969A7CB0021923F /* LaunchScreen.storyboard in Resources */,
 				92C851692969A7CB0021923F /* Assets.xcassets in Resources */,
@@ -677,6 +749,7 @@
 			files = (
 				9206EBD52ACDC3FF00198337 /* DataFileResource.cpp in Sources */,
 				9206EBCF2ACDC3FF00198337 /* TextureResource.cpp in Sources */,
+				92C536D62C245161008CD2BF /* BackgroundMusicPlayer.mm in Sources */,
 				9206EBD82ACDC3FF00198337 /* MathUtils.cpp in Sources */,
 				9206EBD12ACDC3FF00198337 /* OBJMeshLoader.cpp in Sources */,
 				9206EBD22ACDC3FF00198337 /* ResourceLoadingService.cpp in Sources */,
@@ -692,6 +765,7 @@
 				9206EBD32ACDC3FF00198337 /* MeshResource.cpp in Sources */,
 				9206EC002ACDC99D00198337 /* SDL_uikit_main.c in Sources */,
 				9206EBDD2ACDC3FF00198337 /* Scene.cpp in Sources */,
+				92C536D82C245161008CD2BF /* SfxPlayer.mm in Sources */,
 				9206EBFF2ACDC99D00198337 /* InputStateManagerPlatformImpl.cpp in Sources */,
 				9206EBD02ACDC3FF00198337 /* TextureLoader.cpp in Sources */,
 				9206EBD92ACDC3FF00198337 /* Camera.cpp in Sources */,
@@ -703,6 +777,8 @@
 				860EB71A433096C480955728 /* SceneObjectUtils.cpp in Sources */,
 				B4646BE5AB02E3828791D61E /* SceneObjectUtils.h in Sources */,
 				AD7BB55992EC6177BB3DE6B1 /* RenderingUtils.cpp in Sources */,
+				92C536E72C245170008CD2BF /* NetworkObjectDefinitions.inc in Sources */,
+				92C536D42C245161008CD2BF /* AppleUtils.mm in Sources */,
 				7FF61324BBA1F6D4E1EC3F71 /* RenderingUtils.h in Sources */,
 				5C9953DDFEE1C355339E8F4D /* EventSystem.cpp in Sources */,
 				A2D77982E2E1A21D9C1F22E3 /* EventSystem.h in Sources */,
@@ -717,28 +793,25 @@
 				67B1455F17EDD453F49F14AA /* ImageSurfaceResource.cpp in Sources */,
 				8F23093EE098A3EBA8E96C18 /* ImageSurfaceLoader.cpp in Sources */,
 				3BF66DE631A90A5B18DAA6D7 /* ImageSurfaceLoader.h in Sources */,
+				92C536D22C245161008CD2BF /* AppleSoundUtils.mm in Sources */,
 				87A8C87B81C696FE66FCCA16 /* ImageSurfaceResource.h in Sources */,
 				0BBF6683EF819A4D125B98A0 /* ThreadSafeQueue.h in Sources */,
 				3932349844F41A87BC153A8B /* TypeTraits.cpp in Sources */,
 				46F6BCE0E0E5C698199D1767 /* BaseDataFileDeserializer.cpp in Sources */,
 				CB369EDB3723CEDB16D2A2FE /* BaseDataFileSerializer.cpp in Sources */,
+				92C536DA2C245161008CD2BF /* TinyMMOClientReachability.m in Sources */,
 				DE60B65371427753F78EFC38 /* BaseDataFileDeserializer.h in Sources */,
 				08AE236E40150C6D07B7AF70 /* BaseDataFileSerializer.h in Sources */,
 				1EB158AD6807266C96047A69 /* SerializationDefinitions.h in Sources */,
-				B209DCA09AE5D2ECDCEB382C /* AppleUtils.h in Sources */,
-				184764CEA45E8103AB5053DA /* AppleUtils.mm in Sources */,
 				4E71A19BB3DA7B87946D19C7 /* Date.h in Sources */,
-				ABDC5333E2E95E5AB630A5E4 /* AppleSoundUtils.h in Sources */,
-				EAD29D4944FA967EBE7A3F02 /* AppleSoundUtils.mm in Sources */,
 				5E2DBB8D2706EB68C9F73856 /* SoundManager.cpp in Sources */,
 				66AB165A307A903CD1E44358 /* SoundManager.h in Sources */,
-				E026EEAFC052B55D49EBCADF /* SfxPlayer.h in Sources */,
-				078BCD5037ED7BA43F90F5D2 /* BackgroundMusicPlayer.h in Sources */,
-				27EBB117D38FD5C44627896A /* SfxPlayer.mm in Sources */,
-				97D5D6B8347443288B8ABA12 /* BackgroundMusicPlayer.mm in Sources */,
 				4B4CF9850E3F8C1AC25DA9BE /* stb_image_write.h in Sources */,
-				7295151C8C9D6DD7D7BD4BC1 /* TinyMMOClientReachability.h in Sources */,
-				474475A8D3C563AE4E3E2FD8 /* TinyMMOClientReachability.m in Sources */,
+				7BECC45C550A56F588DCE95C /* AnimatedButton.cpp in Sources */,
+				822FE0D9B0F43ABCCA670AEE /* Logging.cpp in Sources */,
+				84315642A814819314A60879 /* Editor.cpp in Sources */,
+				8FBAC0DD7391D92D6B27696D /* AnimatedButton.h in Sources */,
+				29126AABDF932B273DF5D906 /* Editor.h in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -917,6 +990,7 @@
 					"\"$(SRCROOT)/ThirdParty/SDL_image-source\"",
 					"\"$(SRCROOT)/../../lib/json\"",
 					"\"$(SRCROOT)/../../source_apple_utilities\"",
+					"\"$(SRCROOT)/../../source_net_common\"",
 				);
 				INFOPLIST_FILE = TinyMMOClientIOS/Info.plist;
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Bluetooth connection allows for Music & Sounds to be played while wearing wireless headphones.";
@@ -925,7 +999,8 @@
 				INFOPLIST_KEY_UIRequiredDeviceCapabilities = metal;
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UIStatusBarHidden = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -966,6 +1041,7 @@
 					"\"$(SRCROOT)/ThirdParty/SDL_image-source\"",
 					"\"$(SRCROOT)/../../lib/json\"",
 					"\"$(SRCROOT)/../../source_apple_utilities\"",
+					"\"$(SRCROOT)/../../source_net_common\"",
 				);
 				INFOPLIST_FILE = TinyMMOClientIOS/Info.plist;
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Bluetooth connection allows for Music & Sounds to be played while wearing wireless headphones.";
@@ -974,7 +1050,8 @@
 				INFOPLIST_KEY_UIRequiredDeviceCapabilities = metal;
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UIStatusBarHidden = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

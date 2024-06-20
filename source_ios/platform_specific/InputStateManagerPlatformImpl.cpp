@@ -62,6 +62,20 @@ bool InputStateManagerPlatformImpl::VButtonTapped(const Button button) const
 
 ///------------------------------------------------------------------------------------------------
 
+bool InputStateManagerPlatformImpl::VKeyPressed(const Key) const
+{
+    return false;
+}
+
+///------------------------------------------------------------------------------------------------
+
+bool InputStateManagerPlatformImpl::VKeyTapped(const Key) const
+{
+    return false;
+}
+
+///------------------------------------------------------------------------------------------------
+
 void InputStateManagerPlatformImpl::VProcessInputEvent(const SDL_Event& event, bool& shouldQuit, bool& windowSizeChange, bool& applicationMovingToBackground, bool& applicationMovingToForeground)
 {
     shouldQuit = false;

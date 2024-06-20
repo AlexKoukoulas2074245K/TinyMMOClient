@@ -289,7 +289,7 @@ bool ResourceLoadingService::DoesResourceExist(const std::string& resourcePath, 
 
 bool ResourceLoadingService::HasLoadedResource(const ResourceId resourceId) const
 {
-    return mResourceMap.contains(resourceId);
+    return mResourceMap.count(resourceId) != 0;
 }
 
 ///------------------------------------------------------------------------------------------------

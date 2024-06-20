@@ -103,7 +103,7 @@ void Editor::CreateDebugWidgets()
 {
 }
 #else
-void Game::CreateDebugWidgets()
+void Editor::CreateDebugWidgets()
 {
 }
 #endif

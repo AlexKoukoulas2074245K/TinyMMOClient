@@ -30,13 +30,16 @@ for f in files do
   
   # move on to the next file if it does
   next if file_reference_exists
-
+  
   # assign the main group to a variable
   group = project.main_group
 
   # represent the file path as an array of subfolders
   split_file_path = ("TinyMMOClientIOS/" + f[6..-1]).split('/')
 
+  
+  puts "split_file_path  #{split_file_path}"
+  
   # get the file name and remove it from the array
   file_name = split_file_path.pop
 
@@ -60,9 +63,12 @@ for f in files do
   # once again, replace the full path in file reference to a file name
   file_reference.path = file_name
 
-  # add the file reference to the first (main) target's `Compile Sources` build phase
-  # even though the main target will work for most cases, you might want to replace it with a specific one
-  project.targets.first.source_build_phase.add_file_reference(file_reference)
+  puts "file_reference.path  #{file_reference.path}"
+  puts "                                                "
+  
+  for target in project.targets do
+      target.source_build_phase.add_file_reference(file_reference)
+  end # add the file reference to the first (main) target's `Compile Sources` build phase
 
   puts "Copied over #{f}"
 end

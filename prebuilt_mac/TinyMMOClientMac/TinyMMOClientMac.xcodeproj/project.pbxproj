@@ -856,7 +856,6 @@
 				928B0C1A2B5C3C850025DF3F /* main.cpp */,
 				9C9C1F62F9CB94CF74AD4252 /* engine */,
 				8E4514132075279E3493D1F6 /* editor */,
-				E7DFB230BBF56C1BDF99CEF0 /* map */,
 			);
 			name = source_common;
 			path = ../../source_common;
@@ -1101,13 +1100,6 @@
 				D099CB93E6198C3BE5F73FDE /* IInputStateManager.h */,
 			);
 			path = input;
-			sourceTree = "<group>";
-		};
-		E7DFB230BBF56C1BDF99CEF0 /* map */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = map;
 			sourceTree = "<group>";
 		};
 		ECBC0BBB828E75C2C4875F6F /* net_common */ = {

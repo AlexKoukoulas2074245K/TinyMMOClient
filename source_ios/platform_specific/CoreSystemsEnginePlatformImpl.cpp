@@ -25,10 +25,10 @@
 
 ///------------------------------------------------------------------------------------------------
 
-static constexpr int DEFAULT_WINDOW_WIDTH  = 1688;
-static constexpr int DEFAULT_WINDOW_HEIGHT = 780;
-static constexpr int MIN_WINDOW_WIDTH      = 844;
-static constexpr int MIN_WINDOW_HEIGHT     = 390;
+static constexpr int DEFAULT_WINDOW_WIDTH  = 585;
+static constexpr int DEFAULT_WINDOW_HEIGHT = 1688;
+static constexpr int MIN_WINDOW_WIDTH      = 390;
+static constexpr int MIN_WINDOW_HEIGHT     = 844;
 static constexpr int TARGET_GAME_LOGIC_FPS = 60;
 
 ///------------------------------------------------------------------------------------------------
@@ -73,7 +73,7 @@ void CoreSystemsEngine::Initialize()
     // Initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
-        ospopups::ShowMessageBox(ospopups::MessageBoxType::ERROR, "SDL could not initialize!", SDL_GetError());
+        ospopups::ShowInfoMessageBox(ospopups::MessageBoxType::ERROR, "SDL could not initialize!", SDL_GetError());
         return;
     }
 
@@ -81,13 +81,13 @@ void CoreSystemsEngine::Initialize()
     SDL_SetHint(SDL_HINT_IOS_HIDE_HOME_INDICATOR, "2");
     
     mWindow = SDL_CreateWindow("Realm of Beasts", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-    
+
     // Set minimum window size
     SDL_SetWindowMinimumSize(mWindow, MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT);
 
     if (!mWindow)
     {
-        ospopups::ShowMessageBox(ospopups::MessageBoxType::ERROR, "SDL could not initialize!", SDL_GetError());
+        ospopups::ShowInfoMessageBox(ospopups::MessageBoxType::ERROR, "SDL could not initialize!", SDL_GetError());
         return;
     }
   
@@ -99,7 +99,7 @@ void CoreSystemsEngine::Initialize()
     mContext = SDL_GL_CreateContext(mWindow);
     if (!mContext || SDL_GL_MakeCurrent(mWindow, mContext) != 0)
     {
-        ospopups::ShowMessageBox(ospopups::MessageBoxType::ERROR, "SDL could not initialize!", SDL_GetError());
+        ospopups::ShowInfoMessageBox(ospopups::MessageBoxType::ERROR, "SDL could not initialize!", SDL_GetError());
         return;
     }
     
