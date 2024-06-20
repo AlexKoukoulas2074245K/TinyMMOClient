@@ -44,15 +44,55 @@ struct Glyph
 
 struct Font
 {
-    const Glyph& FindGlyph(char c) const
+    const std::vector<Glyph> FindGlyphs(const std::string& str) const
     {
-        auto glyphIter = mGlyphs.find(c);
-        return glyphIter == mGlyphs.cend() ? mGlyphs.at(' ') : glyphIter->second;
+        std::vector<Glyph> glyphs;
+        size_t i = 0;
+        while (i < str.size())
+        {
+            uint32_t codePoint = 0;
+            unsigned char c = str[i];
+            if (c < 0x80) 
+            {
+                // 1-byte character (ASCII)
+                codePoint = c;
+                i += 1;
+            } 
+            else if ((c & 0xE0) == 0xC0)
+            {
+                // 2-byte character
+                codePoint = ((c & 0x1F) << 6) |
+                            (str[i + 1] & 0x3F);
+                i += 2;
+            }
+            else if ((c & 0xF0) == 0xE0)
+            {
+                // 3-byte character
+                codePoint = ((c & 0x0F) << 12) |
+                            ((str[i + 1] & 0x3F) << 6) |
+                            (str[i + 2] & 0x3F);
+                i += 3;
+            }
+            else if ((c & 0xF8) == 0xF0) 
+            {
+                // 4-byte character
+                codePoint = ((c & 0x07) << 18) |
+                            ((str[i + 1] & 0x3F) << 12) |
+                            ((str[i + 2] & 0x3F) << 6) |
+                            (str[i + 3] & 0x3F);
+                i += 4;
+            }
+            
+            auto glyphIter = mGlyphs.find(codePoint);
+            glyphs.push_back(glyphIter == mGlyphs.end() ? mGlyphs.at('?') : glyphIter->second);
+        }
+        
+        return glyphs;
     }
     
     strutils::StringId mFontName = strutils::StringId();
     resources::ResourceId mFontTextureResourceId;
-    std::unordered_map<char, Glyph> mGlyphs;
+    std::unordered_map<uint32_t, Glyph> mGlyphs;
     glm::vec2 mFontTextureDimensions = glm::vec2(0.0f, 0.0f);
 };
 

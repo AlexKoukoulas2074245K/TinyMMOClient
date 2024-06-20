@@ -45,6 +45,7 @@ private:
     void SendNetworkMessage(const nlohmann::json& message, const networking::MessageType messageType, const networking::MessagePriority messagePriority);
     void OnServerResponse(const std::string& response);
     void OnServerLoginResponse(const nlohmann::json& responseJson);
+    void OnServerWordResponse(const nlohmann::json& responseJson);
     void OnPlayButtonPressed();
 
 private:

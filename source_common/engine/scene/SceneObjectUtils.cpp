@@ -40,9 +40,10 @@ math::Rectangle GetSceneObjectBoundingRect(const scene::SceneObject& sceneObject
         float maxX = xCursor;
         float maxY = yCursor;
         
-        for (size_t i = 0; i < textData.mText.size(); ++i)
+        const auto& stringFontGlyphs = font.FindGlyphs(textData.mText);
+        for (size_t i = 0; i < stringFontGlyphs.size(); ++i)
         {
-            const auto& glyph = font.FindGlyph(textData.mText[i]);
+            const auto& glyph = stringFontGlyphs[i];
             
             xCursor += glyph.mXOffsetOverride * sceneObject.mScale.x;
             float targetX = xCursor;
@@ -57,7 +58,7 @@ math::Rectangle GetSceneObjectBoundingRect(const scene::SceneObject& sceneObject
             {
                 // Since each glyph is rendered with its center as the origin, we advance
                 // half this glyph's width + half the next glyph's width ahead
-                const auto& nextGlyph = font.FindGlyph(textData.mText[i + 1]);
+                const auto& nextGlyph = stringFontGlyphs[i + 1];
                 xCursor += (glyph.mWidthPixels * sceneObject.mScale.x) * 0.5f + (nextGlyph.mWidthPixels * sceneObject.mScale.x) * 0.5f;
                 xCursor += glyph.mAdvancePixels * sceneObject.mScale.x;
             }

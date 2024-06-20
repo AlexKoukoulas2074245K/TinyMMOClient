@@ -173,6 +173,7 @@ void ResourceLoadingService::Initialize()
     mResourceExtensionsToLoadersMap[StringId("png")]  = mResourceLoaders[0].get();
     mResourceExtensionsToLoadersMap[StringId("json")] = mResourceLoaders[1].get();
     mResourceExtensionsToLoadersMap[StringId("dat")]  = mResourceLoaders[1].get();
+    mResourceExtensionsToLoadersMap[StringId("fnt")]  = mResourceLoaders[1].get();
     mResourceExtensionsToLoadersMap[StringId("txt")]  = mResourceLoaders[1].get();
     mResourceExtensionsToLoadersMap[StringId("lua")]  = mResourceLoaders[1].get();
     mResourceExtensionsToLoadersMap[StringId("xml")]  = mResourceLoaders[1].get();

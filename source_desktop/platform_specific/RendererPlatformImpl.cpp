@@ -159,10 +159,11 @@ public:
         
         float xCursor = mSceneObject.mPosition.x;
         
-        for (size_t i = 0; i < sceneObjectTypeData.mText.size(); ++i)
+        const auto& stringFontGlyphs = font.FindGlyphs(sceneObjectTypeData.mText);
+        for (size_t i = 0; i < stringFontGlyphs.size(); ++i)
         {
-            const auto& glyph = font.FindGlyph(sceneObjectTypeData.mText[i]);
-            
+            const auto& glyph = stringFontGlyphs[i];
+           
             xCursor += glyph.mXOffsetOverride * mSceneObject.mScale.x;
             float targetX = xCursor;
             float targetY = mSceneObject.mPosition.y - glyph.mYOffsetPixels * mSceneObject.mScale.y * 0.5f;
@@ -193,7 +194,7 @@ public:
             {
                 // Since each glyph is rendered with its center as the origin, we advance
                 // half this glyph's width + half the next glyph's width ahead
-                const auto& nextGlyph = font.FindGlyph(sceneObjectTypeData.mText[i + 1]);
+                const auto& nextGlyph = stringFontGlyphs[i + 1];
                 xCursor += (glyph.mWidthPixels * mSceneObject.mScale.x) * 0.5f + (nextGlyph.mWidthPixels * mSceneObject.mScale.x) * 0.5f;
                 xCursor += glyph.mAdvancePixels * mSceneObject.mScale.x;
             }

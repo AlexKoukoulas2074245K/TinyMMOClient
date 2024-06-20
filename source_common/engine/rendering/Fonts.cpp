@@ -61,46 +61,43 @@ void FontRepository::LoadFont(const std::string& fontName, const resources::Reso
         fontDefinitionName = fontDefinitionName.substr(0, fontDefinitionName.find(FONT_PLACEHOLDER_STRING));
     }
     
-    auto fontDefinitionJsonResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_DATA_ROOT + fontDefinitionName + ".json", resourceReloadMode);
-    const auto fontJson =  nlohmann::json::parse(CoreSystemsEngine::GetInstance().GetResourceLoadingService().GetResource<resources::DataFileResource>(fontDefinitionJsonResourceId).GetContents());
+    auto fontDefinitionJsonResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_DATA_ROOT + fontDefinitionName + ".fnt", resourceReloadMode);
+    const auto& fontData = CoreSystemsEngine::GetInstance().GetResourceLoadingService().GetResource<resources::DataFileResource>(fontDefinitionJsonResourceId).GetContents();
     
     Font font;
     font.mFontName = strutils::StringId(fontName);
     font.mFontTextureResourceId = fontTextureResourceId;
     font.mFontTextureDimensions = fontTexture.GetDimensions();
     
-    for (const auto& charObject: fontJson["font"]["chars"]["char"])
+    std::stringstream fontLineStream(fontData);
+    std::string fontLine;
+    while (std::getline(fontLineStream, fontLine))
     {
-        Glyph glyph;
-        glyph.mWidthPixels = std::stof(charObject["width"].get<std::string>());
-        glyph.mHeightPixels = std::stof(charObject["height"].get<std::string>());
-        
-        auto normalizedU = std::stof(charObject["x"].get<std::string>()) / font.mFontTextureDimensions.x;
-        glyph.minU = normalizedU;
-        glyph.maxU = normalizedU + glyph.mWidthPixels / font.mFontTextureDimensions.x;
-        
-        auto normalizedV = (font.mFontTextureDimensions.y - std::stof(charObject["y"].get<std::string>())) / font.mFontTextureDimensions.y;
-        glyph.minV = normalizedV - glyph.mHeightPixels / font.mFontTextureDimensions.y;
-        glyph.maxV = normalizedV;
-        
-        glyph.mXOffsetPixels = std::stof(charObject["xoffset"].get<std::string>());
-        glyph.mYOffsetPixels = std::stof(charObject["yoffset"].get<std::string>());
-        glyph.mAdvancePixels = std::stof(charObject["xadvance"].get<std::string>());
-        
-        if (charObject.count("xoffsetoverride"))
+        if (strutils::StringStartsWith(fontLine, "char id="))
         {
-            glyph.mXOffsetOverride = std::stof(charObject["xoffsetoverride"].get<std::string>());
+            const auto& lineComponents = strutils::StringSplit(fontLine, ' ');
+            
+            Glyph glyph;
+            glyph.mWidthPixels = std::stof(strutils::StringSplit(lineComponents[4], '=')[1]);
+            glyph.mHeightPixels = std::stof(strutils::StringSplit(lineComponents[5], '=')[1]);
+            
+            auto normalizedU = std::stof(strutils::StringSplit(lineComponents[2], '=')[1]) / font.mFontTextureDimensions.x;
+            glyph.minU = normalizedU;
+            glyph.maxU = normalizedU + glyph.mWidthPixels / font.mFontTextureDimensions.x;
+            
+            auto normalizedV = (font.mFontTextureDimensions.y - std::stof(strutils::StringSplit(lineComponents[3], '=')[1])) / font.mFontTextureDimensions.y;
+            glyph.minV = normalizedV - glyph.mHeightPixels / font.mFontTextureDimensions.y;
+            glyph.maxV = normalizedV;
+            
+            glyph.mXOffsetPixels = std::stof(strutils::StringSplit(lineComponents[6], '=')[1]);
+            glyph.mYOffsetPixels = std::stof(strutils::StringSplit(lineComponents[7], '=')[1]);
+            glyph.mAdvancePixels = std::stof(strutils::StringSplit(lineComponents[8], '=')[1]);
+            
+            font.mGlyphs[std::stof(strutils::StringSplit(lineComponents[1], '=')[1])] = glyph;
         }
-        
-        font.mGlyphs[static_cast<char>(std::stoi(charObject["id"].get<std::string>()))] = glyph;
     }
     
     mFontMap[font.mFontName] = font;
-    
-    if (resourceReloadMode == resources::ResourceReloadMode::RELOAD_EVERY_SECOND)
-    {
-        mFontsToAutoReload.insert(font.mFontName);
-    }
 }
 
 ///------------------------------------------------------------------------------------------------

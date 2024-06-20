@@ -78,7 +78,7 @@ void Game::Init()
     auto scene = systemsEngine.GetSceneManager().CreateScene(game_constants::WORLD_SCENE_NAME);
     scene->SetLoaded(true);
     
-    mPlayButton = std::make_unique<AnimatedButton>(glm::vec3(-0.057f, 0.038f, 1.0f), glm::vec3(0.001f, 0.001f, 0.001f), game_constants::DEFAULT_FONT_NAME, "Play", PLAY_BUTTON_NAME, [&](){ OnPlayButtonPressed(); }, *scene);
+    mPlayButton = std::make_unique<AnimatedButton>(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0002f, 0.0002f, 0.0002f), game_constants::DEFAULT_FONT_NAME, "Play", PLAY_BUTTON_NAME, [&](){ OnPlayButtonPressed(); }, *scene);
     mPlayButton->GetSceneObject()->mShaderFloatUniformValues[strutils::StringId("custom_alpha")] = 1.0f;
     
     auto& eventSystem = events::EventSystem::GetInstance();
@@ -187,9 +187,13 @@ void Game::OnServerResponse(const std::string& response)
         auto responseJson = nlohmann::json::parse(response);
         //logging::Log(logging::LogType::INFO, responseJson.dump(4).c_str());
         
-        if (networking::IsMessageOfType(responseJson, networking::MessageType::SC_REQUEST_LOGIN_RESPONSE))
+        if (networking::IsMessageOfType(responseJson, networking::MessageType::SC_LOGIN_RESPONSE))
         {
             OnServerLoginResponse(responseJson);
+        }
+        else if (networking::IsMessageOfType(responseJson, networking::MessageType::SC_WORD_RESPONSE))
+        {
+            OnServerWordResponse(responseJson);
         }
         else
         {
@@ -212,8 +216,27 @@ void Game::OnServerLoginResponse(const nlohmann::json& responseJson)
     
     if (loginResponse.allowed)
     {
-        
+        networking::WordRequest wordRequest = {};
+        wordRequest.sourceLanguge = "Greek";
+        wordRequest.targetLanguage = "Chinese";
+        SendNetworkMessage(wordRequest.SerializeToJson(), networking::MessageType::CS_WORD_REQUEST, networking::MessagePriority::HIGH);
     }
+}
+
+///------------------------------------------------------------------------------------------------
+
+void Game::OnServerWordResponse(const nlohmann::json& responseJson)
+{
+    networking::WordResponse wordResponse = {};
+    wordResponse.DeserializeFromJson(responseJson);
+    
+    auto scene = CoreSystemsEngine::GetInstance().GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME);
+    
+    std::make_unique<AnimatedButton>(glm::vec3(0.0f, 0.1f, 1.0f), glm::vec3(0.0002f, 0.0002f, 0.0002f), game_constants::DEFAULT_FONT_NAME, wordResponse.sourceWord, strutils::StringId(wordResponse.sourceWord), [&](){  }, *scene);
+    std::make_unique<AnimatedButton>(glm::vec3(-0.2f, 0.0f, 1.0f), glm::vec3(0.0002f, 0.0002f, 0.0002f), game_constants::DEFAULT_FONT_NAME, wordResponse.choices[0], strutils::StringId(wordResponse.choices[0]), [&](){  }, *scene);
+    std::make_unique<AnimatedButton>(glm::vec3(0.2f, 0.0f, 1.0f), glm::vec3(0.0002f, 0.0002f, 0.0002f), game_constants::DEFAULT_FONT_NAME, wordResponse.choices[1], strutils::StringId(wordResponse.choices[1]), [&](){ }, *scene);
+    std::make_unique<AnimatedButton>(glm::vec3(-0.2f, -0.2f, 1.0f), glm::vec3(0.0002f, 0.0002f, 0.0002f), game_constants::DEFAULT_FONT_NAME, wordResponse.choices[2], strutils::StringId(wordResponse.choices[2]), [&](){ }, *scene);
+    std::make_unique<AnimatedButton>(glm::vec3(0.2f, -0.2f, 1.0f), glm::vec3(0.0002f, 0.0002f, 0.0002f), game_constants::DEFAULT_FONT_NAME, wordResponse.choices[3], strutils::StringId(wordResponse.choices[3]), [&](){}, *scene);
 }
 
 ///------------------------------------------------------------------------------------------------
@@ -232,7 +255,7 @@ void Game::OnPlayButtonPressed()
     });
     
     // Request login details
-    SendNetworkMessage(nlohmann::json(), networking::MessageType::CS_REQUEST_LOGIN, networking::MessagePriority::HIGH);
+    SendNetworkMessage(nlohmann::json(), networking::MessageType::CS_LOGIN_REQUEST, networking::MessagePriority::HIGH);
 }
 
 ///------------------------------------------------------------------------------------------------
