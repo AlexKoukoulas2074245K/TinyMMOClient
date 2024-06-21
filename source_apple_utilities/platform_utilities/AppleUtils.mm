@@ -438,7 +438,7 @@ void SendNetworkMessage(const nlohmann::json& networkMessage, const networking::
     auto finalNetworkMessageJson = networkMessage;
     networking::PopulateMessageHeader(finalNetworkMessageJson, messageType);
     const auto startTime = std::chrono::system_clock::now();
-    canSendNetworkMessage = false;
+    //canSendNetworkMessage = false;
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         networking::ServerResponseData responseData = {};

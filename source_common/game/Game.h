@@ -46,12 +46,14 @@ private:
     void OnServerResponse(const std::string& response);
     void OnServerLoginResponse(const nlohmann::json& responseJson);
     void OnServerWordResponse(const nlohmann::json& responseJson);
+    void OnServerGetSupportedLanguagesResponse(const nlohmann::json& responseJson);
     void OnPlayButtonPressed();
 
 private:
     std::atomic<int> mLastPingMillis = 0;
     std::unique_ptr<AnimatedButton> mPlayButton;
     std::unique_ptr<events::IListener> mSendNetworkMessageEventListener;
+    std::vector<std::unique_ptr<AnimatedButton>> mWordButtons;
 };
 
 ///------------------------------------------------------------------------------------------------

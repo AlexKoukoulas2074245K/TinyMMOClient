@@ -48,7 +48,7 @@ public:
             while (true)
             {
                 auto messageJobToSend = mMessageQueueToSend.dequeue();                    
-                mCanSendNetworkMessage = false;
+                //mCanSendNetworkMessage = false;
                 const auto startTime = std::chrono::system_clock::now();
 
                 networking::ServerResponseData responseData = {};
