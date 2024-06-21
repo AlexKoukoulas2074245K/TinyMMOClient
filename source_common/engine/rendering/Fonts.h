@@ -37,7 +37,6 @@ struct Glyph
     float mWidthPixels = 0.0f;
     float mHeightPixels = 0.0f;
     float mAdvancePixels = 0.0f;
-    float mXOffsetOverride = 0.0f;
 };
 
 ///------------------------------------------------------------------------------------------------

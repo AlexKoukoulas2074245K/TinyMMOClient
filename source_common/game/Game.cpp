@@ -52,9 +52,10 @@ static const strutils::StringId SECOND_CHOICE_WORD_NAME = strutils::StringId("se
 static const strutils::StringId THIRD_CHOICE_WORD_NAME = strutils::StringId("third_choice");
 static const strutils::StringId FOURTH_CHOICE_WORD_NAME = strutils::StringId("fourth_choice");
 
-static std::string sSourceLanguage = "Greek";
-static std::string sTargetLanguage = "Japanese";
+static std::string sSourceLanguage = "English";
+static std::string sTargetLanguage = "Greek";
 static std::vector<std::string> sSupportedLanguages;
+static const float fontSize = 1.0f;
 
 ///------------------------------------------------------------------------------------------------
 
@@ -85,9 +86,10 @@ void Game::Init()
     systemsEngine.GetSoundManager().SetAudioEnabled(false);
     
     auto scene = systemsEngine.GetSceneManager().CreateScene(game_constants::WORLD_SCENE_NAME);
+    scene->GetCamera().SetZoomFactor(0.01f);
     scene->SetLoaded(true);
     
-    mPlayButton = std::make_unique<AnimatedButton>(glm::vec3(-0.034f, 0.05f, 1.0f), glm::vec3(0.0002f, 0.0002f, 0.0002f), game_constants::DEFAULT_FONT_NAME, "Play", PLAY_BUTTON_NAME, [&](){ OnPlayButtonPressed(); }, *scene);
+    mPlayButton = std::make_unique<AnimatedButton>(glm::vec3(-100.0f, 150.0f, 1.0f), glm::vec3(fontSize, fontSize, fontSize), game_constants::DEFAULT_FONT_NAME, "Play", PLAY_BUTTON_NAME, [&](){ OnPlayButtonPressed(); }, *scene);
     mPlayButton->GetSceneObject()->mShaderFloatUniformValues[strutils::StringId("custom_alpha")] = 1.0f;
     
     auto& eventSystem = events::EventSystem::GetInstance();
@@ -329,11 +331,11 @@ void Game::OnServerWordResponse(const nlohmann::json& responseJson)
     
     mWordButtons.clear();
     
-    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(-0.1f, 0.1f, 1.0f), glm::vec3(0.00015f, 0.00015f, 0.00015f), game_constants::DEFAULT_FONT_NAME, wordResponse.sourceWord, SOURCE_WORD_NAME, [&](){  }, *scene));
-    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(-0.1f, 0.0f, 1.0f), glm::vec3(0.00015f, 0.00015f, 0.00015f), game_constants::DEFAULT_FONT_NAME, wordResponse.choices[0], FIRST_CHOICE_WORD_NAME, [&](){  }, *scene));
-    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(-0.1f, -0.05f, 1.0f), glm::vec3(0.00015f, 0.00015f, 0.00015f), game_constants::DEFAULT_FONT_NAME, wordResponse.choices[1], SECOND_CHOICE_WORD_NAME, [&](){ }, *scene));
-    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(-0.1f, -0.1f, 1.0f), glm::vec3(0.00015f, 0.00015f, 0.00015f), game_constants::DEFAULT_FONT_NAME, wordResponse.choices[2], THIRD_CHOICE_WORD_NAME, [&](){ }, *scene));
-    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(-0.1f, -0.15f, 1.0f), glm::vec3(0.00015f, 0.00015f, 0.00015f), game_constants::DEFAULT_FONT_NAME, wordResponse.choices[3], FOURTH_CHOICE_WORD_NAME, [&](){}, *scene));
+    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(-300.0f, 300.0f, 1.0f), glm::vec3(fontSize), game_constants::DEFAULT_FONT_NAME, wordResponse.sourceWord, SOURCE_WORD_NAME, [&](){  }, *scene));
+    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(-300.0f, -100.0f, 1.0f), glm::vec3(fontSize), game_constants::DEFAULT_FONT_NAME, wordResponse.choices[0], FIRST_CHOICE_WORD_NAME, [&](){  }, *scene));
+    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(-300.0f, -500.0f, 1.0f), glm::vec3(fontSize), game_constants::DEFAULT_FONT_NAME, wordResponse.choices[1], SECOND_CHOICE_WORD_NAME, [&](){ }, *scene));
+    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(-300.0f, -900.0f, 1.0f), glm::vec3(fontSize), game_constants::DEFAULT_FONT_NAME, wordResponse.choices[2], THIRD_CHOICE_WORD_NAME, [&](){ }, *scene));
+    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(-300.0f, -1300.0f, 1.0f), glm::vec3(fontSize), game_constants::DEFAULT_FONT_NAME, wordResponse.choices[3], FOURTH_CHOICE_WORD_NAME, [&](){}, *scene));
 }
 
 ///------------------------------------------------------------------------------------------------

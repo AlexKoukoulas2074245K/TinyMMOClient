@@ -163,10 +163,10 @@ public:
         for (size_t i = 0; i < stringFontGlyphs.size(); ++i)
         {
             const auto& glyph = stringFontGlyphs[i];
-           
-            xCursor += glyph.mXOffsetOverride * mSceneObject.mScale.x;
-            float targetX = xCursor;
-            float targetY = mSceneObject.mPosition.y - glyph.mYOffsetPixels * mSceneObject.mScale.y * 0.5f;
+            float yCursor = mSceneObject.mPosition.y - glyph.mHeightPixels/2.0f * mSceneObject.mScale.y;
+            
+            float targetX = xCursor + glyph.mXOffsetPixels * mSceneObject.mScale.x;
+            float targetY = yCursor - glyph.mYOffsetPixels * mSceneObject.mScale.y;
             
             glm::mat4 world(1.0f);
             world = glm::translate(world, glm::vec3(targetX, targetY, mSceneObject.mPosition.z));
@@ -190,13 +190,9 @@ public:
             GL_CALL(glDrawElements(GL_TRIANGLES, currentMesh->GetElementCount(), GL_UNSIGNED_SHORT, (void*)0));
             sDrawCallCounter++;
             
-            if (i != sceneObjectTypeData.mText.size() - 1)
+            if (i != stringFontGlyphs.size() - 1)
             {
-                // Since each glyph is rendered with its center as the origin, we advance
-                // half this glyph's width + half the next glyph's width ahead
-                const auto& nextGlyph = stringFontGlyphs[i + 1];
-                xCursor += (glyph.mWidthPixels * mSceneObject.mScale.x) * 0.5f + (nextGlyph.mWidthPixels * mSceneObject.mScale.x) * 0.5f;
-                xCursor += glyph.mAdvancePixels * mSceneObject.mScale.x;
+                xCursor += (glyph.mAdvancePixels * mSceneObject.mScale.x)/2.0f + (stringFontGlyphs[i + 1].mAdvancePixels * mSceneObject.mScale.y)/2.0f;
             }
         }
     }
@@ -433,6 +429,7 @@ public:
 };
 
 static SceneObjectDataIMGuiVisitor imguiVisitor;
+extern float FNT_PIXELS_TO_GL_MULTIPLIER;
 
 void RendererPlatformImpl::CreateIMGuiWidgets()
 {
@@ -444,6 +441,10 @@ void RendererPlatformImpl::CreateIMGuiWidgets()
     ImGui::Text("Draw Calls %d", sDrawCallCounter);
     ImGui::Text("Particle Count %d", sParticleCounter);
     ImGui::Text("Anims Live %d", CoreSystemsEngine::GetInstance().GetAnimationManager().GetAnimationsPlayingCount());
+    if (ImGui::SliderFloat("Font Multiplier", &FNT_PIXELS_TO_GL_MULTIPLIER, 0.1f, 5.0f))
+    {
+        CoreSystemsEngine::GetInstance().GetFontRepository().LoadFont("font");
+    }
     ImGui::End();
     
     // Create scene data viewer

@@ -23,6 +23,8 @@ namespace rendering
 ///------------------------------------------------------------------------------------------------
 
 static const std::string FONT_PLACEHOLDER_STRING = "_placeholder";
+//static float FNT_PIXELS_TO_GL = 1.0f/2048.0f;
+float FNT_PIXELS_TO_GL_MULTIPLIER = 1.0f;
 
 ///------------------------------------------------------------------------------------------------
 
@@ -89,9 +91,11 @@ void FontRepository::LoadFont(const std::string& fontName, const resources::Reso
             glyph.minV = normalizedV - glyph.mHeightPixels / font.mFontTextureDimensions.y;
             glyph.maxV = normalizedV;
             
-            glyph.mXOffsetPixels = std::stof(strutils::StringSplit(lineComponents[6], '=')[1]);
-            glyph.mYOffsetPixels = std::stof(strutils::StringSplit(lineComponents[7], '=')[1]);
-            glyph.mAdvancePixels = std::stof(strutils::StringSplit(lineComponents[8], '=')[1]);
+            glyph.mXOffsetPixels = std::stof(strutils::StringSplit(lineComponents[6], '=')[1]) * 1.0f;
+            glyph.mYOffsetPixels = std::stof(strutils::StringSplit(lineComponents[7], '=')[1]) * 1.0f;
+            glyph.mAdvancePixels = std::stof(strutils::StringSplit(lineComponents[8], '=')[1]) * 1.0f;
+            //glyph.mWidthPixels *= FNT_PIXELS_TO_GL * 1.0f;
+            //glyph.mHeightPixels *= FNT_PIXELS_TO_GL * 1.0f;
             
             font.mGlyphs[std::stof(strutils::StringSplit(lineComponents[1], '=')[1])] = glyph;
         }
