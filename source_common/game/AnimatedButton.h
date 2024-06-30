@@ -15,6 +15,7 @@
 #include <engine/utils/StringUtils.h>
 #include <functional>
 #include <memory>
+#include <vector>
 
 ///------------------------------------------------------------------------------------------------
 
@@ -33,6 +34,7 @@ enum class ButtonUpdateInteractionResult
 class AnimatedButton final
 {
 public:
+    // Single texture buttton
     AnimatedButton
     (
         const glm::vec3& position,
@@ -44,6 +46,8 @@ public:
         scene::SnapToEdgeBehavior snapToEdgeBehavior = scene::SnapToEdgeBehavior::NONE,
         const float snapToEdgeScaleOffsetFactor = 1.0f
     );
+    
+    // Single font string buttton
     AnimatedButton
     (
         const glm::vec3& position,
@@ -56,14 +60,31 @@ public:
         scene::SnapToEdgeBehavior snapToEdgeBehavior = scene::SnapToEdgeBehavior::NONE,
         const float snapToEdgeScaleOffsetFactor = 1.0f
     );
+    
+    // Texture + Inner font string button
+    AnimatedButton
+    (
+        const glm::vec3& position,
+        const glm::vec3& textScale,
+        const float textureAspectRatio,
+        const std::string& textureFilename,
+        const strutils::StringId& fontName,
+        const std::string& text,
+        const strutils::StringId& buttonName,
+        std::function<void()> onPressCallback,
+        scene::Scene& scene,
+        scene::SnapToEdgeBehavior snapToEdgeBehavior = scene::SnapToEdgeBehavior::NONE,
+        const float snapToEdgeScaleOffsetFactor = 1.0f
+    );
+    
     ~AnimatedButton();
     
     ButtonUpdateInteractionResult Update(const float dtMillis);
-    std::shared_ptr<scene::SceneObject> GetSceneObject();
+    std::vector<std::shared_ptr<scene::SceneObject>> GetSceneObjects();
     
 private:
     scene::Scene& mScene;
-    std::shared_ptr<scene::SceneObject> mSceneObject;
+    std::vector<std::shared_ptr<scene::SceneObject>> mSceneObjects;
     std::function<void()> mOnPressCallback;
     bool mAnimating;
 };

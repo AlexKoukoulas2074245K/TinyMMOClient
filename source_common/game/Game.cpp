@@ -55,7 +55,7 @@ static const strutils::StringId FOURTH_CHOICE_WORD_NAME = strutils::StringId("fo
 static std::string sSourceLanguage = "English";
 static std::string sTargetLanguage = "Greek";
 static std::vector<std::string> sSupportedLanguages;
-static const float fontSize = 1.0f;
+static const float fontSize = 0.5f;
 
 ///------------------------------------------------------------------------------------------------
 
@@ -89,8 +89,12 @@ void Game::Init()
     scene->GetCamera().SetZoomFactor(0.01f);
     scene->SetLoaded(true);
     
-    mPlayButton = std::make_unique<AnimatedButton>(glm::vec3(-100.0f, 150.0f, 1.0f), glm::vec3(fontSize, fontSize, fontSize), game_constants::DEFAULT_FONT_NAME, "Play", PLAY_BUTTON_NAME, [&](){ OnPlayButtonPressed(); }, *scene);
-    mPlayButton->GetSceneObject()->mShaderFloatUniformValues[strutils::StringId("custom_alpha")] = 1.0f;
+    mPlayButton = std::make_unique<AnimatedButton>(glm::vec3(-200.0f, 450.0f, 1.0f), glm::vec3(fontSize, fontSize, fontSize), 1.7142f, "game/ui_button.png", game_constants::DEFAULT_FONT_NAME, "Play!", PLAY_BUTTON_NAME, [&](){ OnPlayButtonPressed(); }, *scene);
+    
+    for (auto& sceneObject: mPlayButton->GetSceneObjects())
+    {
+        sceneObject->mShaderFloatUniformValues[strutils::StringId("custom_alpha")] = 1.0f;
+    }
     
     auto& eventSystem = events::EventSystem::GetInstance();
     mSendNetworkMessageEventListener = eventSystem.RegisterForEvent<events::SendNetworkMessageEvent>([=](const events::SendNetworkMessageEvent& event)
@@ -301,11 +305,14 @@ void Game::OnServerLoginResponse(const nlohmann::json& responseJson)
         auto scene = sceneManager.FindScene(game_constants::WORLD_SCENE_NAME);
         
         // Fade button out
-        CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenValueAnimation>(mPlayButton->GetSceneObject()->mShaderFloatUniformValues[strutils::StringId("custom_alpha")], 0.0f, 0.2f), [=]()
+        for (auto& sceneObject: mPlayButton->GetSceneObjects())
         {
-            scene->RemoveSceneObject(PLAY_BUTTON_NAME);
-            mPlayButton = nullptr;
-        });
+            CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenValueAnimation>(sceneObject->mShaderFloatUniformValues[strutils::StringId("custom_alpha")], 0.0f, 0.2f), [=]()
+            {
+                scene->RemoveSceneObject(sceneObject->mName);
+                mPlayButton = nullptr;
+            });
+        }
         
         networking::WordRequest wordRequest = {};
         wordRequest.sourceLanguge = sSourceLanguage;
