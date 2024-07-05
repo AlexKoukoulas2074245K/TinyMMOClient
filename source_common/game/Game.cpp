@@ -55,7 +55,10 @@ static const strutils::StringId FOURTH_CHOICE_WORD_NAME = strutils::StringId("fo
 static std::string sSourceLanguage = "English";
 static std::string sTargetLanguage = "Greek";
 static std::vector<std::string> sSupportedLanguages;
-static const float fontSize = 0.5f;
+
+static const glm::vec3 WORD_CHOICE_BUTTON_SCALE = glm::vec3(500.0f, 266.0f, 1.0f);
+//static const glm::vec3 WORD_CHOICE_TEXT_SCALE = glm::vec3(0.75f);
+static const glm::vec3 ACTION_TEXT_SCALE = glm::vec3(1.0f);
 
 ///------------------------------------------------------------------------------------------------
 
@@ -89,7 +92,7 @@ void Game::Init()
     scene->GetCamera().SetZoomFactor(0.01f);
     scene->SetLoaded(true);
     
-    mPlayButton = std::make_unique<AnimatedButton>(glm::vec3(-200.0f, 450.0f, 1.0f), glm::vec3(fontSize, fontSize, fontSize), 1.7142f, "game/ui_button.png", game_constants::DEFAULT_FONT_NAME, "Play!", PLAY_BUTTON_NAME, [&](){ OnPlayButtonPressed(); }, *scene);
+    mPlayButton = std::make_unique<AnimatedButton>(glm::vec3(-200.0f, 450.0f, 1.0f), ACTION_TEXT_SCALE, 1.7142f, "game/ui_button.png", game_constants::DEFAULT_FONT_NAME, "Play!", PLAY_BUTTON_NAME, [&](){ OnPlayButtonPressed(); }, *scene);
     
     for (auto& sceneObject: mPlayButton->GetSceneObjects())
     {
@@ -223,6 +226,11 @@ void Game::UpdateGUI(const float dtMillis)
     {
         mPlayButton->Update(dtMillis);
     }
+    
+    for (auto i = 1; i < mWordButtons.size(); ++i)
+    {
+        mWordButtons[i]->Update(dtMillis);
+    }
 }
 
 ///------------------------------------------------------------------------------------------------
@@ -338,11 +346,12 @@ void Game::OnServerWordResponse(const nlohmann::json& responseJson)
     
     mWordButtons.clear();
     
-    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(-300.0f, 300.0f, 1.0f), glm::vec3(fontSize), game_constants::DEFAULT_FONT_NAME, wordResponse.sourceWord, SOURCE_WORD_NAME, [&](){  }, *scene));
-    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(-300.0f, -100.0f, 1.0f), glm::vec3(fontSize), game_constants::DEFAULT_FONT_NAME, wordResponse.choices[0], FIRST_CHOICE_WORD_NAME, [&](){  }, *scene));
-    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(-300.0f, -500.0f, 1.0f), glm::vec3(fontSize), game_constants::DEFAULT_FONT_NAME, wordResponse.choices[1], SECOND_CHOICE_WORD_NAME, [&](){ }, *scene));
-    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(-300.0f, -900.0f, 1.0f), glm::vec3(fontSize), game_constants::DEFAULT_FONT_NAME, wordResponse.choices[2], THIRD_CHOICE_WORD_NAME, [&](){ }, *scene));
-    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(-300.0f, -1300.0f, 1.0f), glm::vec3(fontSize), game_constants::DEFAULT_FONT_NAME, wordResponse.choices[3], FOURTH_CHOICE_WORD_NAME, [&](){}, *scene));
+    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(-200.0f, 200.0f, 1.0f), ACTION_TEXT_SCALE, game_constants::DEFAULT_FONT_NAME, wordResponse.sourceWord, SOURCE_WORD_NAME, [&](){  }, *scene));
+    
+    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(-330.0f, -100.0f, 1.0f), WORD_CHOICE_BUTTON_SCALE, "game/ui_button.png", game_constants::DEFAULT_FONT_NAME, "a"/*wordResponse.choices[0]*/, FIRST_CHOICE_WORD_NAME, [&](){  }, *scene));
+    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(350.0f, -100.0f, 1.0f), WORD_CHOICE_BUTTON_SCALE, "game/ui_button.png", game_constants::DEFAULT_FONT_NAME, "very"/*wordResponse.choices[1]*/, SECOND_CHOICE_WORD_NAME, [&](){ }, *scene));
+    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(-330.0f, -600.0f, 1.0f), WORD_CHOICE_BUTTON_SCALE, "game/ui_button.png", game_constants::DEFAULT_FONT_NAME, "extremely"/*wordResponse.choices[2]*/, THIRD_CHOICE_WORD_NAME, [&](){ }, *scene));
+    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(350.0f, -600.0f, 1.0f), WORD_CHOICE_BUTTON_SCALE, "game/ui_button.png", game_constants::DEFAULT_FONT_NAME, "Ginormous Insane Word"/*wordResponse.choices[3]*/, FOURTH_CHOICE_WORD_NAME, [&](){}, *scene));
 }
 
 ///------------------------------------------------------------------------------------------------

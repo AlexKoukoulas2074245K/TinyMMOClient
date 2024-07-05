@@ -23,8 +23,13 @@ static const float DYNAMIC_TEXTURE_HEIGHT_MULTIPLIER = 4.0f;
 static const float DYNAMIC_TEXTURE_X_OFFSET_MULTIPLIER = 1.0f/2.5f;
 static const float DYNAMIC_TEXTURE_X_OFFSET_POWER = 1.015f;
 static const float DYNAMIC_TEXTURE_Y_OFFSET_MULTIPLIER = 1.0f/1.8f;
+static const float DYNAMIC_TEXT_INIT_SCALE_GUESS_MULTIPLIER = 1.0f/700.0f;
+static const float DYNAMIC_TEXT_POSITION_X_MULTIPLIER = 1.0f/2.3f;
+static const float DYNAMIC_TEXT_POSITION_Y_MULTIPLIER = 1.0f/1.8f;
 
-static const strutils::StringId BUTTON_PULSING_ANIMATION_NAME = strutils::StringId("pulsing_animation");
+
+static const strutils::StringId BUTTON_PULSING_IN_ANIMATION_NAME = strutils::StringId("pulsing_in_animation");
+static const strutils::StringId BUTTON_PULSING_OUT_ANIMATION_NAME = strutils::StringId("pulsing_out_animation");
 static const strutils::StringId BUTTON_CLICK_ANIMATION_NAME = strutils::StringId("click_animation");
 static const std::string BASE_BUTTON_SCENE_OBJECT_NAME_POSTFIX = "_base";
 static const std::string INNER_BUTTON_SCENE_OBJECT_NAME_POSTFIX = "_inner";
@@ -140,6 +145,69 @@ AnimatedButton::AnimatedButton
 
 ///------------------------------------------------------------------------------------------------
 
+AnimatedButton::AnimatedButton
+(
+    const glm::vec3& texturePosition,
+    const glm::vec3& textureScale,
+    const std::string& textureFilename,
+    const strutils::StringId& fontName,
+    const std::string& text,
+    const strutils::StringId& buttonName,
+    std::function<void()> onPressCallback,
+    scene::Scene& scene,
+    scene::SnapToEdgeBehavior snapToEdgeBehavior /* = scene::SnapToEdgeBehavior::NONE */,
+    const float snapToEdgeScaleOffsetFactor /* = 1.0f */
+)
+    : mScene(scene)
+    , mOnPressCallback(onPressCallback)
+    , mAnimating(false)
+{
+    mSceneObjects.push_back(scene.CreateSceneObject(strutils::StringId(buttonName.GetString() + BASE_BUTTON_SCENE_OBJECT_NAME_POSTFIX)));
+    mSceneObjects.back()->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + textureFilename);
+    mSceneObjects.back()->mPosition = texturePosition;
+    mSceneObjects.back()->mScale = textureScale;
+    mSceneObjects.back()->mSnapToEdgeBehavior = snapToEdgeBehavior;
+    mSceneObjects.back()->mSnapToEdgeScaleOffsetFactor = mSceneObjects.back()->mScale.x * snapToEdgeScaleOffsetFactor;
+    
+    auto textureSceneObjectRect = scene_object_utils::GetSceneObjectBoundingRect(*mSceneObjects.back());
+    auto textureSceneObjectWidth = textureSceneObjectRect.topRight.x - textureSceneObjectRect.bottomLeft.x;
+    
+    mSceneObjects.push_back(scene.CreateSceneObject(strutils::StringId(buttonName.GetString() + INNER_BUTTON_SCENE_OBJECT_NAME_POSTFIX)));
+    
+    scene::TextSceneObjectData textData;
+    textData.mFontName = fontName;
+    textData.mText = text;
+    
+    mSceneObjects.back()->mSceneObjectTypeData = std::move(textData);
+    mSceneObjects.back()->mPosition = texturePosition;
+    mSceneObjects.back()->mPosition.z += INNER_BUTTON_OBJECT_Z_OFFSET;
+    
+    auto computedTextScale = textureScale.x * DYNAMIC_TEXT_INIT_SCALE_GUESS_MULTIPLIER;
+    mSceneObjects.back()->mScale = glm::vec3(computedTextScale);
+    
+    auto textSceneObjectRect = scene_object_utils::GetSceneObjectBoundingRect(*mSceneObjects.back());
+    auto textSceneObjectWidth = textSceneObjectRect.topRight.x - textSceneObjectRect.bottomLeft.x;
+    auto textSceneObjectHeight = textSceneObjectRect.topRight.y - textSceneObjectRect.bottomLeft.y;
+    
+    while (textSceneObjectWidth > textureSceneObjectWidth)
+    {
+        computedTextScale *= 0.9f;
+        mSceneObjects.back()->mScale = glm::vec3(computedTextScale);
+        
+        textSceneObjectRect = scene_object_utils::GetSceneObjectBoundingRect(*mSceneObjects.back());
+        textSceneObjectWidth = textSceneObjectRect.topRight.x - textSceneObjectRect.bottomLeft.x;
+        textSceneObjectHeight = textSceneObjectRect.topRight.y - textSceneObjectRect.bottomLeft.y;
+    }
+    
+    mSceneObjects.back()->mPosition.y += textSceneObjectHeight * DYNAMIC_TEXT_POSITION_Y_MULTIPLIER;
+    mSceneObjects.back()->mPosition.x -= textSceneObjectWidth * DYNAMIC_TEXT_POSITION_X_MULTIPLIER;
+    
+    mSceneObjects.back()->mSnapToEdgeBehavior = snapToEdgeBehavior;
+    mSceneObjects.back()->mSnapToEdgeScaleOffsetFactor = mSceneObjects.back()->mScale.x * snapToEdgeScaleOffsetFactor;
+}
+
+///------------------------------------------------------------------------------------------------
+
 AnimatedButton::~AnimatedButton()
 {
     for (auto& sceneObject: mSceneObjects)
@@ -169,18 +237,12 @@ ButtonUpdateInteractionResult AnimatedButton::Update(const float)
         mAnimating = true;
         auto& animationManager = CoreSystemsEngine::GetInstance().GetAnimationManager();
         
-        for (auto& sceneObject: mSceneObjects)
+        auto initScale = mSceneObjects.front()->mScale;
+        animationManager.StartAnimation(std::make_unique<rendering::TweenPositionScaleGroupAnimation>(mSceneObjects, mSceneObjects.front()->mPosition, initScale * INTERACTION_ANIMATION_SCALE_FACTOR, INTERACTION_ANIMATION_DURATION), [=]()
         {
-            auto originalScale = sceneObject->mScale;
-            animationManager.StartAnimation(std::make_unique<rendering::PulseAnimation>(sceneObject, INTERACTION_ANIMATION_SCALE_FACTOR, INTERACTION_ANIMATION_DURATION), [=]()
-            {
-                sceneObject->mScale = originalScale;
-                mAnimating = false;
-            }, BUTTON_PULSING_ANIMATION_NAME);
-        }
-        
-        // Dummy animation to invoke callback mid-way pulse animation
-        animationManager.StartAnimation(std::make_unique<rendering::TweenRotationAnimation>(baseSceneObject, baseSceneObject->mRotation, INTERACTION_ANIMATION_DURATION/2, animation_flags::NONE, 0.0f, math::LinearFunction, math::TweeningMode::EASE_IN), [=](){ mOnPressCallback(); }, BUTTON_CLICK_ANIMATION_NAME);
+            mOnPressCallback();
+            CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenPositionScaleGroupAnimation>(mSceneObjects, mSceneObjects.front()->mPosition, initScale, INTERACTION_ANIMATION_DURATION, animation_flags::NONE), [=](){ mAnimating = false; }, BUTTON_PULSING_OUT_ANIMATION_NAME);
+        }, BUTTON_PULSING_IN_ANIMATION_NAME);
     }
     
     return interactionResult;

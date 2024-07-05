@@ -61,12 +61,27 @@ public:
         const float snapToEdgeScaleOffsetFactor = 1.0f
     );
     
-    // Texture + Inner font string button
+    // Texture transforms based on inner font string
     AnimatedButton
     (
         const glm::vec3& position,
         const glm::vec3& textScale,
         const float textureAspectRatio,
+        const std::string& textureFilename,
+        const strutils::StringId& fontName,
+        const std::string& text,
+        const strutils::StringId& buttonName,
+        std::function<void()> onPressCallback,
+        scene::Scene& scene,
+        scene::SnapToEdgeBehavior snapToEdgeBehavior = scene::SnapToEdgeBehavior::NONE,
+        const float snapToEdgeScaleOffsetFactor = 1.0f
+    );
+    
+    // Inner font transforms based on texture
+    AnimatedButton
+    (
+        const glm::vec3& texturePosition,
+        const glm::vec3& textureScale,
         const std::string& textureFilename,
         const strutils::StringId& fontName,
         const std::string& text,
