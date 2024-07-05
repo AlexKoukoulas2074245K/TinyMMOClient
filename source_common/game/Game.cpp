@@ -46,7 +46,8 @@
 ///------------------------------------------------------------------------------------------------
 
 static const strutils::StringId PLAY_BUTTON_NAME = strutils::StringId("play_button");
-static const strutils::StringId SOURCE_WORD_NAME = strutils::StringId("source_word");
+static const strutils::StringId SOURCE_WORD_NAME_1 = strutils::StringId("source_word_1");
+static const strutils::StringId SOURCE_WORD_NAME_2 = strutils::StringId("source_word_2");
 static const strutils::StringId FIRST_CHOICE_WORD_NAME = strutils::StringId("first_choice");
 static const strutils::StringId SECOND_CHOICE_WORD_NAME = strutils::StringId("second_choice");
 static const strutils::StringId THIRD_CHOICE_WORD_NAME = strutils::StringId("third_choice");
@@ -56,9 +57,8 @@ static std::string sSourceLanguage = "English";
 static std::string sTargetLanguage = "Greek";
 static std::vector<std::string> sSupportedLanguages;
 
-static const glm::vec3 WORD_CHOICE_BUTTON_SCALE = glm::vec3(500.0f, 266.0f, 1.0f);
-//static const glm::vec3 WORD_CHOICE_TEXT_SCALE = glm::vec3(0.75f);
-static const glm::vec3 ACTION_TEXT_SCALE = glm::vec3(1.0f);
+static const glm::vec3 WORD_CHOICE_BUTTON_SCALE = glm::vec3(0.1f, 0.053f, 1.0f);
+static const glm::vec3 ACTION_TEXT_SCALE = glm::vec3(0.00014f);
 
 ///------------------------------------------------------------------------------------------------
 
@@ -89,10 +89,10 @@ void Game::Init()
     systemsEngine.GetSoundManager().SetAudioEnabled(false);
     
     auto scene = systemsEngine.GetSceneManager().CreateScene(game_constants::WORLD_SCENE_NAME);
-    scene->GetCamera().SetZoomFactor(0.01f);
+    scene->GetCamera().SetZoomFactor(50.0f);
     scene->SetLoaded(true);
     
-    mPlayButton = std::make_unique<AnimatedButton>(glm::vec3(-200.0f, 450.0f, 1.0f), ACTION_TEXT_SCALE, 1.7142f, "game/ui_button.png", game_constants::DEFAULT_FONT_NAME, "Play!", PLAY_BUTTON_NAME, [&](){ OnPlayButtonPressed(); }, *scene);
+    mPlayButton = std::make_unique<AnimatedButton>(glm::vec3(-0.04f, 0.09f, 1.0f), ACTION_TEXT_SCALE, 1.7142f, "game/ui_button.png", game_constants::DEFAULT_FONT_NAME, "Play!", PLAY_BUTTON_NAME, [&](){ OnPlayButtonPressed(); }, *scene);
     
     for (auto& sceneObject: mPlayButton->GetSceneObjects())
     {
@@ -110,11 +110,13 @@ void Game::Init()
 
 void Game::Update(const float dtMillis)
 {
+    // Dequeue and process any pending server messages
     while (mQueuedServerResponses.size() > 0)
     {
         OnServerResponse(std::move(mQueuedServerResponses.dequeue()));
     }
     
+    // Update rest of game logic
     UpdateGUI(dtMillis);
 }
 
@@ -232,7 +234,7 @@ void Game::UpdateGUI(const float dtMillis)
         mPlayButton->Update(dtMillis);
     }
     
-    for (auto i = 1; i < mWordButtons.size(); ++i)
+    for (auto i = 2; i < mWordButtons.size(); ++i)
     {
         mWordButtons[i]->Update(dtMillis);
     }
@@ -353,12 +355,13 @@ void Game::OnServerWordResponse(const nlohmann::json& responseJson)
     
     mWordButtons.clear();
     
-    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(-200.0f, 200.0f, 1.0f), ACTION_TEXT_SCALE, game_constants::DEFAULT_FONT_NAME, wordResponse.sourceWord, SOURCE_WORD_NAME, [&](){  }, *scene));
+    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(-0.1147f, 0.09f, 1.0f), ACTION_TEXT_SCALE, game_constants::DEFAULT_FONT_NAME, "What is the correct translation", SOURCE_WORD_NAME_1, [&](){  }, *scene));
+    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(-0.06f, 0.06f, 1.0f), ACTION_TEXT_SCALE, game_constants::DEFAULT_FONT_NAME, "for: " + wordResponse.sourceWord + "?", SOURCE_WORD_NAME_2, [&](){  }, *scene));
     
-    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(-330.0f, -100.0f, 1.0f), WORD_CHOICE_BUTTON_SCALE, "game/ui_button.png", game_constants::DEFAULT_FONT_NAME, wordResponse.choices[0], FIRST_CHOICE_WORD_NAME, [&](){  }, *scene));
-    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(350.0f, -100.0f, 1.0f), WORD_CHOICE_BUTTON_SCALE, "game/ui_button.png", game_constants::DEFAULT_FONT_NAME, wordResponse.choices[1], SECOND_CHOICE_WORD_NAME, [&](){ }, *scene));
-    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(-330.0f, -600.0f, 1.0f), WORD_CHOICE_BUTTON_SCALE, "game/ui_button.png", game_constants::DEFAULT_FONT_NAME, wordResponse.choices[2], THIRD_CHOICE_WORD_NAME, [&](){ }, *scene));
-    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(350.0f, -600.0f, 1.0f), WORD_CHOICE_BUTTON_SCALE, "game/ui_button.png", game_constants::DEFAULT_FONT_NAME, wordResponse.choices[3], FOURTH_CHOICE_WORD_NAME, [&](){}, *scene));
+    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(-0.066f, -0.02f, 1.0f), WORD_CHOICE_BUTTON_SCALE, "game/ui_button.png", game_constants::DEFAULT_FONT_NAME, wordResponse.choices[0], FIRST_CHOICE_WORD_NAME, [&](){  }, *scene));
+    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(0.07f, -0.02f, 1.0f), WORD_CHOICE_BUTTON_SCALE, "game/ui_button.png", game_constants::DEFAULT_FONT_NAME, wordResponse.choices[1], SECOND_CHOICE_WORD_NAME, [&](){ }, *scene));
+    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(-0.066f, -0.12f, 1.0f), WORD_CHOICE_BUTTON_SCALE, "game/ui_button.png", game_constants::DEFAULT_FONT_NAME, wordResponse.choices[2], THIRD_CHOICE_WORD_NAME, [&](){ }, *scene));
+    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(0.07f, -0.12f, 1.0f), WORD_CHOICE_BUTTON_SCALE, "game/ui_button.png", game_constants::DEFAULT_FONT_NAME, wordResponse.choices[3], FOURTH_CHOICE_WORD_NAME, [&](){}, *scene));
 }
 
 ///------------------------------------------------------------------------------------------------
