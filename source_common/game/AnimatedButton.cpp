@@ -26,7 +26,7 @@ static const float DYNAMIC_TEXTURE_Y_OFFSET_MULTIPLIER = 1.0f/1.8f;
 static const float DYNAMIC_TEXT_INIT_SCALE_GUESS_MULTIPLIER = 1.0f/700.0f;
 static const float DYNAMIC_TEXT_POSITION_X_MULTIPLIER = 1.0f/2.3f;
 static const float DYNAMIC_TEXT_POSITION_Y_MULTIPLIER = 1.0f/1.8f;
-
+static const float DYNAMIC_TEXT_WIDTH_THRESHOLD_MULTIPLIER = 0.9f;
 
 static const strutils::StringId BUTTON_PULSING_IN_ANIMATION_NAME = strutils::StringId("pulsing_in_animation");
 static const strutils::StringId BUTTON_PULSING_OUT_ANIMATION_NAME = strutils::StringId("pulsing_out_animation");
@@ -189,7 +189,7 @@ AnimatedButton::AnimatedButton
     auto textSceneObjectWidth = textSceneObjectRect.topRight.x - textSceneObjectRect.bottomLeft.x;
     auto textSceneObjectHeight = textSceneObjectRect.topRight.y - textSceneObjectRect.bottomLeft.y;
     
-    while (textSceneObjectWidth > textureSceneObjectWidth)
+    while (textSceneObjectWidth > textureSceneObjectWidth * DYNAMIC_TEXT_WIDTH_THRESHOLD_MULTIPLIER)
     {
         computedTextScale *= 0.9f;
         mSceneObjects.back()->mScale = glm::vec3(computedTextScale);

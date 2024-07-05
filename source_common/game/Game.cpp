@@ -110,6 +110,11 @@ void Game::Init()
 
 void Game::Update(const float dtMillis)
 {
+    while (mQueuedServerResponses.size() > 0)
+    {
+        OnServerResponse(std::move(mQueuedServerResponses.dequeue()));
+    }
+    
     UpdateGUI(dtMillis);
 }
 
@@ -197,7 +202,7 @@ void Game::CreateDebugWidgets()
                 if (ImGui::Selectable(sSupportedLanguages[n].c_str(), isSelected))
                 {
                     selectedTargetLanguageIndex = n;
-                    sTargetLanguage = sSupportedLanguages[selectedSourceLanguageIndex];
+                    sTargetLanguage = sSupportedLanguages[selectedTargetLanguageIndex];
                 }
                 
                 // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
@@ -247,7 +252,7 @@ void Game::SendNetworkMessage(const nlohmann::json& message, const networking::M
         else
         {
             mLastPingMillis = static_cast<int>(responseData.mPingMillis);
-            OnServerResponse(responseData.mResponse);
+            mQueuedServerResponses.enqueue(std::move(responseData.mResponse));
         }
     });
 #elif defined(WINDOWS)
@@ -260,7 +265,7 @@ void Game::SendNetworkMessage(const nlohmann::json& message, const networking::M
         else
         {
             mLastPingMillis = static_cast<int>(responseData.mPingMillis);
-            OnServerResponse(responseData.mResponse);
+            mQueuedServerResponses.enqueue(std::move(responseData.mResponse));
         }
     });
 #endif
@@ -338,20 +343,22 @@ void Game::OnServerWordResponse(const nlohmann::json& responseJson)
     
     auto scene = CoreSystemsEngine::GetInstance().GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME);
     
-    scene->RemoveSceneObject(SOURCE_WORD_NAME);
-    scene->RemoveSceneObject(FIRST_CHOICE_WORD_NAME);
-    scene->RemoveSceneObject(SECOND_CHOICE_WORD_NAME);
-    scene->RemoveSceneObject(THIRD_CHOICE_WORD_NAME);
-    scene->RemoveSceneObject(FOURTH_CHOICE_WORD_NAME);
+    for (auto& wordButton: mWordButtons)
+    {
+        for (auto& wordButtonSceneObject: wordButton->GetSceneObjects())
+        {
+            scene->RemoveSceneObject(wordButtonSceneObject->mName);
+        }
+    }
     
     mWordButtons.clear();
     
     mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(-200.0f, 200.0f, 1.0f), ACTION_TEXT_SCALE, game_constants::DEFAULT_FONT_NAME, wordResponse.sourceWord, SOURCE_WORD_NAME, [&](){  }, *scene));
     
-    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(-330.0f, -100.0f, 1.0f), WORD_CHOICE_BUTTON_SCALE, "game/ui_button.png", game_constants::DEFAULT_FONT_NAME, "a"/*wordResponse.choices[0]*/, FIRST_CHOICE_WORD_NAME, [&](){  }, *scene));
-    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(350.0f, -100.0f, 1.0f), WORD_CHOICE_BUTTON_SCALE, "game/ui_button.png", game_constants::DEFAULT_FONT_NAME, "very"/*wordResponse.choices[1]*/, SECOND_CHOICE_WORD_NAME, [&](){ }, *scene));
-    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(-330.0f, -600.0f, 1.0f), WORD_CHOICE_BUTTON_SCALE, "game/ui_button.png", game_constants::DEFAULT_FONT_NAME, "extremely"/*wordResponse.choices[2]*/, THIRD_CHOICE_WORD_NAME, [&](){ }, *scene));
-    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(350.0f, -600.0f, 1.0f), WORD_CHOICE_BUTTON_SCALE, "game/ui_button.png", game_constants::DEFAULT_FONT_NAME, "Ginormous Insane Word"/*wordResponse.choices[3]*/, FOURTH_CHOICE_WORD_NAME, [&](){}, *scene));
+    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(-330.0f, -100.0f, 1.0f), WORD_CHOICE_BUTTON_SCALE, "game/ui_button.png", game_constants::DEFAULT_FONT_NAME, wordResponse.choices[0], FIRST_CHOICE_WORD_NAME, [&](){  }, *scene));
+    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(350.0f, -100.0f, 1.0f), WORD_CHOICE_BUTTON_SCALE, "game/ui_button.png", game_constants::DEFAULT_FONT_NAME, wordResponse.choices[1], SECOND_CHOICE_WORD_NAME, [&](){ }, *scene));
+    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(-330.0f, -600.0f, 1.0f), WORD_CHOICE_BUTTON_SCALE, "game/ui_button.png", game_constants::DEFAULT_FONT_NAME, wordResponse.choices[2], THIRD_CHOICE_WORD_NAME, [&](){ }, *scene));
+    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(350.0f, -600.0f, 1.0f), WORD_CHOICE_BUTTON_SCALE, "game/ui_button.png", game_constants::DEFAULT_FONT_NAME, wordResponse.choices[3], FOURTH_CHOICE_WORD_NAME, [&](){}, *scene));
 }
 
 ///------------------------------------------------------------------------------------------------

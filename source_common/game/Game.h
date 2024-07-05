@@ -14,6 +14,7 @@
 #include <memory>
 #include <engine/utils/MathUtils.h>
 #include <engine/utils/StringUtils.h>
+#include <engine/utils/ThreadSafeQueue.h>
 #include <game/events/EventSystem.h>
 #include <net_common/NetworkMessages.h>
 #include <net_common/SerializableNetworkObjects.h>
@@ -54,6 +55,7 @@ private:
     std::unique_ptr<AnimatedButton> mPlayButton;
     std::unique_ptr<events::IListener> mSendNetworkMessageEventListener;
     std::vector<std::unique_ptr<AnimatedButton>> mWordButtons;
+    ThreadSafeQueue<std::string> mQueuedServerResponses;
 };
 
 ///------------------------------------------------------------------------------------------------
