@@ -100,7 +100,7 @@ void Game::Init()
     }
     
     auto& eventSystem = events::EventSystem::GetInstance();
-    mSendNetworkMessageEventListener = eventSystem.RegisterForEvent<events::SendNetworkMessageEvent>([=](const events::SendNetworkMessageEvent& event)
+    mSendNetworkMessageEventListener = eventSystem.RegisterForEvent<events::SendNetworkMessageEvent>([this](const events::SendNetworkMessageEvent& event)
     {
         SendNetworkMessage(event.mMessageJson, event.mMessageType, event.mMessagePriority);
     });
@@ -322,7 +322,7 @@ void Game::OnServerLoginResponse(const nlohmann::json& responseJson)
         // Fade button out
         for (auto& sceneObject: mPlayButton->GetSceneObjects())
         {
-            CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenValueAnimation>(sceneObject->mShaderFloatUniformValues[strutils::StringId("custom_alpha")], 0.0f, 0.2f), [=]()
+            CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenValueAnimation>(sceneObject->mShaderFloatUniformValues[strutils::StringId("custom_alpha")], 0.0f, 0.2f), [this, scene, sceneObject]()
             {
                 scene->RemoveSceneObject(sceneObject->mName);
                 mPlayButton = nullptr;

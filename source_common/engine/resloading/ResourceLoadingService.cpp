@@ -58,7 +58,7 @@ std::string ResourceLoadingService::RES_TEXTURES_ROOT      = RES_ROOT + "texture
 std::string ResourceLoadingService::RES_ATLASES_ROOT       = RES_TEXTURES_ROOT + "atlases/";
 std::string ResourceLoadingService::RES_FONT_MAP_DATA_ROOT = RES_DATA_ROOT + "font_maps/";
 
-static const std::string ZIPPED_ASSETS_FILE_NAME = "assets.zip";
+//static const std::string ZIPPED_ASSETS_FILE_NAME = "assets.zip";
 
 ///------------------------------------------------------------------------------------------------
 

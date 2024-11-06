@@ -238,10 +238,10 @@ ButtonUpdateInteractionResult AnimatedButton::Update(const float)
         auto& animationManager = CoreSystemsEngine::GetInstance().GetAnimationManager();
         
         auto initScale = mSceneObjects.front()->mScale;
-        animationManager.StartAnimation(std::make_unique<rendering::TweenPositionScaleGroupAnimation>(mSceneObjects, mSceneObjects.front()->mPosition, initScale * INTERACTION_ANIMATION_SCALE_FACTOR, INTERACTION_ANIMATION_DURATION), [=]()
+        animationManager.StartAnimation(std::make_unique<rendering::TweenPositionScaleGroupAnimation>(mSceneObjects, mSceneObjects.front()->mPosition, initScale * INTERACTION_ANIMATION_SCALE_FACTOR, INTERACTION_ANIMATION_DURATION), [this, initScale]()
         {
             mOnPressCallback();
-            CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenPositionScaleGroupAnimation>(mSceneObjects, mSceneObjects.front()->mPosition, initScale, INTERACTION_ANIMATION_DURATION, animation_flags::NONE), [=](){ mAnimating = false; }, BUTTON_PULSING_OUT_ANIMATION_NAME);
+            CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenPositionScaleGroupAnimation>(mSceneObjects, mSceneObjects.front()->mPosition, initScale, INTERACTION_ANIMATION_DURATION, animation_flags::NONE), [this](){ mAnimating = false; }, BUTTON_PULSING_OUT_ANIMATION_NAME);
         }, BUTTON_PULSING_IN_ANIMATION_NAME);
     }
     
