@@ -26,7 +26,7 @@ if(NOT APPLE)
   set(OPENGL_LIBRARIES opengl32.lib)
 endif()
 
-target_link_libraries(${BINARY} PUBLIC ${CMAKE_PROJECT_NAME}_lib ${PROJECT_NAME}_platform gtest ${SDL2_LIBS} ${SDL2_IMAGE_LIBRARIES} ${OPENGL_LIBRARIES} ${FREETYPE_LIBRARIES})
+target_link_libraries(${BINARY} PUBLIC ${CMAKE_PROJECT_NAME}_lib ${PROJECT_NAME}_platform ${PROJECT_NAME}_net_common gtest ${SDL2_LIBS} ${SDL2_IMAGE_LIBRARIES} ${OPENGL_LIBRARIES} ${FREETYPE_LIBRARIES})
 
 assign_source_group(${TEST_SOURCES})
 

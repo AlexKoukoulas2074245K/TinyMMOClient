@@ -258,7 +258,7 @@ void Game::SendNetworkMessage(const nlohmann::json& message, const networking::M
         }
     });
 #elif defined(WINDOWS)
-    windows_utils::SendNetworkMessage(message, messageType, messagePriority, [&](const networking::ServerResponseData& responseData)
+    windows_utils::SendNetworkMessage(message, messageType, messagePriority == networking::MessagePriority::HIGH, [&](const networking::ServerResponseData& responseData)
     {
         if (!responseData.mError.empty())
         {
