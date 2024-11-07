@@ -46,19 +46,9 @@
 ///------------------------------------------------------------------------------------------------
 
 static const strutils::StringId PLAY_BUTTON_NAME = strutils::StringId("play_button");
-static const strutils::StringId SOURCE_WORD_NAME_1 = strutils::StringId("source_word_1");
-static const strutils::StringId SOURCE_WORD_NAME_2 = strutils::StringId("source_word_2");
-static const strutils::StringId FIRST_CHOICE_WORD_NAME = strutils::StringId("first_choice");
-static const strutils::StringId SECOND_CHOICE_WORD_NAME = strutils::StringId("second_choice");
-static const strutils::StringId THIRD_CHOICE_WORD_NAME = strutils::StringId("third_choice");
-static const strutils::StringId FOURTH_CHOICE_WORD_NAME = strutils::StringId("fourth_choice");
+static const strutils::StringId POKER_TABLE_NAME = strutils::StringId("poker_table");
 
-static std::string sSourceLanguage = "English";
-static std::string sTargetLanguage = "Greek";
-static std::vector<std::string> sSupportedLanguages;
-
-static const glm::vec3 WORD_CHOICE_BUTTON_SCALE = glm::vec3(0.1f, 0.053f, 1.0f);
-static const glm::vec3 ACTION_TEXT_SCALE = glm::vec3(0.00014f);
+static const glm::vec3 TABLE_SCALE = glm::vec3(1.5f * 1.0f, 1.0f, 1.0f);
 
 ///------------------------------------------------------------------------------------------------
 
@@ -92,12 +82,9 @@ void Game::Init()
     scene->GetCamera().SetZoomFactor(50.0f);
     scene->SetLoaded(true);
     
-    mPlayButton = std::make_unique<AnimatedButton>(glm::vec3(-0.04f, 0.09f, 1.0f), ACTION_TEXT_SCALE, 1.7142f, "game/ui_button.png", game_constants::DEFAULT_FONT_NAME, "Play!", PLAY_BUTTON_NAME, [&](){ OnPlayButtonPressed(); }, *scene);
-    
-    for (auto& sceneObject: mPlayButton->GetSceneObjects())
-    {
-        sceneObject->mShaderFloatUniformValues[strutils::StringId("custom_alpha")] = 1.0f;
-    }
+    auto table = scene->CreateSceneObject(POKER_TABLE_NAME);
+    table->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "game/poker_table.png");
+    table->mScale = TABLE_SCALE;
     
     auto& eventSystem = events::EventSystem::GetInstance();
     mSendNetworkMessageEventListener = eventSystem.RegisterForEvent<events::SendNetworkMessageEvent>([this](const events::SendNetworkMessageEvent& event)
@@ -146,78 +133,6 @@ void Game::CreateDebugWidgets()
     ImGui::Begin("Net Stats", nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
     ImGui::Text("Ping %d millis", mLastPingMillis.load());
     ImGui::End();
- 
-    ImGui::Begin("Game Hacks", nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
-    ImGui::SeparatorText("Get New Word");
-    if (ImGui::Button("New Word"))
-    {
-        networking::WordRequest wordRequest = {};
-        wordRequest.sourceLanguge = sSourceLanguage;
-        wordRequest.targetLanguage = sTargetLanguage;
-        SendNetworkMessage(wordRequest.SerializeToJson(), networking::MessageType::CS_WORD_REQUEST, networking::MessagePriority::HIGH);
-    }
-    ImGui::SeparatorText("Swap Source/Target Languages");
-    
-    if (sSupportedLanguages.size() > 0)
-    {
-        auto findElementIndex = [](const std::string& element, const std::vector<std::string> elements)
-        {
-            auto index = 0;
-            for (auto i = 0; i < elements.size(); ++i)
-            {
-                if (elements[i] == element)
-                {
-                    index = i;
-                    break;
-                }
-            }
-            return index;
-        };
-        
-        static int selectedSourceLanguageIndex = findElementIndex(sSourceLanguage, sSupportedLanguages);
-        if (ImGui::BeginCombo("Source Language", sSupportedLanguages[selectedSourceLanguageIndex].c_str()))
-        {
-            for (int n = 0; n < sSupportedLanguages.size(); n++)
-            {
-                const bool isSelected = (selectedSourceLanguageIndex == n);
-                if (ImGui::Selectable(sSupportedLanguages[n].c_str(), isSelected))
-                {
-                    selectedSourceLanguageIndex = n;
-                    sSourceLanguage = sSupportedLanguages[selectedSourceLanguageIndex];
-                }
-                
-                // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
-                if (isSelected)
-                {
-                    ImGui::SetItemDefaultFocus();
-                }
-            }
-            ImGui::EndCombo();
-        }
-        
-        static int selectedTargetLanguageIndex = findElementIndex(sTargetLanguage, sSupportedLanguages);
-        if (ImGui::BeginCombo("Target Language", sSupportedLanguages[selectedTargetLanguageIndex].c_str()))
-        {
-            for (int n = 0; n < sSupportedLanguages.size(); n++)
-            {
-                const bool isSelected = (selectedTargetLanguageIndex == n);
-                if (ImGui::Selectable(sSupportedLanguages[n].c_str(), isSelected))
-                {
-                    selectedTargetLanguageIndex = n;
-                    sTargetLanguage = sSupportedLanguages[selectedTargetLanguageIndex];
-                }
-                
-                // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
-                if (isSelected)
-                {
-                    ImGui::SetItemDefaultFocus();
-                }
-            }
-            ImGui::EndCombo();
-        }
-    }
-    
-    ImGui::End();
 }
 #else
 void Game::CreateDebugWidgets()
@@ -229,15 +144,7 @@ void Game::CreateDebugWidgets()
 
 void Game::UpdateGUI(const float dtMillis)
 {
-    if (mPlayButton)
-    {
-        mPlayButton->Update(dtMillis);
-    }
     
-    for (auto i = 2; i < mWordButtons.size(); ++i)
-    {
-        mWordButtons[i]->Update(dtMillis);
-    }
 }
 
 ///------------------------------------------------------------------------------------------------
@@ -286,14 +193,6 @@ void Game::OnServerResponse(const std::string& response)
         {
             OnServerLoginResponse(responseJson);
         }
-        else if (networking::IsMessageOfType(responseJson, networking::MessageType::SC_WORD_RESPONSE))
-        {
-            OnServerWordResponse(responseJson);
-        }
-        else if (networking::IsMessageOfType(responseJson, networking::MessageType::SC_GET_SUPPORTED_LANGUAGES_RESPONSE))
-        {
-            OnServerGetSupportedLanguagesResponse(responseJson);
-        }
         else
         {
             logging::Log(logging::LogType::ERROR, "Unrecognised message type %d", static_cast<int>(networking::GetMessageType(responseJson)));
@@ -315,74 +214,25 @@ void Game::OnServerLoginResponse(const nlohmann::json& responseJson)
     
     if (loginResponse.allowed)
     {
-        auto& systemsEngine = CoreSystemsEngine::GetInstance();
-        auto& sceneManager = systemsEngine.GetSceneManager();
-        auto scene = sceneManager.FindScene(game_constants::WORLD_SCENE_NAME);
-        
-        // Fade button out
-        for (auto& sceneObject: mPlayButton->GetSceneObjects())
-        {
-            CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenValueAnimation>(sceneObject->mShaderFloatUniformValues[strutils::StringId("custom_alpha")], 0.0f, 0.2f), [this, scene, sceneObject]()
-            {
-                scene->RemoveSceneObject(sceneObject->mName);
-                mPlayButton = nullptr;
-            });
-        }
-        
-        networking::WordRequest wordRequest = {};
-        wordRequest.sourceLanguge = sSourceLanguage;
-        wordRequest.targetLanguage = sTargetLanguage;
-        SendNetworkMessage(wordRequest.SerializeToJson(), networking::MessageType::CS_WORD_REQUEST, networking::MessagePriority::HIGH);
+//        auto& systemsEngine = CoreSystemsEngine::GetInstance();
+//        auto& sceneManager = systemsEngine.GetSceneManager();
+//        auto scene = sceneManager.FindScene(game_constants::WORLD_SCENE_NAME);
+//        
+//        // Fade button out
+//        for (auto& sceneObject: mPlayButton->GetSceneObjects())
+//        {
+//            CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenValueAnimation>(sceneObject->mShaderFloatUniformValues[strutils::StringId("custom_alpha")], 0.0f, 0.2f), [this, scene, sceneObject]()
+//            {
+//                scene->RemoveSceneObject(sceneObject->mName);
+//                mPlayButton = nullptr;
+//            });
+//        }
+//        
+//        networking::WordRequest wordRequest = {};
+//        wordRequest.sourceLanguge = sSourceLanguage;
+//        wordRequest.targetLanguage = sTargetLanguage;
+//        SendNetworkMessage(wordRequest.SerializeToJson(), networking::MessageType::CS_WORD_REQUEST, networking::MessagePriority::HIGH);
     }
-}
-
-///------------------------------------------------------------------------------------------------
-
-void Game::OnServerWordResponse(const nlohmann::json& responseJson)
-{
-    networking::WordResponse wordResponse = {};
-    wordResponse.DeserializeFromJson(responseJson);
-    
-    auto scene = CoreSystemsEngine::GetInstance().GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME);
-    
-    for (auto& wordButton: mWordButtons)
-    {
-        for (auto& wordButtonSceneObject: wordButton->GetSceneObjects())
-        {
-            scene->RemoveSceneObject(wordButtonSceneObject->mName);
-        }
-    }
-    
-    mWordButtons.clear();
-    
-    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(-0.1147f, 0.09f, 1.0f), ACTION_TEXT_SCALE, game_constants::DEFAULT_FONT_NAME, "What is the correct translation", SOURCE_WORD_NAME_1, [&](){  }, *scene));
-    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(-0.06f, 0.06f, 1.0f), ACTION_TEXT_SCALE, game_constants::DEFAULT_FONT_NAME, "for: " + wordResponse.sourceWord + "?", SOURCE_WORD_NAME_2, [&](){  }, *scene));
-    
-    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(-0.066f, -0.02f, 1.0f), WORD_CHOICE_BUTTON_SCALE, "game/ui_button.png", game_constants::DEFAULT_FONT_NAME, wordResponse.choices[0], FIRST_CHOICE_WORD_NAME, [&](){  }, *scene));
-    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(0.07f, -0.02f, 1.0f), WORD_CHOICE_BUTTON_SCALE, "game/ui_button.png", game_constants::DEFAULT_FONT_NAME, wordResponse.choices[1], SECOND_CHOICE_WORD_NAME, [&](){ }, *scene));
-    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(-0.066f, -0.12f, 1.0f), WORD_CHOICE_BUTTON_SCALE, "game/ui_button.png", game_constants::DEFAULT_FONT_NAME, wordResponse.choices[2], THIRD_CHOICE_WORD_NAME, [&](){ }, *scene));
-    mWordButtons.emplace_back(std::make_unique<AnimatedButton>(glm::vec3(0.07f, -0.12f, 1.0f), WORD_CHOICE_BUTTON_SCALE, "game/ui_button.png", game_constants::DEFAULT_FONT_NAME, wordResponse.choices[3], FOURTH_CHOICE_WORD_NAME, [&](){}, *scene));
-}
-
-///------------------------------------------------------------------------------------------------
-
-void Game::OnServerGetSupportedLanguagesResponse(const nlohmann::json& responseJson)
-{
-    networking::GetSupportedLanguagesResponse getSupportedLanguagesResponse = {};
-    getSupportedLanguagesResponse.DeserializeFromJson(responseJson);
-    
-    sSupportedLanguages = getSupportedLanguagesResponse.supportedLanguages;
-}
-
-///------------------------------------------------------------------------------------------------
-
-void Game::OnPlayButtonPressed()
-{
-    // Request login details
-    SendNetworkMessage(nlohmann::json(), networking::MessageType::CS_LOGIN_REQUEST, networking::MessagePriority::HIGH);
-    
-    // Request supported languages
-    SendNetworkMessage(nlohmann::json(), networking::MessageType::CS_GET_SUPPORTED_LANGUAGES_REQUEST, networking::MessagePriority::HIGH);
 }
 
 ///------------------------------------------------------------------------------------------------
