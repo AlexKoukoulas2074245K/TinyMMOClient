@@ -583,7 +583,7 @@
 		928B0BC82B5C3C850025DF3F /* EventSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EventSystem.h; sourceTree = "<group>"; };
 		928B0BC92B5C3C850025DF3F /* Events.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Events.h; sourceTree = "<group>"; };
 		928B0BCA2B5C3C850025DF3F /* EventSystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EventSystem.cpp; sourceTree = "<group>"; };
-		928B0BCF2B5C3C850025DF3F /* Game.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Game.cpp; sourceTree = "<group>"; };
+		928B0BCF2B5C3C850025DF3F /* Game.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Game.cpp; path = ../game/Game.cpp; sourceTree = "<group>"; };
 		928B0C1A2B5C3C850025DF3F /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		928B0D1E2B5C3E120025DF3F /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		928B0D202B5C41AD0025DF3F /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; name = assets; path = ../../assets; sourceTree = "<group>"; };
@@ -910,6 +910,7 @@
 		928B0A8D2B5C3C840025DF3F /* imgui */ = {
 			isa = PBXGroup;
 			children = (
+				928B0BCF2B5C3C850025DF3F /* Game.cpp */,
 				928B0A8E2B5C3C840025DF3F /* misc */,
 				928B0AA72B5C3C840025DF3F /* imgui.h */,
 				928B0AA82B5C3C840025DF3F /* imstb_textedit.h */,
@@ -1021,7 +1022,6 @@
 				92B8A59E2BE13B00006EC56F /* AnimatedButton.cpp */,
 				92B8A59D2BE13B00006EC56F /* AnimatedButton.h */,
 				928B0BBE2B5C3C850025DF3F /* Game.h */,
-				928B0BCF2B5C3C850025DF3F /* Game.cpp */,
 				928B0BC72B5C3C850025DF3F /* events */,
 			);
 			path = game;

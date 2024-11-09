@@ -16,9 +16,11 @@
 #include <engine/utils/StringUtils.h>
 #include <engine/utils/ThreadSafeQueue.h>
 #include <game/events/EventSystem.h>
+#include <net_common/Card.h>
 #include <net_common/NetworkMessages.h>
 #include <net_common/SerializableNetworkObjects.h>
 #include <nlohmann/json.hpp>
+#include <vector>
 
 ///------------------------------------------------------------------------------------------------
 
@@ -45,12 +47,21 @@ private:
     void UpdateGUI(const float dtMillis);
     void SendNetworkMessage(const nlohmann::json& message, const networking::MessageType messageType, const networking::MessagePriority messagePriority);
     void OnServerResponse(const std::string& response);
-    void OnServerLoginResponse(const nlohmann::json& responseJson);
-
+    void OnServerPlayResponse(const nlohmann::json& responseJson);
+    void OnServerTableStateResponse(const nlohmann::json& responseJson);
+    void OnPlayButtonPressed();
+    
 private:
     std::atomic<int> mLastPingMillis = 0;
+    std::unique_ptr<AnimatedButton> mPlayButton;
     std::unique_ptr<events::IListener> mSendNetworkMessageEventListener;
+    std::vector<poker::Card> mHoleCards;
+    std::vector<poker::Card> mCommunityCards;
+    long long mPlayerId = 0;
+    long long mTableId = 0;
     ThreadSafeQueue<std::string> mQueuedServerResponses;
+    float mTableStateRequestTimer;
+    std::string mRoundStateName;
 };
 
 ///------------------------------------------------------------------------------------------------
