@@ -9,12 +9,9 @@
 /* Begin PBXBuildFile section */
 		005DDF1CA71A424F880BFF85 /* BackgroundMusicPlayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 7F068929D88F95729D0195E3 /* BackgroundMusicPlayer.mm */; };
 		0118CE0544990425D47F3A12 /* ShaderResource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB4F4B243BF9EE66291B3910 /* ShaderResource.cpp */; };
-		020E51368021E34F20A13773 /* Card.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F85B6A17741AFF1D567243E /* Card.cpp */; };
 		02E7DF925FD7370A12023A23 /* Camera.h in Sources */ = {isa = PBXBuildFile; fileRef = 70EE9661089211DACFF22288 /* Camera.h */; };
 		03B28C98FAB2D3C8F86DF546 /* IInputStateManager.h in Sources */ = {isa = PBXBuildFile; fileRef = D099CB93E6198C3BE5F73FDE /* IInputStateManager.h */; };
-		03B3590724B2999543340ADA /* BestHandFinderTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8879F50EBB21DB1763EACEA9 /* BestHandFinderTest.cpp */; };
-		03B91A789BFBC460335DFD14 /* BestHandFinderTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8879F50EBB21DB1763EACEA9 /* BestHandFinderTest.cpp */; };
-		0F4B59D06F0D49D0DEBFFE28 /* CardTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3A6852110D6B134074083490 /* CardTest.cpp */; };
+		0F4B59D06F0D49D0DEBFFE28 /* BoardTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3A6852110D6B134074083490 /* BoardTest.cpp */; };
 		120CF200D56449CFC3BD99AF /* AppleSoundUtils.h in Sources */ = {isa = PBXBuildFile; fileRef = D8216CC78F9B7DEB0BEC7678 /* AppleSoundUtils.h */; };
 		16092693C24E8507EFDFBB70 /* Editor.h in Sources */ = {isa = PBXBuildFile; fileRef = AB2400E817D39628656BEFF1 /* Editor.h */; };
 		174B1673DD1B94C2743829E9 /* Editor.h in Sources */ = {isa = PBXBuildFile; fileRef = AB2400E817D39628656BEFF1 /* Editor.h */; };
@@ -22,27 +19,20 @@
 		191617E17721C2C19E20E920 /* IResource.h in Sources */ = {isa = PBXBuildFile; fileRef = 99B2042795EEDA27C28F2D84 /* IResource.h */; };
 		19AB2555F153D36FD08A7E15 /* MeshResource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DDD0E1D0B63F40D725F02A35 /* MeshResource.cpp */; };
 		1AFC9A98EB4CEF5FA6491FA6 /* ResourceLoadingService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 052939A977343440F86F0858 /* ResourceLoadingService.cpp */; };
-		1C6631C2180BB52702FC5D11 /* BestHandFinderTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8879F50EBB21DB1763EACEA9 /* BestHandFinderTest.cpp */; };
 		1ECC3C6E351A36D1C71615E0 /* Logging.h in Sources */ = {isa = PBXBuildFile; fileRef = 43A25A1E55390D38AC6A5742 /* Logging.h */; };
 		216990DC394003275C5EA33D /* Fonts.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB8C2E3FACC90180DAAE4F40 /* Fonts.cpp */; };
 		2459A2AD382EE0AA9153A204 /* wglew.h in Sources */ = {isa = PBXBuildFile; fileRef = D64C3227BB47CA8611283D51 /* wglew.h */; };
 		249415978B8DA701343AE116 /* ThreadSafeQueue.h in Sources */ = {isa = PBXBuildFile; fileRef = 543F0360AEBB87C61E32D84B /* ThreadSafeQueue.h */; };
 		2AA2F6A7573CDD74098EFB98 /* CoreSystemsEnginePlatformImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6D3F63C77D9E3CBD37931ADE /* CoreSystemsEnginePlatformImpl.cpp */; };
-		2B5260BBB10C55209BD2E0D7 /* Card.h in Sources */ = {isa = PBXBuildFile; fileRef = 30E03B0AAACE43ED265C3CE2 /* Card.h */; };
+		2B5260BBB10C55209BD2E0D7 /* Board.h in Sources */ = {isa = PBXBuildFile; fileRef = 30E03B0AAACE43ED265C3CE2 /* Board.h */; };
 		2CCF496499DF11B16C0F2C43 /* SfxPlayer.h in Sources */ = {isa = PBXBuildFile; fileRef = 3714C4A3B069768E05DD0199 /* SfxPlayer.h */; };
 		2F07E8202DDD53253B38EF21 /* OpenGL.h in Sources */ = {isa = PBXBuildFile; fileRef = 0724B463AFC06A5A52F1047E /* OpenGL.h */; };
 		308ED2F39D5A19DC22EB87B3 /* glew.h in Sources */ = {isa = PBXBuildFile; fileRef = 051E00BF71689A5C0A9F91D2 /* glew.h */; };
-		3250728D07F4330763DC8A08 /* HandComparisonTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CCE0E451E006580A332B5114 /* HandComparisonTest.cpp */; };
 		33CC4D39831F836C2D367D51 /* PlatformMacros.h in Sources */ = {isa = PBXBuildFile; fileRef = 7961514C3AA5315045E54E7E /* PlatformMacros.h */; };
 		3404AFE81C1263670F2BD149 /* MathUtils.h in Sources */ = {isa = PBXBuildFile; fileRef = 2096C38A74EAF730ECCA5E36 /* MathUtils.h */; };
-		344F77CE81C50A912D32F73D /* BestHandFinder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B88A0C352357A78B9458D9CA /* BestHandFinder.cpp */; };
-		35DF8B5934BA810AD30C1CAE /* BestHandFinder.h in Sources */ = {isa = PBXBuildFile; fileRef = 55DA9A768C09FBFC8C6D0E74 /* BestHandFinder.h */; };
 		3800CC997FE9DCC2CADAF5E2 /* TypeTraits.h in Sources */ = {isa = PBXBuildFile; fileRef = 6E2183A368D71198F98D6738 /* TypeTraits.h */; };
-		3A3E107AAB647A064A46E180 /* BestHandFinder.h in Sources */ = {isa = PBXBuildFile; fileRef = 55DA9A768C09FBFC8C6D0E74 /* BestHandFinder.h */; };
-		3AA63138458B3D73A2F84204 /* Card.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F85B6A17741AFF1D567243E /* Card.cpp */; };
 		3D0B74E401CD9DB2D3AF3061 /* RenderingUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 59B053AEBDD62B4FCAB8E05D /* RenderingUtils.cpp */; };
 		3E3B65024B721F5CCC0D71E0 /* Animations.h in Sources */ = {isa = PBXBuildFile; fileRef = 82DFED0E0B1AB607780AED60 /* Animations.h */; };
-		3E76CEE9E0D121F4874AE8C6 /* BestHandFinder.h in Sources */ = {isa = PBXBuildFile; fileRef = 55DA9A768C09FBFC8C6D0E74 /* BestHandFinder.h */; };
 		45963ED9A5DA3C4EB9144646 /* TextureResource.h in Sources */ = {isa = PBXBuildFile; fileRef = 989BFF482B72A00F213431FE /* TextureResource.h */; };
 		4D0513581BFF046081AADA26 /* Editor.h in Sources */ = {isa = PBXBuildFile; fileRef = AB2400E817D39628656BEFF1 /* Editor.h */; };
 		4E9ADD55CB0B5CA8962F347E /* StringUtils.h in Sources */ = {isa = PBXBuildFile; fileRef = EF61AB7D638A80B4ABD5D5B7 /* StringUtils.h */; };
@@ -51,16 +41,13 @@
 		55A949B09D185B35C8B0D135 /* Logging.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3BF946C1B449BB4FE7DF288A /* Logging.cpp */; };
 		55B88F03ED55A2709BD2B704 /* SceneObjectUtils.h in Sources */ = {isa = PBXBuildFile; fileRef = FB0E9FCA60AD270C9B09FA51 /* SceneObjectUtils.h */; };
 		590BC49901179FB522AD2223 /* OSMessageBox.h in Sources */ = {isa = PBXBuildFile; fileRef = EEC2E35013E2E8B9B7A912C6 /* OSMessageBox.h */; };
-		5937DE467C7D6AD39F1086CD /* Hand.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F174001DAFF43E8A4C0EAC1 /* Hand.cpp */; };
 		5BEFD96D266F53B603C278C1 /* TypeTraits.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 988043F06556266668BE5677 /* TypeTraits.cpp */; };
 		5E524DDE069F7535F27650B6 /* NetworkObjectDefinitions.inc in Sources */ = {isa = PBXBuildFile; fileRef = BE806858C85634D9FB14B857 /* NetworkObjectDefinitions.inc */; };
-		6014180DD37A37A30C10D568 /* Hand.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F174001DAFF43E8A4C0EAC1 /* Hand.cpp */; };
 		63011B7BE17965C680A05EAD /* BaseDataFileSerializer.h in Sources */ = {isa = PBXBuildFile; fileRef = 30D02CEC6861EBD7441E2004 /* BaseDataFileSerializer.h */; };
 		67D1938FF041F0D5033321B3 /* Editor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A49D33C4F1B1DC1C02DB9E05 /* Editor.cpp */; };
 		69A3B6CA894565C4F51E1123 /* SoundManager.h in Sources */ = {isa = PBXBuildFile; fileRef = 7AC3E452BAA560B6D8B1349E /* SoundManager.h */; };
 		6B03252E24CF56D73B9C3DC7 /* Editor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A49D33C4F1B1DC1C02DB9E05 /* Editor.cpp */; };
 		6B29A2EA7B3D661771AB8A2D /* RenderingUtils.h in Sources */ = {isa = PBXBuildFile; fileRef = 8AE4C68818CCB619974358E0 /* RenderingUtils.h */; };
-		6B80F80530E4C582BF7D6AE8 /* Hand.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0F174001DAFF43E8A4C0EAC1 /* Hand.cpp */; };
 		6E1A780876A016C76FFF66C6 /* OBJMeshLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 06291EA0D3FF12CB3058DEF2 /* OBJMeshLoader.cpp */; };
 		71319CF262B3FEA0241CE51E /* RendererPlatformImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68CBCF02480A4F7771578514 /* RendererPlatformImpl.cpp */; };
 		71DEABFBFD9A818B6DFD8412 /* TextureLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E0D05FD28DC001514531A214 /* TextureLoader.cpp */; };
@@ -70,11 +57,9 @@
 		7A35378576E3FCE89E70ABA4 /* SceneManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FB79D70FA4FA614F184AFE40 /* SceneManager.cpp */; };
 		7C959AE38E5D848AF2C4A4BA /* EditorImGuiCommands.inc in Sources */ = {isa = PBXBuildFile; fileRef = 3A0B70DC7ADA228D909C7E71 /* EditorImGuiCommands.inc */; };
 		7CA340B584BA7BDBF8857C4C /* OBJMeshLoader.h in Sources */ = {isa = PBXBuildFile; fileRef = 46BB489973B1ACFF46F552DB /* OBJMeshLoader.h */; };
-		7F0CD3B53EFA0AEEDBBB863D /* Hand.h in Sources */ = {isa = PBXBuildFile; fileRef = D417C89AA6ECA2BE31286B80 /* Hand.h */; };
 		851FBE54CFC3F1C7F292AD3D /* AnimationManager.h in Sources */ = {isa = PBXBuildFile; fileRef = F2FC1889E08EEFD36C0B6476 /* AnimationManager.h */; };
-		86BE6465DBA9683F9048EDE5 /* Card.h in Sources */ = {isa = PBXBuildFile; fileRef = 30E03B0AAACE43ED265C3CE2 /* Card.h */; };
+		86BE6465DBA9683F9048EDE5 /* Board.h in Sources */ = {isa = PBXBuildFile; fileRef = 30E03B0AAACE43ED265C3CE2 /* Board.h */; };
 		8C096F9D043616750BC963F8 /* TextureLoader.h in Sources */ = {isa = PBXBuildFile; fileRef = 05D038A4FFCF3C5AA2E85A75 /* TextureLoader.h */; };
-		8CB73A1246E37C7A997CC768 /* Hand.h in Sources */ = {isa = PBXBuildFile; fileRef = D417C89AA6ECA2BE31286B80 /* Hand.h */; };
 		920C54052B80E41A006F6743 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 920C54042B80E41A006F6743 /* OpenAL.framework */; };
 		926C7C1E2B7239720028766E /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 926C7C1D2B7239720028766E /* AppKit.framework */; };
 		9272506B2B7D2CCC0010DF26 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9272506A2B7D2CCC0010DF26 /* AVFoundation.framework */; };
@@ -383,26 +368,21 @@
 		92B8A59F2BE13B00006EC56F /* AnimatedButton.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 92B8A59E2BE13B00006EC56F /* AnimatedButton.cpp */; };
 		92CA97412B65132C00B53B01 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92CA97402B65132B00B53B01 /* StoreKit.framework */; };
 		95BF1C18A001B37A45C9BF9E /* IRenderer.h in Sources */ = {isa = PBXBuildFile; fileRef = E0599E67CDFA7350C55C73A5 /* IRenderer.h */; };
-		9BE8896941F8C3B1CD4A3C21 /* CardTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3A6852110D6B134074083490 /* CardTest.cpp */; };
-		9D23C85EEEB4627A9073DA93 /* Card.h in Sources */ = {isa = PBXBuildFile; fileRef = 30E03B0AAACE43ED265C3CE2 /* Card.h */; };
+		9BE8896941F8C3B1CD4A3C21 /* BoardTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3A6852110D6B134074083490 /* BoardTest.cpp */; };
+		9D23C85EEEB4627A9073DA93 /* Board.h in Sources */ = {isa = PBXBuildFile; fileRef = 30E03B0AAACE43ED265C3CE2 /* Board.h */; };
 		9F60F6BEA7D20AB4B5EFA323 /* ResourceLoadingService.h in Sources */ = {isa = PBXBuildFile; fileRef = 7C92E4EC0FBCD6AFCA53FD77 /* ResourceLoadingService.h */; };
 		9FE4A0895085C4A710AF1FF6 /* SerializableNetworkObjects.h in Sources */ = {isa = PBXBuildFile; fileRef = A7F720915E74A51C6579763C /* SerializableNetworkObjects.h */; };
 		A190FCD102A510B7AF224622 /* AnimationManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E9824F6D620FAB012DF0BC78 /* AnimationManager.cpp */; };
 		A24C468FFD129BCDF0B2E5B2 /* InputStateManagerPlatformImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CF33F7C72612B80A9AB49895 /* InputStateManagerPlatformImpl.cpp */; };
-		A3ACBE3883D4396C98DFFCAF /* Hand.h in Sources */ = {isa = PBXBuildFile; fileRef = D417C89AA6ECA2BE31286B80 /* Hand.h */; };
 		A50C73CD4B3C9E1668BFADDD /* SfxPlayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5B33DAF295D4E7E164154510 /* SfxPlayer.mm */; };
 		A7B97E4491771F3812AD0124 /* ParticleManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 14207B709EC0713AAB9C29C8 /* ParticleManager.cpp */; };
-		ABBCC9C9740D92CFB8BA401C /* BestHandFinder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B88A0C352357A78B9458D9CA /* BestHandFinder.cpp */; };
 		AEBAABE4C4BC0F6D887BFBCB /* ImageSurfaceLoader.h in Sources */ = {isa = PBXBuildFile; fileRef = D979EC9B74F12857F47E4007 /* ImageSurfaceLoader.h */; };
-		B1223D6F28E2F43CF50F0A6F /* Card.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F85B6A17741AFF1D567243E /* Card.cpp */; };
-		B25433FC516AF3800F430E31 /* HandComparisonTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CCE0E451E006580A332B5114 /* HandComparisonTest.cpp */; };
 		BC81826A579566F5CA5790E9 /* BaseDataFileDeserializer.h in Sources */ = {isa = PBXBuildFile; fileRef = 8D6E209DDF4F577F8C87C6A0 /* BaseDataFileDeserializer.h */; };
 		BD43AFA7713BE8684E4A8ACA /* ShaderLoader.h in Sources */ = {isa = PBXBuildFile; fileRef = 642B84557417F85C19410FDE /* ShaderLoader.h */; };
-		BDDBAF2040F67DF3EDE896F7 /* HandComparisonTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CCE0E451E006580A332B5114 /* HandComparisonTest.cpp */; };
 		BE9038402F304B01BC7CAAB8 /* DataFileResource.h in Sources */ = {isa = PBXBuildFile; fileRef = 08AAC0562233A3F34613E310 /* DataFileResource.h */; };
 		C006C977BE7088F71FAC7329 /* Fonts.h in Sources */ = {isa = PBXBuildFile; fileRef = F3DCD97E5C6A637C6DD4BC0B /* Fonts.h */; };
 		C14FB694A5255B1DC21B4A13 /* SceneObjectUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F16121E2A49D2514A725F7AA /* SceneObjectUtils.cpp */; };
-		C2D16752D8C6C726721BB97E /* CardTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3A6852110D6B134074083490 /* CardTest.cpp */; };
+		C2D16752D8C6C726721BB97E /* BoardTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3A6852110D6B134074083490 /* BoardTest.cpp */; };
 		C2E83D8C714D1A35A7B1FC57 /* EditorImGuiCommands.inc in Sources */ = {isa = PBXBuildFile; fileRef = 3A0B70DC7ADA228D909C7E71 /* EditorImGuiCommands.inc */; };
 		C303F0F3781FE76FA4F0A754 /* Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EA3B9899242A079FE63DCD1E /* Camera.cpp */; };
 		C406B60810EC8EDBDDA519DA /* Scene.h in Sources */ = {isa = PBXBuildFile; fileRef = 659D24C3A310C59893EE9475 /* Scene.h */; };
@@ -412,7 +392,6 @@
 		C7FF0B8B56D6E0E9E98D535C /* SceneObject.h in Sources */ = {isa = PBXBuildFile; fileRef = 9F1941D1E63978B2B9C05A1E /* SceneObject.h */; };
 		CA9897BC57F466630194BFE8 /* MeshResource.h in Sources */ = {isa = PBXBuildFile; fileRef = 88B55A70915E2429F0F03C71 /* MeshResource.h */; };
 		CB1B337E51727F74A3851A0E /* BackgroundMusicPlayer.h in Sources */ = {isa = PBXBuildFile; fileRef = 9A0A1CFEB31EB9D7990F0B4B /* BackgroundMusicPlayer.h */; };
-		CBA1DFA24DE6888316C062FF /* BestHandFinder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B88A0C352357A78B9458D9CA /* BestHandFinder.cpp */; };
 		CCE13A87F90CB8EB69073CD1 /* FileUtils.h in Sources */ = {isa = PBXBuildFile; fileRef = 0D09AB023B7A329D725F2F2F /* FileUtils.h */; };
 		D21664D760A3220A78231910 /* Logging.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3BF946C1B449BB4FE7DF288A /* Logging.cpp */; };
 		D44276B3AAC7224FC2221FC6 /* ImageSurfaceResource.h in Sources */ = {isa = PBXBuildFile; fileRef = CAEF02928D06B177B1091C5F /* ImageSurfaceResource.h */; };
@@ -484,7 +463,6 @@
 		08AAC0562233A3F34613E310 /* DataFileResource.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = DataFileResource.h; sourceTree = "<group>"; };
 		0A05CE2983C7CEA1D2A25585 /* BaseDataFileDeserializer.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = BaseDataFileDeserializer.cpp; sourceTree = "<group>"; };
 		0D09AB023B7A329D725F2F2F /* FileUtils.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = FileUtils.h; sourceTree = "<group>"; };
-		0F174001DAFF43E8A4C0EAC1 /* Hand.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = Hand.cpp; sourceTree = "<group>"; };
 		13FDFD19955883B3085E4725 /* ShaderResource.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = ShaderResource.h; sourceTree = "<group>"; };
 		14207B709EC0713AAB9C29C8 /* ParticleManager.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = ParticleManager.cpp; sourceTree = "<group>"; };
 		1B15A1EEB522F75EE7E24E55 /* CoreSystemsEngine.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CoreSystemsEngine.h; sourceTree = "<group>"; };
@@ -492,12 +470,12 @@
 		221289B3E3FA84B55F4C25E2 /* SceneManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = SceneManager.h; sourceTree = "<group>"; };
 		255CBE3395586957104E385D /* ShaderLoader.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = ShaderLoader.cpp; sourceTree = "<group>"; };
 		30D02CEC6861EBD7441E2004 /* BaseDataFileSerializer.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = BaseDataFileSerializer.h; sourceTree = "<group>"; };
-		30E03B0AAACE43ED265C3CE2 /* Card.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = Card.h; sourceTree = "<group>"; };
+		30E03B0AAACE43ED265C3CE2 /* Board.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = Board.h; sourceTree = "<group>"; };
 		3199A38C1A16A070A579BAB4 /* ParticleManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = ParticleManager.h; sourceTree = "<group>"; };
 		3714C4A3B069768E05DD0199 /* SfxPlayer.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = SfxPlayer.h; sourceTree = "<group>"; };
 		393520815AD90C67A6A6989C /* MathUtils.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = MathUtils.cpp; sourceTree = "<group>"; };
 		3A0B70DC7ADA228D909C7E71 /* EditorImGuiCommands.inc */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.pascal; path = EditorImGuiCommands.inc; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
-		3A6852110D6B134074083490 /* CardTest.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CardTest.cpp; sourceTree = "<group>"; };
+		3A6852110D6B134074083490 /* BoardTest.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = BoardTest.cpp; sourceTree = "<group>"; };
 		3BF946C1B449BB4FE7DF288A /* Logging.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = Logging.cpp; sourceTree = "<group>"; };
 		3E13E4D3AA7809E3A06CFF75 /* stb_image_write.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = stb_image_write.h; sourceTree = "<group>"; };
 		431D52A0E0BD619E5CEDBCA7 /* DataFileResource.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = DataFileResource.cpp; sourceTree = "<group>"; };
@@ -505,7 +483,6 @@
 		46BB489973B1ACFF46F552DB /* OBJMeshLoader.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = OBJMeshLoader.h; sourceTree = "<group>"; };
 		53CDE03B92A8F220738E44FE /* ImageSurfaceResource.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = ImageSurfaceResource.cpp; sourceTree = "<group>"; };
 		543F0360AEBB87C61E32D84B /* ThreadSafeQueue.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = ThreadSafeQueue.h; sourceTree = "<group>"; };
-		55DA9A768C09FBFC8C6D0E74 /* BestHandFinder.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = BestHandFinder.h; sourceTree = "<group>"; };
 		59B053AEBDD62B4FCAB8E05D /* RenderingUtils.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = RenderingUtils.cpp; sourceTree = "<group>"; };
 		5B33DAF295D4E7E164154510 /* SfxPlayer.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; path = SfxPlayer.mm; sourceTree = "<group>"; };
 		642B84557417F85C19410FDE /* ShaderLoader.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = ShaderLoader.h; sourceTree = "<group>"; };
@@ -514,7 +491,6 @@
 		68CBCF02480A4F7771578514 /* RendererPlatformImpl.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = RendererPlatformImpl.cpp; sourceTree = "<group>"; };
 		6D3F63C77D9E3CBD37931ADE /* CoreSystemsEnginePlatformImpl.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CoreSystemsEnginePlatformImpl.cpp; sourceTree = "<group>"; };
 		6E2183A368D71198F98D6738 /* TypeTraits.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = TypeTraits.h; sourceTree = "<group>"; };
-		6F85B6A17741AFF1D567243E /* Card.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = Card.cpp; sourceTree = "<group>"; };
 		70EE9661089211DACFF22288 /* Camera.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = Camera.h; sourceTree = "<group>"; };
 		7961514C3AA5315045E54E7E /* PlatformMacros.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = PlatformMacros.h; sourceTree = "<group>"; };
 		7AC3E452BAA560B6D8B1349E /* SoundManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = SoundManager.h; sourceTree = "<group>"; };
@@ -522,7 +498,6 @@
 		7F068929D88F95729D0195E3 /* BackgroundMusicPlayer.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; path = BackgroundMusicPlayer.mm; sourceTree = "<group>"; };
 		82DFED0E0B1AB607780AED60 /* Animations.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = Animations.h; sourceTree = "<group>"; };
 		83294548BB5AEF7EB30C76DC /* NetworkMessages.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = NetworkMessages.h; sourceTree = "<group>"; };
-		8879F50EBB21DB1763EACEA9 /* BestHandFinderTest.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = BestHandFinderTest.cpp; sourceTree = "<group>"; };
 		88B55A70915E2429F0F03C71 /* MeshResource.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = MeshResource.h; sourceTree = "<group>"; };
 		8AE4C68818CCB619974358E0 /* RenderingUtils.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = RenderingUtils.h; sourceTree = "<group>"; };
 		8D6E209DDF4F577F8C87C6A0 /* BaseDataFileDeserializer.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = BaseDataFileDeserializer.h; sourceTree = "<group>"; };
@@ -583,7 +558,7 @@
 		928B0BC82B5C3C850025DF3F /* EventSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EventSystem.h; sourceTree = "<group>"; };
 		928B0BC92B5C3C850025DF3F /* Events.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Events.h; sourceTree = "<group>"; };
 		928B0BCA2B5C3C850025DF3F /* EventSystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EventSystem.cpp; sourceTree = "<group>"; };
-		928B0BCF2B5C3C850025DF3F /* Game.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Game.cpp; path = ../game/Game.cpp; sourceTree = "<group>"; };
+		928B0BCF2B5C3C850025DF3F /* Game.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Game.cpp; sourceTree = "<group>"; };
 		928B0C1A2B5C3C850025DF3F /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		928B0D1E2B5C3E120025DF3F /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		928B0D202B5C41AD0025DF3F /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; name = assets; path = ../../assets; sourceTree = "<group>"; };
@@ -617,14 +592,11 @@
 		AD86196C948CE14DCBBE5446 /* IResourceLoader.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = IResourceLoader.h; sourceTree = "<group>"; };
 		B645F5160C1B36C70F708518 /* ImageSurfaceLoader.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = ImageSurfaceLoader.cpp; sourceTree = "<group>"; };
 		B83F90BE48846F5019309046 /* DataFileLoader.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = DataFileLoader.h; sourceTree = "<group>"; };
-		B88A0C352357A78B9458D9CA /* BestHandFinder.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = BestHandFinder.cpp; sourceTree = "<group>"; };
 		BB8C2E3FACC90180DAAE4F40 /* Fonts.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = Fonts.cpp; sourceTree = "<group>"; };
 		BE806858C85634D9FB14B857 /* NetworkObjectDefinitions.inc */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.pascal; path = NetworkObjectDefinitions.inc; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		CAEF02928D06B177B1091C5F /* ImageSurfaceResource.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = ImageSurfaceResource.h; sourceTree = "<group>"; };
-		CCE0E451E006580A332B5114 /* HandComparisonTest.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = HandComparisonTest.cpp; sourceTree = "<group>"; };
 		CF33F7C72612B80A9AB49895 /* InputStateManagerPlatformImpl.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = InputStateManagerPlatformImpl.cpp; sourceTree = "<group>"; };
 		D099CB93E6198C3BE5F73FDE /* IInputStateManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = IInputStateManager.h; sourceTree = "<group>"; };
-		D417C89AA6ECA2BE31286B80 /* Hand.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = Hand.h; sourceTree = "<group>"; };
 		D64C3227BB47CA8611283D51 /* wglew.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = wglew.h; sourceTree = "<group>"; };
 		D8216CC78F9B7DEB0BEC7678 /* AppleSoundUtils.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = AppleSoundUtils.h; sourceTree = "<group>"; };
 		D979EC9B74F12857F47E4007 /* ImageSurfaceLoader.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = ImageSurfaceLoader.h; sourceTree = "<group>"; };
@@ -705,9 +677,7 @@
 		1B447CE9E764CFC91F9368BE /* net_common */ = {
 			isa = PBXGroup;
 			children = (
-				3A6852110D6B134074083490 /* CardTest.cpp */,
-				CCE0E451E006580A332B5114 /* HandComparisonTest.cpp */,
-				8879F50EBB21DB1763EACEA9 /* BestHandFinderTest.cpp */,
+				3A6852110D6B134074083490 /* BoardTest.cpp */,
 			);
 			path = net_common;
 			sourceTree = "<group>";
@@ -910,7 +880,6 @@
 		928B0A8D2B5C3C840025DF3F /* imgui */ = {
 			isa = PBXGroup;
 			children = (
-				928B0BCF2B5C3C850025DF3F /* Game.cpp */,
 				928B0A8E2B5C3C840025DF3F /* misc */,
 				928B0AA72B5C3C840025DF3F /* imgui.h */,
 				928B0AA82B5C3C840025DF3F /* imstb_textedit.h */,
@@ -1022,6 +991,7 @@
 				92B8A59E2BE13B00006EC56F /* AnimatedButton.cpp */,
 				92B8A59D2BE13B00006EC56F /* AnimatedButton.h */,
 				928B0BBE2B5C3C850025DF3F /* Game.h */,
+				928B0BCF2B5C3C850025DF3F /* Game.cpp */,
 				928B0BC72B5C3C850025DF3F /* events */,
 			);
 			path = game;
@@ -1155,12 +1125,7 @@
 				A7F720915E74A51C6579763C /* SerializableNetworkObjects.h */,
 				BE806858C85634D9FB14B857 /* NetworkObjectDefinitions.inc */,
 				83294548BB5AEF7EB30C76DC /* NetworkMessages.h */,
-				30E03B0AAACE43ED265C3CE2 /* Card.h */,
-				6F85B6A17741AFF1D567243E /* Card.cpp */,
-				0F174001DAFF43E8A4C0EAC1 /* Hand.cpp */,
-				D417C89AA6ECA2BE31286B80 /* Hand.h */,
-				B88A0C352357A78B9458D9CA /* BestHandFinder.cpp */,
-				55DA9A768C09FBFC8C6D0E74 /* BestHandFinder.h */,
+				30E03B0AAACE43ED265C3CE2 /* Board.h */,
 			);
 			path = net_common;
 			sourceTree = "<group>";
@@ -1460,15 +1425,8 @@
 				16092693C24E8507EFDFBB70 /* Editor.h in Sources */,
 				7C959AE38E5D848AF2C4A4BA /* EditorImGuiCommands.inc in Sources */,
 				FFC2DBB68CE0D48497767EEC /* Logging.cpp in Sources */,
-				2B5260BBB10C55209BD2E0D7 /* Card.h in Sources */,
-				9BE8896941F8C3B1CD4A3C21 /* CardTest.cpp in Sources */,
-				020E51368021E34F20A13773 /* Card.cpp in Sources */,
-				6014180DD37A37A30C10D568 /* Hand.cpp in Sources */,
-				7F0CD3B53EFA0AEEDBBB863D /* Hand.h in Sources */,
-				BDDBAF2040F67DF3EDE896F7 /* HandComparisonTest.cpp in Sources */,
-				344F77CE81C50A912D32F73D /* BestHandFinder.cpp in Sources */,
-				3A3E107AAB647A064A46E180 /* BestHandFinder.h in Sources */,
-				03B3590724B2999543340ADA /* BestHandFinderTest.cpp in Sources */,
+				2B5260BBB10C55209BD2E0D7 /* Board.h in Sources */,
+				9BE8896941F8C3B1CD4A3C21 /* BoardTest.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1580,15 +1538,8 @@
 				174B1673DD1B94C2743829E9 /* Editor.h in Sources */,
 				C2E83D8C714D1A35A7B1FC57 /* EditorImGuiCommands.inc in Sources */,
 				D21664D760A3220A78231910 /* Logging.cpp in Sources */,
-				9D23C85EEEB4627A9073DA93 /* Card.h in Sources */,
-				0F4B59D06F0D49D0DEBFFE28 /* CardTest.cpp in Sources */,
-				3AA63138458B3D73A2F84204 /* Card.cpp in Sources */,
-				5937DE467C7D6AD39F1086CD /* Hand.cpp in Sources */,
-				A3ACBE3883D4396C98DFFCAF /* Hand.h in Sources */,
-				3250728D07F4330763DC8A08 /* HandComparisonTest.cpp in Sources */,
-				ABBCC9C9740D92CFB8BA401C /* BestHandFinder.cpp in Sources */,
-				35DF8B5934BA810AD30C1CAE /* BestHandFinder.h in Sources */,
-				1C6631C2180BB52702FC5D11 /* BestHandFinderTest.cpp in Sources */,
+				9D23C85EEEB4627A9073DA93 /* Board.h in Sources */,
+				0F4B59D06F0D49D0DEBFFE28 /* BoardTest.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1700,15 +1651,8 @@
 				4D0513581BFF046081AADA26 /* Editor.h in Sources */,
 				755F10742FF09979BBBA9C58 /* EditorImGuiCommands.inc in Sources */,
 				55A949B09D185B35C8B0D135 /* Logging.cpp in Sources */,
-				86BE6465DBA9683F9048EDE5 /* Card.h in Sources */,
-				C2D16752D8C6C726721BB97E /* CardTest.cpp in Sources */,
-				B1223D6F28E2F43CF50F0A6F /* Card.cpp in Sources */,
-				6B80F80530E4C582BF7D6AE8 /* Hand.cpp in Sources */,
-				8CB73A1246E37C7A997CC768 /* Hand.h in Sources */,
-				B25433FC516AF3800F430E31 /* HandComparisonTest.cpp in Sources */,
-				CBA1DFA24DE6888316C062FF /* BestHandFinder.cpp in Sources */,
-				3E76CEE9E0D121F4874AE8C6 /* BestHandFinder.h in Sources */,
-				03B91A789BFBC460335DFD14 /* BestHandFinderTest.cpp in Sources */,
+				86BE6465DBA9683F9048EDE5 /* Board.h in Sources */,
+				C2D16752D8C6C726721BB97E /* BoardTest.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
