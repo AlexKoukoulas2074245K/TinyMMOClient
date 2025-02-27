@@ -15,8 +15,8 @@
 
 ///------------------------------------------------------------------------------------------------
 
-static const float INTERACTION_ANIMATION_DURATION = 0.1f;
-static const float INTERACTION_ANIMATION_SCALE_FACTOR = 0.5f;
+static const float INTERACTION_ANIMATION_DURATION = 0.085f;
+static const float INTERACTION_ANIMATION_SCALE_FACTOR = 0.6f;
 static const float INNER_BUTTON_OBJECT_Z_OFFSET = 0.01f;
 static const float MIN_DYNAMIC_TEXTURE_HEIGHT_MULTIPLIER = 1.4f;
 static const float DYNAMIC_TEXTURE_HEIGHT_MULTIPLIER = 4.0f;

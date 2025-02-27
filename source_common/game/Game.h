@@ -46,15 +46,14 @@ private:
     void UpdateGUI(const float dtMillis);
     void SendNetworkMessage(const nlohmann::json& message, const networking::MessageType messageType, const networking::MessagePriority messagePriority);
     void OnServerResponse(const std::string& response);
-    void OnServerLoginResponse(const std::string& response);
-    void OnServerSpinResponse(const std::string& response);
+    void OnServerLoginResponse(const nlohmann::json& responseJson);
+    void OnServerSpinResponse(const nlohmann::json& responseJson);
     void OnLoginButtonPressed();
     void OnSpinButtonPressed();
     
 private:
     std::atomic<int> mLastPingMillis = 0;
     std::unique_ptr<AnimatedButton> mLoginButton;
-    std::unique_ptr<AnimatedButton> mSpinButton;
     std::unique_ptr<events::IListener> mSendNetworkMessageEventListener;
     long long mPlayerId = 0;
     ThreadSafeQueue<std::string> mQueuedServerResponses;

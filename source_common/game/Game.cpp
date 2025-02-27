@@ -32,6 +32,7 @@
 #include <game/events/EventSystem.h>
 #include <imgui/imgui.h>
 #include <mutex>
+#include <SDL.h>
 
 #if defined(MOBILE_FLOW)
 #include <platform_specific/IOSUtils.h>
@@ -46,9 +47,12 @@
 ///------------------------------------------------------------------------------------------------
 
 static const strutils::StringId LOGIN_BUTTON_NAME = strutils::StringId("login_button");
-static const strutils::StringId PLAY_BUTTON_NAME = strutils::StringId("spin_button");
+static const strutils::StringId SPIN_BUTTON_NAME = strutils::StringId("spin_button");
+static const strutils::StringId BOARD_NAME = strutils::StringId("board");
 
 static const glm::vec3 ACTION_TEXT_SCALE = glm::vec3(0.00056f);
+static const glm::vec3 SPIN_BUTTON_SCALE = glm::vec3(0.156f);
+static const glm::vec3 BOARD_SCALE = glm::vec3(0.5f * 1.28f, 0.5f, 1.0f);
 
 ///------------------------------------------------------------------------------------------------
 
@@ -82,7 +86,11 @@ void Game::Init()
     scene->GetCamera().SetZoomFactor(50.0f);
     scene->SetLoaded(true);
     
-    mLoginButton = std::make_unique<AnimatedButton>(glm::vec3(-0.075f, 0.134f, 1.0f), ACTION_TEXT_SCALE, game_constants::DEFAULT_FONT_NAME, "Log in", PLAY_BUTTON_NAME, [&](){ OnLoginButtonPressed(); }, *scene);
+    mLoginButton = std::make_unique<AnimatedButton>(glm::vec3(-0.075f, 0.134f, 2.0f), ACTION_TEXT_SCALE, game_constants::DEFAULT_FONT_NAME, "Log in", LOGIN_BUTTON_NAME, [&](){ OnLoginButtonPressed(); }, *scene);
+    for (auto& sceneObject: mLoginButton->GetSceneObjects())
+    {
+        sceneObject->mShaderFloatUniformValues[strutils::StringId("custom_alpha")] = 1.0f;
+    }
     
     auto& eventSystem = events::EventSystem::GetInstance();
     mSendNetworkMessageEventListener = eventSystem.RegisterForEvent<events::SendNetworkMessageEvent>([this](const events::SendNetworkMessageEvent& event)
@@ -148,14 +156,45 @@ void Game::CreateDebugWidgets()
 
 void Game::UpdateGUI(const float dtMillis)
 {
+    const auto& inputStateManager = CoreSystemsEngine::GetInstance().GetInputStateManager();
+    auto& systemsEngine = CoreSystemsEngine::GetInstance();
+    auto& sceneManager = systemsEngine.GetSceneManager();
+    auto& animationManager = CoreSystemsEngine::GetInstance().GetAnimationManager();
+    auto scene = sceneManager.FindScene(game_constants::WORLD_SCENE_NAME);
+    
     if (mLoginButton)
     {
         mLoginButton->Update(dtMillis);
     }
     
-    if (mSpinButton)
+    auto spinButton = scene->FindSceneObject(SPIN_BUTTON_NAME);
+    if (spinButton)
     {
-        mSpinButton->Update(dtMillis);
+        while (spinButton->mRotation.z < -2.0f * math::PI)
+        {
+            spinButton->mRotation.z += 2.0f * math::PI;
+        }
+        
+        if (animationManager.GetAnimationCountPlayingForSceneObject(SPIN_BUTTON_NAME) == 0)
+        {
+            auto worldTouchPos = inputStateManager.VGetPointingPosInWorldSpace(scene->GetCamera().GetViewMatrix(), scene->GetCamera().GetProjMatrix());
+            
+            auto sceneObjectRect = scene_object_utils::GetSceneObjectBoundingRect(*spinButton);
+            bool cursorInSceneObject = math::IsPointInsideRectangle(sceneObjectRect.bottomLeft, sceneObjectRect.topRight, worldTouchPos);
+            
+            if (cursorInSceneObject && inputStateManager.VButtonTapped(input::Button::MAIN_BUTTON))
+            {
+                auto initScale = spinButton->mScale;
+                animationManager.StartAnimation(std::make_unique<rendering::TweenPositionScaleAnimation>(spinButton, spinButton->mPosition, initScale * 0.8f, 0.15f), [this, initScale, spinButton]()
+                {
+                    OnSpinButtonPressed();
+                    CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenPositionScaleAnimation>(spinButton, spinButton->mPosition, initScale, 0.15f, animation_flags::NONE), [](){});
+                });
+                
+                auto currentRotation = spinButton->mRotation;
+                CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenRotationAnimation>(spinButton, glm::vec3(currentRotation.x, currentRotation.y, currentRotation.z - 2.0f * math::PI), 1.0f), [](){});
+            }
+        }
     }
 }
 
@@ -168,6 +207,26 @@ void Game::SendNetworkMessage(const nlohmann::json& message, const networking::M
     {
         if (!responseData.mError.empty())
         {
+            auto& systemsEngine = CoreSystemsEngine::GetInstance();
+            auto& sceneManager = systemsEngine.GetSceneManager();
+            auto scene = sceneManager.FindScene(game_constants::WORLD_SCENE_NAME);
+            
+            scene::TextSceneObjectData textData;
+            textData.mFontName = game_constants::DEFAULT_FONT_NAME;
+            textData.mText = responseData.mError;
+            
+            auto soName = strutils::StringId("Error: " + std::to_string(SDL_GetTicks()));
+            auto errorTextSceneObject = scene->CreateSceneObject(soName);
+            errorTextSceneObject->mSceneObjectTypeData = std::move(textData);
+            errorTextSceneObject->mPosition = glm::vec3(0.0f, -0.1f, 0.1f);
+            errorTextSceneObject->mScale = glm::vec3(0.00036f);
+            
+            auto boundingRect = scene_object_utils::GetSceneObjectBoundingRect(*errorTextSceneObject);
+            auto textLength = boundingRect.topRight.x - boundingRect.bottomLeft.x;
+            errorTextSceneObject->mPosition.x -= textLength/2.0f;
+            
+            CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenPositionScaleAnimation>(errorTextSceneObject, glm::vec3(errorTextSceneObject->mPosition.x, 1.0f, errorTextSceneObject->mPosition.z), errorTextSceneObject->mScale, 1.0f, animation_flags::NONE, 0.2f), [=](){ scene->RemoveSceneObject(soName); });
+            
             logging::Log(logging::LogType::ERROR, responseData.mError.c_str());
         }
         else
@@ -216,17 +275,17 @@ void Game::OnServerResponse(const std::string& response)
     }
     else
     {
-        logging::Log(logging::LogType::ERROR, "Error parsing world state");
+        logging::Log(logging::LogType::ERROR, "Error parsing server response");
     }
     
 }
 
 ///------------------------------------------------------------------------------------------------
 
-void Game::OnServerLoginResponse(const std::string& response)
+void Game::OnServerLoginResponse(const nlohmann::json& responseJson)
 {
     networking::LoginResponse loginResponse;
-    loginResponse.DeserializeFromJson(response);
+    loginResponse.DeserializeFromJson(responseJson);
     
     if (loginResponse.allowed)
     {
@@ -239,18 +298,30 @@ void Game::OnServerLoginResponse(const std::string& response)
         // Fade button out
         for (auto& sceneObject: mLoginButton->GetSceneObjects())
         {
-            CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenValueAnimation>(sceneObject->mShaderFloatUniformValues[strutils::StringId("custom_alpha")], 0.0f, 0.2f), [this, scene, sceneObject]()
-            {
-                scene->RemoveSceneObject(sceneObject->mName);
-                mLoginButton = nullptr;
-            });
+            scene->RemoveSceneObject(sceneObject->mName);
         }
+        mLoginButton = nullptr;
+        
+        auto board = scene->CreateSceneObject(BOARD_NAME);
+        board->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + "game/shelves.png");
+        board->mPosition.z = -0.2f;
+        board->mScale = BOARD_SCALE;
+        board->mShaderFloatUniformValues[strutils::StringId("custom_alpha")] = 0.0f;
+        CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenAlphaAnimation>(board, 1.0f, 0.5f), [](){});
+        
+        
+        auto spinButton = scene->CreateSceneObject(SPIN_BUTTON_NAME);
+        spinButton->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + "game/wheel.png");
+        spinButton->mPosition = glm::vec3(0.403f, 0.0f, 1.0f);
+        spinButton->mScale = SPIN_BUTTON_SCALE;
+        spinButton->mShaderFloatUniformValues[strutils::StringId("custom_alpha")] = 0.0f;
+        CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenAlphaAnimation>(spinButton, 1.0f, 0.5f), [](){});
     }
 }
 
 ///------------------------------------------------------------------------------------------------
 
-void Game::OnServerSpinResponse(const std::string& response)
+void Game::OnServerSpinResponse(const nlohmann::json& responseJson)
 {
     
 }
@@ -267,6 +338,8 @@ void Game::OnLoginButtonPressed()
 
 void Game::OnSpinButtonPressed()
 {
+    logging::Log(logging::LogType::INFO, "Spin!");
+    
     // Request quick play
     SendNetworkMessage(nlohmann::json(), networking::MessageType::CS_SPIN_REQUEST, networking::MessagePriority::HIGH);
 }
