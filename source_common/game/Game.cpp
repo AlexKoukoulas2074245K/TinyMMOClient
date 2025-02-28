@@ -28,6 +28,7 @@
 #include <engine/utils/PlatformMacros.h>
 #include <fstream>
 #include <game/AnimatedButton.h>
+#include <game/BoardView.h>
 #include <game/Game.h>
 #include <game/events/EventSystem.h>
 #include <imgui/imgui.h>
@@ -48,11 +49,9 @@
 
 static const strutils::StringId LOGIN_BUTTON_NAME = strutils::StringId("login_button");
 static const strutils::StringId SPIN_BUTTON_NAME = strutils::StringId("spin_button");
-static const strutils::StringId BOARD_NAME = strutils::StringId("board");
 
 static const glm::vec3 ACTION_TEXT_SCALE = glm::vec3(0.00056f);
 static const glm::vec3 SPIN_BUTTON_SCALE = glm::vec3(0.156f);
-static const glm::vec3 BOARD_SCALE = glm::vec3(0.5f * 1.28f, 0.5f, 1.0f);
 
 ///------------------------------------------------------------------------------------------------
 
@@ -99,6 +98,7 @@ void Game::Init()
     });
     
     mPlayerId = 0;
+    mSpinId = 0;
 }
 
 ///------------------------------------------------------------------------------------------------
@@ -144,6 +144,15 @@ void Game::CreateDebugWidgets()
     
     ImGui::Begin("Debug Data", nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
     ImGui::Text("Player ID: %lld", mPlayerId);
+    ImGui::Text("Current Spin ID: %d", mSpinId);
+    if (ImGui::Button("Refill Board"))
+    {
+        if (mBoardView)
+        {
+            mBoardView->DebugFillBoard();
+        }
+    }
+    
     ImGui::End();
 }
 #else
@@ -302,20 +311,14 @@ void Game::OnServerLoginResponse(const nlohmann::json& responseJson)
         }
         mLoginButton = nullptr;
         
-        auto board = scene->CreateSceneObject(BOARD_NAME);
-        board->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + "game/shelves.png");
-        board->mPosition.z = -0.2f;
-        board->mScale = BOARD_SCALE;
-        board->mShaderFloatUniformValues[strutils::StringId("custom_alpha")] = 0.0f;
-        CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenAlphaAnimation>(board, 1.0f, 0.5f), [](){});
-        
-        
         auto spinButton = scene->CreateSceneObject(SPIN_BUTTON_NAME);
         spinButton->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + "game/wheel.png");
         spinButton->mPosition = glm::vec3(0.403f, 0.0f, 1.0f);
         spinButton->mScale = SPIN_BUTTON_SCALE;
         spinButton->mShaderFloatUniformValues[strutils::StringId("custom_alpha")] = 0.0f;
         CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenAlphaAnimation>(spinButton, 1.0f, 0.5f), [](){});
+        
+        mBoardView = std::make_unique<BoardView>(*scene);
     }
 }
 
@@ -323,7 +326,10 @@ void Game::OnServerLoginResponse(const nlohmann::json& responseJson)
 
 void Game::OnServerSpinResponse(const nlohmann::json& responseJson)
 {
+    networking::SpinResponse spinResponse;
+    spinResponse.DeserializeFromJson(responseJson);
     
+    mSpinId = spinResponse.spinId;
 }
 
 ///------------------------------------------------------------------------------------------------

@@ -6,13 +6,15 @@
 ///------------------------------------------------------------------------------------------------
 
 #include <gtest/gtest.h>
-//#include <net_common/Card.h>
+#include <net_common/Board.h>
 
 ///------------------------------------------------------------------------------------------------
 
-TEST(BoardTest, TestBasicBoardStaet)
+TEST(BoardTest, TestBasicBoardAccessors)
 {
-    EXPECT_EQ(2, 2);
+    slots::Board b;
+    b.SetBoardSymbol(0, 0, slots::SymbolType::CHICKEN);
+    ASSERT_EQ(b.GetBoardSymbol(0, 0), slots::SymbolType::CHICKEN);
 }
 
 ///------------------------------------------------------------------------------------------------

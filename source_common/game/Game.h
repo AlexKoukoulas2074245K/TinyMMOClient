@@ -29,6 +29,7 @@ namespace scene
 }
 
 class AnimatedButton;
+class BoardView;
 class Game final
 {
 public:
@@ -55,7 +56,9 @@ private:
     std::atomic<int> mLastPingMillis = 0;
     std::unique_ptr<AnimatedButton> mLoginButton;
     std::unique_ptr<events::IListener> mSendNetworkMessageEventListener;
+    std::unique_ptr<BoardView> mBoardView;
     long long mPlayerId = 0;
+    int mSpinId = 0;
     ThreadSafeQueue<std::string> mQueuedServerResponses;
 };
 
