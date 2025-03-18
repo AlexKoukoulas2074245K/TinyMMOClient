@@ -429,6 +429,7 @@ public:
 };
 
 static SceneObjectDataIMGuiVisitor imguiVisitor;
+static char filterText[128] = {};
 extern float FNT_PIXELS_TO_GL_MULTIPLIER;
 
 void RendererPlatformImpl::CreateIMGuiWidgets()
@@ -492,12 +493,23 @@ void RendererPlatformImpl::CreateIMGuiWidgets()
             }
         }
         
+        ImGui::Text("SO Filtering:");
+        ImGui::SameLine();
+        ImGui::InputText("     ", filterText, IM_ARRAYSIZE(filterText));
+        std::string filterString(filterText);
+        
         // SO Properties
         size_t i = 0;
         for (auto sceneObject: sceneRef.get().GetSceneObjects())
         {
             auto sceneObjectName = sceneObject->mName.isEmpty() ? strutils::StringId("SO: " + std::to_string(i)) : strutils::StringId("SO: " + sceneObject->mName.GetString());
+            i++;
             
+            if (!filterString.empty() && !strutils::StringContains(sceneObjectName.GetString(), filterString))
+            {
+                continue;
+            }
+
             if (ImGui::CollapsingHeader(sceneObjectName.GetString().c_str(), ImGuiTreeNodeFlags_None))
             {
                 ImGui::PushID(sceneObjectName.GetString().c_str());
@@ -576,7 +588,6 @@ void RendererPlatformImpl::CreateIMGuiWidgets()
                 }
                 ImGui::PopID();
             }
-            i++;
         }
         ImGui::End();
     }

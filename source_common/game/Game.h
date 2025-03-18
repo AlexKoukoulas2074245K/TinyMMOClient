@@ -18,6 +18,7 @@
 #include <game/events/EventSystem.h>
 #include <net_common/NetworkMessages.h>
 #include <net_common/SerializableNetworkObjects.h>
+#include <net_common/Board.h>
 #include <nlohmann/json.hpp>
 #include <vector>
 
@@ -57,6 +58,7 @@ private:
     std::unique_ptr<AnimatedButton> mLoginButton;
     std::unique_ptr<events::IListener> mSendNetworkMessageEventListener;
     std::unique_ptr<BoardView> mBoardView;
+    slots::Board mBoardModel;
     long long mPlayerId = 0;
     int mSpinId = 0;
     ThreadSafeQueue<std::string> mQueuedServerResponses;

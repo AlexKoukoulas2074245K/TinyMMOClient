@@ -17,11 +17,12 @@
 ///------------------------------------------------------------------------------------------------
 
 static const strutils::StringId BOARD_NAME = strutils::StringId("board");
+
 static const glm::vec3 BOARD_SCALE = glm::vec3(0.5f * 1.28f, 0.5f, 1.0f);
 static const glm::vec3 SYMBOL_SCALE = glm::vec3(0.08f * 1.4f, 0.08f, 1.0f);
 static const float HOR_SYMBOL_DISTANCE = 0.123f;
 static const float VER_SYMBOL_DISTANCE = 0.116f;
-static const glm::vec3 TOP_LEFT_SYMBOL_POSITION = glm::vec3(-0.2467f, 0.123f, 0.1f);
+static const glm::vec3 TOP_LEFT_SYMBOL_POSITION = glm::vec3(-0.2467f, 0.464f, 0.1f);
 
 static const std::unordered_map<slots::SymbolType, std::string> SYMBOL_TEXTURE_PATHS =
 {
@@ -44,8 +45,9 @@ static const std::unordered_map<slots::SymbolType, std::string> SYMBOL_TEXTURE_P
 
 ///------------------------------------------------------------------------------------------------
 
-BoardView::BoardView(scene::Scene& scene)
+BoardView::BoardView(scene::Scene& scene, const slots::Board& boardModel)
     : mScene(scene)
+    , mBoardModel(boardModel)
 {
     auto board = scene.CreateSceneObject(BOARD_NAME);
     board->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + "game/shelves.png");
@@ -71,9 +73,16 @@ std::vector<std::shared_ptr<scene::SceneObject>> BoardView::GetSceneObjects() { 
 
 ///------------------------------------------------------------------------------------------------
 
+const std::string& BoardView::GetSymbolTexturePath(slots::SymbolType symbol) const
+{
+    return SYMBOL_TEXTURE_PATHS.at(symbol);
+}
+
+///------------------------------------------------------------------------------------------------
+
 void BoardView::DebugFillBoard()
 {
-    for (int row = 0; row < slots::BOARD_ROWS; ++row)
+    for (int row = 0; row < slots::REEL_LENGTH; ++row)
     {
         for (int col = 0; col < slots::BOARD_COLS; ++col)
         {
@@ -93,7 +102,7 @@ void BoardView::DebugFillBoard()
         mSceneObjects.erase(mSceneObjects.begin() + 1, mSceneObjects.end());
     }
     
-    for (int row = 0; row < slots::BOARD_ROWS; ++row)
+    for (int row = 0; row < slots::REEL_LENGTH; ++row)
     {
         for (int col = 0; col < slots::BOARD_COLS; ++col)
         {
@@ -103,10 +112,9 @@ void BoardView::DebugFillBoard()
             
             auto initSymbolPosition = targetSymbolPosition;
             initSymbolPosition.y += 0.2f;
-            
-            auto symbolType = static_cast<slots::SymbolType>(math::RandomInt() % 15);
+
             auto symbol = mScene.CreateSceneObject(strutils::StringId(std::to_string(row) + "," + std::to_string(col) + "_symbol"));
-            symbol->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + SYMBOL_TEXTURE_PATHS.at(symbolType));
+            symbol->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + SYMBOL_TEXTURE_PATHS.at(mBoardModel.GetBoardSymbol(row, col)));
             symbol->mPosition = initSymbolPosition;
             symbol->mScale = SYMBOL_SCALE * 0.9f;
             symbol->mShaderFloatUniformValues[strutils::StringId("custom_alpha")] = 1.0f;
