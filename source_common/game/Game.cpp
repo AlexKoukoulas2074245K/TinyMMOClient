@@ -159,14 +159,68 @@ void Game::CreateDebugWidgets()
     ImGui::Begin("Debug Data", nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
     ImGui::Text("Player ID: %lld", mPlayerId);
     ImGui::Text("Current Spin ID: %d", mSpinId);
+    ImGui::Text("Spin Animation State: %s", mBoardView ? mBoardView->GetSpinAnimationStateName().c_str() : "IDLE");
+    
     if (ImGui::Button("Refill Board"))
     {
         if (mBoardView)
         {
             mSpinId = math::RandomInt();
             mBoardModel.PopulateBoard(mSpinId);
-            mBoardView->DebugFillBoard();
+            mBoardView->ResetBoardSymbols();
         }
+    }
+    
+    static const std::unordered_map<slots::SymbolType, std::string> DEBUG_SYMBOL_NAMES =
+    {
+        { slots::SymbolType::BUTTER, "Butter" },
+        { slots::SymbolType::CAMP_FIRE, "CampFire" },
+        { slots::SymbolType::CHICKEN, "Chicken" },
+        { slots::SymbolType::CHOCOLATE, "Chocolate" },
+        { slots::SymbolType::COOKING_OIL, "CookingOil" },
+        { slots::SymbolType::EGGS, "Eggs" },
+        { slots::SymbolType::FLOUR, "Flour" },
+        { slots::SymbolType::GARLICS, "Garlics" },
+        { slots::SymbolType::LEMONS, "Lemons" },
+        { slots::SymbolType::STRAWBERRIES, "Strawberries" },
+        { slots::SymbolType::SUGAR, "Sugar" },
+        { slots::SymbolType::CHOCOLATE_CAKE, "ChocolateCake" },
+        { slots::SymbolType::STRAWBERRY_CAKE, "StrawberryCake" },
+        { slots::SymbolType::ROAST_CHICKEN, "RoastChicken" },
+        { slots::SymbolType::WILD, "Grandma" }
+    };
+    ImGui::Separator();
+    if (ImGui::BeginTable("Pending Symbol State", slots::BOARD_COLS))
+    {
+        ImGui::TableNextRow();
+        for (int column = 0; column < slots::BOARD_COLS; column++)
+        {
+            ImGui::TableSetColumnIndex(column);
+            ImGui::Text("%s", mBoardView ? mBoardView->GetPendingSymbolDataStateName(column).c_str() : "LOCKED");
+        }
+        ImGui::EndTable();
+    }
+    ImGui::Separator();
+    if (ImGui::BeginTable("Board View", slots::BOARD_COLS))
+    {
+        for (int row = 0; row < slots::REEL_LENGTH; row++)
+        {
+            ImGui::TableNextRow();
+            for (int column = 0; column < slots::BOARD_COLS; column++)
+            {
+                ImGui::TableSetColumnIndex(column);
+                
+                if (row <= 2 || row >= 6)
+                {
+                    ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "%s", DEBUG_SYMBOL_NAMES.at(mBoardModel.GetBoardSymbol(row, column)).c_str());
+                }
+                else
+                {
+                    ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "%s", DEBUG_SYMBOL_NAMES.at(mBoardModel.GetBoardSymbol(row, column)).c_str());
+                }
+            }
+        }
+        ImGui::EndTable();
     }
     
     ImGui::End();
@@ -205,7 +259,7 @@ void Game::UpdateGUI(const float dtMillis)
             spinButton->mRotation.z += 2.0f * math::PI;
         }
         
-        if (animationManager.GetAnimationCountPlayingForSceneObject(SPIN_BUTTON_NAME) == 0)
+        if (animationManager.GetAnimationCountPlayingForSceneObject(SPIN_BUTTON_NAME) == 0 && mBoardView->GetSpinAnimationState() == BoardView::SpinAnimationState::IDLE)
         {
             if (spinButtonEffect->mShaderFloatUniformValues[strutils::StringId("custom_alpha")] < 1.0f)
             {
@@ -237,6 +291,11 @@ void Game::UpdateGUI(const float dtMillis)
     if (spinButtonEffect)
     {
         spinButtonEffect->mShaderFloatUniformValues[strutils::StringId("time")] = time;
+    }
+    
+    if (mBoardView)
+    {
+        mBoardView->Update(dtMillis);
     }
 }
 
@@ -381,8 +440,9 @@ void Game::OnServerSpinResponse(const nlohmann::json& responseJson)
     spinResponse.DeserializeFromJson(responseJson);
     
     mSpinId = spinResponse.spinId;
+    mBoardView->ResetBoardSymbols();
     mBoardModel.PopulateBoard(mSpinId);
-    mBoardView->DebugFillBoard();
+    mBoardView->BeginSpin();
 }
 
 ///------------------------------------------------------------------------------------------------

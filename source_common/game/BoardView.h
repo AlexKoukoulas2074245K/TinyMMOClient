@@ -26,19 +26,51 @@ namespace scene { struct SceneObject; }
 class BoardView final
 {
 public:
+    enum class SpinAnimationState
+    {
+        IDLE,
+        PRE_SPIN_LOADING,
+        SPINNING,
+        POST_SPINNING
+    };
+    
+    struct PendingSymbolData
+    {
+        enum class PendingSymbolDataState
+        {
+            LOCKED,
+            UNLOCKED,
+            FINISHED
+        };
+
+        PendingSymbolDataState mState = PendingSymbolDataState::LOCKED;
+        std::vector<slots::SymbolType> mSymbols;
+    };
+
+public:
     BoardView(scene::Scene& scene, const slots::Board& boardModel);
     
     void Update(const float dtMillis);
     
     std::vector<std::shared_ptr<scene::SceneObject>> GetSceneObjects();
     const std::string& GetSymbolTexturePath(slots::SymbolType symbol) const;
-    
-    void DebugFillBoard();
+    const std::string& GetSpinAnimationStateName() const;
+    const std::string& GetPendingSymbolDataStateName(const int reelIndex) const;
+    SpinAnimationState GetSpinAnimationState() const;
+
+    void BeginSpin();
+    void ResetBoardSymbols();
+
+private:
+    void AnimateReelSymbolsToFinalPosition(const int reelIndex);
 
 private:
     scene::Scene& mScene;
     const slots::Board& mBoardModel;
     std::vector<std::shared_ptr<scene::SceneObject>> mSceneObjects;
+    PendingSymbolData mPendingSymbolData[slots::BOARD_COLS];
+    SpinAnimationState mSpinAnimationState;
+    float mSymbolSpinSpeed;
 };
 
 ///------------------------------------------------------------------------------------------------
