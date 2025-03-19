@@ -48,7 +48,7 @@ static const std::unordered_map<slots::SymbolType, std::string> SYMBOL_TEXTURE_P
     { slots::SymbolType::SUGAR, "game/food_slot_images/sugar.png" },
     { slots::SymbolType::CHOCOLATE_CAKE, "game/food_slot_images/chocolate_cake.png" },
     { slots::SymbolType::STRAWBERRY_CAKE, "game/food_slot_images/strawberry_cake.png" },
-    { slots::SymbolType::ROAST_CHICKEN, "game/food_slot_images/Roast_chicken.png" },
+    { slots::SymbolType::ROAST_CHICKEN, "game/food_slot_images/roast_chicken.png" },
     { slots::SymbolType::WILD, "game/food_slot_images/grandma.png" }
 };
 
