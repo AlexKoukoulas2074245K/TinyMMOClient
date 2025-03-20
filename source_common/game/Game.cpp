@@ -120,6 +120,10 @@ void Game::Init()
 void Game::Update(const float dtMillis)
 {
     // Dequeue and process any pending server messages
+    while (mQueuedServerErrors.size() > 0)
+    {
+        OnServerError(std::move(mQueuedServerErrors.dequeue()));
+    }
     while (mQueuedServerResponses.size() > 0)
     {
         OnServerResponse(std::move(mQueuedServerResponses.dequeue()));
@@ -308,26 +312,7 @@ void Game::SendNetworkMessage(const nlohmann::json& message, const networking::M
     {
         if (!responseData.mError.empty())
         {
-            auto& systemsEngine = CoreSystemsEngine::GetInstance();
-            auto& sceneManager = systemsEngine.GetSceneManager();
-            auto scene = sceneManager.FindScene(game_constants::WORLD_SCENE_NAME);
-            
-            scene::TextSceneObjectData textData;
-            textData.mFontName = game_constants::DEFAULT_FONT_NAME;
-            textData.mText = responseData.mError;
-            
-            auto soName = strutils::StringId("Error: " + std::to_string(SDL_GetTicks()));
-            auto errorTextSceneObject = scene->CreateSceneObject(soName);
-            errorTextSceneObject->mSceneObjectTypeData = std::move(textData);
-            errorTextSceneObject->mPosition = glm::vec3(0.0f, -0.1f, 0.1f);
-            errorTextSceneObject->mScale = glm::vec3(0.00036f);
-            
-            auto boundingRect = scene_object_utils::GetSceneObjectBoundingRect(*errorTextSceneObject);
-            auto textLength = boundingRect.topRight.x - boundingRect.bottomLeft.x;
-            errorTextSceneObject->mPosition.x -= textLength/2.0f;
-            
-            CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenPositionScaleAnimation>(errorTextSceneObject, glm::vec3(errorTextSceneObject->mPosition.x, 1.0f, errorTextSceneObject->mPosition.z), errorTextSceneObject->mScale, 1.0f, animation_flags::NONE, 0.2f), [=](){ scene->RemoveSceneObject(soName); });
-            
+            mQueuedServerErrors.enqueue(responseData.mError);
             logging::Log(logging::LogType::ERROR, responseData.mError.c_str());
         }
         else
@@ -350,6 +335,33 @@ void Game::SendNetworkMessage(const nlohmann::json& message, const networking::M
         }
     });
 #endif
+}
+
+///------------------------------------------------------------------------------------------------
+
+void Game::OnServerError(const std::string& error)
+{
+    auto& systemsEngine = CoreSystemsEngine::GetInstance();
+    auto& sceneManager = systemsEngine.GetSceneManager();
+    auto scene = sceneManager.FindScene(game_constants::WORLD_SCENE_NAME);
+    
+    scene::TextSceneObjectData textData;
+    textData.mFontName = game_constants::DEFAULT_FONT_NAME;
+    textData.mText = error;
+    
+    auto soName = strutils::StringId("Error: " + std::to_string(SDL_GetTicks()));
+    auto errorTextSceneObject = scene->CreateSceneObject(soName);
+    errorTextSceneObject->mSceneObjectTypeData = std::move(textData);
+    errorTextSceneObject->mPosition = glm::vec3(0.0f, -0.1f, 5.0f);
+    errorTextSceneObject->mScale = glm::vec3(0.00036f);
+    
+    auto boundingRect = scene_object_utils::GetSceneObjectBoundingRect(*errorTextSceneObject);
+    auto textLength = boundingRect.topRight.x - boundingRect.bottomLeft.x;
+    errorTextSceneObject->mPosition.x -= textLength/2.0f;
+    
+    CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenPositionScaleAnimation>(errorTextSceneObject, glm::vec3(errorTextSceneObject->mPosition.x, 1.0f, errorTextSceneObject->mPosition.z), errorTextSceneObject->mScale, 1.0f, animation_flags::NONE, 0.2f), [=](){
+        scene->RemoveSceneObject(soName);
+    });
 }
 
 ///------------------------------------------------------------------------------------------------

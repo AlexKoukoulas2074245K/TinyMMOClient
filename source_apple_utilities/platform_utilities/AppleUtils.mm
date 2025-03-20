@@ -463,8 +463,9 @@ void SendNetworkMessage(const nlohmann::json& networkMessage, const networking::
         // Specify server address
         serverAddr.sin_family = AF_INET;
         serverAddr.sin_port = htons(8070); // Use the same port as the server
-        //serverAddr.sin_addr.s_addr = inet_addr("178.16.131.241");
-        serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+        //serverAddr.sin_addr.s_addr = inet_addr("178.16.131.241"); /* Hostinger VPN */
+        //serverAddr.sin_addr.s_addr = inet_addr("172.16.26.125");  /* Mac inet addr (WIFI) */
+        serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");        /* Localhost */
         
         // Connect to server
         if (connect(clientSocket, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) == -1)

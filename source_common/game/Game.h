@@ -47,6 +47,7 @@ public:
 private:
     void UpdateGUI(const float dtMillis);
     void SendNetworkMessage(const nlohmann::json& message, const networking::MessageType messageType, const networking::MessagePriority messagePriority);
+    void OnServerError(const std::string& error);
     void OnServerResponse(const std::string& response);
     void OnServerLoginResponse(const nlohmann::json& responseJson);
     void OnServerSpinResponse(const nlohmann::json& responseJson);
@@ -62,6 +63,7 @@ private:
     long long mPlayerId = 0;
     int mSpinId = 0;
     ThreadSafeQueue<std::string> mQueuedServerResponses;
+    ThreadSafeQueue<std::string> mQueuedServerErrors;
 };
 
 ///------------------------------------------------------------------------------------------------
