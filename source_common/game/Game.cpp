@@ -59,6 +59,12 @@ static const glm::vec3 BACKGROUND_SCALE = glm::vec3(1.370f, 1.04f, 1.0f);
 static const glm::vec3 ACTION_TEXT_SCALE = glm::vec3(0.00056f);
 static const glm::vec3 SPIN_BUTTON_SCALE = glm::vec3(0.156f);
 static const glm::vec3 SPIN_BUTTON_EFFECT_SCALE = glm::vec3(0.224f);
+static const glm::vec3 SPIN_BUTTON_EFFECT_POSITION = glm::vec3(0.403f, 0.0f, 1.9f);
+static const glm::vec3 SPIN_BUTTON_POSITION = glm::vec3(0.403f, 0.0f, 2.0f);
+static const glm::vec3 BACKGROUND_POSITION = glm::vec3(0.0f, 0.0f, 1.0f);
+static const glm::vec3 LOGIN_BUTTON_POSITION = glm::vec3(-0.075f, 0.134f, 2.0f);
+
+static const float GAME_ELEMENTS_PRESENTATION_TIME = 1.0f;
 
 ///------------------------------------------------------------------------------------------------
 
@@ -95,12 +101,14 @@ void Game::Init()
     auto background = scene->CreateSceneObject(BACKGROUND_NAME);
     background->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + "game/background.png");
 
-    background->mPosition.z = 1.0f;
+    background->mPosition = BACKGROUND_POSITION;
     background->mScale = BACKGROUND_SCALE;
     background->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 1.0f;
+    background->mShaderFloatUniformValues[strutils::StringId("mask_alpha_comp")] = 1.0f;
     background->mEffectTextureResourceIds[0] = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + "game/background_mask.png");
+    background->mShaderResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT  + "background.vs");
 
-    mLoginButton = std::make_unique<AnimatedButton>(glm::vec3(-0.075f, 0.134f, 2.0f), ACTION_TEXT_SCALE, game_constants::DEFAULT_FONT_NAME, "Log in", LOGIN_BUTTON_NAME, [&](){ OnLoginButtonPressed(); }, *scene);
+    mLoginButton = std::make_unique<AnimatedButton>(LOGIN_BUTTON_POSITION, ACTION_TEXT_SCALE, game_constants::DEFAULT_FONT_NAME, "Log in", LOGIN_BUTTON_NAME, [&](){ OnLoginButtonPressed(); }, *scene);
     for (auto& sceneObject: mLoginButton->GetSceneObjects())
     {
         sceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 1.0f;
@@ -228,6 +236,47 @@ void Game::CreateDebugWidgets()
         ImGui::EndTable();
     }
     
+    ImGui::End();
+    
+    ImGui::Begin("Paylines", nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
+    static int sPaylineIndex = 0;
+    static float sRevealDurationSecs = 1.0f;
+    static float sHiddingDurationSecs = 0.5f;
+    static std::vector<std::string> sPaylines;
+
+    if (sPaylines.empty())
+    {
+        for (int i = 0; i < static_cast<int>(slots::PaylineType::PAYLINE_COUNT); ++i)
+        {
+            sPaylines.emplace_back(PaylineView::GetPaylineName(static_cast<slots::PaylineType>(i)));
+        }
+    }
+    
+    if (ImGui::BeginCombo(" ", sPaylines.at(sPaylineIndex).c_str()))
+    {
+        for (auto n = 0U; n < sPaylines.size(); n++)
+        {
+            const bool isSelected = (sPaylineIndex == n);
+            if (ImGui::Selectable(sPaylines.at(n).c_str(), isSelected))
+            {
+                sPaylineIndex = n;
+            }
+            if (isSelected)
+            {
+                ImGui::SetItemDefaultFocus();
+            }
+        }
+        ImGui::EndCombo();
+    }
+    ImGui::SliderFloat("Reveal Duration(s)", &sRevealDurationSecs, 0.01f, 5.0f);
+    ImGui::SliderFloat("Hiding Duration(s)", &sHiddingDurationSecs, 0.01f, 5.0f);
+    if (ImGui::Button("Animate Payline"))
+    {
+        if (mBoardView)
+        {
+            mBoardView->AnimatePaylineReveal(static_cast<slots::PaylineType>(sPaylineIndex), sRevealDurationSecs, sHiddingDurationSecs);
+        }
+    }
     ImGui::End();
 }
 #else
@@ -417,30 +466,30 @@ void Game::OnServerLoginResponse(const nlohmann::json& responseJson)
         mLoginButton = nullptr;
         
         auto background = scene->FindSceneObject(BACKGROUND_NAME);
-        background->mShaderResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT  + "background.vs");
+        CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenValueAnimation>(background->mShaderFloatUniformValues[strutils::StringId("mask_alpha_comp")], 0.0f, GAME_ELEMENTS_PRESENTATION_TIME), [](){});
         
         auto spinButton = scene->CreateSceneObject(SPIN_BUTTON_NAME);
         spinButton->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + "game/wheel.png");
-        spinButton->mPosition = glm::vec3(0.403f, 0.0f, 2.0f);
+        spinButton->mPosition = SPIN_BUTTON_POSITION;
         spinButton->mScale = SPIN_BUTTON_SCALE;
         spinButton->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 0.0f;
-        CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenAlphaAnimation>(spinButton, 1.0f, 0.5f), [](){});
+        CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenAlphaAnimation>(spinButton, 1.0f, GAME_ELEMENTS_PRESENTATION_TIME), [](){});
         
         auto spinButtonEffect = scene->CreateSceneObject(SPIN_BUTTON_EFFECT_NAME);
         spinButtonEffect->mShaderResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT  + "spin_button_effect.vs");
-        spinButtonEffect->mPosition = glm::vec3(0.403f, 0.0f, 1.95f);
+        spinButtonEffect->mPosition = SPIN_BUTTON_EFFECT_POSITION;
         spinButtonEffect->mScale = SPIN_BUTTON_EFFECT_SCALE;
         spinButtonEffect->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 0.0f;
         spinButtonEffect->mShaderFloatUniformValues[strutils::StringId("time_speed")] = 5.162f;
         spinButtonEffect->mShaderFloatUniformValues[strutils::StringId("perlin_resolution")] = 312.0f;
         spinButtonEffect->mShaderFloatUniformValues[strutils::StringId("perlin_clarity")] = 5.23f;
-        CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenAlphaAnimation>(spinButtonEffect, 1.0f, 0.5f), [](){});
+        CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenAlphaAnimation>(spinButtonEffect, 1.0f, GAME_ELEMENTS_PRESENTATION_TIME), [](){});
 
         mBoardView = std::make_unique<BoardView>(*scene, mBoardModel);
         
         for (auto i = 0; i < static_cast<int>(slots::SymbolType::COUNT); ++i)
         {
-            CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + mBoardView->GetSymbolTexturePath(static_cast<slots::SymbolType>(i)));
+            CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + BoardView::GetSymbolTexturePath(static_cast<slots::SymbolType>(i)));
         }
     }
 }

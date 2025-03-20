@@ -75,6 +75,13 @@ static inline strutils::StringId GetSymbolFrameSoName(const int row, const int c
 
 ///------------------------------------------------------------------------------------------------
 
+const std::string& BoardView::GetSymbolTexturePath(slots::SymbolType symbol)
+{
+    return SYMBOL_TEXTURE_PATHS.at(symbol);
+}
+
+///------------------------------------------------------------------------------------------------
+
 BoardView::BoardView(scene::Scene& scene, const slots::Board& boardModel)
     : mScene(scene)
     , mBoardModel(boardModel)
@@ -85,10 +92,14 @@ BoardView::BoardView(scene::Scene& scene, const slots::Board& boardModel)
     board->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + "game/shelves.png");
     board->mPosition.z = -0.2f;
     board->mScale = BOARD_SCALE;
-    board->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 0.0f;
+    board->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 1.0f;
     mSceneObjects.push_back(board);
-    CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenAlphaAnimation>(board, 1.0f, 0.5f), [](){});
-
+    
+    for (auto i = 0; i < static_cast<int>(slots::PaylineType::PAYLINE_COUNT); ++i)
+    {
+        mPaylines.push_back(PaylineView(scene, static_cast<slots::PaylineType>(i)));
+    }
+    
     ResetBoardSymbols();
 }
 
@@ -210,13 +221,6 @@ std::vector<std::shared_ptr<scene::SceneObject>> BoardView::GetSceneObjects() { 
 
 ///------------------------------------------------------------------------------------------------
 
-const std::string& BoardView::GetSymbolTexturePath(slots::SymbolType symbol) const
-{
-    return SYMBOL_TEXTURE_PATHS.at(symbol);
-}
-
-///------------------------------------------------------------------------------------------------
-
 const std::string& BoardView::GetSpinAnimationStateName() const
 {
     return SPIN_ANIMATION_STATE_NAMES.at(mSpinAnimationState);
@@ -331,6 +335,13 @@ void BoardView::ResetBoardSymbols()
     
     mSpinAnimationState = SpinAnimationState::IDLE;
     mSymbolSpinSpeed = 0.0f;
+}
+
+///------------------------------------------------------------------------------------------------
+
+void BoardView::AnimatePaylineReveal(const slots::PaylineType paylineType, const float revealAnimationDurationSecs, const float hidingAnimationDurationSecs)
+{
+    mPaylines[static_cast<int>(paylineType)].AnimatePaylineReveal(revealAnimationDurationSecs, hidingAnimationDurationSecs);
 }
 
 ///------------------------------------------------------------------------------------------------

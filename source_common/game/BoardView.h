@@ -10,6 +10,7 @@
 
 ///------------------------------------------------------------------------------------------------
 
+#include <game/PaylineView.h>
 #include <engine/utils/MathUtils.h>
 #include <engine/scene/Scene.h>
 #include <engine/utils/StringUtils.h>
@@ -48,25 +49,28 @@ public:
     };
 
 public:
+    static const std::string& GetSymbolTexturePath(slots::SymbolType symbol);
+
+public:
     BoardView(scene::Scene& scene, const slots::Board& boardModel);
     
     void Update(const float dtMillis);
     
     std::vector<std::shared_ptr<scene::SceneObject>> GetSceneObjects();
-    const std::string& GetSymbolTexturePath(slots::SymbolType symbol) const;
     const std::string& GetSpinAnimationStateName() const;
     const std::string& GetPendingSymbolDataStateName(const int reelIndex) const;
     SpinAnimationState GetSpinAnimationState() const;
 
     void BeginSpin();
     void ResetBoardSymbols();
-
+    void AnimatePaylineReveal(const slots::PaylineType paylineType, const float revealAnimationDurationSecs, const float hidingAnimationDurationSecs);
 private:
     void AnimateReelSymbolsToFinalPosition(const int reelIndex);
 
 private:
     scene::Scene& mScene;
     const slots::Board& mBoardModel;
+    std::vector<PaylineView> mPaylines;
     std::vector<std::shared_ptr<scene::SceneObject>> mSceneObjects;
     PendingSymbolData mPendingSymbolData[slots::BOARD_COLS];
     SpinAnimationState mSpinAnimationState;

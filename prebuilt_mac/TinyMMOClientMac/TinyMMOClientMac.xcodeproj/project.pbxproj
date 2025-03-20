@@ -27,6 +27,7 @@
 		21EC3AD81A23E93548A1D76F /* BoardView.h in Sources */ = {isa = PBXBuildFile; fileRef = 2BFFC6441342229428E33195 /* BoardView.h */; };
 		2459A2AD382EE0AA9153A204 /* wglew.h in Sources */ = {isa = PBXBuildFile; fileRef = D64C3227BB47CA8611283D51 /* wglew.h */; };
 		249415978B8DA701343AE116 /* ThreadSafeQueue.h in Sources */ = {isa = PBXBuildFile; fileRef = 543F0360AEBB87C61E32D84B /* ThreadSafeQueue.h */; };
+		29E22320669F6B79D634B4C3 /* PaylineView.h in Sources */ = {isa = PBXBuildFile; fileRef = 0FD0557BEDD5E251752E1792 /* PaylineView.h */; };
 		2AA2F6A7573CDD74098EFB98 /* CoreSystemsEnginePlatformImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6D3F63C77D9E3CBD37931ADE /* CoreSystemsEnginePlatformImpl.cpp */; };
 		2B5260BBB10C55209BD2E0D7 /* Board.h in Sources */ = {isa = PBXBuildFile; fileRef = 30E03B0AAACE43ED265C3CE2 /* Board.h */; };
 		2C796C36D339C3D09D474175 /* Board.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9BF6CCA2D0E95C57CA0ED7B9 /* Board.cpp */; };
@@ -36,6 +37,7 @@
 		33CC4D39831F836C2D367D51 /* PlatformMacros.h in Sources */ = {isa = PBXBuildFile; fileRef = 7961514C3AA5315045E54E7E /* PlatformMacros.h */; };
 		3404AFE81C1263670F2BD149 /* MathUtils.h in Sources */ = {isa = PBXBuildFile; fileRef = 2096C38A74EAF730ECCA5E36 /* MathUtils.h */; };
 		354623B6EE97CC4A7A37F182 /* SymbolDataRepository.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04F6915C7D49428A4BF1A4FA /* SymbolDataRepository.cpp */; };
+		37460013CABAA8BD2E424B2F /* PaylineView.h in Sources */ = {isa = PBXBuildFile; fileRef = 0FD0557BEDD5E251752E1792 /* PaylineView.h */; };
 		3800CC997FE9DCC2CADAF5E2 /* TypeTraits.h in Sources */ = {isa = PBXBuildFile; fileRef = 6E2183A368D71198F98D6738 /* TypeTraits.h */; };
 		3D0B74E401CD9DB2D3AF3061 /* RenderingUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 59B053AEBDD62B4FCAB8E05D /* RenderingUtils.cpp */; };
 		3E0686E0364F1D3BFC522A92 /* CommonUniforms.h in Sources */ = {isa = PBXBuildFile; fileRef = 9CC1A200C9B794A05E296C21 /* CommonUniforms.h */; };
@@ -48,6 +50,7 @@
 		4EC7FEA252F40C0286D148D0 /* BoardView.h in Sources */ = {isa = PBXBuildFile; fileRef = 2BFFC6441342229428E33195 /* BoardView.h */; };
 		5285724978640648FFD94960 /* TextureResource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93D83DB41AD868D09B2A3C94 /* TextureResource.cpp */; };
 		532521F009DF925259026C23 /* SerializationDefinitions.h in Sources */ = {isa = PBXBuildFile; fileRef = F05BCACB9D0D7193765BB311 /* SerializationDefinitions.h */; };
+		53BF5611CC60F79F57D910F8 /* PaylineView.h in Sources */ = {isa = PBXBuildFile; fileRef = 0FD0557BEDD5E251752E1792 /* PaylineView.h */; };
 		55A949B09D185B35C8B0D135 /* Logging.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3BF946C1B449BB4FE7DF288A /* Logging.cpp */; };
 		55B88F03ED55A2709BD2B704 /* SceneObjectUtils.h in Sources */ = {isa = PBXBuildFile; fileRef = FB0E9FCA60AD270C9B09FA51 /* SceneObjectUtils.h */; };
 		590BC49901179FB522AD2223 /* OSMessageBox.h in Sources */ = {isa = PBXBuildFile; fileRef = EEC2E35013E2E8B9B7A912C6 /* OSMessageBox.h */; };
@@ -70,10 +73,13 @@
 		7A35378576E3FCE89E70ABA4 /* SceneManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FB79D70FA4FA614F184AFE40 /* SceneManager.cpp */; };
 		7C959AE38E5D848AF2C4A4BA /* EditorImGuiCommands.inc in Sources */ = {isa = PBXBuildFile; fileRef = 3A0B70DC7ADA228D909C7E71 /* EditorImGuiCommands.inc */; };
 		7CA340B584BA7BDBF8857C4C /* OBJMeshLoader.h in Sources */ = {isa = PBXBuildFile; fileRef = 46BB489973B1ACFF46F552DB /* OBJMeshLoader.h */; };
+		7CB6A0994CA90DE98BB4026F /* PaylineView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7D6743D12656359B9F94AE23 /* PaylineView.cpp */; };
+		846BEAFE6622E65F596CC336 /* Paylines.h in Sources */ = {isa = PBXBuildFile; fileRef = 7D531E3FF3BC6A6BB48B4CA9 /* Paylines.h */; };
 		851FBE54CFC3F1C7F292AD3D /* AnimationManager.h in Sources */ = {isa = PBXBuildFile; fileRef = F2FC1889E08EEFD36C0B6476 /* AnimationManager.h */; };
 		856245AD4BB31471EE574CB5 /* Board.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9BF6CCA2D0E95C57CA0ED7B9 /* Board.cpp */; };
 		86BE6465DBA9683F9048EDE5 /* Board.h in Sources */ = {isa = PBXBuildFile; fileRef = 30E03B0AAACE43ED265C3CE2 /* Board.h */; };
 		8C096F9D043616750BC963F8 /* TextureLoader.h in Sources */ = {isa = PBXBuildFile; fileRef = 05D038A4FFCF3C5AA2E85A75 /* TextureLoader.h */; };
+		8EF9707CCD71E46D210D6EF1 /* PaylineView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7D6743D12656359B9F94AE23 /* PaylineView.cpp */; };
 		920C54052B80E41A006F6743 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 920C54042B80E41A006F6743 /* OpenAL.framework */; };
 		926C7C1E2B7239720028766E /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 926C7C1D2B7239720028766E /* AppKit.framework */; };
 		9272506B2B7D2CCC0010DF26 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9272506A2B7D2CCC0010DF26 /* AVFoundation.framework */; };
@@ -382,6 +388,7 @@
 		92B8A59F2BE13B00006EC56F /* AnimatedButton.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 92B8A59E2BE13B00006EC56F /* AnimatedButton.cpp */; };
 		92CA97412B65132C00B53B01 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92CA97402B65132B00B53B01 /* StoreKit.framework */; };
 		95BF1C18A001B37A45C9BF9E /* IRenderer.h in Sources */ = {isa = PBXBuildFile; fileRef = E0599E67CDFA7350C55C73A5 /* IRenderer.h */; };
+		96A42D4F8A9E7CEF86B6FD2F /* Paylines.h in Sources */ = {isa = PBXBuildFile; fileRef = 7D531E3FF3BC6A6BB48B4CA9 /* Paylines.h */; };
 		9BE8896941F8C3B1CD4A3C21 /* BoardTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3A6852110D6B134074083490 /* BoardTest.cpp */; };
 		9D23C85EEEB4627A9073DA93 /* Board.h in Sources */ = {isa = PBXBuildFile; fileRef = 30E03B0AAACE43ED265C3CE2 /* Board.h */; };
 		9F60F6BEA7D20AB4B5EFA323 /* ResourceLoadingService.h in Sources */ = {isa = PBXBuildFile; fileRef = 7C92E4EC0FBCD6AFCA53FD77 /* ResourceLoadingService.h */; };
@@ -419,8 +426,10 @@
 		D6B3BDD48999F9AF32D62641 /* NetworkMessages.h in Sources */ = {isa = PBXBuildFile; fileRef = 83294548BB5AEF7EB30C76DC /* NetworkMessages.h */; };
 		D6C5F484EB7FB13F7EB6438F /* BaseDataFileDeserializer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A05CE2983C7CEA1D2A25585 /* BaseDataFileDeserializer.cpp */; };
 		D7CE3ABE255F8D331D6B9B40 /* DataFileResource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 431D52A0E0BD619E5CEDBCA7 /* DataFileResource.cpp */; };
+		D95640AB7397F720BF19BFB4 /* Paylines.h in Sources */ = {isa = PBXBuildFile; fileRef = 7D531E3FF3BC6A6BB48B4CA9 /* Paylines.h */; };
 		DA10C0E53C5ECEEC7421546E /* Reel.h in Sources */ = {isa = PBXBuildFile; fileRef = 0808F578545FADE323B82471 /* Reel.h */; };
 		DB820AAFF394F648CD278031 /* stb_image_write.h in Sources */ = {isa = PBXBuildFile; fileRef = 3E13E4D3AA7809E3A06CFF75 /* stb_image_write.h */; };
+		DE3AC5DA89FDF588649C7182 /* PaylineView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7D6743D12656359B9F94AE23 /* PaylineView.cpp */; };
 		DFC9D6A2B4A6F0AF0A0416C9 /* DataFileLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0106479588E4C78D4F938113 /* DataFileLoader.cpp */; };
 		E2240B574B476A510E0FEE8A /* AppleSoundUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = EFF6CA715340BD63F4562F60 /* AppleSoundUtils.mm */; };
 		E24F8BEB335EFB8866189742 /* BaseDataFileSerializer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 903005ABB6F4A9CB6247ABDC /* BaseDataFileSerializer.cpp */; };
@@ -493,6 +502,7 @@
 		08AAC0562233A3F34613E310 /* DataFileResource.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = DataFileResource.h; sourceTree = "<group>"; };
 		0A05CE2983C7CEA1D2A25585 /* BaseDataFileDeserializer.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = BaseDataFileDeserializer.cpp; sourceTree = "<group>"; };
 		0D09AB023B7A329D725F2F2F /* FileUtils.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = FileUtils.h; sourceTree = "<group>"; };
+		0FD0557BEDD5E251752E1792 /* PaylineView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = PaylineView.h; path = PaylineView.h; sourceTree = "<group>"; };
 		13FDFD19955883B3085E4725 /* ShaderResource.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = ShaderResource.h; sourceTree = "<group>"; };
 		14207B709EC0713AAB9C29C8 /* ParticleManager.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = ParticleManager.cpp; sourceTree = "<group>"; };
 		17FD62578C4E3F684EA56CBC /* Symbols.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = Symbols.h; sourceTree = "<group>"; };
@@ -528,6 +538,8 @@
 		7961514C3AA5315045E54E7E /* PlatformMacros.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = PlatformMacros.h; sourceTree = "<group>"; };
 		7AC3E452BAA560B6D8B1349E /* SoundManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = SoundManager.h; sourceTree = "<group>"; };
 		7C92E4EC0FBCD6AFCA53FD77 /* ResourceLoadingService.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = ResourceLoadingService.h; sourceTree = "<group>"; };
+		7D531E3FF3BC6A6BB48B4CA9 /* Paylines.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = Paylines.h; path = Paylines.h; sourceTree = "<group>"; };
+		7D6743D12656359B9F94AE23 /* PaylineView.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = PaylineView.cpp; path = PaylineView.cpp; sourceTree = "<group>"; };
 		7F068929D88F95729D0195E3 /* BackgroundMusicPlayer.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; path = BackgroundMusicPlayer.mm; sourceTree = "<group>"; };
 		82DFED0E0B1AB607780AED60 /* Animations.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = Animations.h; sourceTree = "<group>"; };
 		83294548BB5AEF7EB30C76DC /* NetworkMessages.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = NetworkMessages.h; sourceTree = "<group>"; };
@@ -1032,6 +1044,8 @@
 				928B0BC72B5C3C850025DF3F /* events */,
 				D97ACDDDC0FA3D2B6C8764F6 /* BoardView.cpp */,
 				2BFFC6441342229428E33195 /* BoardView.h */,
+				7D6743D12656359B9F94AE23 /* PaylineView.cpp */,
+				0FD0557BEDD5E251752E1792 /* PaylineView.h */,
 			);
 			path = game;
 			sourceTree = "<group>";
@@ -1171,6 +1185,7 @@
 				33BB453DEBDE9661C88609E7 /* SymbolDataRepository.h */,
 				006393D9627BF00BE369EC69 /* Reel.cpp */,
 				0808F578545FADE323B82471 /* Reel.h */,
+				7D531E3FF3BC6A6BB48B4CA9 /* Paylines.h */,
 			);
 			path = net_common;
 			sourceTree = "<group>";
@@ -1481,6 +1496,9 @@
 				0DCA3A1C508D33D2C69D6B8A /* Reel.cpp in Sources */,
 				DA10C0E53C5ECEEC7421546E /* Reel.h in Sources */,
 				F420E735CA3AE6AC068AD22E /* CommonUniforms.h in Sources */,
+				7CB6A0994CA90DE98BB4026F /* PaylineView.cpp in Sources */,
+				53BF5611CC60F79F57D910F8 /* PaylineView.h in Sources */,
+				846BEAFE6622E65F596CC336 /* Paylines.h in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1603,6 +1621,9 @@
 				793BCBA94EDC60F508E16A5A /* Reel.cpp in Sources */,
 				FB76936B366FDA6E237509AD /* Reel.h in Sources */,
 				3E0686E0364F1D3BFC522A92 /* CommonUniforms.h in Sources */,
+				8EF9707CCD71E46D210D6EF1 /* PaylineView.cpp in Sources */,
+				37460013CABAA8BD2E424B2F /* PaylineView.h in Sources */,
+				D95640AB7397F720BF19BFB4 /* Paylines.h in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1725,6 +1746,9 @@
 				F0004BDC7B35E98CC87F0D50 /* Reel.cpp in Sources */,
 				6E4B2E1884BE8DC6D5DBC433 /* Reel.h in Sources */,
 				6D827E1ADCEBBFD2A690675C /* CommonUniforms.h in Sources */,
+				DE3AC5DA89FDF588649C7182 /* PaylineView.cpp in Sources */,
+				29E22320669F6B79D634B4C3 /* PaylineView.h in Sources */,
+				96A42D4F8A9E7CEF86B6FD2F /* Paylines.h in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
