@@ -9,6 +9,7 @@
 #include <engine/input/IInputStateManager.h>
 #include <engine/rendering/Animations.h>
 #include <engine/rendering/AnimationManager.h>
+#include <engine/rendering/CommonUniforms.h>
 #include <engine/scene/Scene.h>
 #include <engine/scene/SceneObjectUtils.h>
 #include <net_common/Board.h>
@@ -84,9 +85,8 @@ BoardView::BoardView(scene::Scene& scene, const slots::Board& boardModel)
     board->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + "game/shelves.png");
     board->mPosition.z = -0.2f;
     board->mScale = BOARD_SCALE;
-    board->mShaderFloatUniformValues[strutils::StringId("custom_alpha")] = 0.0f;
+    board->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 0.0f;
     mSceneObjects.push_back(board);
-
     CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenAlphaAnimation>(board, 1.0f, 0.5f), [](){});
 
     ResetBoardSymbols();
@@ -316,7 +316,7 @@ void BoardView::ResetBoardSymbols()
             symbol->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + SYMBOL_TEXTURE_PATHS.at(mBoardModel.GetBoardSymbol(row, col)));
             symbol->mPosition = targetSymbolPosition;
             symbol->mScale = SYMBOL_SCALE * 0.9f;
-            symbol->mShaderFloatUniformValues[strutils::StringId("custom_alpha")] = 1.0f;
+            symbol->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 1.0f;
             mSceneObjects.push_back(symbol);
             
             auto symbolFrame = mScene.CreateSceneObject(GetSymbolFrameSoName(row, col));
@@ -324,7 +324,7 @@ void BoardView::ResetBoardSymbols()
             symbolFrame->mPosition = targetSymbolPosition;
             symbolFrame->mPosition.z += 0.1f;
             symbolFrame->mScale = SYMBOL_SCALE;
-            symbolFrame->mShaderFloatUniformValues[strutils::StringId("custom_alpha")] = 1.0f;
+            symbolFrame->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 1.0f;
             mSceneObjects.push_back(symbolFrame);
         }
     }

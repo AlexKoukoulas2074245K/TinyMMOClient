@@ -38,6 +38,7 @@
 		354623B6EE97CC4A7A37F182 /* SymbolDataRepository.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04F6915C7D49428A4BF1A4FA /* SymbolDataRepository.cpp */; };
 		3800CC997FE9DCC2CADAF5E2 /* TypeTraits.h in Sources */ = {isa = PBXBuildFile; fileRef = 6E2183A368D71198F98D6738 /* TypeTraits.h */; };
 		3D0B74E401CD9DB2D3AF3061 /* RenderingUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 59B053AEBDD62B4FCAB8E05D /* RenderingUtils.cpp */; };
+		3E0686E0364F1D3BFC522A92 /* CommonUniforms.h in Sources */ = {isa = PBXBuildFile; fileRef = 9CC1A200C9B794A05E296C21 /* CommonUniforms.h */; };
 		3E3B65024B721F5CCC0D71E0 /* Animations.h in Sources */ = {isa = PBXBuildFile; fileRef = 82DFED0E0B1AB607780AED60 /* Animations.h */; };
 		45963ED9A5DA3C4EB9144646 /* TextureResource.h in Sources */ = {isa = PBXBuildFile; fileRef = 989BFF482B72A00F213431FE /* TextureResource.h */; };
 		499C4AA8C6A39368D61618D6 /* SymbolDataRepository.h in Sources */ = {isa = PBXBuildFile; fileRef = 33BB453DEBDE9661C88609E7 /* SymbolDataRepository.h */; };
@@ -57,6 +58,7 @@
 		69A3B6CA894565C4F51E1123 /* SoundManager.h in Sources */ = {isa = PBXBuildFile; fileRef = 7AC3E452BAA560B6D8B1349E /* SoundManager.h */; };
 		6B03252E24CF56D73B9C3DC7 /* Editor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A49D33C4F1B1DC1C02DB9E05 /* Editor.cpp */; };
 		6B29A2EA7B3D661771AB8A2D /* RenderingUtils.h in Sources */ = {isa = PBXBuildFile; fileRef = 8AE4C68818CCB619974358E0 /* RenderingUtils.h */; };
+		6D827E1ADCEBBFD2A690675C /* CommonUniforms.h in Sources */ = {isa = PBXBuildFile; fileRef = 9CC1A200C9B794A05E296C21 /* CommonUniforms.h */; };
 		6E1A780876A016C76FFF66C6 /* OBJMeshLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 06291EA0D3FF12CB3058DEF2 /* OBJMeshLoader.cpp */; };
 		6E4B2E1884BE8DC6D5DBC433 /* Reel.h in Sources */ = {isa = PBXBuildFile; fileRef = 0808F578545FADE323B82471 /* Reel.h */; };
 		71319CF262B3FEA0241CE51E /* RendererPlatformImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68CBCF02480A4F7771578514 /* RendererPlatformImpl.cpp */; };
@@ -425,6 +427,7 @@
 		E7F3EF85172DB9E9D9AF8321 /* ImageSurfaceLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B645F5160C1B36C70F708518 /* ImageSurfaceLoader.cpp */; };
 		F0004BDC7B35E98CC87F0D50 /* Reel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 006393D9627BF00BE369EC69 /* Reel.cpp */; };
 		F2C17A279E5E5256D4401C90 /* DataFileLoader.h in Sources */ = {isa = PBXBuildFile; fileRef = B83F90BE48846F5019309046 /* DataFileLoader.h */; };
+		F420E735CA3AE6AC068AD22E /* CommonUniforms.h in Sources */ = {isa = PBXBuildFile; fileRef = 9CC1A200C9B794A05E296C21 /* CommonUniforms.h */; };
 		F467390ABB511496E18AF585 /* SceneManager.h in Sources */ = {isa = PBXBuildFile; fileRef = 221289B3E3FA84B55F4C25E2 /* SceneManager.h */; };
 		F51ECBEA53C3E1BE870B0612 /* ShaderResource.h in Sources */ = {isa = PBXBuildFile; fileRef = 13FDFD19955883B3085E4725 /* ShaderResource.h */; };
 		F7A5A5A1C07E56B0E105A3E2 /* CoreSystemsEngine.h in Sources */ = {isa = PBXBuildFile; fileRef = 1B15A1EEB522F75EE7E24E55 /* CoreSystemsEngine.h */; };
@@ -614,6 +617,7 @@
 		99B2042795EEDA27C28F2D84 /* IResource.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = IResource.h; sourceTree = "<group>"; };
 		9A0A1CFEB31EB9D7990F0B4B /* BackgroundMusicPlayer.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = BackgroundMusicPlayer.h; sourceTree = "<group>"; };
 		9BF6CCA2D0E95C57CA0ED7B9 /* Board.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = Board.cpp; sourceTree = "<group>"; };
+		9CC1A200C9B794A05E296C21 /* CommonUniforms.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CommonUniforms.h; path = CommonUniforms.h; sourceTree = "<group>"; };
 		9F1941D1E63978B2B9C05A1E /* SceneObject.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = SceneObject.h; sourceTree = "<group>"; };
 		A49D33C4F1B1DC1C02DB9E05 /* Editor.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = Editor.cpp; sourceTree = "<group>"; };
 		A4ADBD10E11C136014CDB469 /* Animations.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = Animations.cpp; sourceTree = "<group>"; };
@@ -797,6 +801,7 @@
 				82DFED0E0B1AB607780AED60 /* Animations.h */,
 				3199A38C1A16A070A579BAB4 /* ParticleManager.h */,
 				3E13E4D3AA7809E3A06CFF75 /* stb_image_write.h */,
+				9CC1A200C9B794A05E296C21 /* CommonUniforms.h */,
 			);
 			path = rendering;
 			sourceTree = "<group>";
@@ -1475,6 +1480,7 @@
 				4B68AB26E9CFE7876B3EE55C /* BoardView.h in Sources */,
 				0DCA3A1C508D33D2C69D6B8A /* Reel.cpp in Sources */,
 				DA10C0E53C5ECEEC7421546E /* Reel.h in Sources */,
+				F420E735CA3AE6AC068AD22E /* CommonUniforms.h in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1596,6 +1602,7 @@
 				21EC3AD81A23E93548A1D76F /* BoardView.h in Sources */,
 				793BCBA94EDC60F508E16A5A /* Reel.cpp in Sources */,
 				FB76936B366FDA6E237509AD /* Reel.h in Sources */,
+				3E0686E0364F1D3BFC522A92 /* CommonUniforms.h in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1717,6 +1724,7 @@
 				4EC7FEA252F40C0286D148D0 /* BoardView.h in Sources */,
 				F0004BDC7B35E98CC87F0D50 /* Reel.cpp in Sources */,
 				6E4B2E1884BE8DC6D5DBC433 /* Reel.h in Sources */,
+				6D827E1ADCEBBFD2A690675C /* CommonUniforms.h in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

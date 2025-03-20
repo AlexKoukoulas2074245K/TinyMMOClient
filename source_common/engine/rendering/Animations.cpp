@@ -6,6 +6,7 @@
 ///------------------------------------------------------------------------------------------------
 
 #include <engine/rendering/Animations.h>
+#include <engine/rendering/CommonUniforms.h>
 #include <engine/scene/SceneObject.h>
 #include <engine/utils/Logging.h>
 
@@ -227,7 +228,7 @@ std::shared_ptr<scene::SceneObject> ContinualRotationAnimation::VGetSceneObject(
 TweenAlphaAnimation::TweenAlphaAnimation(std::shared_ptr<scene::SceneObject> sceneObjectTarget, const float targetAlpha, const float secsDuration, const uint8_t animationFlags /* = animation_flags::NONE */, const float secsDelay /* = 0.0f */, const std::function<float(const float)> tweeningFunc /* = math::LinearFunction */, const math::TweeningMode tweeningMode /* = math::TweeningMode::EASE_IN */)
     : BaseAnimation(animationFlags, secsDuration, secsDelay)
     , mSceneObjectTarget(sceneObjectTarget)
-    , mInitAlpha(sceneObjectTarget->mShaderFloatUniformValues.at(strutils::StringId("custom_alpha")))
+    , mInitAlpha(sceneObjectTarget->mShaderFloatUniformValues.at(CUSTOM_ALPHA_UNIFORM_NAME))
     , mTargetAlpha(targetAlpha)
     , mTweeningFunc(tweeningFunc)
     , mTweeningMode(tweeningMode)
@@ -241,7 +242,7 @@ TweenAlphaAnimation::TweenAlphaAnimation(std::shared_ptr<scene::SceneObject> sce
 AnimationUpdateResult TweenAlphaAnimation::VUpdate(const float dtMillis)
 {
     auto animationUpdateResult = BaseAnimation::VUpdate(dtMillis);
-    mSceneObjectTarget->mShaderFloatUniformValues[strutils::StringId("custom_alpha")] = math::Lerp(mInitAlpha, mTargetAlpha, math::TweenValue(mAnimationT, mTweeningFunc, mTweeningMode));
+    mSceneObjectTarget->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = math::Lerp(mInitAlpha, mTargetAlpha, math::TweenValue(mAnimationT, mTweeningFunc, mTweeningMode));
     return animationUpdateResult;
 }
 

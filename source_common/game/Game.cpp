@@ -10,6 +10,7 @@
 #include <engine/input/IInputStateManager.h>
 #include <engine/rendering/AnimationManager.h>
 #include <engine/rendering/Camera.h>
+#include <engine/rendering/CommonUniforms.h>
 #include <engine/rendering/Fonts.h>
 #include <engine/rendering/ParticleManager.h>
 #include <engine/rendering/RenderingUtils.h>
@@ -96,13 +97,13 @@ void Game::Init()
 
     background->mPosition.z = 1.0f;
     background->mScale = BACKGROUND_SCALE;
-    background->mShaderFloatUniformValues[strutils::StringId("custom_alpha")] = 1.0f;
+    background->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 1.0f;
     background->mEffectTextureResourceIds[0] = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + "game/background_mask.png");
-    
+
     mLoginButton = std::make_unique<AnimatedButton>(glm::vec3(-0.075f, 0.134f, 2.0f), ACTION_TEXT_SCALE, game_constants::DEFAULT_FONT_NAME, "Log in", LOGIN_BUTTON_NAME, [&](){ OnLoginButtonPressed(); }, *scene);
     for (auto& sceneObject: mLoginButton->GetSceneObjects())
     {
-        sceneObject->mShaderFloatUniformValues[strutils::StringId("custom_alpha")] = 1.0f;
+        sceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 1.0f;
     }
     
     auto& eventSystem = events::EventSystem::GetInstance();
@@ -265,9 +266,9 @@ void Game::UpdateGUI(const float dtMillis)
         
         if (animationManager.GetAnimationCountPlayingForSceneObject(SPIN_BUTTON_NAME) == 0 && mBoardView->GetSpinAnimationState() == BoardView::SpinAnimationState::IDLE)
         {
-            if (spinButtonEffect->mShaderFloatUniformValues[strutils::StringId("custom_alpha")] < 1.0f)
+            if (spinButtonEffect->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] < 1.0f)
             {
-                spinButtonEffect->mShaderFloatUniformValues[strutils::StringId("custom_alpha")] += dtMillis/1000.0f;
+                spinButtonEffect->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] += dtMillis/1000.0f;
             }
             
             auto worldTouchPos = inputStateManager.VGetPointingPosInWorldSpace(scene->GetCamera().GetViewMatrix(), scene->GetCamera().GetProjMatrix());
@@ -422,14 +423,14 @@ void Game::OnServerLoginResponse(const nlohmann::json& responseJson)
         spinButton->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + "game/wheel.png");
         spinButton->mPosition = glm::vec3(0.403f, 0.0f, 2.0f);
         spinButton->mScale = SPIN_BUTTON_SCALE;
-        spinButton->mShaderFloatUniformValues[strutils::StringId("custom_alpha")] = 0.0f;
+        spinButton->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 0.0f;
         CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenAlphaAnimation>(spinButton, 1.0f, 0.5f), [](){});
         
         auto spinButtonEffect = scene->CreateSceneObject(SPIN_BUTTON_EFFECT_NAME);
         spinButtonEffect->mShaderResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT  + "spin_button_effect.vs");
         spinButtonEffect->mPosition = glm::vec3(0.403f, 0.0f, 1.95f);
         spinButtonEffect->mScale = SPIN_BUTTON_EFFECT_SCALE;
-        spinButtonEffect->mShaderFloatUniformValues[strutils::StringId("custom_alpha")] = 0.0f;
+        spinButtonEffect->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 0.0f;
         spinButtonEffect->mShaderFloatUniformValues[strutils::StringId("time_speed")] = 5.162f;
         spinButtonEffect->mShaderFloatUniformValues[strutils::StringId("perlin_resolution")] = 312.0f;
         spinButtonEffect->mShaderFloatUniformValues[strutils::StringId("perlin_clarity")] = 5.23f;

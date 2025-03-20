@@ -8,6 +8,7 @@
 #include <engine/CoreSystemsEngine.h>
 #include <engine/rendering/Fonts.h>
 #include <engine/rendering/OpenGL.h>
+#include <engine/rendering/CommonUniforms.h>
 #include <engine/resloading/MeshResource.h>
 #include <engine/resloading/ResourceLoadingService.h>
 #include <engine/resloading/ShaderResource.h>
@@ -30,23 +31,6 @@ namespace rendering
 {
 
 ///------------------------------------------------------------------------------------------------
-
-static const strutils::StringId WORLD_MATRIX_UNIFORM_NAME = strutils::StringId("world");
-static const strutils::StringId VIEW_MATRIX_UNIFORM_NAME  = strutils::StringId("view");
-static const strutils::StringId PROJ_MATRIX_UNIFORM_NAME  = strutils::StringId("proj");
-static const strutils::StringId MIN_U_UNIFORM_NAME = strutils::StringId("min_u");
-static const strutils::StringId MIN_V_UNIFORM_NAME = strutils::StringId("min_v");
-static const strutils::StringId MAX_U_UNIFORM_NAME = strutils::StringId("max_u");
-static const strutils::StringId MAX_V_UNIFORM_NAME = strutils::StringId("max_v");
-static const strutils::StringId ACTIVE_LIGHT_COUNT_UNIFORM_NAME = strutils::StringId("active_light_count");
-static const strutils::StringId AMBIENT_LIGHT_COLOR_UNIFORM_NAME = strutils::StringId("ambient_light_color");
-static const strutils::StringId POINT_LIGHT_COLORS_UNIFORM_NAME = strutils::StringId("point_light_colors");
-static const strutils::StringId POINT_LIGHT_POSITIONS_UNIFORM_NAME = strutils::StringId("point_light_positions");
-static const strutils::StringId POINT_LIGHT_POWERS_UNIFORM_NAME = strutils::StringId("point_light_powers");
-static const strutils::StringId IS_TEXTURE_SHEET_UNIFORM_NAME = strutils::StringId("texture_sheet");
-static const strutils::StringId CUSTOM_ALPHA_UNIFORM_NAME = strutils::StringId("custom_alpha");
-static const strutils::StringId ROT_MATRIX_UNIFORM_NAME  = strutils::StringId("rot");
-static const strutils::StringId IS_AFFECTED_BY_LIGHT_UNIFORM_NAME = strutils::StringId("affected_by_light");
 
 static const glm::ivec4 RENDER_TO_TEXTURE_VIEWPORT = {-1536, -1024, 4096, 4096};
 static const glm::vec4 RENDER_TO_TEXTURE_CLEAR_COLOR = {1.0f, 1.0f, 1.0f, 0.0f};
