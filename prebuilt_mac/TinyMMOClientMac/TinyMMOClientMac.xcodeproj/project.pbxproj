@@ -68,6 +68,7 @@
 		71DEABFBFD9A818B6DFD8412 /* TextureLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E0D05FD28DC001514531A214 /* TextureLoader.cpp */; };
 		755F10742FF09979BBBA9C58 /* EditorImGuiCommands.inc in Sources */ = {isa = PBXBuildFile; fileRef = 3A0B70DC7ADA228D909C7E71 /* EditorImGuiCommands.inc */; };
 		77F8C741493973A71A6DBA22 /* ImageSurfaceResource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53CDE03B92A8F220738E44FE /* ImageSurfaceResource.cpp */; };
+		7807AEA10392512899B607F0 /* BoardStateResolutionData.h in Sources */ = {isa = PBXBuildFile; fileRef = 86DA90B563EB04D9388EFB06 /* BoardStateResolutionData.h */; };
 		793BCBA94EDC60F508E16A5A /* Reel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 006393D9627BF00BE369EC69 /* Reel.cpp */; };
 		7A14147B43076FC43E6D5662 /* SoundManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F701DBE1A8A6D1664BEF16A3 /* SoundManager.cpp */; };
 		7A35378576E3FCE89E70ABA4 /* SceneManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FB79D70FA4FA614F184AFE40 /* SceneManager.cpp */; };
@@ -398,6 +399,7 @@
 		A50C73CD4B3C9E1668BFADDD /* SfxPlayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5B33DAF295D4E7E164154510 /* SfxPlayer.mm */; };
 		A582BB3FBEED4E9219980219 /* Symbols.h in Sources */ = {isa = PBXBuildFile; fileRef = 17FD62578C4E3F684EA56CBC /* Symbols.h */; };
 		A7B97E4491771F3812AD0124 /* ParticleManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 14207B709EC0713AAB9C29C8 /* ParticleManager.cpp */; };
+		A877F8389972D2FDDF6AC2E1 /* BoardStateResolutionData.h in Sources */ = {isa = PBXBuildFile; fileRef = 86DA90B563EB04D9388EFB06 /* BoardStateResolutionData.h */; };
 		A9EF8CD036BFDA54DF35E491 /* Symbols.h in Sources */ = {isa = PBXBuildFile; fileRef = 17FD62578C4E3F684EA56CBC /* Symbols.h */; };
 		ACC5BC6349E33A23CB98FE6E /* SymbolDataRepository.h in Sources */ = {isa = PBXBuildFile; fileRef = 33BB453DEBDE9661C88609E7 /* SymbolDataRepository.h */; };
 		AEBAABE4C4BC0F6D887BFBCB /* ImageSurfaceLoader.h in Sources */ = {isa = PBXBuildFile; fileRef = D979EC9B74F12857F47E4007 /* ImageSurfaceLoader.h */; };
@@ -412,6 +414,7 @@
 		C2E83D8C714D1A35A7B1FC57 /* EditorImGuiCommands.inc in Sources */ = {isa = PBXBuildFile; fileRef = 3A0B70DC7ADA228D909C7E71 /* EditorImGuiCommands.inc */; };
 		C303F0F3781FE76FA4F0A754 /* Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EA3B9899242A079FE63DCD1E /* Camera.cpp */; };
 		C406B60810EC8EDBDDA519DA /* Scene.h in Sources */ = {isa = PBXBuildFile; fileRef = 659D24C3A310C59893EE9475 /* Scene.h */; };
+		C45EF8722D69B0DBCE42E193 /* BoardStateResolutionData.h in Sources */ = {isa = PBXBuildFile; fileRef = 86DA90B563EB04D9388EFB06 /* BoardStateResolutionData.h */; };
 		C47AB43C912958FA00860801 /* ParticleManager.h in Sources */ = {isa = PBXBuildFile; fileRef = 3199A38C1A16A070A579BAB4 /* ParticleManager.h */; };
 		C729734CCEC807E5626787EB /* IResourceLoader.h in Sources */ = {isa = PBXBuildFile; fileRef = AD86196C948CE14DCBBE5446 /* IResourceLoader.h */; };
 		C7D9496C201BF1823858B0C9 /* Editor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A49D33C4F1B1DC1C02DB9E05 /* Editor.cpp */; };
@@ -543,6 +546,7 @@
 		7F068929D88F95729D0195E3 /* BackgroundMusicPlayer.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; path = BackgroundMusicPlayer.mm; sourceTree = "<group>"; };
 		82DFED0E0B1AB607780AED60 /* Animations.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = Animations.h; sourceTree = "<group>"; };
 		83294548BB5AEF7EB30C76DC /* NetworkMessages.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = NetworkMessages.h; sourceTree = "<group>"; };
+		86DA90B563EB04D9388EFB06 /* BoardStateResolutionData.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = BoardStateResolutionData.h; path = BoardStateResolutionData.h; sourceTree = "<group>"; };
 		88B55A70915E2429F0F03C71 /* MeshResource.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = MeshResource.h; sourceTree = "<group>"; };
 		8AE4C68818CCB619974358E0 /* RenderingUtils.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = RenderingUtils.h; sourceTree = "<group>"; };
 		8D6E209DDF4F577F8C87C6A0 /* BaseDataFileDeserializer.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = BaseDataFileDeserializer.h; sourceTree = "<group>"; };
@@ -1186,6 +1190,7 @@
 				006393D9627BF00BE369EC69 /* Reel.cpp */,
 				0808F578545FADE323B82471 /* Reel.h */,
 				7D531E3FF3BC6A6BB48B4CA9 /* Paylines.h */,
+				86DA90B563EB04D9388EFB06 /* BoardStateResolutionData.h */,
 			);
 			path = net_common;
 			sourceTree = "<group>";
@@ -1499,6 +1504,7 @@
 				7CB6A0994CA90DE98BB4026F /* PaylineView.cpp in Sources */,
 				53BF5611CC60F79F57D910F8 /* PaylineView.h in Sources */,
 				846BEAFE6622E65F596CC336 /* Paylines.h in Sources */,
+				A877F8389972D2FDDF6AC2E1 /* BoardStateResolutionData.h in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1624,6 +1630,7 @@
 				8EF9707CCD71E46D210D6EF1 /* PaylineView.cpp in Sources */,
 				37460013CABAA8BD2E424B2F /* PaylineView.h in Sources */,
 				D95640AB7397F720BF19BFB4 /* Paylines.h in Sources */,
+				C45EF8722D69B0DBCE42E193 /* BoardStateResolutionData.h in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1749,6 +1756,7 @@
 				DE3AC5DA89FDF588649C7182 /* PaylineView.cpp in Sources */,
 				29E22320669F6B79D634B4C3 /* PaylineView.h in Sources */,
 				96A42D4F8A9E7CEF86B6FD2F /* Paylines.h in Sources */,
+				7807AEA10392512899B607F0 /* BoardStateResolutionData.h in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -179,7 +179,7 @@ void Game::CreateDebugWidgets()
         if (mBoardView)
         {
             mSpinId = math::RandomInt();
-            mBoardModel.PopulateBoard(mSpinId);
+            mBoardModel.PopulateBoardForSpin(mSpinId);
             mBoardView->ResetBoardSymbols();
         }
     }
@@ -200,7 +200,8 @@ void Game::CreateDebugWidgets()
         { slots::SymbolType::CHOCOLATE_CAKE, "ChocolateCake" },
         { slots::SymbolType::STRAWBERRY_CAKE, "StrawberryCake" },
         { slots::SymbolType::ROAST_CHICKEN, "RoastChicken" },
-        { slots::SymbolType::WILD, "Grandma" }
+        { slots::SymbolType::WILD, "Wild" },
+        { slots::SymbolType::SCATTER, "Grandma" }
     };
     ImGui::Separator();
     if (ImGui::BeginTable("Pending Symbol State", slots::BOARD_COLS))
@@ -277,6 +278,23 @@ void Game::CreateDebugWidgets()
             mBoardView->AnimatePaylineReveal(static_cast<slots::PaylineType>(sPaylineIndex), sRevealDurationSecs, sHiddingDurationSecs);
         }
     }
+    if (ImGui::Button("Animate Payline Symbols"))
+    {
+        if (mBoardView)
+        {
+            auto paylineResolutionData = mBoardModel.ResolvePayline(static_cast<slots::PaylineType>(sPaylineIndex));
+            
+            auto scene = CoreSystemsEngine::GetInstance().GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME);
+            for (const auto& symbolData: paylineResolutionData.mSymbolData)
+            {
+                auto symbol = scene->FindSceneObject(strutils::StringId(std::to_string(symbolData.mRow) + "," + std::to_string(symbolData.mCol) + "_symbol"));
+                auto symbolFrame = scene->FindSceneObject(strutils::StringId(std::to_string(symbolData.mRow) + "," + std::to_string(symbolData.mCol) + "_symbol_frame"));
+                
+                CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::PulseAnimation>(symbol, 1.2f, 0.5f), [](){});
+                CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::PulseAnimation>(symbolFrame, 1.2f, 0.5f), [](){});
+            }
+        }
+    }
     ImGui::End();
 }
 #else
@@ -344,7 +362,7 @@ void Game::UpdateGUI(const float dtMillis)
     
     if (spinButtonEffect)
     {
-        spinButtonEffect->mShaderFloatUniformValues[strutils::StringId("time")] = time;
+        spinButtonEffect->mShaderFloatUniformValues[TIME_UNIFORM_NAME] = time;
     }
     
     if (mBoardView)
@@ -503,7 +521,7 @@ void Game::OnServerSpinResponse(const nlohmann::json& responseJson)
     
     mSpinId = spinResponse.spinId;
     mBoardView->ResetBoardSymbols();
-    mBoardModel.PopulateBoard(mSpinId);
+    mBoardModel.PopulateBoardForSpin(mSpinId);
     mBoardView->BeginSpin();
 }
 

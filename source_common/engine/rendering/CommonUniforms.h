@@ -18,6 +18,7 @@ inline const strutils::StringId WORLD_MATRIX_UNIFORM_NAME = strutils::StringId("
 inline const strutils::StringId VIEW_MATRIX_UNIFORM_NAME  = strutils::StringId("view");
 inline const strutils::StringId PROJ_MATRIX_UNIFORM_NAME  = strutils::StringId("proj");
 inline const strutils::StringId ROT_MATRIX_UNIFORM_NAME  = strutils::StringId("rot");
+inline const strutils::StringId TIME_UNIFORM_NAME  = strutils::StringId("time");
 inline const strutils::StringId MIN_U_UNIFORM_NAME = strutils::StringId("min_u");
 inline const strutils::StringId MIN_V_UNIFORM_NAME = strutils::StringId("min_v");
 inline const strutils::StringId MAX_U_UNIFORM_NAME = strutils::StringId("max_u");
