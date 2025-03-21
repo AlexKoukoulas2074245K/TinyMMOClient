@@ -54,18 +54,19 @@ PaylineView::PaylineView(scene::Scene& scene, const slots::PaylineType payline)
     mSceneObject->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + "game/paylines/" + mSceneObject->mName.GetString() + ".png");
     mSceneObject->mShaderResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT  + "payline.vs");
     mSceneObject->mPosition = PAYLINE_POSITION;
+    mSceneObject->mPosition.z += static_cast<int>(payline) * 0.01f;
     mSceneObject->mScale = PAYLINE_SCALE;
     ResetAnimationVars();
 }
 
 ///------------------------------------------------------------------------------------------------
 
-void PaylineView::AnimatePaylineReveal(const float revealAnimationDurationSecs, const float hidingAnimationDurationSecs)
+void PaylineView::AnimatePaylineReveal(const float revealAnimationDurationSecs, const float hidingAnimationDurationSecs, const float delaySecs /* = 0.0f */)
 {
     ResetAnimationVars();
     CoreSystemsEngine::GetInstance().GetAnimationManager().StopAllAnimationsPlayingForSceneObject(mSceneObject->mName);
     
-    CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenValueAnimation>(mSceneObject->mShaderFloatUniformValues[HOR_REVEAL_THRESHOLD_UNIFORM_NAME], 1.0f, revealAnimationDurationSecs), [this, hidingAnimationDurationSecs]()
+    CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenValueAnimation>(mSceneObject->mShaderFloatUniformValues[HOR_REVEAL_THRESHOLD_UNIFORM_NAME], 1.0f, revealAnimationDurationSecs, animation_flags::NONE, delaySecs), [this, hidingAnimationDurationSecs]()
     {
         CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenAlphaAnimation>(mSceneObject, 0.0f, hidingAnimationDurationSecs), [this]()
         {

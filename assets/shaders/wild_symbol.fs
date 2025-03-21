@@ -14,6 +14,7 @@ uniform float custom_alpha;
 uniform float time;
 uniform float interactive_color_threshold;
 uniform float interactive_color_time_multiplier;
+uniform bool grayscale;
 out vec4 frag_color;
 
 const vec4 INTERACTIVE_COLOR = vec4(0.0f, 0.0f, 0.0f, 1.0f);
@@ -53,10 +54,21 @@ void main()
 
     if (frag_color.a < 0.1) discard;
     
+    float adjustedTime = time;
+    if (grayscale)
+    {
+        adjustedTime = 0;
+    }
+
     if (distance(frag_color, INTERACTIVE_COLOR) < interactive_color_threshold)
     {
         float initialHueValue = mapXPositionToHue(frag_unprojected_pos.x);
-        frag_color.rgb = hsv2rgb(vec3(initialHueValue + (time * interactive_color_time_multiplier), 1.0f, 1.0f));
+        frag_color.rgb = hsv2rgb(vec3(initialHueValue + (adjustedTime * interactive_color_time_multiplier), 1.0f, 1.0f));
+    }
+    
+    if (grayscale)
+    {
+        frag_color.rgb = vec3((frag_color.r + frag_color.g + frag_color.b)/3.0f);
     }
     
     frag_color.a *= custom_alpha;

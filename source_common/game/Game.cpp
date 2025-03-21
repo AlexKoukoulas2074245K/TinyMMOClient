@@ -172,6 +172,11 @@ void Game::CreateDebugWidgets()
     ImGui::Begin("Debug Data", nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
     ImGui::Text("Player ID: %lld", mPlayerId);
     ImGui::Text("Current Spin ID: %d", mSpinId);
+    ImGui::SameLine();
+    if (ImGui::Button("Copy to Clipboard"))
+    {
+        SDL_SetClipboardText(std::to_string(mSpinId).c_str());
+    }
     ImGui::Text("Spin Animation State: %s", mBoardView ? mBoardView->GetSpinAnimationStateName().c_str() : "IDLE");
     
     if (ImGui::Button("Refill Board"))
@@ -353,9 +358,9 @@ void Game::UpdateGUI(const float dtMillis)
                 });
                 
                 auto currentRotation = spinButton->mRotation;
-                CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenRotationAnimation>(spinButton, glm::vec3(currentRotation.x, currentRotation.y, currentRotation.z - 2.0f * math::PI), 1.0f), [](){});
+                animationManager.StartAnimation(std::make_unique<rendering::TweenRotationAnimation>(spinButton, glm::vec3(currentRotation.x, currentRotation.y, currentRotation.z - 2.0f * math::PI), 1.0f), [](){});
                 
-                CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenAlphaAnimation>(spinButtonEffect, 0.0f, 0.5f), [](){});
+                animationManager.StartAnimation(std::make_unique<rendering::TweenAlphaAnimation>(spinButtonEffect, 0.0f, 0.5f), [](){});
             }
         }
     }
@@ -368,6 +373,57 @@ void Game::UpdateGUI(const float dtMillis)
     if (mBoardView)
     {
         mBoardView->Update(dtMillis);
+        
+        if (mBoardView->GetSpinAnimationState() == BoardView::SpinAnimationState::POST_SPINNING)
+        {
+            const auto& boardStateResolutionData = mBoardModel.ResolveBoardState();
+            if (boardStateResolutionData.mTotalWinMultiplier <= 0)
+            {
+                mBoardView->CompleteSpin();
+            }
+            else
+            {
+                mBoardView->WaitForPaylines();
+                for (int i = 0; i < boardStateResolutionData.mWinningPaylines.size(); ++i)
+                {
+                    mBoardView->AnimatePaylineReveal(boardStateResolutionData.mWinningPaylines[i].mPayline, 1.0f, 0.5f, i * 0.5f);
+                    
+                    auto winningSymbolData = boardStateResolutionData.mWinningPaylines[i].mSymbolData;
+                    animationManager.StartAnimation(std::make_unique<rendering::TimeDelayAnimation>(i * 0.5f), [winningSymbolData, this]()
+                    {
+                        auto scene = CoreSystemsEngine::GetInstance().GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME);
+                        for (const auto& symbolData: winningSymbolData)
+                        {
+                            auto symbolName = strutils::StringId(std::to_string(symbolData.mRow) + "," + std::to_string(symbolData.mCol) + "_symbol");
+                            auto symbolFrameName = strutils::StringId(std::to_string(symbolData.mRow) + "," + std::to_string(symbolData.mCol) + "_symbol_frame");
+                            
+                            auto symbol = scene->FindSceneObject(symbolName);
+                            symbol->mShaderBoolUniformValues[GRAYSCALE_UNIFORM_NAME] = false;
+                            
+                            auto symbolFrame = scene->FindSceneObject(symbolFrameName);
+                            symbolFrame->mShaderBoolUniformValues[GRAYSCALE_UNIFORM_NAME] = false;
+                            
+                            auto& animationManager = CoreSystemsEngine::GetInstance().GetAnimationManager();
+                            
+                            if (animationManager.GetAnimationCountPlayingForSceneObject(symbolName) == 0)
+                            {
+                                animationManager.StartAnimation(std::make_unique<rendering::PulseAnimation>(symbol, 1.1, 0.5f, animation_flags::ANIMATE_CONTINUOUSLY), [](){});
+                            }
+                            
+                            if (animationManager.GetAnimationCountPlayingForSceneObject(symbolFrameName) == 0)
+                            {
+                                animationManager.StartAnimation(std::make_unique<rendering::PulseAnimation>(symbolFrame, 1.1, 0.5f, animation_flags::ANIMATE_CONTINUOUSLY), [](){});
+                            }
+                        }
+                    });
+                }
+                
+                animationManager.StartAnimation(std::make_unique<rendering::TimeDelayAnimation>((boardStateResolutionData.mWinningPaylines.size() - 1) * 0.5f + 1.5f), [this]()
+                {
+                    mBoardView->CompleteSpin();
+                });
+            }
+        }
     }
 }
 

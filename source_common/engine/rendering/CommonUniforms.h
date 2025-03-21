@@ -23,6 +23,7 @@ inline const strutils::StringId MIN_U_UNIFORM_NAME = strutils::StringId("min_u")
 inline const strutils::StringId MIN_V_UNIFORM_NAME = strutils::StringId("min_v");
 inline const strutils::StringId MAX_U_UNIFORM_NAME = strutils::StringId("max_u");
 inline const strutils::StringId MAX_V_UNIFORM_NAME = strutils::StringId("max_v");
+inline const strutils::StringId GRAYSCALE_UNIFORM_NAME = strutils::StringId("grayscale");
 inline const strutils::StringId ACTIVE_LIGHT_COUNT_UNIFORM_NAME = strutils::StringId("active_light_count");
 inline const strutils::StringId AMBIENT_LIGHT_COLOR_UNIFORM_NAME = strutils::StringId("ambient_light_color");
 inline const strutils::StringId POINT_LIGHT_COLORS_UNIFORM_NAME = strutils::StringId("point_light_colors");

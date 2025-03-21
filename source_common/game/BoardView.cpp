@@ -69,7 +69,8 @@ static const std::unordered_map<BoardView::SpinAnimationState, std::string> SPIN
     { BoardView::SpinAnimationState::IDLE, "IDLE" },
     { BoardView::SpinAnimationState::PRE_SPIN_LOADING, "PRE_SPIN_LOADING" },
     { BoardView::SpinAnimationState::SPINNING, "SPINNING" },
-    { BoardView::SpinAnimationState::POST_SPINNING, "POST_SPINNING" }
+    { BoardView::SpinAnimationState::POST_SPINNING, "POST_SPINNING" },
+    { BoardView::SpinAnimationState::WAITING_FOR_PAYLINES, "WAITING_FOR_PAYLINES" }
 };
 
 static const std::unordered_map<BoardView::PendingSymbolData::PendingSymbolDataState, std::string> PENDING_SYMBOL_DATA_STATE_NAMES =
@@ -223,7 +224,7 @@ void BoardView::Update(const float dtMillis)
                                 }
 
                                 sceneObject->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + SYMBOL_TEXTURE_PATHS.at(newSymbolType));
-                                sceneObject->mShaderResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT  + (SPECIAL_SYMBOL_SHADERS.count(newSymbolType) ? SPECIAL_SYMBOL_SHADERS.at(newSymbolType) : "basic.vs"));
+                                sceneObject->mShaderResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT  + (SPECIAL_SYMBOL_SHADERS.count(newSymbolType) ? SPECIAL_SYMBOL_SHADERS.at(newSymbolType) : "symbol.vs"));
                             }
                         }
                         
@@ -239,10 +240,7 @@ void BoardView::Update(const float dtMillis)
             }
         } break;
             
-        case SpinAnimationState::POST_SPINNING:
-        {
-            mSpinAnimationState = SpinAnimationState::IDLE;
-        } break;
+        default: break;
     }
 }
 
@@ -317,6 +315,35 @@ void BoardView::BeginSpin()
 
 ///------------------------------------------------------------------------------------------------
 
+void BoardView::WaitForPaylines()
+{
+    for (int row = 0; row < slots::REEL_LENGTH; ++row)
+    {
+        for (int col = 0; col < slots::BOARD_COLS; ++col)
+        {
+            auto symbolSoName = GetSymbolSoName(row, col);
+            auto symbolFrameSoName = GetSymbolFrameSoName(row, col);
+            
+            auto symbolSceneObjects = mScene.FindSceneObjectsWhoseNameStartsWith(std::to_string(row) + "," + std::to_string(col));
+            
+            for (auto& sceneObject: symbolSceneObjects)
+            {
+                sceneObject->mShaderBoolUniformValues[GRAYSCALE_UNIFORM_NAME] = true;
+            }
+        }
+    }
+    mSpinAnimationState = SpinAnimationState::WAITING_FOR_PAYLINES;
+}
+
+///------------------------------------------------------------------------------------------------
+
+void BoardView::CompleteSpin()
+{
+    mSpinAnimationState = SpinAnimationState::IDLE;
+}
+
+///------------------------------------------------------------------------------------------------
+
 void BoardView::ResetBoardSymbols()
 {
     for (int row = 0; row < slots::REEL_LENGTH; ++row)
@@ -352,12 +379,13 @@ void BoardView::ResetBoardSymbols()
             symbol->mShaderResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT  + (SPECIAL_SYMBOL_SHADERS.count(mBoardModel.GetBoardSymbol(row, col)) ? SPECIAL_SYMBOL_SHADERS.at(mBoardModel.GetBoardSymbol(row, col)) : "basic.vs"));
             symbol->mShaderFloatUniformValues[INTERACTIVE_COLOR_THRESHOLD_UNIFORM_NAME] = INTERACTIVE_COLOR_THRESHOLD;
             symbol->mShaderFloatUniformValues[INTERACTIVE_COLOR_TIME_MULTIPLIER_UNIFORM_NAME] = INTERACTIVE_COLOR_TIME_MULTIPLIER;
+            symbol->mShaderBoolUniformValues[GRAYSCALE_UNIFORM_NAME] = false;
 
             symbol->mPosition = targetSymbolPosition;
             symbol->mScale = SYMBOL_SCALE * 0.9f;
             symbol->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 1.0f;
             mSceneObjects.push_back(symbol);
-            
+
             auto symbolFrame = mScene.CreateSceneObject(GetSymbolFrameSoName(row, col));
             symbolFrame->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + SYMBOL_FRAME_TEXTURE_PATH);
             symbolFrame->mPosition = targetSymbolPosition;
@@ -374,9 +402,9 @@ void BoardView::ResetBoardSymbols()
 
 ///------------------------------------------------------------------------------------------------
 
-void BoardView::AnimatePaylineReveal(const slots::PaylineType paylineType, const float revealAnimationDurationSecs, const float hidingAnimationDurationSecs)
+void BoardView::AnimatePaylineReveal(const slots::PaylineType paylineType, const float revealAnimationDurationSecs, const float hidingAnimationDurationSecs, const float delaySecs /* = 0.0f */)
 {
-    mPaylines[static_cast<int>(paylineType)].AnimatePaylineReveal(revealAnimationDurationSecs, hidingAnimationDurationSecs);
+    mPaylines[static_cast<int>(paylineType)].AnimatePaylineReveal(revealAnimationDurationSecs, hidingAnimationDurationSecs, delaySecs);
 }
 
 ///------------------------------------------------------------------------------------------------

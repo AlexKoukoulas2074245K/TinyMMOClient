@@ -32,7 +32,8 @@ public:
         IDLE,
         PRE_SPIN_LOADING,
         SPINNING,
-        POST_SPINNING
+        POST_SPINNING,
+        WAITING_FOR_PAYLINES
     };
     
     struct PendingSymbolData
@@ -62,8 +63,10 @@ public:
     SpinAnimationState GetSpinAnimationState() const;
 
     void BeginSpin();
+    void WaitForPaylines();
+    void CompleteSpin();
     void ResetBoardSymbols();
-    void AnimatePaylineReveal(const slots::PaylineType paylineType, const float revealAnimationDurationSecs, const float hidingAnimationDurationSecs);
+    void AnimatePaylineReveal(const slots::PaylineType paylineType, const float revealAnimationDurationSecs, const float hidingAnimationDurationSecs, const float delaySecs = 0.0f);
 private:
     void AnimateReelSymbolsToFinalPosition(const int reelIndex);
 

@@ -31,7 +31,7 @@ public:
 public:
     PaylineView(scene::Scene& scene, const slots::PaylineType payline);
 
-    void AnimatePaylineReveal(const float revealAnimationDurationSecs, const float hidingAnimationDurationSecs);
+    void AnimatePaylineReveal(const float revealAnimationDurationSecs, const float hidingAnimationDurationSecs, const float delaySecs = 0.0f);
     std::shared_ptr<scene::SceneObject> GetSceneObject();
 
 private:
