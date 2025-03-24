@@ -63,12 +63,13 @@ public:
     SpinAnimationState GetSpinAnimationState() const;
 
     void BeginSpin();
-    void WaitForPaylines();
+    void WaitForPaylines(const slots::BoardStateResolutionData& boardResolutionData);
     void CompleteSpin();
     void ResetBoardSymbols();
-    void AnimatePaylineReveal(const slots::PaylineType paylineType, const float revealAnimationDurationSecs, const float hidingAnimationDurationSecs, const float delaySecs = 0.0f);
+    void AnimatePaylineReveal(const slots::PaylineResolutionData& paylineResolutionData, const float revealAnimationDurationSecs, const float hidingAnimationDurationSecs, const float delaySecs = 0.0f);
 private:
     void AnimateReelSymbolsToFinalPosition(const int reelIndex);
+    void UpdateSceneObjectDuringReelAnimation(std::shared_ptr<scene::SceneObject> sceneObject, const float dtMillis, const int reelIndex);
 
 private:
     scene::Scene& mScene;

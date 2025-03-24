@@ -87,7 +87,6 @@ Game::Game(const int argc, char** argv)
 Game::~Game(){}
 
 ///------------------------------------------------------------------------------------------------
-
 void Game::Init()
 {
     auto& systemsEngine = CoreSystemsEngine::GetInstance();
@@ -280,24 +279,9 @@ void Game::CreateDebugWidgets()
     {
         if (mBoardView)
         {
-            mBoardView->AnimatePaylineReveal(static_cast<slots::PaylineType>(sPaylineIndex), sRevealDurationSecs, sHiddingDurationSecs);
-        }
-    }
-    if (ImGui::Button("Animate Payline Symbols"))
-    {
-        if (mBoardView)
-        {
-            auto paylineResolutionData = mBoardModel.ResolvePayline(static_cast<slots::PaylineType>(sPaylineIndex));
-            
-            auto scene = CoreSystemsEngine::GetInstance().GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME);
-            for (const auto& symbolData: paylineResolutionData.mSymbolData)
-            {
-                auto symbol = scene->FindSceneObject(strutils::StringId(std::to_string(symbolData.mRow) + "," + std::to_string(symbolData.mCol) + "_symbol"));
-                auto symbolFrame = scene->FindSceneObject(strutils::StringId(std::to_string(symbolData.mRow) + "," + std::to_string(symbolData.mCol) + "_symbol_frame"));
-                
-                CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::PulseAnimation>(symbol, 1.2f, 0.5f), [](){});
-                CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::PulseAnimation>(symbolFrame, 1.2f, 0.5f), [](){});
-            }
+            slots::PaylineResolutionData paylineResolutionData;
+            paylineResolutionData.mPayline = static_cast<slots::PaylineType>(sPaylineIndex);
+            mBoardView->AnimatePaylineReveal(paylineResolutionData, sRevealDurationSecs, sHiddingDurationSecs);
         }
     }
     ImGui::End();
@@ -383,42 +367,13 @@ void Game::UpdateGUI(const float dtMillis)
             }
             else
             {
-                mBoardView->WaitForPaylines();
+                mBoardView->WaitForPaylines(boardStateResolutionData);
                 for (int i = 0; i < boardStateResolutionData.mWinningPaylines.size(); ++i)
                 {
-                    mBoardView->AnimatePaylineReveal(boardStateResolutionData.mWinningPaylines[i].mPayline, 1.0f, 0.5f, i * 0.5f);
-                    
-                    auto winningSymbolData = boardStateResolutionData.mWinningPaylines[i].mSymbolData;
-                    animationManager.StartAnimation(std::make_unique<rendering::TimeDelayAnimation>(i * 0.5f), [winningSymbolData, this]()
-                    {
-                        auto scene = CoreSystemsEngine::GetInstance().GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME);
-                        for (const auto& symbolData: winningSymbolData)
-                        {
-                            auto symbolName = strutils::StringId(std::to_string(symbolData.mRow) + "," + std::to_string(symbolData.mCol) + "_symbol");
-                            auto symbolFrameName = strutils::StringId(std::to_string(symbolData.mRow) + "," + std::to_string(symbolData.mCol) + "_symbol_frame");
-                            
-                            auto symbol = scene->FindSceneObject(symbolName);
-                            symbol->mShaderBoolUniformValues[GRAYSCALE_UNIFORM_NAME] = false;
-                            
-                            auto symbolFrame = scene->FindSceneObject(symbolFrameName);
-                            symbolFrame->mShaderBoolUniformValues[GRAYSCALE_UNIFORM_NAME] = false;
-                            
-                            auto& animationManager = CoreSystemsEngine::GetInstance().GetAnimationManager();
-                            
-                            if (animationManager.GetAnimationCountPlayingForSceneObject(symbolName) == 0)
-                            {
-                                animationManager.StartAnimation(std::make_unique<rendering::PulseAnimation>(symbol, 1.1, 0.5f, animation_flags::ANIMATE_CONTINUOUSLY), [](){});
-                            }
-                            
-                            if (animationManager.GetAnimationCountPlayingForSceneObject(symbolFrameName) == 0)
-                            {
-                                animationManager.StartAnimation(std::make_unique<rendering::PulseAnimation>(symbolFrame, 1.1, 0.5f, animation_flags::ANIMATE_CONTINUOUSLY), [](){});
-                            }
-                        }
-                    });
+                    mBoardView->AnimatePaylineReveal(boardStateResolutionData.mWinningPaylines[i], 1.0f, 0.5f, i * 1.5f);
                 }
                 
-                animationManager.StartAnimation(std::make_unique<rendering::TimeDelayAnimation>((boardStateResolutionData.mWinningPaylines.size() - 1) * 0.5f + 1.5f), [this]()
+                animationManager.StartAnimation(std::make_unique<rendering::TimeDelayAnimation>(boardStateResolutionData.mWinningPaylines.size() * 1.5f), [this]()
                 {
                     mBoardView->CompleteSpin();
                 });

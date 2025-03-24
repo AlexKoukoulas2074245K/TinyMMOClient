@@ -43,8 +43,8 @@ public:
     ~Scene();
     
     [[nodiscard]] std::shared_ptr<SceneObject> CreateSceneObject(const strutils::StringId sceneObjectName = strutils::StringId());
-    [[nodiscard]] std::shared_ptr<SceneObject> FindSceneObject(const strutils::StringId& sceneObjectName);
-    [[nodiscard]] std::vector<std::shared_ptr<SceneObject>> FindSceneObjectsWhoseNameStartsWith(const std::string& sceneObjectNamePrefix);
+    [[nodiscard]] std::shared_ptr<SceneObject> FindSceneObject(const strutils::StringId& sceneObjectName) const ;
+    [[nodiscard]] std::vector<std::shared_ptr<SceneObject>> FindSceneObjectsWhoseNameStartsWith(const std::string& sceneObjectNamePrefix) const;
     
     void RecalculatePositionOfEdgeSnappingSceneObject(std::shared_ptr<SceneObject> sceneObject, const math::Frustum& cameraFrustum);
     void RecalculatePositionOfEdgeSnappingSceneObjects();

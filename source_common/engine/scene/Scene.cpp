@@ -43,7 +43,7 @@ std::shared_ptr<SceneObject> Scene::CreateSceneObject(const strutils::StringId s
 
 ///------------------------------------------------------------------------------------------------
 
-std::shared_ptr<SceneObject> Scene::FindSceneObject(const strutils::StringId& sceneObjectName)
+std::shared_ptr<SceneObject> Scene::FindSceneObject(const strutils::StringId& sceneObjectName) const
 {
     auto findIter = std::find_if(mSceneObjects.begin(), mSceneObjects.end(), [&](const std::shared_ptr<SceneObject>& sceneObject)
     {
@@ -55,7 +55,7 @@ std::shared_ptr<SceneObject> Scene::FindSceneObject(const strutils::StringId& sc
 
 ///------------------------------------------------------------------------------------------------
 
-std::vector<std::shared_ptr<SceneObject>> Scene::FindSceneObjectsWhoseNameStartsWith(const std::string& sceneObjectNamePrefix)
+std::vector<std::shared_ptr<SceneObject>> Scene::FindSceneObjectsWhoseNameStartsWith(const std::string& sceneObjectNamePrefix) const
 {
     std::vector<std::shared_ptr<SceneObject>> result;
     for (auto& sceneObject: mSceneObjects)
