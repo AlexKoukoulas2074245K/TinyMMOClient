@@ -10,11 +10,13 @@ in vec3 frag_pos;
 in vec3 normal_interp;
 
 uniform sampler2D tex;
+uniform sampler2D scatter_effect_tex;
 uniform float custom_alpha;
 uniform float time;
 uniform float shine_ray_x;
 uniform float interactive_color_threshold;
 uniform float interactive_color_time_multiplier;
+uniform float scatter_effect_stretch_multiplier;
 uniform bool grayscale;
 out vec4 frag_color;
 
@@ -54,9 +56,12 @@ void main()
     float final_uv_x = uv_frag.x * 0.999f;
     float final_uv_y = 1.0 - uv_frag.y;
     frag_color = texture(tex, vec2(final_uv_x, final_uv_y));
-
+    
+    vec4 maskColor = texture(scatter_effect_tex, vec2(final_uv_x, final_uv_y));
+    
     if (frag_color.a < 0.1) discard;
     
+    float displacement = 0.0;
     float adjustedTime = time;
     if (grayscale)
     {
@@ -67,15 +72,30 @@ void main()
     {
         float initialHueValue = mapXPositionToHue(frag_unprojected_pos.x);
         frag_color.rgb = hsv2rgb(vec3(initialHueValue + (adjustedTime * interactive_color_time_multiplier), 1.0f, 1.0f));
-        frag_color.rgb *= 0.8f;
     }
+    
     
     if (grayscale)
     {
+        vec2 displaced_coords = vec2(final_uv_x, final_uv_y) + vec2(0.0, displacement);
+        vec4 displaced_mask_color = texture(scatter_effect_tex, displaced_coords);
+
+        frag_color = mix(frag_color, displaced_mask_color, displaced_mask_color.a);
         frag_color.rgb = vec3((frag_color.r + frag_color.g + frag_color.b)/6.0f);
     }
     else
     {
+        // Identify letters based on color
+        float letterID = floor(final_uv_x * 5.0) / 5.0;
+        displacement = sin(time * (letterID + 5.0) + 18.28) * scatter_effect_stretch_multiplier;
+        
+        // Shift the mask texture coordinates vertically
+        vec2 displaced_coords = vec2(final_uv_x, final_uv_y) + vec2(0.0, displacement);
+        vec4 displaced_mask_color = texture(scatter_effect_tex, displaced_coords);
+        displaced_mask_color.rgb += vec3(max(0.0f, sin(time - letterID)*2.0f)/5.0f);
+        
+        frag_color = mix(frag_color, displaced_mask_color, displaced_mask_color.a);
+
         float distance_to_ray = abs(frag_unprojected_pos.x - shine_ray_x);
         if (distance_to_ray < RAY_THICKNESS)
         {

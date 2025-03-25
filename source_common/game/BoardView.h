@@ -57,7 +57,6 @@ public:
     
     void Update(const float dtMillis);
     
-    std::vector<std::shared_ptr<scene::SceneObject>> GetSceneObjects();
     const std::string& GetSpinAnimationStateName() const;
     const std::string& GetPendingSymbolDataStateName(const int reelIndex) const;
     SpinAnimationState GetSpinAnimationState() const;
@@ -75,7 +74,6 @@ private:
     scene::Scene& mScene;
     const slots::Board& mBoardModel;
     std::vector<PaylineView> mPaylines;
-    std::vector<std::shared_ptr<scene::SceneObject>> mSceneObjects;
     PendingSymbolData mPendingSymbolData[slots::BOARD_COLS];
     SpinAnimationState mSpinAnimationState;
     float mSymbolSpinSpeed;

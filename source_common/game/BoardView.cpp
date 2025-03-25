@@ -25,10 +25,11 @@ static const strutils::StringId SHINE_RAY_X_UNIFORM_NAME = strutils::StringId("s
 static const std::string SYMBOL_SHADER_PATH = "symbol.vs";
 static const std::string SYMBOL_FRAME_TEXTURE_PATH = "game/basket_frame.png";
 static const std::string SHELVES_TEXTURE_PATH = "game/shelves.png";
+static const std::string SCATTER_SYMBOL_EFFECT_TEXTURE_PATH = "game/food_slot_images/scatter_effect.png";
 
 static const glm::vec2 SHINE_RAY_X_VALUES = glm::vec2(-0.5f, 0.5f);
 static const glm::vec3 BOARD_SCALE = glm::vec3(0.5f * 1.28f, 0.5f, 1.0f);
-static const glm::vec3 SYMBOL_SCALE = glm::vec3(0.1f, 0.072f, 1.0f);
+static const glm::vec3 SYMBOL_SCALE = glm::vec3(0.092f, 0.06624f, 1.0f);
 static const glm::vec3 SYMBOL_FRAME_SCALE = glm::vec3(0.08f * 1.4f, 0.08f, 1.0f);
 static const glm::vec3 SHELVES_POSITION = glm::vec3(0.0f, 0.0f, -0.2f);
 static const glm::vec3 TOP_LEFT_SYMBOL_POSITION = glm::vec3(-0.2467f, 0.464f, 0.1f);
@@ -44,7 +45,7 @@ static const float TIME_PER_REEL_SYMBOL_UNLOCK = 0.3f;
 static const float TIME_TO_FINALIZE_SYMBOL_POSITION = 0.8f;
 static const float TIME_TO_ANIMATE_SHINE_RAY = 1.0f;
 static const float TIME_DELAY_TO_BEGIN_WINNING_SYMBOLS_ANIMATION = 0.1f;
-static const float INTERACTIVE_COLOR_THRESHOLD = 0.07f;
+static const float INTERACTIVE_COLOR_THRESHOLD = 0.224f;
 static const float INTERACTIVE_COLOR_TIME_MULTIPLIER = -0.7f;
 static const float WINNING_SYMBOL_PULSE_SCALE_FACTOR = 1.2f;
 static const float WINNING_SYMBOL_PULSE_ANIMATION_DURATION = 0.3f;
@@ -72,7 +73,8 @@ static const std::unordered_map<slots::SymbolType, std::string> SYMBOL_TEXTURE_P
 
 static const std::unordered_map<slots::SymbolType, std::string> SPECIAL_SYMBOL_SHADERS =
 {
-    { slots::SymbolType::WILD, "wild_symbol.vs" }
+    { slots::SymbolType::WILD, "wild_symbol.vs" },
+    { slots::SymbolType::SCATTER, "scatter_symbol.vs" }
 };
 
 static const std::unordered_map<BoardView::SpinAnimationState, std::string> SPIN_ANIMATION_STATE_NAMES =
@@ -117,7 +119,6 @@ BoardView::BoardView(scene::Scene& scene, const slots::Board& boardModel)
     board->mPosition = SHELVES_POSITION;
     board->mScale = BOARD_SCALE;
     board->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 1.0f;
-    mSceneObjects.push_back(board);
     
     for (auto i = 0; i < static_cast<int>(slots::PaylineType::PAYLINE_COUNT); ++i)
     {
@@ -194,9 +195,6 @@ void BoardView::Update(const float dtMillis)
                         continue;
                     }
 
-                    auto symbolSoName = GetSymbolSoName(row, col);
-                    auto symbolFrameSoName = GetSymbolFrameSoName(row, col);
-                    
                     auto symbolSceneObjects = FindAllSceneObjectsForSymbolCoordinates(mScene, row, col);
                     
                     for (auto& sceneObject: symbolSceneObjects)
@@ -218,10 +216,6 @@ void BoardView::Update(const float dtMillis)
         default: break;
     }
 }
-
-///------------------------------------------------------------------------------------------------
-
-std::vector<std::shared_ptr<scene::SceneObject>> BoardView::GetSceneObjects() { return mSceneObjects; }
 
 ///------------------------------------------------------------------------------------------------
 
@@ -356,12 +350,7 @@ void BoardView::ResetBoardSymbols()
             mScene.RemoveSceneObject(symbolFrameSoName);
         }
     }
-    
-    if (mSceneObjects.size() > 1)
-    {
-        mSceneObjects.erase(mSceneObjects.begin() + 1, mSceneObjects.end());
-    }
-    
+
     for (int row = 0; row < slots::REEL_LENGTH; ++row)
     {
         for (int col = 0; col < slots::BOARD_COLS; ++col)
@@ -371,17 +360,18 @@ void BoardView::ResetBoardSymbols()
             targetSymbolPosition.y -= row * VER_SYMBOL_DISTANCE;
             
             auto symbol = mScene.CreateSceneObject(GetSymbolSoName(row, col));
-            symbol->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + SYMBOL_TEXTURE_PATHS.at(mBoardModel.GetBoardSymbol(row, col)));
+            symbol->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + SYMBOL_TEXTURE_PATHS.at(mBoardModel.GetBoardSymbol(row, col)));
             symbol->mShaderResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT  + (SPECIAL_SYMBOL_SHADERS.count(mBoardModel.GetBoardSymbol(row, col)) ? SPECIAL_SYMBOL_SHADERS.at(mBoardModel.GetBoardSymbol(row, col)) : SYMBOL_SHADER_PATH));
+            symbol->mEffectTextureResourceIds[0] = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + SCATTER_SYMBOL_EFFECT_TEXTURE_PATH);
             symbol->mShaderFloatUniformValues[INTERACTIVE_COLOR_THRESHOLD_UNIFORM_NAME] = INTERACTIVE_COLOR_THRESHOLD;
             symbol->mShaderFloatUniformValues[INTERACTIVE_COLOR_TIME_MULTIPLIER_UNIFORM_NAME] = INTERACTIVE_COLOR_TIME_MULTIPLIER;
             symbol->mShaderFloatUniformValues[SHINE_RAY_X_UNIFORM_NAME] = SHINE_RAY_X_VALUES.r;
+            symbol->mShaderFloatUniformValues[strutils::StringId("scatter_effect_stretch_multiplier")] = 0.02f;
             symbol->mShaderBoolUniformValues[GRAYSCALE_UNIFORM_NAME] = false;
             
             symbol->mPosition = targetSymbolPosition;
             symbol->mScale = SYMBOL_SCALE;
             symbol->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 1.0f;
-            mSceneObjects.push_back(symbol);
 
             auto symbolFrame = mScene.CreateSceneObject(GetSymbolFrameSoName(row, col));
             symbolFrame->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + SYMBOL_FRAME_TEXTURE_PATH);
@@ -389,7 +379,6 @@ void BoardView::ResetBoardSymbols()
             symbolFrame->mPosition.z += 0.1f;
             symbolFrame->mScale = SYMBOL_FRAME_SCALE;
             symbolFrame->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 1.0f;
-            mSceneObjects.push_back(symbolFrame);
         }
     }
     
@@ -401,7 +390,10 @@ void BoardView::ResetBoardSymbols()
 
 void BoardView::AnimatePaylineReveal(const slots::PaylineResolutionData& paylineResolutionData, const float revealAnimationDurationSecs, const float hidingAnimationDurationSecs, const float delaySecs /* = 0.0f */)
 {
-    mPaylines[static_cast<int>(paylineResolutionData.mPayline)].AnimatePaylineReveal(revealAnimationDurationSecs, hidingAnimationDurationSecs, delaySecs);
+    if (!paylineResolutionData.mScatter)
+    {
+        mPaylines[static_cast<int>(paylineResolutionData.mPayline)].AnimatePaylineReveal(revealAnimationDurationSecs, hidingAnimationDurationSecs, delaySecs);
+    }
     
     auto winningSymbolData = paylineResolutionData.mSymbolData;
     auto& animationManager = CoreSystemsEngine::GetInstance().GetAnimationManager();

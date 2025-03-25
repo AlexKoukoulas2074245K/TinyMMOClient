@@ -531,9 +531,12 @@ void Game::OnServerSpinResponse(const nlohmann::json& responseJson)
     spinResponse.DeserializeFromJson(responseJson);
     
     mSpinId = spinResponse.spinId;
+    mSpinId = -195889367;
     mBoardView->ResetBoardSymbols();
     mBoardModel.PopulateBoardForSpin(mSpinId);
     mBoardView->BeginSpin();
+    
+    logging::Log(logging::LogType::INFO, "Spin %d!", mSpinId);
 }
 
 ///------------------------------------------------------------------------------------------------
@@ -548,8 +551,6 @@ void Game::OnLoginButtonPressed()
 
 void Game::OnSpinButtonPressed()
 {
-    logging::Log(logging::LogType::INFO, "Spin!");
-    
     // Request quick play
     SendNetworkMessage(nlohmann::json(), networking::MessageType::CS_SPIN_REQUEST, networking::MessagePriority::HIGH);
 }
