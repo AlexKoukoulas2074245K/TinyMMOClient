@@ -20,14 +20,14 @@
 static const strutils::StringId BOARD_NAME = strutils::StringId("board");
 static const strutils::StringId INTERACTIVE_COLOR_THRESHOLD_UNIFORM_NAME = strutils::StringId("interactive_color_threshold");
 static const strutils::StringId INTERACTIVE_COLOR_TIME_MULTIPLIER_UNIFORM_NAME = strutils::StringId("interactive_color_time_multiplier");
-static const strutils::StringId SHINE_RAY_X_UNIFORM_NAME = strutils::StringId("shine_ray_x");
+static const strutils::StringId SCATTER_EFFECT_MULTIPLIER_COEFF_UNIFORM_NAME =  strutils::StringId("scatter_effect_stretch_multiplier");
 
 static const std::string SYMBOL_SHADER_PATH = "symbol.vs";
 static const std::string SYMBOL_FRAME_TEXTURE_PATH = "game/basket_frame.png";
 static const std::string SHELVES_TEXTURE_PATH = "game/shelves.png";
 static const std::string SCATTER_SYMBOL_EFFECT_TEXTURE_PATH = "game/food_slot_images/scatter_effect.png";
+static const std::string SCATTER_BACKGROUND_MASK_TEXTURE_PATH = "game/food_slot_images/scatter_background_mask.png";
 
-static const glm::vec2 SHINE_RAY_X_VALUES = glm::vec2(-0.5f, 0.5f);
 static const glm::vec3 BOARD_SCALE = glm::vec3(0.5f * 1.28f, 0.5f, 1.0f);
 static const glm::vec3 SYMBOL_SCALE = glm::vec3(0.092f, 0.06624f, 1.0f);
 static const glm::vec3 SYMBOL_FRAME_SCALE = glm::vec3(0.08f * 1.4f, 0.08f, 1.0f);
@@ -43,13 +43,16 @@ static const float TIME_TO_REACH_MAX_REEL_SPIN_SPEED = 0.5f;
 static const float TIME_TILL_REEL_PENDING_SYMBOLS_UNLOCK = 1.0f;
 static const float TIME_PER_REEL_SYMBOL_UNLOCK = 0.3f;
 static const float TIME_TO_FINALIZE_SYMBOL_POSITION = 0.8f;
-static const float TIME_TO_ANIMATE_SHINE_RAY = 1.0f;
 static const float TIME_DELAY_TO_BEGIN_WINNING_SYMBOLS_ANIMATION = 0.1f;
 static const float INTERACTIVE_COLOR_THRESHOLD = 0.224f;
 static const float INTERACTIVE_COLOR_TIME_MULTIPLIER = -0.7f;
 static const float WINNING_SYMBOL_PULSE_SCALE_FACTOR = 1.2f;
 static const float WINNING_SYMBOL_PULSE_ANIMATION_DURATION = 0.3f;
 static const float WINNING_SYMBOL_PULSE_ANIMATION_DELAY = 0.3f;
+static const float SCATTER_EFFECT_MULTIPLIER_COEFF = 0.02f;
+static const float SCATTER_SUSPENSE_SLOWDOWN_MULTIPIER = 0.2f;
+static const float SCATTER_SUSPENSE_EXTRA_SPIN_TIME = 2.0f;
+static const float SCATTER_SLOWDOWN_KICKOFF_MULTIPLIER = 0.6666f;
 
 static const std::unordered_map<slots::SymbolType, std::string> SYMBOL_TEXTURE_PATHS =
 {
@@ -68,7 +71,7 @@ static const std::unordered_map<slots::SymbolType, std::string> SYMBOL_TEXTURE_P
     { slots::SymbolType::STRAWBERRY_CAKE, "game/food_slot_images/strawberry_cake.png" },
     { slots::SymbolType::ROAST_CHICKEN, "game/food_slot_images/roast_chicken.png" },
     { slots::SymbolType::WILD, "game/food_slot_images/wild.png" },
-    { slots::SymbolType::SCATTER, "game/food_slot_images/grandma.png" }
+    { slots::SymbolType::SCATTER, "game/food_slot_images/scatter.png" }
 };
 
 static const std::unordered_map<slots::SymbolType, std::string> SPECIAL_SYMBOL_SHADERS =
@@ -89,6 +92,7 @@ static const std::unordered_map<BoardView::SpinAnimationState, std::string> SPIN
 static const std::unordered_map<BoardView::PendingSymbolData::PendingSymbolDataState, std::string> PENDING_SYMBOL_DATA_STATE_NAMES =
 {
     { BoardView::PendingSymbolData::PendingSymbolDataState::LOCKED, "LOCKED" },
+    { BoardView::PendingSymbolData::PendingSymbolDataState::LOCKED_SUSPENSE, "LOCKED_SUSPENSE" },
     { BoardView::PendingSymbolData::PendingSymbolDataState::UNLOCKED, "UNLOCKED" },
     { BoardView::PendingSymbolData::PendingSymbolDataState::FINISHED, "FINISHED" }
 };
@@ -112,7 +116,6 @@ BoardView::BoardView(scene::Scene& scene, const slots::Board& boardModel)
     : mScene(scene)
     , mBoardModel(boardModel)
     , mSpinAnimationState(SpinAnimationState::IDLE)
-    , mSymbolSpinSpeed(0.0f)
 {
     auto board = scene.CreateSceneObject(BOARD_NAME);
     board->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + SHELVES_TEXTURE_PATH);
@@ -158,29 +161,46 @@ void BoardView::Update(const float dtMillis)
         
         case SpinAnimationState::PRE_SPIN_LOADING:
         {
-            bool foundAnimatedSymbols = false;
-            for (int row = 0; row < slots::REEL_LENGTH; ++row)
+            // Set up reel speeds and configure reel animations
+            mSpinAnimationState = SpinAnimationState::SPINNING;
+                        
+            for (int i = 0; i < slots::BOARD_COLS; ++i)
             {
-                for (int col = 0; col < slots::BOARD_COLS; ++col)
-                {
-                    auto symbolSoName = GetSymbolSoName(row, col);
-                    auto symbolFrameSoName = GetSymbolFrameSoName(row, col);
-                    
-                    foundAnimatedSymbols |= CoreSystemsEngine::GetInstance().GetAnimationManager().GetAnimationCountPlayingForSceneObject(symbolSoName);
-                    foundAnimatedSymbols |= CoreSystemsEngine::GetInstance().GetAnimationManager().GetAnimationCountPlayingForSceneObject(symbolFrameSoName);
-                }
-            }
-            
-            // Pull all symbols up a tiny bit before proceeding with the main reel animation
-            if (!foundAnimatedSymbols)
-            {
-                mSpinAnimationState = SpinAnimationState::SPINNING;
-                CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenValueAnimation>(mSymbolSpinSpeed, MAX_REEL_SPIN_SPEED, TIME_TO_REACH_MAX_REEL_SPIN_SPEED), [](){});
+                CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenValueAnimation>(mPendingSymbolData[i].mReelSpeed, MAX_REEL_SPIN_SPEED, TIME_TO_REACH_MAX_REEL_SPIN_SPEED), [](){});
                 
-                for (int i = 0; i < slots::BOARD_COLS; ++i)
+                if (mPendingSymbolData[i].mState == PendingSymbolData::PendingSymbolDataState::LOCKED_SUSPENSE)
                 {
-                    CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TimeDelayAnimation>(TIME_TILL_REEL_PENDING_SYMBOLS_UNLOCK + TIME_PER_REEL_SYMBOL_UNLOCK * i), [i, this](){ mPendingSymbolData[i].mState = PendingSymbolData::PendingSymbolDataState::UNLOCKED; });
+                    continue;
                 }
+
+                float reelSpinTillUnlockDuration = TIME_TILL_REEL_PENDING_SYMBOLS_UNLOCK + TIME_PER_REEL_SYMBOL_UNLOCK * i;
+                
+                // Scatter suspense flow
+                int scatterCountInPreviousReels = 0;
+                for (int prevReelIndex = 0; prevReelIndex < i; ++prevReelIndex)
+                {
+                    scatterCountInPreviousReels += mBoardModel.GetSymbolCountInPlayableReelArea(prevReelIndex, slots::SymbolType::SCATTER);
+                }
+                
+                if (scatterCountInPreviousReels >= 2)
+                {
+                    reelSpinTillUnlockDuration += SCATTER_SUSPENSE_EXTRA_SPIN_TIME;
+                    
+                    for (int nextReelIndex = i + 1; nextReelIndex < slots::BOARD_COLS; ++nextReelIndex)
+                    {
+                        mPendingSymbolData[nextReelIndex].mState = PendingSymbolData::PendingSymbolDataState::LOCKED_SUSPENSE;
+                    }
+                    
+                    CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TimeDelayAnimation>(reelSpinTillUnlockDuration * SCATTER_SLOWDOWN_KICKOFF_MULTIPLIER), [i, this]()
+                    {
+                        CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenValueAnimation>(mPendingSymbolData[i].mReelSpeed, MAX_REEL_SPIN_SPEED * SCATTER_SUSPENSE_SLOWDOWN_MULTIPIER, SCATTER_SUSPENSE_EXTRA_SPIN_TIME), [](){});
+                    });
+                }
+                
+                CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TimeDelayAnimation>(reelSpinTillUnlockDuration), [i, this]()
+                {
+                    mPendingSymbolData[i].mState = PendingSymbolData::PendingSymbolDataState::UNLOCKED;
+                });
             }
         } break;
         
@@ -249,9 +269,11 @@ void BoardView::BeginSpin()
         for (int col = 0; col < slots::BOARD_COLS; ++col)
         {
             mPendingSymbolData[col].mState = PendingSymbolData::PendingSymbolDataState::LOCKED;
+            mPendingSymbolData[col].mReelSpeed = 0.0f;
             mPendingSymbolData[col].mSymbols.clear();
         }
         
+        // Pull all symbols up a tiny bit before proceeding with the main reel animation
         for (int row = 0; row < slots::REEL_LENGTH; ++row)
         {
             for (int col = 0; col < slots::BOARD_COLS; ++col)
@@ -288,7 +310,6 @@ void BoardView::WaitForPaylines(const slots::BoardStateResolutionData& boardReso
 
     animationManager.StartAnimation(std::make_unique<rendering::TimeDelayAnimation>(TIME_DELAY_TO_BEGIN_WINNING_SYMBOLS_ANIMATION), [this, winningPaylines]()
     {
-        auto& animationManager = CoreSystemsEngine::GetInstance().GetAnimationManager();
         for (int row = 0; row < slots::REEL_LENGTH; ++row)
         {
             for (int col = 0; col < slots::BOARD_COLS; ++col)
@@ -311,12 +332,6 @@ void BoardView::WaitForPaylines(const slots::BoardStateResolutionData& boardReso
                 for (auto& sceneObject: symbolSceneObjects)
                 {
                     sceneObject->mShaderBoolUniformValues[GRAYSCALE_UNIFORM_NAME] = false;
-                    
-                    // For winning symbols animate a shinning ray
-                    animationManager.StartAnimation(std::make_unique<rendering::TweenValueAnimation>(sceneObject->mShaderFloatUniformValues[SHINE_RAY_X_UNIFORM_NAME], SHINE_RAY_X_VALUES.g, TIME_TO_ANIMATE_SHINE_RAY), [sceneObject]()
-                    {
-                        sceneObject->mShaderFloatUniformValues[SHINE_RAY_X_UNIFORM_NAME] = SHINE_RAY_X_VALUES.r;
-                    });
                 }
             }
         }
@@ -363,10 +378,10 @@ void BoardView::ResetBoardSymbols()
             symbol->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + SYMBOL_TEXTURE_PATHS.at(mBoardModel.GetBoardSymbol(row, col)));
             symbol->mShaderResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT  + (SPECIAL_SYMBOL_SHADERS.count(mBoardModel.GetBoardSymbol(row, col)) ? SPECIAL_SYMBOL_SHADERS.at(mBoardModel.GetBoardSymbol(row, col)) : SYMBOL_SHADER_PATH));
             symbol->mEffectTextureResourceIds[0] = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + SCATTER_SYMBOL_EFFECT_TEXTURE_PATH);
+            symbol->mEffectTextureResourceIds[1] = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + SCATTER_BACKGROUND_MASK_TEXTURE_PATH);
             symbol->mShaderFloatUniformValues[INTERACTIVE_COLOR_THRESHOLD_UNIFORM_NAME] = INTERACTIVE_COLOR_THRESHOLD;
             symbol->mShaderFloatUniformValues[INTERACTIVE_COLOR_TIME_MULTIPLIER_UNIFORM_NAME] = INTERACTIVE_COLOR_TIME_MULTIPLIER;
-            symbol->mShaderFloatUniformValues[SHINE_RAY_X_UNIFORM_NAME] = SHINE_RAY_X_VALUES.r;
-            symbol->mShaderFloatUniformValues[strutils::StringId("scatter_effect_stretch_multiplier")] = 0.02f;
+            symbol->mShaderFloatUniformValues[SCATTER_EFFECT_MULTIPLIER_COEFF_UNIFORM_NAME] = SCATTER_EFFECT_MULTIPLIER_COEFF;
             symbol->mShaderBoolUniformValues[GRAYSCALE_UNIFORM_NAME] = false;
             
             symbol->mPosition = targetSymbolPosition;
@@ -383,7 +398,6 @@ void BoardView::ResetBoardSymbols()
     }
     
     mSpinAnimationState = SpinAnimationState::IDLE;
-    mSymbolSpinSpeed = 0.0f;
 }
 
 ///------------------------------------------------------------------------------------------------
@@ -420,7 +434,7 @@ void BoardView::AnimatePaylineReveal(const slots::PaylineResolutionData& payline
 
 void BoardView::UpdateSceneObjectDuringReelAnimation(std::shared_ptr<scene::SceneObject> sceneObject, const float dtMillis, const int reelIndex)
 {
-    sceneObject->mPosition.y -= mSymbolSpinSpeed * dtMillis;
+    sceneObject->mPosition.y -= mPendingSymbolData[reelIndex].mReelSpeed * dtMillis;
     auto newRow = static_cast<int>(std::round((TOP_LEFT_SYMBOL_POSITION.y - sceneObject->mPosition.y)/VER_SYMBOL_DISTANCE));
     
     auto newSceneObjectName = sceneObject->mName.GetString();
@@ -447,9 +461,30 @@ void BoardView::UpdateSceneObjectDuringReelAnimation(std::shared_ptr<scene::Scen
         if (!strutils::StringEndsWith(newSceneObjectName, "frame"))
         {
             auto newSymbolType = static_cast<slots::SymbolType>(math::RandomInt() % static_cast<int>(slots::SymbolType::COUNT));
+            
+            bool existingWildInReel = false;
+            bool existingScatterInReel = false;
+            for (int row = 0; row < slots::REEL_LENGTH - 1; row++)
+            {
+                auto sceneObjects = mScene.FindSceneObjectsWhoseNameStartsWith(GetSymbolSoName(row, reelIndex).GetString());
+                for (auto sceneObject: sceneObjects)
+                {
+                    if (sceneObject->mTextureResourceId == CoreSystemsEngine::GetInstance().GetResourceLoadingService().GetResourceIdFromPath(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + SYMBOL_TEXTURE_PATHS.at(slots::SymbolType::WILD), false))
+                    {
+                        existingWildInReel = true;
+                    }
+                    
+                    if (sceneObject->mTextureResourceId == CoreSystemsEngine::GetInstance().GetResourceLoadingService().GetResourceIdFromPath(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + SYMBOL_TEXTURE_PATHS.at(slots::SymbolType::SCATTER), false))
+                    {
+                        existingScatterInReel = true;
+                    }
+                }
+            }
             while (newSymbolType == slots::SymbolType::CHOCOLATE_CAKE ||
                    newSymbolType == slots::SymbolType::STRAWBERRY_CAKE ||
-                   newSymbolType == slots::SymbolType::ROAST_CHICKEN)
+                   newSymbolType == slots::SymbolType::ROAST_CHICKEN ||
+                   (newSymbolType == slots::SymbolType::WILD && existingWildInReel) ||
+                   (newSymbolType == slots::SymbolType::SCATTER && existingScatterInReel))
             {
                 newSymbolType = static_cast<slots::SymbolType>(math::RandomInt() % static_cast<int>(slots::SymbolType::COUNT));
             }
@@ -488,6 +523,22 @@ void BoardView::AnimateReelSymbolsToFinalPosition(const int reelIndex)
         auto finalPosition = reelSceneObject->mPosition;
         finalPosition.y = TOP_LEFT_SYMBOL_POSITION.y - (i/2) * VER_SYMBOL_DISTANCE;
         CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenPositionScaleAnimation>(reelSceneObject, finalPosition, reelSceneObject->mScale, TIME_TO_FINALIZE_SYMBOL_POSITION, animation_flags::NONE, 0.0f, math::ElasticFunction, math::TweeningMode::EASE_IN), [this, reelIndex](){});
+    }
+    
+    // For scatter suspense, time the unlock of the next reel
+    if (reelIndex < slots::BOARD_COLS - 1 && mPendingSymbolData[reelIndex + 1].mState == PendingSymbolData::PendingSymbolDataState::LOCKED_SUSPENSE)
+    {
+        auto nextReelIndex = reelIndex + 1;
+        float reelSpinTillUnlockDuration = TIME_TILL_REEL_PENDING_SYMBOLS_UNLOCK + TIME_PER_REEL_SYMBOL_UNLOCK + SCATTER_SUSPENSE_EXTRA_SPIN_TIME;
+        CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TimeDelayAnimation>(reelSpinTillUnlockDuration * SCATTER_SLOWDOWN_KICKOFF_MULTIPLIER), [nextReelIndex, this]()
+        {
+            CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenValueAnimation>(mPendingSymbolData[nextReelIndex].mReelSpeed, MAX_REEL_SPIN_SPEED * SCATTER_SUSPENSE_SLOWDOWN_MULTIPIER, SCATTER_SUSPENSE_EXTRA_SPIN_TIME), [](){});
+        });
+    
+        CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TimeDelayAnimation>(reelSpinTillUnlockDuration), [nextReelIndex, this]()
+        {
+            mPendingSymbolData[nextReelIndex].mState = PendingSymbolData::PendingSymbolDataState::UNLOCKED;
+        });
     }
     
     if (reelIndex == slots::BOARD_COLS - 1)

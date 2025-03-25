@@ -11,18 +11,17 @@ in vec3 normal_interp;
 
 uniform sampler2D tex;
 uniform sampler2D scatter_effect_tex;
+uniform sampler2D scatter_background_mask_tex;
 uniform float custom_alpha;
 uniform float time;
-uniform float shine_ray_x;
 uniform float interactive_color_threshold;
 uniform float interactive_color_time_multiplier;
 uniform float scatter_effect_stretch_multiplier;
 uniform bool grayscale;
+
 out vec4 frag_color;
 
 const vec4 INTERACTIVE_COLOR = vec4(0.0f, 0.0f, 0.0f, 1.0f);
-const float RAY_THICKNESS = 0.2f;
-const float RAY_COLOR_STRENGTH = 10.0f;
 
 vec3 rgb2hsv(vec3 c)
 {
@@ -58,7 +57,8 @@ void main()
     frag_color = texture(tex, vec2(final_uv_x, final_uv_y));
     
     vec4 maskColor = texture(scatter_effect_tex, vec2(final_uv_x, final_uv_y));
-    
+    vec4 background_mask_color = texture(scatter_background_mask_tex, vec2(final_uv_x, final_uv_y));
+
     if (frag_color.a < 0.1) discard;
     
     float displacement = 0.0;
@@ -68,13 +68,6 @@ void main()
         adjustedTime = 0;
     }
 
-    if (distance(frag_color, INTERACTIVE_COLOR) < interactive_color_threshold)
-    {
-        float initialHueValue = mapXPositionToHue(frag_unprojected_pos.x);
-        frag_color.rgb = hsv2rgb(vec3(initialHueValue + (adjustedTime * interactive_color_time_multiplier), 1.0f, 1.0f));
-    }
-    
-    
     if (grayscale)
     {
         vec2 displaced_coords = vec2(final_uv_x, final_uv_y) + vec2(0.0, displacement);
@@ -94,17 +87,15 @@ void main()
         vec4 displaced_mask_color = texture(scatter_effect_tex, displaced_coords);
         displaced_mask_color.rgb += vec3(max(0.0f, sin(time - letterID)*2.0f)/5.0f);
         
-        frag_color = mix(frag_color, displaced_mask_color, displaced_mask_color.a);
-
-        float distance_to_ray = abs(frag_unprojected_pos.x - shine_ray_x);
-        if (distance_to_ray < RAY_THICKNESS)
+        if (background_mask_color.g > 0.95f && background_mask_color.b < 0.01f && background_mask_color.r < 0.01f)
         {
-            float shine_color = (RAY_THICKNESS - distance_to_ray) * RAY_COLOR_STRENGTH;
-            frag_color.rgb += vec3(shine_color);
-            frag_color.r = min(1.0f, frag_color.r);
-            frag_color.g = min(1.0f, frag_color.g);
-            frag_color.b = min(1.0f, frag_color.b);
+            float shine = sin(adjustedTime + final_uv_x * 5.5f) * 0.273f + 0.168f;
+            vec3 foil_color = vec3(0.576f, 0.576f, 0.576f + 0.2f) * shine;
+            frag_color.rgb += foil_color;
         }
+        
+        
+        frag_color = mix(frag_color, displaced_mask_color, displaced_mask_color.a);
     }
     
     frag_color.a *= custom_alpha;

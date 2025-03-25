@@ -65,6 +65,13 @@ static const glm::vec3 BACKGROUND_POSITION = glm::vec3(0.0f, 0.0f, 1.0f);
 static const glm::vec3 LOGIN_BUTTON_POSITION = glm::vec3(-0.075f, 0.134f, 2.0f);
 
 static const float GAME_ELEMENTS_PRESENTATION_TIME = 1.0f;
+static const float PAYLINE_REVEAL_ANIMATION_DURATION = 1.0f;
+static const float PAYLINE_HIDE_ANIMATION_DURATION = 0.5f;
+static const float PAYLINE_ANIMATION_DURATION = PAYLINE_REVEAL_ANIMATION_DURATION + PAYLINE_HIDE_ANIMATION_DURATION;
+static const float SPIN_BUTTON_DEPRESSED_SCALE_FACTOR = 0.85f;
+static const float SPIN_BUTTON_ANIMATION_DURATION = 0.15f;
+static const float SPIN_BUTTON_EFFECT_ANIMATION_DURATION = 0.5f;
+
 
 ///------------------------------------------------------------------------------------------------
 
@@ -335,16 +342,16 @@ void Game::UpdateGUI(const float dtMillis)
             if (cursorInSceneObject && inputStateManager.VButtonTapped(input::Button::MAIN_BUTTON))
             {
                 auto initScale = spinButton->mScale;
-                animationManager.StartAnimation(std::make_unique<rendering::TweenPositionScaleAnimation>(spinButton, spinButton->mPosition, initScale * 0.8f, 0.15f), [this, initScale, spinButton]()
+                animationManager.StartAnimation(std::make_unique<rendering::TweenPositionScaleAnimation>(spinButton, spinButton->mPosition, initScale * SPIN_BUTTON_DEPRESSED_SCALE_FACTOR, SPIN_BUTTON_ANIMATION_DURATION), [this, initScale, spinButton]()
                 {
                     OnSpinButtonPressed();
-                    CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenPositionScaleAnimation>(spinButton, spinButton->mPosition, initScale, 0.15f, animation_flags::NONE), [](){});
+                    CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenPositionScaleAnimation>(spinButton, spinButton->mPosition, initScale, SPIN_BUTTON_ANIMATION_DURATION, animation_flags::NONE), [](){});
                 });
                 
                 auto currentRotation = spinButton->mRotation;
                 animationManager.StartAnimation(std::make_unique<rendering::TweenRotationAnimation>(spinButton, glm::vec3(currentRotation.x, currentRotation.y, currentRotation.z - 2.0f * math::PI), 1.0f), [](){});
                 
-                animationManager.StartAnimation(std::make_unique<rendering::TweenAlphaAnimation>(spinButtonEffect, 0.0f, 0.5f), [](){});
+                animationManager.StartAnimation(std::make_unique<rendering::TweenAlphaAnimation>(spinButtonEffect, 0.0f, SPIN_BUTTON_EFFECT_ANIMATION_DURATION), [](){});
             }
         }
     }
@@ -370,10 +377,10 @@ void Game::UpdateGUI(const float dtMillis)
                 mBoardView->WaitForPaylines(boardStateResolutionData);
                 for (int i = 0; i < boardStateResolutionData.mWinningPaylines.size(); ++i)
                 {
-                    mBoardView->AnimatePaylineReveal(boardStateResolutionData.mWinningPaylines[i], 1.0f, 0.5f, i * 1.5f);
+                    mBoardView->AnimatePaylineReveal(boardStateResolutionData.mWinningPaylines[i], PAYLINE_REVEAL_ANIMATION_DURATION, PAYLINE_HIDE_ANIMATION_DURATION, i * PAYLINE_ANIMATION_DURATION);
                 }
                 
-                animationManager.StartAnimation(std::make_unique<rendering::TimeDelayAnimation>(boardStateResolutionData.mWinningPaylines.size() * 1.5f), [this]()
+                animationManager.StartAnimation(std::make_unique<rendering::TimeDelayAnimation>(boardStateResolutionData.mWinningPaylines.size() * PAYLINE_ANIMATION_DURATION), [this]()
                 {
                     mBoardView->CompleteSpin();
                 });
@@ -531,7 +538,7 @@ void Game::OnServerSpinResponse(const nlohmann::json& responseJson)
     spinResponse.DeserializeFromJson(responseJson);
     
     mSpinId = spinResponse.spinId;
-    mSpinId = -195889367;
+    //mSpinId = -438211357;
     mBoardView->ResetBoardSymbols();
     mBoardModel.PopulateBoardForSpin(mSpinId);
     mBoardView->BeginSpin();

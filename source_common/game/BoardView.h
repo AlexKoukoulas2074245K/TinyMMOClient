@@ -41,12 +41,14 @@ public:
         enum class PendingSymbolDataState
         {
             LOCKED,
+            LOCKED_SUSPENSE,
             UNLOCKED,
             FINISHED
         };
 
         PendingSymbolDataState mState = PendingSymbolDataState::LOCKED;
         std::vector<slots::SymbolType> mSymbols;
+        float mReelSpeed = 0.0f;
     };
 
 public:
@@ -76,7 +78,6 @@ private:
     std::vector<PaylineView> mPaylines;
     PendingSymbolData mPendingSymbolData[slots::BOARD_COLS];
     SpinAnimationState mSpinAnimationState;
-    float mSymbolSpinSpeed;
 };
 
 ///------------------------------------------------------------------------------------------------
