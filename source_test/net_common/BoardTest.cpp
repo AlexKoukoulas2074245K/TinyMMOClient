@@ -60,7 +60,8 @@ TEST(BoardTest, TestComplexSymbolsNotAppearingInRandomBoardPopulation)
         {
             if (b.GetSymbolCountInEntireReel(reelIndex, slots::SymbolType::STRAWBERRY_CAKE) > 0 ||
                 b.GetSymbolCountInEntireReel(reelIndex, slots::SymbolType::CHOCOLATE_CAKE) > 0 ||
-                b.GetSymbolCountInEntireReel(reelIndex, slots::SymbolType::ROAST_CHICKEN) > 0)
+                b.GetSymbolCountInEntireReel(reelIndex, slots::SymbolType::ROAST_CHICKEN) > 0 ||
+                b.GetSymbolCountInEntireReel(reelIndex, slots::SymbolType::CHICKEN_SOUP) > 0)
             {
                 foundComplexSymbol = true;
                 break;
@@ -150,7 +151,7 @@ TEST(BoardTest, TestRandomBoardWinStats)
 
         for (const auto& paylineData: boardStateResolution.mWinningPaylines)
         {
-            if (paylineData.mTumble)
+            if (paylineData.mCombo)
             {
                 numberOfTumbles++;
                 break;

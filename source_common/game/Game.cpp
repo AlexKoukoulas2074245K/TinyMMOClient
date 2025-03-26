@@ -208,11 +208,13 @@ void Game::CreateDebugWidgets()
         { slots::SymbolType::LEMONS, "Lemons" },
         { slots::SymbolType::STRAWBERRIES, "Strawberries" },
         { slots::SymbolType::SUGAR, "Sugar" },
+        { slots::SymbolType::WATER, "Water" },
         { slots::SymbolType::CHOCOLATE_CAKE, "ChocolateCake" },
         { slots::SymbolType::STRAWBERRY_CAKE, "StrawberryCake" },
         { slots::SymbolType::ROAST_CHICKEN, "RoastChicken" },
         { slots::SymbolType::WILD, "Wild" },
-        { slots::SymbolType::SCATTER, "Grandma" }
+        { slots::SymbolType::SCATTER, "Scatter" },
+        { slots::SymbolType::CHICKEN_SOUP, "ChickenSoup" }
     };
     ImGui::Separator();
     if (ImGui::BeginTable("Pending Symbol State", slots::BOARD_COLS))
@@ -538,7 +540,7 @@ void Game::OnServerSpinResponse(const nlohmann::json& responseJson)
     spinResponse.DeserializeFromJson(responseJson);
     
     mSpinId = spinResponse.spinId;
-    //mSpinId = -438211357;
+    //mSpinId = 2070399566;
     mBoardView->ResetBoardSymbols();
     mBoardModel.PopulateBoardForSpin(mSpinId);
     mBoardView->BeginSpin();

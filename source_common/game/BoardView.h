@@ -71,6 +71,8 @@ public:
 private:
     void AnimateReelSymbolsToFinalPosition(const int reelIndex);
     void UpdateSceneObjectDuringReelAnimation(std::shared_ptr<scene::SceneObject> sceneObject, const float dtMillis, const int reelIndex);
+    bool IsFrictionEmitterEnabled(const int emitterIndex) const;
+    void SetFrictionEmitterState(const int emitterIndex, const bool enabled);
 
 private:
     scene::Scene& mScene;

@@ -10,10 +10,12 @@
 #include <engine/rendering/Animations.h>
 #include <engine/rendering/AnimationManager.h>
 #include <engine/rendering/CommonUniforms.h>
+#include <engine/rendering/ParticleManager.h>
 #include <engine/scene/Scene.h>
 #include <engine/scene/SceneObjectUtils.h>
 #include <net_common/Board.h>
 #include <net_common/Symbols.h>
+#include <net_common/SymbolDataRepository.h>
 
 ///------------------------------------------------------------------------------------------------
 
@@ -21,18 +23,31 @@ static const strutils::StringId BOARD_NAME = strutils::StringId("board");
 static const strutils::StringId INTERACTIVE_COLOR_THRESHOLD_UNIFORM_NAME = strutils::StringId("interactive_color_threshold");
 static const strutils::StringId INTERACTIVE_COLOR_TIME_MULTIPLIER_UNIFORM_NAME = strutils::StringId("interactive_color_time_multiplier");
 static const strutils::StringId SCATTER_EFFECT_MULTIPLIER_COEFF_UNIFORM_NAME =  strutils::StringId("scatter_effect_stretch_multiplier");
+static const strutils::StringId FRICTION_PARTICLE_DEFINITION_NAME =  strutils::StringId("friction_particle");
 
 static const std::string SYMBOL_SHADER_PATH = "symbol.vs";
 static const std::string SYMBOL_FRAME_TEXTURE_PATH = "game/basket_frame.png";
 static const std::string SHELVES_TEXTURE_PATH = "game/shelves.png";
 static const std::string SCATTER_SYMBOL_EFFECT_TEXTURE_PATH = "game/food_slot_images/scatter_effect.png";
 static const std::string SCATTER_BACKGROUND_MASK_TEXTURE_PATH = "game/food_slot_images/scatter_background_mask.png";
+static const std::string FRICTION_EMITTER_NAME_PREFIX = "friction_emitter_";
+
+static constexpr int FRICTION_EMITTER_COUNT = 6;
 
 static const glm::vec3 BOARD_SCALE = glm::vec3(0.5f * 1.28f, 0.5f, 1.0f);
 static const glm::vec3 SYMBOL_SCALE = glm::vec3(0.092f, 0.06624f, 1.0f);
 static const glm::vec3 SYMBOL_FRAME_SCALE = glm::vec3(0.08f * 1.4f, 0.08f, 1.0f);
 static const glm::vec3 SHELVES_POSITION = glm::vec3(0.0f, 0.0f, -0.2f);
 static const glm::vec3 TOP_LEFT_SYMBOL_POSITION = glm::vec3(-0.2467f, 0.464f, 0.1f);
+static const glm::vec3 FRICTION_PARTICLE_EMITTER_POSITIONS[FRICTION_EMITTER_COUNT] =
+{
+    glm::vec3(-0.06f, -0.140f, 1.5f), // Unused
+    glm::vec3(-0.06f, -0.140f, 1.5f), // Unused
+    glm::vec3(-0.074f, -0.168f, 1.5f),
+    glm::vec3( 0.050f, -0.168f, 1.5f),
+    glm::vec3( 0.174f, -0.168f, 1.5f),
+    glm::vec3( 0.298f, -0.168f, 1.5f)
+};
 
 static const float HOR_SYMBOL_DISTANCE = 0.123f;
 static const float VER_SYMBOL_DISTANCE = 0.116f;
@@ -67,9 +82,11 @@ static const std::unordered_map<slots::SymbolType, std::string> SYMBOL_TEXTURE_P
     { slots::SymbolType::LEMONS, "game/food_slot_images/lemons.png" },
     { slots::SymbolType::STRAWBERRIES, "game/food_slot_images/strawberries.png" },
     { slots::SymbolType::SUGAR, "game/food_slot_images/sugar.png" },
+    { slots::SymbolType::WATER, "game/food_slot_images/water.png" },
     { slots::SymbolType::CHOCOLATE_CAKE, "game/food_slot_images/chocolate_cake.png" },
     { slots::SymbolType::STRAWBERRY_CAKE, "game/food_slot_images/strawberry_cake.png" },
     { slots::SymbolType::ROAST_CHICKEN, "game/food_slot_images/roast_chicken.png" },
+    { slots::SymbolType::CHICKEN_SOUP, "game/food_slot_images/chicken_soup.png" },
     { slots::SymbolType::WILD, "game/food_slot_images/wild.png" },
     { slots::SymbolType::SCATTER, "game/food_slot_images/scatter.png" }
 };
@@ -128,6 +145,13 @@ BoardView::BoardView(scene::Scene& scene, const slots::Board& boardModel)
         mPaylines.push_back(PaylineView(scene, static_cast<slots::PaylineType>(i)));
     }
     
+    auto& particleManager = CoreSystemsEngine::GetInstance().GetParticleManager();
+    for (auto i = 0; i < FRICTION_EMITTER_COUNT; ++i)
+    {
+        auto emitterSo = particleManager.CreateParticleEmitterAtPosition(FRICTION_PARTICLE_DEFINITION_NAME, FRICTION_PARTICLE_EMITTER_POSITIONS[i], mScene, strutils::StringId(FRICTION_EMITTER_NAME_PREFIX + std::to_string(i)));
+        particleManager.RemoveParticleEmitterFlag(particle_flags::CONTINUOUS_PARTICLE_GENERATION, emitterSo->mName, mScene);
+    }
+
     ResetBoardSymbols();
 }
 
@@ -193,6 +217,8 @@ void BoardView::Update(const float dtMillis)
                     
                     CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TimeDelayAnimation>(reelSpinTillUnlockDuration * SCATTER_SLOWDOWN_KICKOFF_MULTIPLIER), [i, this]()
                     {
+                        SetFrictionEmitterState(i, true);
+                        SetFrictionEmitterState(i + 1, true);
                         CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenValueAnimation>(mPendingSymbolData[i].mReelSpeed, MAX_REEL_SPIN_SPEED * SCATTER_SUSPENSE_SLOWDOWN_MULTIPIER, SCATTER_SUSPENSE_EXTRA_SPIN_TIME), [](){});
                     });
                 }
@@ -480,9 +506,7 @@ void BoardView::UpdateSceneObjectDuringReelAnimation(std::shared_ptr<scene::Scen
                     }
                 }
             }
-            while (newSymbolType == slots::SymbolType::CHOCOLATE_CAKE ||
-                   newSymbolType == slots::SymbolType::STRAWBERRY_CAKE ||
-                   newSymbolType == slots::SymbolType::ROAST_CHICKEN ||
+            while (slots::SymbolDataRepository::GetInstance().GetAllRecipesAndIngredientsMap().count(newSymbolType) ||
                    (newSymbolType == slots::SymbolType::WILD && existingWildInReel) ||
                    (newSymbolType == slots::SymbolType::SCATTER && existingScatterInReel))
             {
@@ -543,7 +567,46 @@ void BoardView::AnimateReelSymbolsToFinalPosition(const int reelIndex)
     
     if (reelIndex == slots::BOARD_COLS - 1)
     {
+        // Disable any running friction emitters
+        SetFrictionEmitterState(reelIndex, false);
+        SetFrictionEmitterState(reelIndex + 1, false);
         mSpinAnimationState = SpinAnimationState::POST_SPINNING;
+    }
+    else
+    {
+        if (IsFrictionEmitterEnabled(reelIndex))
+        {
+            // Disable current emitter and enable next reel's emitters
+            SetFrictionEmitterState(reelIndex, false);
+            SetFrictionEmitterState(reelIndex + 1, true);
+            SetFrictionEmitterState(reelIndex + 2, true);
+        }
+    }
+}
+
+///------------------------------------------------------------------------------------------------
+
+bool BoardView::IsFrictionEmitterEnabled(const int emitterIndex) const
+{
+    auto& particleManager = CoreSystemsEngine::GetInstance().GetParticleManager();
+    auto emitterSo = mScene.FindSceneObject(strutils::StringId(FRICTION_EMITTER_NAME_PREFIX + std::to_string(emitterIndex)));
+    return particleManager.IsParticleEmitterFlagEnabled(particle_flags::CONTINUOUS_PARTICLE_GENERATION, emitterSo->mName, mScene);
+}
+
+///------------------------------------------------------------------------------------------------
+
+void BoardView::SetFrictionEmitterState(const int emitterIndex, const bool enabled)
+{
+    auto& particleManager = CoreSystemsEngine::GetInstance().GetParticleManager();
+    auto emitterSo = mScene.FindSceneObject(strutils::StringId(FRICTION_EMITTER_NAME_PREFIX + std::to_string(emitterIndex)));
+    
+    if (enabled)
+    {
+        particleManager.AddParticleEmitterFlag(particle_flags::CONTINUOUS_PARTICLE_GENERATION, emitterSo->mName, mScene);
+    }
+    else
+    {
+        particleManager.RemoveParticleEmitterFlag(particle_flags::CONTINUOUS_PARTICLE_GENERATION, emitterSo->mName, mScene);
     }
 }
 

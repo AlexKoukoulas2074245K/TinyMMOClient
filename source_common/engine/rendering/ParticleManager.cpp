@@ -92,10 +92,11 @@ void ParticleManager::UpdateSceneParticles(const float dtMillis, scene::Scene& s
                     }
                 }
                 
-                // move the particle up depending on the delta time
-                if (IS_FLAG_SET(particle_flags::ENLARGE_OVER_TIME))
+                // change particle size depending on the delta time
+                if (IS_FLAG_SET(particle_flags::RESIZE_OVER_TIME))
                 {
                     particleEmitterData.mParticleSizes[i] += particleEmitterData.mParticleEnlargementSpeed * dtMillis;
+                    particleEmitterData.mParticleSizes[i] = math::Max(0.0f, particleEmitterData.mParticleSizes[i]);
                 }
                 
                 // rotate the particle depending on the delta time
@@ -108,7 +109,7 @@ void ParticleManager::UpdateSceneParticles(const float dtMillis, scene::Scene& s
                 particleEmitterData.mParticlePositions[i] += particleEmitterData.mParticleVelocities[i] * dtMillis;
             }
             
-            if (deadParticles == particleEmitterData.mParticleCount && !IS_FLAG_SET(particle_flags::CONTINUOUS_PARTICLE_GENERATION))
+            if (deadParticles == particleEmitterData.mParticleCount && (!IS_FLAG_SET(particle_flags::CONTINUOUS_PARTICLE_GENERATION) && !IS_FLAG_SET(particle_flags::PERSISTENT_EVEN_WHEN_EMPTY)))
             {
                 mParticleEmittersToDelete.push_back(sceneObject);
             }
@@ -273,7 +274,7 @@ void ParticleManager::LoadParticleData(const resources::ResourceReloadMode resou
         
         particleEmitterData.mParticleFlags |= particleObject["prefilled"].get<bool>() ? particle_flags::PREFILLED : particle_flags::NONE;
         particleEmitterData.mParticleFlags |= particleObject["continuous_generation"].get<bool>() ? particle_flags::CONTINUOUS_PARTICLE_GENERATION : particle_flags::NONE;
-        particleEmitterData.mParticleFlags |= particleObject["enlarge_over_time"].get<bool>() ? particle_flags::ENLARGE_OVER_TIME : particle_flags::NONE;
+        particleEmitterData.mParticleFlags |= particleObject["resize_over_time"].get<bool>() ? particle_flags::RESIZE_OVER_TIME : particle_flags::NONE;
         particleEmitterData.mParticleFlags |= particleObject["rotate_over_time"].get<bool>() ? particle_flags::ROTATE_OVER_TIME : particle_flags::NONE;
         particleEmitterData.mParticleFlags |= particleObject["initially_rotated"].get<bool>() ? particle_flags::INITIALLY_ROTATED : particle_flags::NONE;
         particleEmitterData.mParticleFlags |= particleObject["custom_update"].get<bool>() ? particle_flags::CUSTOM_UPDATE : particle_flags::NONE;
@@ -311,7 +312,12 @@ void ParticleManager::LoadParticleData(const resources::ResourceReloadMode resou
             particleEmitterData.mParticleVelocityYOffsetRange.y = particleObject["velocity_y_range"]["max"].get<float>();
         }
         
-        if (IS_FLAG_SET(particle_flags::ENLARGE_OVER_TIME))
+        if (particleObject.count("persistent"))
+        {
+            particleEmitterData.mParticleFlags |= particleObject["persistent"].get<bool>() ? particle_flags::PERSISTENT_EVEN_WHEN_EMPTY : particle_flags::NONE;
+        }
+        
+        if (IS_FLAG_SET(particle_flags::RESIZE_OVER_TIME))
         {
             particleEmitterData.mParticleEnlargementSpeed = particleObject["particle_enlargement_speed"].get<float>();
         }
@@ -425,8 +431,8 @@ void ParticleManager::SpawnParticleAtIndex(const size_t index, const glm::vec3& 
     particleEmitterData.mParticlePositions[index].x += xOffset;
     particleEmitterData.mParticlePositions[index].y += yOffset;
     particleEmitterData.mParticlePositions[index].z = zOffset;
-    particleEmitterData.mParticleVelocities[index].x += velXOffset;
-    particleEmitterData.mParticleVelocities[index].y += velYOffset;
+    particleEmitterData.mParticleVelocities[index].x = velXOffset;
+    particleEmitterData.mParticleVelocities[index].y = velYOffset;
     particleEmitterData.mParticleSizes[index] = size;
     particleEmitterData.mParticleAngles[index] = angle;
     
@@ -456,6 +462,30 @@ void ParticleManager::RemoveParticleGraphicsData(scene::SceneObject& particleEmi
     GL_CALL(glDeleteBuffers(1, &particleEmitterData.mParticlePositionsBuffer));
     GL_CALL(glDeleteBuffers(1, &particleEmitterData.mParticleLifetimeSecsBuffer));
     GL_CALL(glDeleteVertexArrays(1, &particleEmitterData.mParticleVertexArrayObject));
+}
+
+///------------------------------------------------------------------------------------------------
+
+bool ParticleManager::IsParticleEmitterFlagEnabled(const uint8_t flag, const strutils::StringId particleEmitterSceneObjectName, scene::Scene& scene) const
+{
+    auto particleSystemSo = scene.FindSceneObject(particleEmitterSceneObjectName);
+    if (particleSystemSo && std::holds_alternative<scene::ParticleEmitterObjectData>(particleSystemSo->mSceneObjectTypeData))
+    {
+        return (std::get<scene::ParticleEmitterObjectData>(particleSystemSo->mSceneObjectTypeData).mParticleFlags & flag) != 0;
+    }
+    
+    return false;
+}
+
+///------------------------------------------------------------------------------------------------
+
+void ParticleManager::AddParticleEmitterFlag(const uint8_t flag, const strutils::StringId particleEmitterSceneObjectName, scene::Scene& scene)
+{
+    auto particleSystemSo = scene.FindSceneObject(particleEmitterSceneObjectName);
+    if (particleSystemSo && std::holds_alternative<scene::ParticleEmitterObjectData>(particleSystemSo->mSceneObjectTypeData))
+    {
+        std::get<scene::ParticleEmitterObjectData>(particleSystemSo->mSceneObjectTypeData).mParticleFlags |= flag;
+    }
 }
 
 ///------------------------------------------------------------------------------------------------

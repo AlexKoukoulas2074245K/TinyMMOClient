@@ -34,10 +34,11 @@ namespace particle_flags
     static constexpr uint8_t NONE                           = 0x0;
     static constexpr uint8_t PREFILLED                      = 0x1;
     static constexpr uint8_t CONTINUOUS_PARTICLE_GENERATION = 0x2;
-    static constexpr uint8_t ENLARGE_OVER_TIME              = 0x4;
+    static constexpr uint8_t RESIZE_OVER_TIME               = 0x4;
     static constexpr uint8_t ROTATE_OVER_TIME               = 0x8;
     static constexpr uint8_t INITIALLY_ROTATED              = 0x10;
     static constexpr uint8_t CUSTOM_UPDATE                  = 0x20;
+    static constexpr uint8_t PERSISTENT_EVEN_WHEN_EMPTY     = 0x40;
 }
 
 ///------------------------------------------------------------------------------------------------
@@ -59,6 +60,8 @@ public:
     int SpawnParticleAtFirstAvailableSlot(scene::SceneObject& particleEmitterSceneObject);
     
     void RemoveParticleGraphicsData(scene::SceneObject& particleEmitterSceneObject);
+    bool IsParticleEmitterFlagEnabled(const uint8_t flag, const strutils::StringId particleEmitterSceneObjectName, scene::Scene& scene) const;
+    void AddParticleEmitterFlag(const uint8_t flag, const strutils::StringId particleEmitterSceneObjectName, scene::Scene& scene);
     void RemoveParticleEmitterFlag(const uint8_t flag, const strutils::StringId particleEmitterSceneObjectName, scene::Scene& scene);
     void SortParticles(scene::ParticleEmitterObjectData& particleEmitterData) const;
     void ChangeParticleTexture(const strutils::StringId& particleEmitterDefinitionName, const resources::ResourceId textureResourceId);

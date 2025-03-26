@@ -65,6 +65,7 @@ static const std::string WINDOW_TITLE = "TinyMMOClient";
 #if defined(USE_IMGUI)
 static const strutils::StringId PLAYGROUND_SCENE_NAME = strutils::StringId("playground_scene");
 static const int PROFILLING_SAMPLE_COUNT = 300;
+static const int TEST_PARTICLE_Z = 5.0f;
 static bool sParticlePaintEnabled = false;
 static float sPitch = 1.0f;
 static float sGain = 1.0f;
@@ -528,7 +529,7 @@ void CoreSystemsEngine::CreateEngineDebugWidgets()
     auto worldTouchPos = mSystems->mInputStateManager.VGetPointingPosInWorldSpace(playgroundScene->GetCamera().GetViewMatrix(), playgroundScene->GetCamera().GetProjMatrix());
     if (sParticlePaintEnabled && mSystems->mInputStateManager.VButtonTapped(input::Button::MAIN_BUTTON))
     {
-        mSystems->mParticleManager.CreateParticleEmitterAtPosition(strutils::StringId(sAvailableParticleNames.at(sParticleIndex)), glm::vec3(worldTouchPos.x, worldTouchPos.y, 0.0f), *playgroundScene);
+        mSystems->mParticleManager.CreateParticleEmitterAtPosition(strutils::StringId(sAvailableParticleNames.at(sParticleIndex)), glm::vec3(worldTouchPos.x, worldTouchPos.y, TEST_PARTICLE_Z), *playgroundScene);
     }
     
     // Sound Effects
