@@ -53,7 +53,7 @@ private:
     void OnServerSpinResponse(const nlohmann::json& responseJson);
     void OnLoginButtonPressed();
     void OnSpinButtonPressed();
-    
+    void UpdateCredits(const int wonCreditMultiplier);
 private:
     std::atomic<int> mLastPingMillis = 0;
     std::unique_ptr<AnimatedButton> mLoginButton;
@@ -61,6 +61,8 @@ private:
     std::unique_ptr<BoardView> mBoardView;
     slots::Board mBoardModel;
     long long mPlayerId = 0;
+    long long mCredits = 0;
+    float mDisplayedCredits = 0.0f;
     int mSpinId = 0;
     ThreadSafeQueue<std::string> mQueuedServerResponses;
     ThreadSafeQueue<std::string> mQueuedServerErrors;

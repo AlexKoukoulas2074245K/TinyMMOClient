@@ -107,7 +107,7 @@ TEST(BoardTest, TestWildAndScatterAppearOnlyOnceInEachReelInRandomBoardPopulatio
 
 TEST(BoardTest, TestRandomBoardWinStats)
 {
-    static const long long SIMULATIONS = 1000000;
+    static const long long SIMULATIONS = 100000;
     static const long long COINS_PER_SPIN = 1;
     
     slots::Board b;

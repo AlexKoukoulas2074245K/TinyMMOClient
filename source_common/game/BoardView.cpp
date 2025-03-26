@@ -43,10 +43,10 @@ static const glm::vec3 FRICTION_PARTICLE_EMITTER_POSITIONS[FRICTION_EMITTER_COUN
 {
     glm::vec3(-0.06f, -0.140f, 1.5f), // Unused
     glm::vec3(-0.06f, -0.140f, 1.5f), // Unused
-    glm::vec3(-0.074f, -0.168f, 1.5f),
-    glm::vec3( 0.050f, -0.168f, 1.5f),
-    glm::vec3( 0.174f, -0.168f, 1.5f),
-    glm::vec3( 0.298f, -0.168f, 1.5f)
+    glm::vec3(-0.074f, -0.198f, 1.5f),
+    glm::vec3( 0.050f, -0.198f, 1.5f),
+    glm::vec3( 0.174f, -0.198f, 1.5f),
+    glm::vec3( 0.298f, -0.198f, 1.5f)
 };
 
 static const float HOR_SYMBOL_DISTANCE = 0.123f;
@@ -65,7 +65,7 @@ static const float WINNING_SYMBOL_PULSE_SCALE_FACTOR = 1.2f;
 static const float WINNING_SYMBOL_PULSE_ANIMATION_DURATION = 0.3f;
 static const float WINNING_SYMBOL_PULSE_ANIMATION_DELAY = 0.3f;
 static const float SCATTER_EFFECT_MULTIPLIER_COEFF = 0.02f;
-static const float SCATTER_SUSPENSE_SLOWDOWN_MULTIPIER = 0.2f;
+static const float SCATTER_SUSPENSE_SLOWDOWN_MULTIPIER = 0.4f;
 static const float SCATTER_SUSPENSE_EXTRA_SPIN_TIME = 2.0f;
 static const float SCATTER_SLOWDOWN_KICKOFF_MULTIPLIER = 0.6666f;
 

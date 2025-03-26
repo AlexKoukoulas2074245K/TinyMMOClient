@@ -53,16 +53,20 @@ static const strutils::StringId SPIN_BUTTON_NAME = strutils::StringId("spin_butt
 static const strutils::StringId SPIN_BUTTON_EFFECT_NAME = strutils::StringId("spin_button_effect");
 static const strutils::StringId BACKGROUND_NAME = strutils::StringId("background");
 static const strutils::StringId BACKGROUND_MASK_NAME = strutils::StringId("background_mask");
+static const strutils::StringId CREDITS_NAME = strutils::StringId("credits");
+static const strutils::StringId CREDIT_UPDATE_ANIMATION_NAME = strutils::StringId("credit_update_animation");
 
 static const glm::vec3 BACKGROUND_SCALE = glm::vec3(1.370f, 1.04f, 1.0f);
 
 static const glm::vec3 ACTION_TEXT_SCALE = glm::vec3(0.00056f);
+static const glm::vec3 CREDITS_TEXT_SCALE = glm::vec3(0.00032f);
 static const glm::vec3 SPIN_BUTTON_SCALE = glm::vec3(0.156f);
 static const glm::vec3 SPIN_BUTTON_EFFECT_SCALE = glm::vec3(0.224f);
 static const glm::vec3 SPIN_BUTTON_EFFECT_POSITION = glm::vec3(0.403f, 0.0f, 1.9f);
 static const glm::vec3 SPIN_BUTTON_POSITION = glm::vec3(0.403f, 0.0f, 2.0f);
 static const glm::vec3 BACKGROUND_POSITION = glm::vec3(0.0f, 0.0f, 1.0f);
 static const glm::vec3 LOGIN_BUTTON_POSITION = glm::vec3(-0.075f, 0.134f, 2.0f);
+static const glm::vec3 CREDITS_TEXT_POSITION = glm::vec3(-0.1f, 0.292f, 2.0f);
 
 static const float GAME_ELEMENTS_PRESENTATION_TIME = 1.0f;
 static const float PAYLINE_REVEAL_ANIMATION_DURATION = 1.0f;
@@ -71,6 +75,7 @@ static const float PAYLINE_ANIMATION_DURATION = PAYLINE_REVEAL_ANIMATION_DURATIO
 static const float SPIN_BUTTON_DEPRESSED_SCALE_FACTOR = 0.85f;
 static const float SPIN_BUTTON_ANIMATION_DURATION = 0.15f;
 static const float SPIN_BUTTON_EFFECT_ANIMATION_DURATION = 0.5f;
+static const float CREDIT_UPDATE_ANIMATION_DURATION = 1.0f;
 
 
 ///------------------------------------------------------------------------------------------------
@@ -113,7 +118,17 @@ void Game::Init()
     background->mShaderFloatUniformValues[strutils::StringId("mask_alpha_comp")] = 1.0f;
     background->mEffectTextureResourceIds[0] = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + "game/background_mask.png");
     background->mShaderResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT  + "background.vs");
-
+    
+    scene::TextSceneObjectData textData;
+    textData.mFontName = game_constants::DEFAULT_FONT_NAME;
+    textData.mText = "Credits: " + std::to_string(mCredits);
+    
+    auto creditsSceneObject = scene->CreateSceneObject(CREDITS_NAME);
+    creditsSceneObject->mSceneObjectTypeData = std::move(textData);
+    creditsSceneObject->mPosition = CREDITS_TEXT_POSITION;
+    creditsSceneObject->mScale = CREDITS_TEXT_SCALE;
+    creditsSceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 0.0f;
+    
     mLoginButton = std::make_unique<AnimatedButton>(LOGIN_BUTTON_POSITION, ACTION_TEXT_SCALE, game_constants::DEFAULT_FONT_NAME, "Log in", LOGIN_BUTTON_NAME, [&](){ OnLoginButtonPressed(); }, *scene);
     for (auto& sceneObject: mLoginButton->GetSceneObjects())
     {
@@ -128,6 +143,8 @@ void Game::Init()
     
     mPlayerId = 0;
     mSpinId = 0;
+    mCredits = 100;
+    mDisplayedCredits = 100.0f;
 }
 
 ///------------------------------------------------------------------------------------------------
@@ -380,6 +397,12 @@ void Game::UpdateGUI(const float dtMillis)
                 for (int i = 0; i < boardStateResolutionData.mWinningPaylines.size(); ++i)
                 {
                     mBoardView->AnimatePaylineReveal(boardStateResolutionData.mWinningPaylines[i], PAYLINE_REVEAL_ANIMATION_DURATION, PAYLINE_HIDE_ANIMATION_DURATION, i * PAYLINE_ANIMATION_DURATION);
+                    
+                    const auto& wonCreditMultiplier = boardStateResolutionData.mWinningPaylines[i].mWinMultiplier;
+                    animationManager.StartAnimation(std::make_unique<rendering::TimeDelayAnimation>(PAYLINE_ANIMATION_DURATION * (i + 1)), [wonCreditMultiplier, this]()
+                    {
+                        UpdateCredits(wonCreditMultiplier);
+                    });
                 }
                 
                 animationManager.StartAnimation(std::make_unique<rendering::TimeDelayAnimation>(boardStateResolutionData.mWinningPaylines.size() * PAYLINE_ANIMATION_DURATION), [this]()
@@ -388,6 +411,12 @@ void Game::UpdateGUI(const float dtMillis)
                 });
             }
         }
+    }
+    
+    auto creditsSceneObject = scene->FindSceneObject(CREDITS_NAME);
+    if (creditsSceneObject)
+    {
+        std::get<scene::TextSceneObjectData>(creditsSceneObject->mSceneObjectTypeData).mText = "Credits: " + std::to_string(static_cast<int>(mDisplayedCredits));
     }
 }
 
@@ -522,6 +551,8 @@ void Game::OnServerLoginResponse(const nlohmann::json& responseJson)
         spinButtonEffect->mShaderFloatUniformValues[strutils::StringId("perlin_resolution")] = 312.0f;
         spinButtonEffect->mShaderFloatUniformValues[strutils::StringId("perlin_clarity")] = 5.23f;
         CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenAlphaAnimation>(spinButtonEffect, 1.0f, GAME_ELEMENTS_PRESENTATION_TIME), [](){});
+        
+        CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenAlphaAnimation>(scene->FindSceneObject(CREDITS_NAME), 1.0f, GAME_ELEMENTS_PRESENTATION_TIME), [](){});
 
         mBoardView = std::make_unique<BoardView>(*scene, mBoardModel);
         
@@ -540,7 +571,9 @@ void Game::OnServerSpinResponse(const nlohmann::json& responseJson)
     spinResponse.DeserializeFromJson(responseJson);
     
     mSpinId = spinResponse.spinId;
-    //mSpinId = 2070399566;
+    mCredits -= 1;
+    mDisplayedCredits = static_cast<int>(mCredits);
+
     mBoardView->ResetBoardSymbols();
     mBoardModel.PopulateBoardForSpin(mSpinId);
     mBoardView->BeginSpin();
@@ -562,6 +595,37 @@ void Game::OnSpinButtonPressed()
 {
     // Request quick play
     SendNetworkMessage(nlohmann::json(), networking::MessageType::CS_SPIN_REQUEST, networking::MessagePriority::HIGH);
+}
+
+///------------------------------------------------------------------------------------------------
+
+void Game::UpdateCredits(const int wonCreditMultiplier)
+{
+    mCredits += wonCreditMultiplier;
+
+    auto& systemsEngine = CoreSystemsEngine::GetInstance();
+    auto& sceneManager = systemsEngine.GetSceneManager();
+    auto scene = sceneManager.FindScene(game_constants::WORLD_SCENE_NAME);
+    
+    scene::TextSceneObjectData textData;
+    textData.mFontName = game_constants::DEFAULT_FONT_NAME;
+    textData.mText = "+" + std::to_string(wonCreditMultiplier);
+    
+    auto soName = strutils::StringId("WonCreditMultiplier " + std::to_string(SDL_GetTicks()));
+    auto newWonCreditMultiplierSceneObject = scene->CreateSceneObject(soName);
+    newWonCreditMultiplierSceneObject->mSceneObjectTypeData = std::move(textData);
+    newWonCreditMultiplierSceneObject->mPosition = glm::vec3(-0.362f, 0.0f, CREDITS_TEXT_POSITION.z);
+    newWonCreditMultiplierSceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 1.0f;
+    newWonCreditMultiplierSceneObject->mScale = CREDITS_TEXT_SCALE;
+    
+    auto targetPosition = newWonCreditMultiplierSceneObject->mPosition;
+    targetPosition.y += 0.1f;
+
+    CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenAlphaAnimation>(newWonCreditMultiplierSceneObject, 0.0f, CREDIT_UPDATE_ANIMATION_DURATION), [](){});
+    CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenValueAnimation>(mDisplayedCredits, static_cast<float>(mCredits), CREDIT_UPDATE_ANIMATION_DURATION), [](){});
+    CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenPositionScaleAnimation>(newWonCreditMultiplierSceneObject, targetPosition, newWonCreditMultiplierSceneObject->mScale, CREDIT_UPDATE_ANIMATION_DURATION), [=](){
+        scene->RemoveSceneObject(soName);
+    });
 }
 
 ///------------------------------------------------------------------------------------------------
