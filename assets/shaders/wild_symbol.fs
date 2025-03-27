@@ -57,7 +57,7 @@ void main()
     float adjustedTime = time;
     if (grayscale)
     {
-        adjustedTime = 0;
+        adjustedTime = 0.0;
     }
 
     if (distance(frag_color, INTERACTIVE_COLOR) < interactive_color_threshold)

@@ -36,6 +36,7 @@
 #include <mutex>
 #include <SDL.h>
 
+//#define ALLOW_OFFLINE_PLAY
 #if defined(MOBILE_FLOW)
 #include <platform_specific/IOSUtils.h>
 #endif
@@ -54,7 +55,10 @@ static const strutils::StringId SPIN_BUTTON_EFFECT_NAME = strutils::StringId("sp
 static const strutils::StringId BACKGROUND_NAME = strutils::StringId("background");
 static const strutils::StringId BACKGROUND_MASK_NAME = strutils::StringId("background_mask");
 static const strutils::StringId CREDITS_NAME = strutils::StringId("credits");
+static const strutils::StringId CREDITS_WAGER_NAME = strutils::StringId("credits_wager");
 static const strutils::StringId CREDIT_UPDATE_ANIMATION_NAME = strutils::StringId("credit_update_animation");
+static const strutils::StringId CREDITS_WAGER_PLUS_BUTTON_NAME = strutils::StringId("credit_wager_plus");
+static const strutils::StringId CREDITS_WAGER_MINUS_BUTTON_NAME = strutils::StringId("credit_wager_minus");
 
 static const glm::vec3 BACKGROUND_SCALE = glm::vec3(1.370f, 1.04f, 1.0f);
 
@@ -62,11 +66,14 @@ static const glm::vec3 ACTION_TEXT_SCALE = glm::vec3(0.00056f);
 static const glm::vec3 CREDITS_TEXT_SCALE = glm::vec3(0.00032f);
 static const glm::vec3 SPIN_BUTTON_SCALE = glm::vec3(0.156f);
 static const glm::vec3 SPIN_BUTTON_EFFECT_SCALE = glm::vec3(0.224f);
-static const glm::vec3 SPIN_BUTTON_EFFECT_POSITION = glm::vec3(0.403f, 0.0f, 1.9f);
-static const glm::vec3 SPIN_BUTTON_POSITION = glm::vec3(0.403f, 0.0f, 2.0f);
+static const glm::vec3 SPIN_BUTTON_EFFECT_POSITION = glm::vec3(0.403f, -0.05f, 1.9f);
+static const glm::vec3 SPIN_BUTTON_POSITION = glm::vec3(0.403f, -0.05f, 2.0f);
 static const glm::vec3 BACKGROUND_POSITION = glm::vec3(0.0f, 0.0f, 1.0f);
 static const glm::vec3 LOGIN_BUTTON_POSITION = glm::vec3(-0.075f, 0.134f, 2.0f);
-static const glm::vec3 CREDITS_TEXT_POSITION = glm::vec3(-0.1f, 0.292f, 2.0f);
+static const glm::vec3 CREDITS_TEXT_POSITION = glm::vec3(-0.3f, 0.292f, 2.0f);
+static const glm::vec3 CREDITS_WAGER_TEXT_POSITION = glm::vec3(0.05f, 0.292f, 2.0f);
+static const glm::vec3 CREDITS_WAGER_PLUS_BUTTON_POSITION = glm::vec3(0.35f, 0.15f, 2.0f);
+static const glm::vec3 CREDITS_WAGER_MINUS_BUTTON_POSITION = glm::vec3(0.45f, 0.15f, 2.0f);
 
 static const float GAME_ELEMENTS_PRESENTATION_TIME = 1.0f;
 static const float PAYLINE_REVEAL_ANIMATION_DURATION = 1.0f;
@@ -129,6 +136,16 @@ void Game::Init()
     creditsSceneObject->mScale = CREDITS_TEXT_SCALE;
     creditsSceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 0.0f;
     
+    scene::TextSceneObjectData creditsWagerTextData;
+    creditsWagerTextData.mFontName = game_constants::DEFAULT_FONT_NAME;
+    creditsWagerTextData.mText = "Wager Per Spin: " + std::to_string(mCreditsWagerPerSpin);
+    
+    auto creditsWagerSceneObject = scene->CreateSceneObject(CREDITS_WAGER_NAME);
+    creditsWagerSceneObject->mSceneObjectTypeData = std::move(creditsWagerTextData);
+    creditsWagerSceneObject->mPosition = CREDITS_WAGER_TEXT_POSITION;
+    creditsWagerSceneObject->mScale = CREDITS_TEXT_SCALE;
+    creditsWagerSceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 0.0f;
+    
     mLoginButton = std::make_unique<AnimatedButton>(LOGIN_BUTTON_POSITION, ACTION_TEXT_SCALE, game_constants::DEFAULT_FONT_NAME, "Log in", LOGIN_BUTTON_NAME, [&](){ OnLoginButtonPressed(); }, *scene);
     for (auto& sceneObject: mLoginButton->GetSceneObjects())
     {
@@ -144,6 +161,7 @@ void Game::Init()
     mPlayerId = 0;
     mSpinId = 0;
     mCredits = 100;
+    mCreditsWagerPerSpin = 1;
     mDisplayedCredits = 100.0f;
 }
 
@@ -336,6 +354,16 @@ void Game::UpdateGUI(const float dtMillis)
         mLoginButton->Update(dtMillis);
     }
     
+    if (mCreditsWagerPlusButton && mBoardView->GetSpinAnimationState() == BoardView::SpinAnimationState::IDLE)
+    {
+        mCreditsWagerPlusButton->Update(dtMillis);
+    }
+    
+    if (mCreditsWagerMinusButton && mBoardView->GetSpinAnimationState() == BoardView::SpinAnimationState::IDLE)
+    {
+        mCreditsWagerMinusButton->Update(dtMillis);
+    }
+    
     auto spinButton = scene->FindSceneObject(SPIN_BUTTON_NAME);
     auto spinButtonEffect = scene->FindSceneObject(SPIN_BUTTON_EFFECT_NAME);
 
@@ -358,7 +386,7 @@ void Game::UpdateGUI(const float dtMillis)
             auto sceneObjectRect = scene_object_utils::GetSceneObjectBoundingRect(*spinButton);
             bool cursorInSceneObject = math::IsPointInsideRectangle(sceneObjectRect.bottomLeft, sceneObjectRect.topRight, worldTouchPos);
             
-            if (cursorInSceneObject && inputStateManager.VButtonTapped(input::Button::MAIN_BUTTON))
+            if (cursorInSceneObject && inputStateManager.VButtonTapped(input::Button::MAIN_BUTTON) && mCredits >= mCreditsWagerPerSpin)
             {
                 auto initScale = spinButton->mScale;
                 animationManager.StartAnimation(std::make_unique<rendering::TweenPositionScaleAnimation>(spinButton, spinButton->mPosition, initScale * SPIN_BUTTON_DEPRESSED_SCALE_FACTOR, SPIN_BUTTON_ANIMATION_DURATION), [this, initScale, spinButton]()
@@ -401,7 +429,7 @@ void Game::UpdateGUI(const float dtMillis)
                     const auto& wonCreditMultiplier = boardStateResolutionData.mWinningPaylines[i].mWinMultiplier;
                     animationManager.StartAnimation(std::make_unique<rendering::TimeDelayAnimation>(PAYLINE_ANIMATION_DURATION * (i + 1)), [wonCreditMultiplier, this]()
                     {
-                        UpdateCredits(wonCreditMultiplier);
+                        UpdateCredits(wonCreditMultiplier * static_cast<int>(mCreditsWagerPerSpin));
                     });
                 }
                 
@@ -417,6 +445,12 @@ void Game::UpdateGUI(const float dtMillis)
     if (creditsSceneObject)
     {
         std::get<scene::TextSceneObjectData>(creditsSceneObject->mSceneObjectTypeData).mText = "Credits: " + std::to_string(static_cast<int>(mDisplayedCredits));
+    }
+    
+    auto creditsWagerSceneObject = scene->FindSceneObject(CREDITS_WAGER_NAME);
+    if (creditsWagerSceneObject)
+    {
+        std::get<scene::TextSceneObjectData>(creditsWagerSceneObject->mSceneObjectTypeData).mText = "Wager Per Spin: " + std::to_string(static_cast<int>(mCreditsWagerPerSpin));
     }
 }
 
@@ -514,23 +548,44 @@ void Game::OnServerResponse(const std::string& response)
 
 void Game::OnServerLoginResponse(const nlohmann::json& responseJson)
 {
+#ifndef ALLOW_OFFLINE_PLAY
     networking::LoginResponse loginResponse;
     loginResponse.DeserializeFromJson(responseJson);
     
     if (loginResponse.allowed)
     {
         mPlayerId = loginResponse.playerId;
-
+#endif
+        mPlayerId = 1;
         auto& systemsEngine = CoreSystemsEngine::GetInstance();
         auto& sceneManager = systemsEngine.GetSceneManager();
         auto scene = sceneManager.FindScene(game_constants::WORLD_SCENE_NAME);
         
         // Fade button out
-        for (auto& sceneObject: mLoginButton->GetSceneObjects())
+#ifdef ALLOW_OFFLINE_PLAY
+        scene::TextSceneObjectData offlinePlayTexData;
+        offlinePlayTexData.mFontName = game_constants::DEFAULT_FONT_NAME;
+        offlinePlayTexData.mText = "(OFFLINE PLAY)";
+        
+        auto offlinePlaySceneObject = scene->CreateSceneObject(strutils::StringId("offline_play"));
+        offlinePlaySceneObject->mSceneObjectTypeData = std::move(offlinePlayTexData);
+        offlinePlaySceneObject->mPosition = CREDITS_TEXT_POSITION;
+        offlinePlaySceneObject->mPosition.x = -0.075f;
+        offlinePlaySceneObject->mPosition.y = -0.226f;
+        offlinePlaySceneObject->mScale = CREDITS_TEXT_SCALE/2.0f;
+        offlinePlaySceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 1.0f;
+        
+        CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TimeDelayAnimation>(0.5f), [=, this]()
         {
-            scene->RemoveSceneObject(sceneObject->mName);
-        }
-        mLoginButton = nullptr;
+#endif
+            for (auto& sceneObject: mLoginButton->GetSceneObjects())
+            {
+                scene->RemoveSceneObject(sceneObject->mName);
+            }
+            mLoginButton = nullptr;
+#ifdef ALLOW_OFFLINE_PLAY
+        });
+#endif
         
         auto background = scene->FindSceneObject(BACKGROUND_NAME);
         CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenValueAnimation>(background->mShaderFloatUniformValues[strutils::StringId("mask_alpha_comp")], 0.0f, GAME_ELEMENTS_PRESENTATION_TIME), [](){});
@@ -550,9 +605,29 @@ void Game::OnServerLoginResponse(const nlohmann::json& responseJson)
         spinButtonEffect->mShaderFloatUniformValues[strutils::StringId("time_speed")] = 5.162f;
         spinButtonEffect->mShaderFloatUniformValues[strutils::StringId("perlin_resolution")] = 312.0f;
         spinButtonEffect->mShaderFloatUniformValues[strutils::StringId("perlin_clarity")] = 5.23f;
+        spinButtonEffect->mShaderFloatUniformValues[strutils::StringId("perlin_color_r_multipier")] = 0.0f;
+        spinButtonEffect->mShaderFloatUniformValues[strutils::StringId("perlin_color_g_multipier")] = 0.0f;
+        spinButtonEffect->mShaderFloatUniformValues[strutils::StringId("perlin_color_b_multipier")] = 0.0f;
+        UpdateSpinButtonEffectAura();
+
         CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenAlphaAnimation>(spinButtonEffect, 1.0f, GAME_ELEMENTS_PRESENTATION_TIME), [](){});
         
+        mCreditsWagerPlusButton = std::make_unique<AnimatedButton>(CREDITS_WAGER_PLUS_BUTTON_POSITION, ACTION_TEXT_SCALE, game_constants::DEFAULT_FONT_NAME, "+", CREDITS_WAGER_PLUS_BUTTON_NAME, [&](){ mCreditsWagerPerSpin *= 2; mCreditsWagerPerSpin = math::Min(128LL, mCreditsWagerPerSpin); UpdateSpinButtonEffectAura(); }, *scene);
+        mCreditsWagerMinusButton = std::make_unique<AnimatedButton>(CREDITS_WAGER_MINUS_BUTTON_POSITION, ACTION_TEXT_SCALE, game_constants::DEFAULT_FONT_NAME, "-", CREDITS_WAGER_MINUS_BUTTON_NAME, [&](){ mCreditsWagerPerSpin /= 2; mCreditsWagerPerSpin = math::Max(1LL, mCreditsWagerPerSpin); UpdateSpinButtonEffectAura(); }, *scene);
+        
+        for (auto& sceneObject: mCreditsWagerPlusButton->GetSceneObjects())
+        {
+            sceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 0.0f;
+            CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenAlphaAnimation>(sceneObject, 1.0f, GAME_ELEMENTS_PRESENTATION_TIME), [](){});
+        }
+        for (auto& sceneObject: mCreditsWagerMinusButton->GetSceneObjects())
+        {
+            sceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 0.0f;
+            CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenAlphaAnimation>(sceneObject, 1.0f, GAME_ELEMENTS_PRESENTATION_TIME), [](){});
+        }
+
         CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenAlphaAnimation>(scene->FindSceneObject(CREDITS_NAME), 1.0f, GAME_ELEMENTS_PRESENTATION_TIME), [](){});
+        CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenAlphaAnimation>(scene->FindSceneObject(CREDITS_WAGER_NAME), 1.0f, GAME_ELEMENTS_PRESENTATION_TIME), [](){});
 
         mBoardView = std::make_unique<BoardView>(*scene, mBoardModel);
         
@@ -560,19 +635,29 @@ void Game::OnServerLoginResponse(const nlohmann::json& responseJson)
         {
             CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + BoardView::GetSymbolTexturePath(static_cast<slots::SymbolType>(i)));
         }
+        
+#ifndef ALLOW_OFFLINE_PLAY
     }
+#endif
 }
 
 ///------------------------------------------------------------------------------------------------
 
 void Game::OnServerSpinResponse(const nlohmann::json& responseJson)
 {
+#ifndef ALLOW_OFFLINE_PLAY
     networking::SpinResponse spinResponse;
     spinResponse.DeserializeFromJson(responseJson);
     
     mSpinId = spinResponse.spinId;
-    mCredits -= 1;
+#else
+    mSpinId = math::RandomInt();
+#endif
+    mCredits -= mCreditsWagerPerSpin;
     mDisplayedCredits = static_cast<int>(mCredits);
+    UpdateSpinButtonEffectAura();
+
+    CoreSystemsEngine::GetInstance().GetAnimationManager().StopAnimation(CREDIT_UPDATE_ANIMATION_NAME);
 
     mBoardView->ResetBoardSymbols();
     mBoardModel.PopulateBoardForSpin(mSpinId);
@@ -585,16 +670,22 @@ void Game::OnServerSpinResponse(const nlohmann::json& responseJson)
 
 void Game::OnLoginButtonPressed()
 {
-    // Request quick play
+#ifdef ALLOW_OFFLINE_PLAY
+    OnServerLoginResponse(nlohmann::json());
+#else
     SendNetworkMessage(nlohmann::json(), networking::MessageType::CS_LOGIN_REQUEST, networking::MessagePriority::HIGH);
+#endif
 }
 
 ///------------------------------------------------------------------------------------------------
 
 void Game::OnSpinButtonPressed()
 {
-    // Request quick play
+#ifdef ALLOW_OFFLINE_PLAY
+    OnServerSpinResponse(nlohmann::json());
+#else
     SendNetworkMessage(nlohmann::json(), networking::MessageType::CS_SPIN_REQUEST, networking::MessagePriority::HIGH);
+#endif
 }
 
 ///------------------------------------------------------------------------------------------------
@@ -622,10 +713,34 @@ void Game::UpdateCredits(const int wonCreditMultiplier)
     targetPosition.y += 0.1f;
 
     CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenAlphaAnimation>(newWonCreditMultiplierSceneObject, 0.0f, CREDIT_UPDATE_ANIMATION_DURATION), [](){});
-    CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenValueAnimation>(mDisplayedCredits, static_cast<float>(mCredits), CREDIT_UPDATE_ANIMATION_DURATION), [](){});
+    CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenValueAnimation>(mDisplayedCredits, static_cast<float>(mCredits), CREDIT_UPDATE_ANIMATION_DURATION), [](){}, CREDIT_UPDATE_ANIMATION_NAME);
     CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenPositionScaleAnimation>(newWonCreditMultiplierSceneObject, targetPosition, newWonCreditMultiplierSceneObject->mScale, CREDIT_UPDATE_ANIMATION_DURATION), [=](){
         scene->RemoveSceneObject(soName);
     });
+}
+
+///------------------------------------------------------------------------------------------------
+
+void Game::UpdateSpinButtonEffectAura()
+{
+    auto& systemsEngine = CoreSystemsEngine::GetInstance();
+    auto& sceneManager = systemsEngine.GetSceneManager();
+    auto scene = sceneManager.FindScene(game_constants::WORLD_SCENE_NAME);
+
+    auto spinButtonEffect = scene->FindSceneObject(SPIN_BUTTON_EFFECT_NAME);
+    if (spinButtonEffect)
+    {
+        if (mCredits < mCreditsWagerPerSpin)
+        {
+            CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenValueAnimation>(spinButtonEffect->mShaderFloatUniformValues[strutils::StringId("perlin_color_r_multipier")], 1.0f, GAME_ELEMENTS_PRESENTATION_TIME), [](){});
+            CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenValueAnimation>(spinButtonEffect->mShaderFloatUniformValues[strutils::StringId("perlin_color_g_multipier")], 0.0f, GAME_ELEMENTS_PRESENTATION_TIME), [](){});
+        }
+        else
+        {
+            CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenValueAnimation>(spinButtonEffect->mShaderFloatUniformValues[strutils::StringId("perlin_color_r_multipier")], 0.0f, GAME_ELEMENTS_PRESENTATION_TIME), [](){});
+            CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenValueAnimation>(spinButtonEffect->mShaderFloatUniformValues[strutils::StringId("perlin_color_g_multipier")], 1.0f, GAME_ELEMENTS_PRESENTATION_TIME), [](){});
+        }
+    }
 }
 
 ///------------------------------------------------------------------------------------------------

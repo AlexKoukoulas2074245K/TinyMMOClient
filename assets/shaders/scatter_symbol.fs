@@ -65,7 +65,7 @@ void main()
     float adjustedTime = time;
     if (grayscale)
     {
-        adjustedTime = 0;
+        adjustedTime = 0.0;
     }
 
     if (grayscale)

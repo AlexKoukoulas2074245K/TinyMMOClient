@@ -54,14 +54,19 @@ private:
     void OnLoginButtonPressed();
     void OnSpinButtonPressed();
     void UpdateCredits(const int wonCreditMultiplier);
+    void UpdateSpinButtonEffectAura();
+    
 private:
     std::atomic<int> mLastPingMillis = 0;
     std::unique_ptr<AnimatedButton> mLoginButton;
+    std::unique_ptr<AnimatedButton> mCreditsWagerPlusButton;
+    std::unique_ptr<AnimatedButton> mCreditsWagerMinusButton;
     std::unique_ptr<events::IListener> mSendNetworkMessageEventListener;
     std::unique_ptr<BoardView> mBoardView;
     slots::Board mBoardModel;
-    long long mPlayerId = 0;
-    long long mCredits = 0;
+    long long mPlayerId = 0LL;
+    long long mCredits = 0LL;
+    long long mCreditsWagerPerSpin = 0LL;
     float mDisplayedCredits = 0.0f;
     int mSpinId = 0;
     ThreadSafeQueue<std::string> mQueuedServerResponses;
