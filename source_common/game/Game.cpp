@@ -732,13 +732,13 @@ void Game::UpdateSpinButtonEffectAura()
     {
         if (mCredits < mCreditsWagerPerSpin)
         {
-            CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenValueAnimation>(spinButtonEffect->mShaderFloatUniformValues[strutils::StringId("perlin_color_r_multipier")], 1.0f, GAME_ELEMENTS_PRESENTATION_TIME), [](){});
-            CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenValueAnimation>(spinButtonEffect->mShaderFloatUniformValues[strutils::StringId("perlin_color_g_multipier")], 0.0f, GAME_ELEMENTS_PRESENTATION_TIME), [](){});
+            spinButtonEffect->mShaderFloatUniformValues[strutils::StringId("perlin_color_r_multipier")] = 1.0f;
+            spinButtonEffect->mShaderFloatUniformValues[strutils::StringId("perlin_color_g_multipier")] = 0.0f;
         }
         else
         {
-            CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenValueAnimation>(spinButtonEffect->mShaderFloatUniformValues[strutils::StringId("perlin_color_r_multipier")], 0.0f, GAME_ELEMENTS_PRESENTATION_TIME), [](){});
-            CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenValueAnimation>(spinButtonEffect->mShaderFloatUniformValues[strutils::StringId("perlin_color_g_multipier")], 1.0f, GAME_ELEMENTS_PRESENTATION_TIME), [](){});
+            spinButtonEffect->mShaderFloatUniformValues[strutils::StringId("perlin_color_r_multipier")] = 0.0f;
+            spinButtonEffect->mShaderFloatUniformValues[strutils::StringId("perlin_color_g_multipier")] = 1.0f;
         }
     }
 }
