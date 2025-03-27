@@ -230,27 +230,6 @@ void Game::CreateDebugWidgets()
         }
     }
     
-    static const std::unordered_map<slots::SymbolType, std::string> DEBUG_SYMBOL_NAMES =
-    {
-        { slots::SymbolType::BUTTER, "Butter" },
-        { slots::SymbolType::CAMP_FIRE, "CampFire" },
-        { slots::SymbolType::CHICKEN, "Chicken" },
-        { slots::SymbolType::CHOCOLATE, "Chocolate" },
-        { slots::SymbolType::COOKING_OIL, "CookingOil" },
-        { slots::SymbolType::EGGS, "Eggs" },
-        { slots::SymbolType::FLOUR, "Flour" },
-        { slots::SymbolType::GARLICS, "Garlics" },
-        { slots::SymbolType::LEMONS, "Lemons" },
-        { slots::SymbolType::STRAWBERRIES, "Strawberries" },
-        { slots::SymbolType::SUGAR, "Sugar" },
-        { slots::SymbolType::WATER, "Water" },
-        { slots::SymbolType::CHOCOLATE_CAKE, "ChocolateCake" },
-        { slots::SymbolType::STRAWBERRY_CAKE, "StrawberryCake" },
-        { slots::SymbolType::ROAST_CHICKEN, "RoastChicken" },
-        { slots::SymbolType::WILD, "Wild" },
-        { slots::SymbolType::SCATTER, "Scatter" },
-        { slots::SymbolType::CHICKEN_SOUP, "ChickenSoup" }
-    };
     ImGui::Separator();
     if (ImGui::BeginTable("Pending Symbol State", slots::BOARD_COLS))
     {
@@ -274,11 +253,11 @@ void Game::CreateDebugWidgets()
                 
                 if (row <= 2 || row >= 6)
                 {
-                    ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "%s", DEBUG_SYMBOL_NAMES.at(mBoardModel.GetBoardSymbol(row, column)).c_str());
+                    ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "%s", slots::Board::GetSymbolDebugName(mBoardModel.GetBoardSymbol(row, column)).c_str());
                 }
                 else
                 {
-                    ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "%s", DEBUG_SYMBOL_NAMES.at(mBoardModel.GetBoardSymbol(row, column)).c_str());
+                    ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "%s", slots::Board::GetSymbolDebugName(mBoardModel.GetBoardSymbol(row, column)).c_str());
                 }
             }
         }

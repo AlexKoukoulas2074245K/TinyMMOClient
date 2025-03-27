@@ -114,7 +114,7 @@ TEST(BoardTest, TestRandomBoardWinStats)
     long long numberOf3Scatters = 0;
     long long numberOf4Scatters = 0;
     long long numberOf5Scatters = 0;
-    long long numberOfTumbles = 0;
+    long long numberOfCombos = 0;
     long long numberOf5Wilds = 0;
     long long totalReturn = 0;
     std::unordered_map<slots::WinSourceType, long long> rawWinSourceTypeContributions;
@@ -123,37 +123,50 @@ TEST(BoardTest, TestRandomBoardWinStats)
     // Iteration Lambda
     [&](long long){
         b.PopulateBoardForSpin(math::RandomInt());
-        const auto& boardStateResolution = b.ResolveBoardState();
-        totalReturn += COINS_PER_SPIN * boardStateResolution.mTotalWinMultiplier;
-
-        if (b.GetSymbolCountInPlayableBoard(slots::SymbolType::WILD) == 5)
-        {
-            numberOf5Wilds++;
-        }
         
-        if (b.GetSymbolCountInPlayableBoard(slots::SymbolType::SCATTER) == 5)
+        while (true)
         {
-            numberOf5Scatters++;
-        }
-        else if (b.GetSymbolCountInPlayableBoard(slots::SymbolType::SCATTER) == 4)
-        {
-            numberOf4Scatters++;
-        }
-        else if (b.GetSymbolCountInPlayableBoard(slots::SymbolType::SCATTER) == 3)
-        {
-            numberOf3Scatters++;
-        }
-        
-        for (const auto& paylineData: boardStateResolution.mWinningPaylines)
-        {
-            rawWinSourceTypeContributions[paylineData.mWinSourceType] += paylineData.mWinMultiplier;
-        }
+            const auto& boardStateResolution = b.ResolveBoardState();
+            totalReturn += COINS_PER_SPIN * boardStateResolution.mTotalWinMultiplier;
 
-        for (const auto& paylineData: boardStateResolution.mWinningPaylines)
-        {
-            if (paylineData.mCombo)
+            if (b.GetSymbolCountInPlayableBoard(slots::SymbolType::WILD) == 5)
             {
-                numberOfTumbles++;
+                numberOf5Wilds++;
+            }
+            
+            if (b.GetSymbolCountInPlayableBoard(slots::SymbolType::SCATTER) == 5)
+            {
+                numberOf5Scatters++;
+            }
+            else if (b.GetSymbolCountInPlayableBoard(slots::SymbolType::SCATTER) == 4)
+            {
+                numberOf4Scatters++;
+            }
+            else if (b.GetSymbolCountInPlayableBoard(slots::SymbolType::SCATTER) == 3)
+            {
+                numberOf3Scatters++;
+            }
+            
+            for (const auto& paylineData: boardStateResolution.mWinningPaylines)
+            {
+                rawWinSourceTypeContributions[paylineData.mWinSourceType] += paylineData.mWinMultiplier;
+            }
+
+            for (const auto& paylineData: boardStateResolution.mWinningPaylines)
+            {
+                if (paylineData.mCombo)
+                {
+                    numberOfCombos++;
+                    break;
+                }
+            }
+            
+            if (boardStateResolution.mShouldTumble)
+            {
+                b.ResolveBoardTumble();
+            }
+            else
+            {
                 break;
             }
         }
@@ -197,7 +210,7 @@ TEST(BoardTest, TestRandomBoardWinStats)
         std::cout << "5 Scatter Chance: " << (numberOf5Scatters/float(SIMULATIONS)) * 100.0f << "%" << std::endl;
         std::cout << "4 Scatter Chance: " << (numberOf4Scatters/float(SIMULATIONS)) * 100.0f << "%" << std::endl;
         std::cout << "3 Scatter Chance: " << (numberOf3Scatters/float(SIMULATIONS)) * 100.0f << "%" << std::endl;
-        std::cout << "Tumble Chance: " << (numberOfTumbles/float(SIMULATIONS)) * 100.0f << "%" << std::endl;
+        std::cout << "Tumble Chance: " << (numberOfCombos/float(SIMULATIONS)) * 100.0f << "%" << std::endl;
     });
 }
 
