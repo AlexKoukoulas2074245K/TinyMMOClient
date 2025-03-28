@@ -32,6 +32,8 @@ public:
         IDLE,
         PRE_SPIN_LOADING,
         SPINNING,
+        COMBO_PRE_TUMBLING,
+        TUMBLING,
         POST_SPINNING,
         WAITING_FOR_PAYLINES
     };
@@ -64,6 +66,7 @@ public:
     SpinAnimationState GetSpinAnimationState() const;
 
     void BeginSpin();
+    void BeginTumble(const slots::TumbleResolutionData& tumbleResolutionData);
     void WaitForPaylines(const slots::BoardStateResolutionData& boardResolutionData);
     void CompleteSpin();
     void ResetBoardSymbols();
@@ -73,12 +76,14 @@ private:
     void UpdateSceneObjectDuringReelAnimation(std::shared_ptr<scene::SceneObject> sceneObject, const float dtMillis, const int reelIndex);
     bool IsFrictionEmitterEnabled(const int emitterIndex) const;
     void SetFrictionEmitterState(const int emitterIndex, const bool enabled);
+    std::pair<std::shared_ptr<scene::SceneObject>, std::shared_ptr<scene::SceneObject>> CreateSymbolSceneObjects(const slots::SymbolType symbolType, const int row, const int col, const std::string customNamePrefix = "");
 
 private:
     scene::Scene& mScene;
     const slots::Board& mBoardModel;
     std::vector<PaylineView> mPaylines;
     PendingSymbolData mPendingSymbolData[slots::BOARD_COLS];
+    slots::TumbleResolutionData mTumbleResolutionData;
     SpinAnimationState mSpinAnimationState;
 };
 

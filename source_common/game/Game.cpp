@@ -412,10 +412,21 @@ void Game::UpdateGUI(const float dtMillis)
                     });
                 }
                 
-                animationManager.StartAnimation(std::make_unique<rendering::TimeDelayAnimation>(boardStateResolutionData.mWinningPaylines.size() * PAYLINE_ANIMATION_DURATION), [this]()
+                if (boardStateResolutionData.mShouldTumble)
                 {
-                    mBoardView->CompleteSpin();
-                });
+                    auto tumbleResolutionData = mBoardModel.ResolveBoardTumble();
+                    animationManager.StartAnimation(std::make_unique<rendering::TimeDelayAnimation>(boardStateResolutionData.mWinningPaylines.size() * PAYLINE_ANIMATION_DURATION), [this, tumbleResolutionData]()
+                    {
+                        mBoardView->BeginTumble(tumbleResolutionData);
+                    });
+                }
+                else
+                {
+                    animationManager.StartAnimation(std::make_unique<rendering::TimeDelayAnimation>(boardStateResolutionData.mWinningPaylines.size() * PAYLINE_ANIMATION_DURATION), [this]()
+                    {
+                        mBoardView->CompleteSpin();
+                    });
+                }
             }
         }
     }
@@ -629,6 +640,8 @@ void Game::OnServerSpinResponse(const nlohmann::json& responseJson)
     spinResponse.DeserializeFromJson(responseJson);
     
     mSpinId = spinResponse.spinId;
+    //mSpinId = 828030532; roast_chicken and chicken_soup
+    mSpinId = 1539116524;
 #else
     mSpinId = math::RandomInt();
 #endif
@@ -684,7 +697,7 @@ void Game::UpdateCredits(const int wonCreditMultiplier)
     auto soName = strutils::StringId("WonCreditMultiplier " + std::to_string(SDL_GetTicks()));
     auto newWonCreditMultiplierSceneObject = scene->CreateSceneObject(soName);
     newWonCreditMultiplierSceneObject->mSceneObjectTypeData = std::move(textData);
-    newWonCreditMultiplierSceneObject->mPosition = glm::vec3(-0.362f, 0.0f, CREDITS_TEXT_POSITION.z);
+    newWonCreditMultiplierSceneObject->mPosition = glm::vec3(-0.427f, 0.0f, CREDITS_TEXT_POSITION.z);
     newWonCreditMultiplierSceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 1.0f;
     newWonCreditMultiplierSceneObject->mScale = CREDITS_TEXT_SCALE;
     

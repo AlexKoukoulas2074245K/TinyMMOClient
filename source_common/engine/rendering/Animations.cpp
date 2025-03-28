@@ -50,7 +50,12 @@ AnimationUpdateResult BaseAnimation::VUpdate(const float dtMillis)
         }
     }
     
-    return (mAnimationT < 1.0f || mSecsDuration < 0.0f) ? AnimationUpdateResult::ONGOING : AnimationUpdateResult::FINISHED;
+    if (mSecsDuration <= 0.0f)
+    {
+        return AnimationUpdateResult::FINISHED;
+    }
+    
+    return mAnimationT < 1.0f ? AnimationUpdateResult::ONGOING : AnimationUpdateResult::FINISHED;
 }
 
 ///------------------------------------------------------------------------------------------------

@@ -8,6 +8,7 @@
 #include <gtest/gtest.h>
 #include <net_common/Board.h>
 #include <engine/utils/MathUtils.h>
+#include <engine/utils/PlatformMacros.h>
 
 ///------------------------------------------------------------------------------------------------
 
@@ -122,13 +123,25 @@ TEST(BoardTest, TestRandomBoardWinStats)
     runSimulation("WinStats", SIMULATIONS,
     // Iteration Lambda
     [&](long long){
-        b.PopulateBoardForSpin(math::RandomInt());
+        int nextSpinId = math::RandomInt();
+        b.PopulateBoardForSpin(nextSpinId);
         
         while (true)
         {
             const auto& boardStateResolution = b.ResolveBoardState();
             totalReturn += COINS_PER_SPIN * boardStateResolution.mTotalWinMultiplier;
-
+            
+//            if (boardStateResolution.mShouldTumble)
+//            {
+//                if (boardStateResolution.mWinningPaylines.size() == 4 &&
+//                    boardStateResolution.mWinningPaylines[0].mCombo &&
+//                    boardStateResolution.mWinningPaylines[1].mCombo &&
+//                    boardStateResolution.mWinningPaylines[2].mCombo &&
+//                    boardStateResolution.mWinningPaylines[3].mCombo)
+//                {
+//                    DEBUG_BREAKPOINT();
+//                }
+//            }
             if (b.GetSymbolCountInPlayableBoard(slots::SymbolType::WILD) == 5)
             {
                 numberOf5Wilds++;

@@ -13,6 +13,8 @@
 #include <engine/rendering/ParticleManager.h>
 #include <engine/scene/Scene.h>
 #include <engine/scene/SceneObjectUtils.h>
+#include <engine/utils/Logging.h>
+#include <engine/utils/PlatformMacros.h>
 #include <net_common/Board.h>
 #include <net_common/Symbols.h>
 #include <net_common/SymbolDataRepository.h>
@@ -22,8 +24,9 @@
 static const strutils::StringId BOARD_NAME = strutils::StringId("board");
 static const strutils::StringId INTERACTIVE_COLOR_THRESHOLD_UNIFORM_NAME = strutils::StringId("interactive_color_threshold");
 static const strutils::StringId INTERACTIVE_COLOR_TIME_MULTIPLIER_UNIFORM_NAME = strutils::StringId("interactive_color_time_multiplier");
-static const strutils::StringId SCATTER_EFFECT_MULTIPLIER_COEFF_UNIFORM_NAME =  strutils::StringId("scatter_effect_stretch_multiplier");
-static const strutils::StringId FRICTION_PARTICLE_DEFINITION_NAME =  strutils::StringId("friction_particle");
+static const strutils::StringId SCATTER_EFFECT_MULTIPLIER_COEFF_UNIFORM_NAME = strutils::StringId("scatter_effect_stretch_multiplier");
+static const strutils::StringId FRICTION_PARTICLE_DEFINITION_NAME = strutils::StringId("friction_particle");
+static const strutils::StringId COMBO_SMOKE_PARTICLE_DEFINITION_NAME = strutils::StringId("combo_smoke");
 
 static const std::string SYMBOL_SHADER_PATH = "symbol.vs";
 static const std::string SYMBOL_FRAME_TEXTURE_PATH = "game/basket_frame.png";
@@ -31,9 +34,11 @@ static const std::string SHELVES_TEXTURE_PATH = "game/shelves.png";
 static const std::string SCATTER_SYMBOL_EFFECT_TEXTURE_PATH = "game/food_slot_images/scatter_effect.png";
 static const std::string SCATTER_BACKGROUND_MASK_TEXTURE_PATH = "game/food_slot_images/scatter_background_mask.png";
 static const std::string FRICTION_EMITTER_NAME_PREFIX = "friction_emitter_";
+static const std::string TUMBLE_TEMP_PREFIX = "tumbl_temp_";
 
 static constexpr int FRICTION_EMITTER_COUNT = 6;
 
+static const glm::vec2 TUMBLE_INGREDIENT_BEZIER_MIDPOINT_Y_POSITIONS = glm::vec2(-0.2f, 0.15f);
 static const glm::vec3 BOARD_SCALE = glm::vec3(0.5f * 1.28f, 0.5f, 1.0f);
 static const glm::vec3 SYMBOL_SCALE = glm::vec3(0.092f, 0.06624f, 1.0f);
 static const glm::vec3 SYMBOL_FRAME_SCALE = glm::vec3(0.08f * 1.4f, 0.08f, 1.0f);
@@ -55,6 +60,7 @@ static const float PRE_SPIN_Y_OFFSET = 0.04f;
 static const float PRE_SPIN_ANIMATION_TIME = 0.15f;
 static const float MAX_REEL_SPIN_SPEED = 0.001f;
 static const float TIME_TO_REACH_MAX_REEL_SPIN_SPEED = 0.5f;
+static const float SYMBOL_FRAME_Z_OFFSET = 0.01f;
 static const float TIME_TILL_REEL_PENDING_SYMBOLS_UNLOCK = 1.0f;
 static const float TIME_PER_REEL_SYMBOL_UNLOCK = 0.3f;
 static const float TIME_TO_FINALIZE_SYMBOL_POSITION = 0.8f;
@@ -68,6 +74,12 @@ static const float SCATTER_EFFECT_MULTIPLIER_COEFF = 0.02f;
 static const float SCATTER_SUSPENSE_SLOWDOWN_MULTIPIER = 0.4f;
 static const float SCATTER_SUSPENSE_EXTRA_SPIN_TIME = 2.0f;
 static const float SCATTER_SLOWDOWN_KICKOFF_MULTIPLIER = 0.6666f;
+static const float TUMBLE_COMBO_SYMBOL_Z = 2.0f;
+static const float TUMBLE_SMOKE_PARTICLE_Z = 3.0f;
+static const float TUMBLE_ANIMATION_DELAY_PER_COMBO_EVENT = 1.5f;
+static const float TUMBLE_ANIMATION_DELAY_PER_TUMBLE_EVENT = 0.5f;
+static const float TUMBLE_INGREDIENT_ANIMATION_TIME = 0.75f;
+static const float TUMBLE_INGREDIENT_ANIMATION_DELAY = 0.2f;
 
 static const std::unordered_map<slots::SymbolType, std::string> SYMBOL_TEXTURE_PATHS =
 {
@@ -102,6 +114,8 @@ static const std::unordered_map<BoardView::SpinAnimationState, std::string> SPIN
     { BoardView::SpinAnimationState::IDLE, "IDLE" },
     { BoardView::SpinAnimationState::PRE_SPIN_LOADING, "PRE_SPIN_LOADING" },
     { BoardView::SpinAnimationState::SPINNING, "SPINNING" },
+    { BoardView::SpinAnimationState::COMBO_PRE_TUMBLING, "COMBO_PRE_TUMBLING" },
+    { BoardView::SpinAnimationState::TUMBLING, "TUMBLING" },
     { BoardView::SpinAnimationState::POST_SPINNING, "POST_SPINNING" },
     { BoardView::SpinAnimationState::WAITING_FOR_PAYLINES, "WAITING_FOR_PAYLINES" }
 };
@@ -118,6 +132,7 @@ static const std::unordered_map<BoardView::PendingSymbolData::PendingSymbolDataS
 
 static inline strutils::StringId GetSymbolSoName(const int row, const int col) { return strutils::StringId(std::to_string(row) + "," + std::to_string(col) + "_symbol"); }
 static inline strutils::StringId GetSymbolFrameSoName(const int row, const int col) { return strutils::StringId(std::to_string(row) + "," + std::to_string(col) + "_symbol_frame"); }
+static inline bool IsSceneObjectNameSymbolFrame(const strutils::StringId& sceneObjectName) { return strutils::StringEndsWith(sceneObjectName.GetString(), "frame"); }
 static inline std::vector<std::shared_ptr<scene::SceneObject>> FindAllSceneObjectsForSymbolCoordinates(const scene::Scene& scene, const int row, const int col){ return scene.FindSceneObjectsWhoseNameStartsWith(std::to_string(row) + "," + std::to_string(col)); }
 
 ///------------------------------------------------------------------------------------------------
@@ -259,6 +274,83 @@ void BoardView::Update(const float dtMillis)
             }
         } break;
             
+        case SpinAnimationState::COMBO_PRE_TUMBLING:
+        {
+            if (mScene.FindSceneObjectsWhoseNameStartsWith(TUMBLE_TEMP_PREFIX).empty())
+            {
+                for (int row = 0; row < slots::REEL_LENGTH; ++row)
+                {
+                    for (int col = 0; col < slots::BOARD_COLS; ++col)
+                    {
+                        auto symbolSceneObjects = FindAllSceneObjectsForSymbolCoordinates(mScene, row, col);
+                        
+                        for (auto& sceneObject: symbolSceneObjects)
+                        {
+                            // De-grayscale everything
+                            sceneObject->mShaderBoolUniformValues[GRAYSCALE_UNIFORM_NAME] = false;
+                            
+                            // And reset z-s (manipulated during combo creation)
+                            sceneObject->mPosition.z = TOP_LEFT_SYMBOL_POSITION.z;                            
+                            if (IsSceneObjectNameSymbolFrame(sceneObject->mName))
+                            {
+                                sceneObject->mPosition.z += SYMBOL_FRAME_Z_OFFSET;
+                            }
+                        }
+                    }
+                }
+                
+                // Newly created symbols (at the invisible top of the reel) should equal the number of destroyed symbols
+                assert(mTumbleResolutionData.mNewlyCreatedSymbolData.size() == mTumbleResolutionData.mDestroyedCoordsTopToBotom.size());
+                
+                auto destroyedCoordCounter = 0;
+                auto iter = mTumbleResolutionData.mDestroyedCoordsTopToBotom.begin();
+                while (iter != mTumbleResolutionData.mDestroyedCoordsTopToBotom.end())
+                {
+                    auto symbolEntryDataToDestroy = *iter;
+                    const auto col = symbolEntryDataToDestroy.mCol;
+                    
+                    CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TimeDelayAnimation>(destroyedCoordCounter * TUMBLE_ANIMATION_DELAY_PER_TUMBLE_EVENT + 1.0f), [this, col, symbolEntryDataToDestroy, destroyedCoordCounter]()
+                    {
+                        // Move all scene objects above the destroyed coord, one position down
+                        for (int row = symbolEntryDataToDestroy.mRow; row > 0; --row)
+                        {
+                            auto targetSymbolPosition = TOP_LEFT_SYMBOL_POSITION;
+                            targetSymbolPosition.x += col * HOR_SYMBOL_DISTANCE;
+                            targetSymbolPosition.y -= row * VER_SYMBOL_DISTANCE;
+                            
+                            auto symbolSceneObjects = FindAllSceneObjectsForSymbolCoordinates(mScene, row - 1, col);
+                            
+                            for (auto sceneObject: symbolSceneObjects)
+                            {
+                                // Adjust z for symbol frames
+                                auto finalTargetPosition = targetSymbolPosition;
+                                if (IsSceneObjectNameSymbolFrame(sceneObject->mName))
+                                {
+                                    finalTargetPosition.z += SYMBOL_FRAME_Z_OFFSET;
+                                }
+                            
+                                CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenPositionScaleAnimation>(sceneObject, finalTargetPosition, sceneObject->mScale, TIME_TO_FINALIZE_SYMBOL_POSITION, animation_flags::NONE, 0.0f, math::ElasticFunction, math::TweeningMode::EASE_IN), [this, row, col, sceneObject]()
+                                {
+                                    sceneObject->mName = IsSceneObjectNameSymbolFrame(sceneObject->mName) ? GetSymbolFrameSoName(row, col) : GetSymbolSoName(row, col);
+                                });
+                            
+                            }
+                        }
+                        
+                        // Get the next symbol that spawns at the top of the reel and create it
+                        const auto& nextNewlyCreatedSymbolData = mTumbleResolutionData.mNewlyCreatedSymbolData.at(destroyedCoordCounter);
+                        CreateSymbolSceneObjects(nextNewlyCreatedSymbolData.mSymbolType, nextNewlyCreatedSymbolData.mRow, nextNewlyCreatedSymbolData.mCol);
+                    });
+                    
+                    iter = mTumbleResolutionData.mDestroyedCoordsTopToBotom.erase(iter);
+                    destroyedCoordCounter++;
+                }
+                
+                mSpinAnimationState = SpinAnimationState::TUMBLING;
+                CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TimeDelayAnimation>((destroyedCoordCounter + 1) * TUMBLE_ANIMATION_DELAY_PER_TUMBLE_EVENT + 1.0f), [this](){ mSpinAnimationState = SpinAnimationState::POST_SPINNING; });
+            }
+        } break;
+            
         default: break;
     }
 }
@@ -324,6 +416,90 @@ void BoardView::BeginSpin()
                 CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenPositionScaleGroupAnimation>(std::vector<std::shared_ptr<scene::SceneObject>>{ symbol, symbolFrame }, targetPosition, symbol->mScale, PRE_SPIN_ANIMATION_TIME), [](){});
             }
         }
+    }
+}
+
+///------------------------------------------------------------------------------------------------
+
+void BoardView::BeginTumble(const slots::TumbleResolutionData& tumbleResolutionData)
+{
+    mTumbleResolutionData = tumbleResolutionData;
+    mSpinAnimationState = SpinAnimationState::COMBO_PRE_TUMBLING;
+    
+    //float totalEventAnimationDelay = 0.0f;
+    
+    // Instantly destroy ingredient symbols (they will be overshadowed by new temporary ones soon)
+    int placedComboCounter = 0;
+    
+    std::set<slots::SymbolEntryData, slots::SymbolEntryDataPlacementComparator> alreadyAnimatingIngredientsSymbolData;
+    for (const auto placedComboData: tumbleResolutionData.mPlacedCombosCoords)
+    {
+        auto comboSymbolPosition = mScene.FindSceneObject(GetSymbolSoName(placedComboData.mRow, placedComboData.mCol))->mPosition;
+        
+        CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TimeDelayAnimation>(placedComboCounter * TUMBLE_ANIMATION_DELAY_PER_COMBO_EVENT), [placedComboData, this]()
+        {
+            auto symbol = mScene.FindSceneObject(GetSymbolSoName(placedComboData.mRow, placedComboData.mCol));
+            auto symbolFrame = mScene.FindSceneObject(GetSymbolFrameSoName(placedComboData.mRow, placedComboData.mCol));
+            
+            symbol->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + SYMBOL_TEXTURE_PATHS.at(placedComboData.mSymbolType));
+            symbol->mShaderResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + SYMBOL_SHADER_PATH);
+            symbol->mPosition.z = TUMBLE_COMBO_SYMBOL_Z;
+            symbolFrame->mPosition.z = symbol->mPosition.z + SYMBOL_FRAME_Z_OFFSET;
+
+            auto& particleManager = CoreSystemsEngine::GetInstance().GetParticleManager();
+            auto particleEmitterPosition = symbol->mPosition;
+            particleEmitterPosition.z = TUMBLE_SMOKE_PARTICLE_Z;
+            particleManager.CreateParticleEmitterAtPosition(COMBO_SMOKE_PARTICLE_DEFINITION_NAME, particleEmitterPosition, mScene);
+        });
+        
+        // For just the 4 combo ingredients, other than the place the combo symbol was placed
+        int secondIngredientIndex = (placedComboCounter * slots::BOARD_COLS) + 1;
+        for (int i = secondIngredientIndex; i < secondIngredientIndex + 4; ++i)
+        {
+            const auto& ingredientSymbolData = tumbleResolutionData.mComboIngredientsSymbolData[i];
+                        
+            auto symbolSoName = GetSymbolSoName(ingredientSymbolData.mRow, ingredientSymbolData.mCol);
+            auto symbolFrameSoName = GetSymbolFrameSoName(ingredientSymbolData.mRow, ingredientSymbolData.mCol);
+            
+            auto symbol = mScene.FindSceneObject(symbolSoName);
+            auto symbolFrame = mScene.FindSceneObject(symbolFrameSoName);
+            
+            auto newNamePrefix = TUMBLE_TEMP_PREFIX + std::to_string(placedComboCounter) + "_" + std::to_string(i - secondIngredientIndex);
+    
+            if (alreadyAnimatingIngredientsSymbolData.contains(ingredientSymbolData) || tumbleResolutionData.mPlacedCombosCoords.contains(ingredientSymbolData))
+            {
+                auto newSymbolSceneObjects = CreateSymbolSceneObjects(ingredientSymbolData.mSymbolType, ingredientSymbolData.mRow, ingredientSymbolData.mCol, newNamePrefix);
+                symbol = newSymbolSceneObjects.first;
+                symbolFrame = newSymbolSceneObjects.second;
+            }
+            else
+            {
+                symbol->mName = strutils::StringId(newNamePrefix + "_symbol");
+                symbolFrame->mName = strutils::StringId(newNamePrefix + "_symbol_frame");
+            }
+            // Bezier-curve animate ingredients to final position
+            symbol->mPosition.z = 1.01f - 0.2f * placedComboCounter + (i - secondIngredientIndex) * 0.05f;
+            symbolFrame->mPosition.z = symbol->mPosition.z + SYMBOL_FRAME_Z_OFFSET;
+            
+            auto animateSceneObjectLambda = [comboSymbolPosition, i, secondIngredientIndex, placedComboCounter, this](std::shared_ptr<scene::SceneObject> sceneObject)
+            {
+                auto targetPosition = comboSymbolPosition;
+                targetPosition.z = sceneObject->mPosition.z;
+                
+                auto midPosition = (targetPosition + sceneObject->mPosition)/2.0f;
+                midPosition.y += (targetPosition.y < sceneObject->mPosition.y) ? TUMBLE_INGREDIENT_BEZIER_MIDPOINT_Y_POSITIONS.r : TUMBLE_INGREDIENT_BEZIER_MIDPOINT_Y_POSITIONS.g;
+                math::BezierCurve bezier(std::vector<glm::vec3>{sceneObject->mPosition, midPosition, targetPosition});
+                
+                CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::BezierCurveAnimation>(sceneObject, bezier, TUMBLE_INGREDIENT_ANIMATION_TIME, animation_flags::NONE, placedComboCounter * TUMBLE_ANIMATION_DELAY_PER_COMBO_EVENT + (i - secondIngredientIndex) * TUMBLE_INGREDIENT_ANIMATION_DELAY), [sceneObject, this](){ mScene.RemoveSceneObject(sceneObject->mName); });
+            };
+            
+            animateSceneObjectLambda(symbol);
+            animateSceneObjectLambda(symbolFrame);
+            
+            alreadyAnimatingIngredientsSymbolData.insert(ingredientSymbolData);
+        }
+        
+        placedComboCounter++;
     }
 }
 
@@ -396,30 +572,7 @@ void BoardView::ResetBoardSymbols()
     {
         for (int col = 0; col < slots::BOARD_COLS; ++col)
         {
-            auto targetSymbolPosition = TOP_LEFT_SYMBOL_POSITION;
-            targetSymbolPosition.x += col * HOR_SYMBOL_DISTANCE;
-            targetSymbolPosition.y -= row * VER_SYMBOL_DISTANCE;
-            
-            auto symbol = mScene.CreateSceneObject(GetSymbolSoName(row, col));
-            symbol->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + SYMBOL_TEXTURE_PATHS.at(mBoardModel.GetBoardSymbol(row, col)));
-            symbol->mShaderResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT  + (SPECIAL_SYMBOL_SHADERS.count(mBoardModel.GetBoardSymbol(row, col)) ? SPECIAL_SYMBOL_SHADERS.at(mBoardModel.GetBoardSymbol(row, col)) : SYMBOL_SHADER_PATH));
-            symbol->mEffectTextureResourceIds[0] = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + SCATTER_SYMBOL_EFFECT_TEXTURE_PATH);
-            symbol->mEffectTextureResourceIds[1] = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + SCATTER_BACKGROUND_MASK_TEXTURE_PATH);
-            symbol->mShaderFloatUniformValues[INTERACTIVE_COLOR_THRESHOLD_UNIFORM_NAME] = INTERACTIVE_COLOR_THRESHOLD;
-            symbol->mShaderFloatUniformValues[INTERACTIVE_COLOR_TIME_MULTIPLIER_UNIFORM_NAME] = INTERACTIVE_COLOR_TIME_MULTIPLIER;
-            symbol->mShaderFloatUniformValues[SCATTER_EFFECT_MULTIPLIER_COEFF_UNIFORM_NAME] = SCATTER_EFFECT_MULTIPLIER_COEFF;
-            symbol->mShaderBoolUniformValues[GRAYSCALE_UNIFORM_NAME] = false;
-            
-            symbol->mPosition = targetSymbolPosition;
-            symbol->mScale = SYMBOL_SCALE;
-            symbol->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 1.0f;
-
-            auto symbolFrame = mScene.CreateSceneObject(GetSymbolFrameSoName(row, col));
-            symbolFrame->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + SYMBOL_FRAME_TEXTURE_PATH);
-            symbolFrame->mPosition = targetSymbolPosition;
-            symbolFrame->mPosition.z += 0.1f;
-            symbolFrame->mScale = SYMBOL_FRAME_SCALE;
-            symbolFrame->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 1.0f;
+            CreateSymbolSceneObjects(mBoardModel.GetBoardSymbol(row, col), row, col);
         }
     }
     
@@ -484,7 +637,7 @@ void BoardView::UpdateSceneObjectDuringReelAnimation(std::shared_ptr<scene::Scen
             sceneObject->mPosition.y += VER_SYMBOL_DISTANCE * slots::REEL_LENGTH;
         }
         
-        if (!strutils::StringEndsWith(newSceneObjectName, "frame"))
+        if (!IsSceneObjectNameSymbolFrame(strutils::StringId(newSceneObjectName)))
         {
             auto newSymbolType = static_cast<slots::SymbolType>(math::RandomInt() % static_cast<int>(slots::SymbolType::COUNT));
             
@@ -608,6 +761,38 @@ void BoardView::SetFrictionEmitterState(const int emitterIndex, const bool enabl
     {
         particleManager.RemoveParticleEmitterFlag(particle_flags::CONTINUOUS_PARTICLE_GENERATION, emitterSo->mName, mScene);
     }
+}
+
+///------------------------------------------------------------------------------------------------
+
+std::pair<std::shared_ptr<scene::SceneObject>, std::shared_ptr<scene::SceneObject>> BoardView::CreateSymbolSceneObjects(const slots::SymbolType symbolType, const int row, const int col, const std::string customNamePrefix /* = "" */)
+{
+    auto targetSymbolPosition = TOP_LEFT_SYMBOL_POSITION;
+    targetSymbolPosition.x += col * HOR_SYMBOL_DISTANCE;
+    targetSymbolPosition.y -= row * VER_SYMBOL_DISTANCE;
+    
+    auto symbol = mScene.CreateSceneObject(customNamePrefix.empty() ? GetSymbolSoName(row, col) : strutils::StringId(customNamePrefix + "_symbol"));
+    symbol->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + SYMBOL_TEXTURE_PATHS.at(symbolType));
+    symbol->mShaderResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + (SPECIAL_SYMBOL_SHADERS.count(symbolType) ? SPECIAL_SYMBOL_SHADERS.at(symbolType) : SYMBOL_SHADER_PATH));
+    symbol->mEffectTextureResourceIds[0] = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + SCATTER_SYMBOL_EFFECT_TEXTURE_PATH);
+    symbol->mEffectTextureResourceIds[1] = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + SCATTER_BACKGROUND_MASK_TEXTURE_PATH);
+    symbol->mShaderFloatUniformValues[INTERACTIVE_COLOR_THRESHOLD_UNIFORM_NAME] = INTERACTIVE_COLOR_THRESHOLD;
+    symbol->mShaderFloatUniformValues[INTERACTIVE_COLOR_TIME_MULTIPLIER_UNIFORM_NAME] = INTERACTIVE_COLOR_TIME_MULTIPLIER;
+    symbol->mShaderFloatUniformValues[SCATTER_EFFECT_MULTIPLIER_COEFF_UNIFORM_NAME] = SCATTER_EFFECT_MULTIPLIER_COEFF;
+    symbol->mShaderBoolUniformValues[GRAYSCALE_UNIFORM_NAME] = false;
+    
+    symbol->mPosition = targetSymbolPosition;
+    symbol->mScale = SYMBOL_SCALE;
+    symbol->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 1.0f;
+
+    auto symbolFrame = mScene.CreateSceneObject(customNamePrefix.empty() ? GetSymbolFrameSoName(row, col) : strutils::StringId(customNamePrefix + "_symbol_frame"));
+    symbolFrame->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + SYMBOL_FRAME_TEXTURE_PATH);
+    symbolFrame->mPosition = targetSymbolPosition;
+    symbolFrame->mPosition.z += SYMBOL_FRAME_Z_OFFSET;
+    symbolFrame->mScale = SYMBOL_FRAME_SCALE;
+    symbolFrame->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 1.0f;
+    
+    return std::make_pair(symbol, symbolFrame);
 }
 
 ///------------------------------------------------------------------------------------------------
