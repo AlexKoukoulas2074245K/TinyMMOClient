@@ -46,13 +46,16 @@ void DebugGameWidgets::CreateDebugWidgets(Game& game)
             static const std::string COMBO_1   = "COMBO_1";
             static const std::string COMBO_2   = "COMBO_2";
             static const std::string COMBO_3   = "COMBO_3";
+            static const std::string COMBO_4   = "COMBO_4";
+
             static std::vector<std::string> sDebugBoardConfigTypes =
             {
                 SCATTER_3,
                 SCATTER_5,
                 COMBO_1,
                 COMBO_2,
-                COMBO_3
+                COMBO_3,
+                COMBO_4
             };
             if (ImGui::BeginCombo(" ", sDebugBoardConfigTypes.at(sDebugBoardConfigTypesIndex).c_str()))
             {
@@ -109,6 +112,10 @@ void DebugGameWidgets::CreateDebugWidgets(Game& game)
                         break;
                     }
                     else if (sDebugBoardConfigTypes.at(sDebugBoardConfigTypesIndex) == COMBO_3 && numberOfCombos == 3)
+                    {
+                        break;
+                    }
+                    else if (sDebugBoardConfigTypes.at(sDebugBoardConfigTypesIndex) == COMBO_4 && numberOfCombos == 4)
                     {
                         break;
                     }

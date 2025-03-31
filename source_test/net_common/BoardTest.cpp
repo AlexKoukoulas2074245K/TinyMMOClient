@@ -176,7 +176,7 @@ TEST(BoardTest, TestRandomBoardWinStats)
             
             if (boardStateResolution.mShouldTumble)
             {
-                b.ResolveBoardTumble();
+                b.ResolveBoardTumble(boardStateResolution);
             }
             else
             {

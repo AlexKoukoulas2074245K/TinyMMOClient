@@ -313,7 +313,7 @@ void Game::UpdateGUI(const float dtMillis)
                 
                 if (boardStateResolutionData.mShouldTumble)
                 {
-                    auto tumbleResolutionData = mBoardModel.ResolveBoardTumble();
+                    auto tumbleResolutionData = mBoardModel.ResolveBoardTumble(boardStateResolutionData);
                     animationManager.StartAnimation(std::make_unique<rendering::TimeDelayAnimation>(boardStateResolutionData.mWinningPaylines.size() * PAYLINE_ANIMATION_DURATION), [this, tumbleResolutionData]()
                     {
                         mBoardView->BeginTumble(tumbleResolutionData);
