@@ -31,8 +31,8 @@
 #include <game/AnimatedButton.h>
 #include <game/BoardView.h>
 #include <game/Game.h>
+#include <game/DebugGameWidgets.h>
 #include <game/events/EventSystem.h>
-#include <imgui/imgui.h>
 #include <mutex>
 #include <SDL.h>
 
@@ -206,108 +206,7 @@ void Game::WindowResize()
 #if defined(USE_IMGUI)
 void Game::CreateDebugWidgets()
 { 
-    ImGui::Begin("Net Stats", nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
-    ImGui::Text("Ping %d millis", mLastPingMillis.load());
-    ImGui::End();
-    
-    ImGui::Begin("Debug Data", nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
-    ImGui::Text("Player ID: %lld", mPlayerId);
-    ImGui::Text("Current Spin ID: %d", mSpinId);
-    ImGui::SameLine();
-    if (ImGui::Button("Copy to Clipboard"))
-    {
-        SDL_SetClipboardText(std::to_string(mSpinId).c_str());
-    }
-    ImGui::Text("Spin Animation State: %s", mBoardView ? mBoardView->GetSpinAnimationStateName().c_str() : "IDLE");
-    
-    if (ImGui::Button("Refill Board"))
-    {
-        if (mBoardView)
-        {
-            mSpinId = math::RandomInt();
-            mBoardModel.PopulateBoardForSpin(mSpinId);
-            mBoardView->ResetBoardSymbols();
-        }
-    }
-    
-    ImGui::Separator();
-    if (ImGui::BeginTable("Pending Symbol State", slots::BOARD_COLS))
-    {
-        ImGui::TableNextRow();
-        for (int column = 0; column < slots::BOARD_COLS; column++)
-        {
-            ImGui::TableSetColumnIndex(column);
-            ImGui::Text("%s", mBoardView ? mBoardView->GetPendingSymbolDataStateName(column).c_str() : "LOCKED");
-        }
-        ImGui::EndTable();
-    }
-    ImGui::Separator();
-    if (ImGui::BeginTable("Board View", slots::BOARD_COLS))
-    {
-        for (int row = 0; row < slots::REEL_LENGTH; row++)
-        {
-            ImGui::TableNextRow();
-            for (int column = 0; column < slots::BOARD_COLS; column++)
-            {
-                ImGui::TableSetColumnIndex(column);
-                
-                if (row <= 2 || row >= 6)
-                {
-                    ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "%s", slots::Board::GetSymbolDebugName(mBoardModel.GetBoardSymbol(row, column)).c_str());
-                }
-                else
-                {
-                    ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "%s", slots::Board::GetSymbolDebugName(mBoardModel.GetBoardSymbol(row, column)).c_str());
-                }
-            }
-        }
-        ImGui::EndTable();
-    }
-    
-    ImGui::End();
-    
-    ImGui::Begin("Paylines", nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
-    static int sPaylineIndex = 0;
-    static float sRevealDurationSecs = 1.0f;
-    static float sHiddingDurationSecs = 0.5f;
-    static std::vector<std::string> sPaylines;
-
-    if (sPaylines.empty())
-    {
-        for (int i = 0; i < static_cast<int>(slots::PaylineType::PAYLINE_COUNT); ++i)
-        {
-            sPaylines.emplace_back(PaylineView::GetPaylineName(static_cast<slots::PaylineType>(i)));
-        }
-    }
-    
-    if (ImGui::BeginCombo(" ", sPaylines.at(sPaylineIndex).c_str()))
-    {
-        for (auto n = 0U; n < sPaylines.size(); n++)
-        {
-            const bool isSelected = (sPaylineIndex == n);
-            if (ImGui::Selectable(sPaylines.at(n).c_str(), isSelected))
-            {
-                sPaylineIndex = n;
-            }
-            if (isSelected)
-            {
-                ImGui::SetItemDefaultFocus();
-            }
-        }
-        ImGui::EndCombo();
-    }
-    ImGui::SliderFloat("Reveal Duration(s)", &sRevealDurationSecs, 0.01f, 5.0f);
-    ImGui::SliderFloat("Hiding Duration(s)", &sHiddingDurationSecs, 0.01f, 5.0f);
-    if (ImGui::Button("Animate Payline"))
-    {
-        if (mBoardView)
-        {
-            slots::PaylineResolutionData paylineResolutionData;
-            paylineResolutionData.mPayline = static_cast<slots::PaylineType>(sPaylineIndex);
-            mBoardView->AnimatePaylineReveal(paylineResolutionData, sRevealDurationSecs, sHiddingDurationSecs);
-        }
-    }
-    ImGui::End();
+    DebugGameWidgets::CreateDebugWidgets(*this);
 }
 #else
 void Game::CreateDebugWidgets()

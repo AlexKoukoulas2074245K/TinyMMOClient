@@ -21,6 +21,7 @@
 		191617E17721C2C19E20E920 /* IResource.h in Sources */ = {isa = PBXBuildFile; fileRef = 99B2042795EEDA27C28F2D84 /* IResource.h */; };
 		19AB2555F153D36FD08A7E15 /* MeshResource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DDD0E1D0B63F40D725F02A35 /* MeshResource.cpp */; };
 		1AFC9A98EB4CEF5FA6491FA6 /* ResourceLoadingService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 052939A977343440F86F0858 /* ResourceLoadingService.cpp */; };
+		1D2E7634ACFD852B1CF9C5E0 /* DebugGameWidgets.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 138D8F5DC22716F66372E08E /* DebugGameWidgets.cpp */; };
 		1E51657DEC156E190649EDB0 /* SymbolDataRepository.h in Sources */ = {isa = PBXBuildFile; fileRef = 33BB453DEBDE9661C88609E7 /* SymbolDataRepository.h */; };
 		1ECC3C6E351A36D1C71615E0 /* Logging.h in Sources */ = {isa = PBXBuildFile; fileRef = 43A25A1E55390D38AC6A5742 /* Logging.h */; };
 		216990DC394003275C5EA33D /* Fonts.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB8C2E3FACC90180DAAE4F40 /* Fonts.cpp */; };
@@ -28,6 +29,7 @@
 		2459A2AD382EE0AA9153A204 /* wglew.h in Sources */ = {isa = PBXBuildFile; fileRef = D64C3227BB47CA8611283D51 /* wglew.h */; };
 		249415978B8DA701343AE116 /* ThreadSafeQueue.h in Sources */ = {isa = PBXBuildFile; fileRef = 543F0360AEBB87C61E32D84B /* ThreadSafeQueue.h */; };
 		29E22320669F6B79D634B4C3 /* PaylineView.h in Sources */ = {isa = PBXBuildFile; fileRef = 0FD0557BEDD5E251752E1792 /* PaylineView.h */; };
+		2A7CB3DE9E5C1FF57FB76E93 /* DebugGameWidgets.h in Sources */ = {isa = PBXBuildFile; fileRef = 5BA0718CE65BB4B003826244 /* DebugGameWidgets.h */; };
 		2AA2F6A7573CDD74098EFB98 /* CoreSystemsEnginePlatformImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6D3F63C77D9E3CBD37931ADE /* CoreSystemsEnginePlatformImpl.cpp */; };
 		2B5260BBB10C55209BD2E0D7 /* Board.h in Sources */ = {isa = PBXBuildFile; fileRef = 30E03B0AAACE43ED265C3CE2 /* Board.h */; };
 		2C796C36D339C3D09D474175 /* Board.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9BF6CCA2D0E95C57CA0ED7B9 /* Board.cpp */; };
@@ -54,6 +56,7 @@
 		53BF5611CC60F79F57D910F8 /* PaylineView.h in Sources */ = {isa = PBXBuildFile; fileRef = 0FD0557BEDD5E251752E1792 /* PaylineView.h */; };
 		55A949B09D185B35C8B0D135 /* Logging.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3BF946C1B449BB4FE7DF288A /* Logging.cpp */; };
 		55B88F03ED55A2709BD2B704 /* SceneObjectUtils.h in Sources */ = {isa = PBXBuildFile; fileRef = FB0E9FCA60AD270C9B09FA51 /* SceneObjectUtils.h */; };
+		57D0B11DC08C35BFA242AC11 /* DebugGameWidgets.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 138D8F5DC22716F66372E08E /* DebugGameWidgets.cpp */; };
 		590BC49901179FB522AD2223 /* OSMessageBox.h in Sources */ = {isa = PBXBuildFile; fileRef = EEC2E35013E2E8B9B7A912C6 /* OSMessageBox.h */; };
 		5BEFD96D266F53B603C278C1 /* TypeTraits.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 988043F06556266668BE5677 /* TypeTraits.cpp */; };
 		5E524DDE069F7535F27650B6 /* NetworkObjectDefinitions.inc in Sources */ = {isa = PBXBuildFile; fileRef = BE806858C85634D9FB14B857 /* NetworkObjectDefinitions.inc */; };
@@ -65,6 +68,7 @@
 		6D827E1ADCEBBFD2A690675C /* CommonUniforms.h in Sources */ = {isa = PBXBuildFile; fileRef = 9CC1A200C9B794A05E296C21 /* CommonUniforms.h */; };
 		6E1A780876A016C76FFF66C6 /* OBJMeshLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 06291EA0D3FF12CB3058DEF2 /* OBJMeshLoader.cpp */; };
 		6E4B2E1884BE8DC6D5DBC433 /* Reel.h in Sources */ = {isa = PBXBuildFile; fileRef = 0808F578545FADE323B82471 /* Reel.h */; };
+		70DA52B0EC52AD7686AA32C0 /* DebugGameWidgets.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 138D8F5DC22716F66372E08E /* DebugGameWidgets.cpp */; };
 		71319CF262B3FEA0241CE51E /* RendererPlatformImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68CBCF02480A4F7771578514 /* RendererPlatformImpl.cpp */; };
 		71DEABFBFD9A818B6DFD8412 /* TextureLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E0D05FD28DC001514531A214 /* TextureLoader.cpp */; };
 		755F10742FF09979BBBA9C58 /* EditorImGuiCommands.inc in Sources */ = {isa = PBXBuildFile; fileRef = 3A0B70DC7ADA228D909C7E71 /* EditorImGuiCommands.inc */; };
@@ -81,6 +85,7 @@
 		851FBE54CFC3F1C7F292AD3D /* AnimationManager.h in Sources */ = {isa = PBXBuildFile; fileRef = F2FC1889E08EEFD36C0B6476 /* AnimationManager.h */; };
 		856245AD4BB31471EE574CB5 /* Board.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9BF6CCA2D0E95C57CA0ED7B9 /* Board.cpp */; };
 		86BE6465DBA9683F9048EDE5 /* Board.h in Sources */ = {isa = PBXBuildFile; fileRef = 30E03B0AAACE43ED265C3CE2 /* Board.h */; };
+		8A788C6FBEE20A908140AD22 /* DebugGameWidgets.h in Sources */ = {isa = PBXBuildFile; fileRef = 5BA0718CE65BB4B003826244 /* DebugGameWidgets.h */; };
 		8C096F9D043616750BC963F8 /* TextureLoader.h in Sources */ = {isa = PBXBuildFile; fileRef = 05D038A4FFCF3C5AA2E85A75 /* TextureLoader.h */; };
 		8EF9707CCD71E46D210D6EF1 /* PaylineView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7D6743D12656359B9F94AE23 /* PaylineView.cpp */; };
 		920C54052B80E41A006F6743 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 920C54042B80E41A006F6743 /* OpenAL.framework */; };
@@ -440,6 +445,7 @@
 		E2240B574B476A510E0FEE8A /* AppleSoundUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = EFF6CA715340BD63F4562F60 /* AppleSoundUtils.mm */; };
 		E24F8BEB335EFB8866189742 /* BaseDataFileSerializer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 903005ABB6F4A9CB6247ABDC /* BaseDataFileSerializer.cpp */; };
 		E7F3EF85172DB9E9D9AF8321 /* ImageSurfaceLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B645F5160C1B36C70F708518 /* ImageSurfaceLoader.cpp */; };
+		E97469C65DF7F329D6F88B4B /* DebugGameWidgets.h in Sources */ = {isa = PBXBuildFile; fileRef = 5BA0718CE65BB4B003826244 /* DebugGameWidgets.h */; };
 		F0004BDC7B35E98CC87F0D50 /* Reel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 006393D9627BF00BE369EC69 /* Reel.cpp */; };
 		F2C17A279E5E5256D4401C90 /* DataFileLoader.h in Sources */ = {isa = PBXBuildFile; fileRef = B83F90BE48846F5019309046 /* DataFileLoader.h */; };
 		F420E735CA3AE6AC068AD22E /* CommonUniforms.h in Sources */ = {isa = PBXBuildFile; fileRef = 9CC1A200C9B794A05E296C21 /* CommonUniforms.h */; };
@@ -510,6 +516,7 @@
 		0B5602AB7CC28E6EA08AAED6 /* Version.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = Version.h; path = Version.h; sourceTree = "<group>"; };
 		0D09AB023B7A329D725F2F2F /* FileUtils.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = FileUtils.h; sourceTree = "<group>"; };
 		0FD0557BEDD5E251752E1792 /* PaylineView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = PaylineView.h; path = PaylineView.h; sourceTree = "<group>"; };
+		138D8F5DC22716F66372E08E /* DebugGameWidgets.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = DebugGameWidgets.cpp; path = DebugGameWidgets.cpp; sourceTree = "<group>"; };
 		13FDFD19955883B3085E4725 /* ShaderResource.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = ShaderResource.h; sourceTree = "<group>"; };
 		14207B709EC0713AAB9C29C8 /* ParticleManager.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = ParticleManager.cpp; sourceTree = "<group>"; };
 		17FD62578C4E3F684EA56CBC /* Symbols.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = Symbols.h; sourceTree = "<group>"; };
@@ -535,6 +542,7 @@
 		543F0360AEBB87C61E32D84B /* ThreadSafeQueue.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = ThreadSafeQueue.h; sourceTree = "<group>"; };
 		59B053AEBDD62B4FCAB8E05D /* RenderingUtils.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = RenderingUtils.cpp; sourceTree = "<group>"; };
 		5B33DAF295D4E7E164154510 /* SfxPlayer.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; path = SfxPlayer.mm; sourceTree = "<group>"; };
+		5BA0718CE65BB4B003826244 /* DebugGameWidgets.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = DebugGameWidgets.h; path = DebugGameWidgets.h; sourceTree = "<group>"; };
 		642B84557417F85C19410FDE /* ShaderLoader.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = ShaderLoader.h; sourceTree = "<group>"; };
 		6544FC0C6E5993C9E3957773 /* Scene.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = Scene.cpp; sourceTree = "<group>"; };
 		659D24C3A310C59893EE9475 /* Scene.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = Scene.h; sourceTree = "<group>"; };
@@ -1054,6 +1062,8 @@
 				2BFFC6441342229428E33195 /* BoardView.h */,
 				7D6743D12656359B9F94AE23 /* PaylineView.cpp */,
 				0FD0557BEDD5E251752E1792 /* PaylineView.h */,
+				138D8F5DC22716F66372E08E /* DebugGameWidgets.cpp */,
+				5BA0718CE65BB4B003826244 /* DebugGameWidgets.h */,
 			);
 			path = game;
 			sourceTree = "<group>";
@@ -1511,6 +1521,8 @@
 				846BEAFE6622E65F596CC336 /* Paylines.h in Sources */,
 				A877F8389972D2FDDF6AC2E1 /* BoardStateResolutionData.h in Sources */,
 				AD3849EC3D7BF58FBE796328 /* Version.h in Sources */,
+				70DA52B0EC52AD7686AA32C0 /* DebugGameWidgets.cpp in Sources */,
+				E97469C65DF7F329D6F88B4B /* DebugGameWidgets.h in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1638,6 +1650,8 @@
 				D95640AB7397F720BF19BFB4 /* Paylines.h in Sources */,
 				C45EF8722D69B0DBCE42E193 /* BoardStateResolutionData.h in Sources */,
 				7F8095DD8B9472184A88DC91 /* Version.h in Sources */,
+				1D2E7634ACFD852B1CF9C5E0 /* DebugGameWidgets.cpp in Sources */,
+				8A788C6FBEE20A908140AD22 /* DebugGameWidgets.h in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1765,6 +1779,8 @@
 				96A42D4F8A9E7CEF86B6FD2F /* Paylines.h in Sources */,
 				7807AEA10392512899B607F0 /* BoardStateResolutionData.h in Sources */,
 				309CA5C19E3574B35486EBD4 /* Version.h in Sources */,
+				57D0B11DC08C35BFA242AC11 /* DebugGameWidgets.cpp in Sources */,
+				2A7CB3DE9E5C1FF57FB76E93 /* DebugGameWidgets.h in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

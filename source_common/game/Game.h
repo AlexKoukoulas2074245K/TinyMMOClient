@@ -33,6 +33,7 @@ class AnimatedButton;
 class BoardView;
 class Game final
 {
+    friend class DebugGameWidgets;
 public:
     Game(const int argc, char** argv);
     ~Game();
