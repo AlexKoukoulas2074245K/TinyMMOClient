@@ -1,7 +1,9 @@
+
+
 ///------------------------------------------------------------------------------------------------
 ///  BoardView.cpp
 ///  Predators
-///                                                                                                
+///
 ///  Created by Alex Koukoulas on 28/02/2025
 ///------------------------------------------------------------------------------------------------
 
@@ -18,6 +20,7 @@
 #include <net_common/Board.h>
 #include <net_common/Symbols.h>
 #include <net_common/SymbolDataRepository.h>
+#include <map>
 
 ///------------------------------------------------------------------------------------------------
 
@@ -77,7 +80,7 @@ static const float SCATTER_SLOWDOWN_KICKOFF_MULTIPLIER = 0.6666f;
 static const float TUMBLE_COMBO_SYMBOL_Z = 2.0f;
 static const float TUMBLE_SMOKE_PARTICLE_Z = 3.0f;
 static const float TUMBLE_ANIMATION_DELAY_PER_COMBO_EVENT = 1.5f;
-static const float TUMBLE_ANIMATION_DELAY_PER_TUMBLE_EVENT = 0.5f;
+static const float TUMBLE_ANIMATION_DELAY_PER_REEL = 0.5f;
 static const float TUMBLE_INGREDIENT_ANIMATION_TIME = 0.75f;
 static const float TUMBLE_INGREDIENT_ANIMATION_DELAY = 0.2f;
 
@@ -130,10 +133,94 @@ static const std::unordered_map<BoardView::PendingSymbolData::PendingSymbolDataS
 
 ///------------------------------------------------------------------------------------------------
 
-static inline strutils::StringId GetSymbolSoName(const int row, const int col) { return strutils::StringId(std::to_string(row) + "," + std::to_string(col) + "_symbol"); }
-static inline strutils::StringId GetSymbolFrameSoName(const int row, const int col) { return strutils::StringId(std::to_string(row) + "," + std::to_string(col) + "_symbol_frame"); }
-static inline bool IsSceneObjectNameSymbolFrame(const strutils::StringId& sceneObjectName) { return strutils::StringEndsWith(sceneObjectName.GetString(), "frame"); }
-static inline std::vector<std::shared_ptr<scene::SceneObject>> FindAllSceneObjectsForSymbolCoordinates(const scene::Scene& scene, const int row, const int col){ return scene.FindSceneObjectsWhoseNameStartsWith(std::to_string(row) + "," + std::to_string(col)); }
+static inline strutils::StringId GetSymbolSoName(const int row, const int col)
+{
+    return strutils::StringId(std::to_string(row) + "," + std::to_string(col) + "_symbol");
+}
+
+static inline strutils::StringId GetSymbolFrameSoName(const int row, const int col)
+{
+    return strutils::StringId(std::to_string(row) + "," + std::to_string(col) + "_symbol_frame");
+}
+
+static inline bool IsSceneObjectNameSymbolFrame(const strutils::StringId& sceneObjectName)
+{
+    return strutils::StringEndsWith(sceneObjectName.GetString(), "frame");
+}
+
+static inline std::vector<std::shared_ptr<scene::SceneObject>> FindAllSceneObjectsForSymbolCoordinates(const scene::Scene& scene, const int row, const int col)
+{
+    return scene.FindSceneObjectsWhoseNameStartsWith(std::to_string(row) + "," + std::to_string(col));
+}
+
+static inline slots::SymbolType LookupSceneObjectSymbolType(const resources::ResourceId textureResourceId)
+{
+    for (auto& symbolToTextureEntry: SYMBOL_TEXTURE_PATHS)
+    {
+        auto genResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().GetResourceIdFromPath(resources::ResourceLoadingService::RES_TEXTURES_ROOT + symbolToTextureEntry.second, false);
+        if (genResourceId == textureResourceId)
+        {
+            return symbolToTextureEntry.first;
+        }
+    }
+    return slots::SymbolType::COUNT;
+};
+
+static inline std::vector<std::shared_ptr<scene::SceneObject>> FindAllSceneObjectsForSymbolCoordinatesWithSymbolType(const scene::Scene& scene, const int row, const int col, const slots::SymbolType symbolType)
+{
+    std::vector<std::shared_ptr<scene::SceneObject>> result;
+    auto allSceneObjectsInCoord = scene.FindSceneObjectsWhoseNameStartsWith(std::to_string(row) + "," + std::to_string(col));
+    
+    for (auto sceneObject: allSceneObjectsInCoord)
+    {
+        if (IsSceneObjectNameSymbolFrame(sceneObject->mName))
+        {
+            result.push_back(sceneObject);
+            break;
+        }
+    }
+    
+    for (auto sceneObject: allSceneObjectsInCoord)
+    {
+        if (LookupSceneObjectSymbolType(sceneObject->mTextureResourceId) == symbolType)
+        {
+            result.push_back(sceneObject);
+            break;
+        }
+    }
+    
+    return result;
+}
+
+///------------------------------------------------------------------------------------------------
+
+struct SymbolEntryNextPositionComparator
+{
+    bool operator()(const slots::SymbolEntryData& lhs, const slots::SymbolEntryData& rhs) const
+    {
+        if (lhs.mCol != rhs.mCol)
+        {
+            return lhs.mCol < rhs.mCol;
+        }
+        else
+        {
+            if (lhs.mRow != rhs.mRow)
+            {
+                return lhs.mRow > rhs.mRow;
+            }
+            else
+            {
+                return lhs.mSymbolType < rhs.mSymbolType;
+            }
+        }
+    }
+};
+
+struct NextPositionEntry
+{
+    slots::SymbolEntryData mSymbolEntryData;
+    glm::vec3 mSymbolPosition;
+};
 
 ///------------------------------------------------------------------------------------------------
 
@@ -290,7 +377,7 @@ void BoardView::Update(const float dtMillis)
                             sceneObject->mShaderBoolUniformValues[GRAYSCALE_UNIFORM_NAME] = false;
                             
                             // And reset z-s (manipulated during combo creation)
-                            sceneObject->mPosition.z = TOP_LEFT_SYMBOL_POSITION.z;                            
+                            sceneObject->mPosition.z = TOP_LEFT_SYMBOL_POSITION.z;
                             if (IsSceneObjectNameSymbolFrame(sceneObject->mName))
                             {
                                 sceneObject->mPosition.z += SYMBOL_FRAME_Z_OFFSET;
@@ -302,6 +389,12 @@ void BoardView::Update(const float dtMillis)
                 // Newly created symbols (at the invisible top of the reel) should equal the number of destroyed symbols
                 assert(mTumbleResolutionData.mNewlyCreatedSymbolData.size() == mTumbleResolutionData.mDestroyedCoordsTopToBotom.size());
                 
+                // Keeps track and updates final tumble positions for all affected symbols
+                std::map<slots::SymbolEntryData, NextPositionEntry, SymbolEntryNextPositionComparator> symbolNextPositionsMap;
+                
+                // Keeps track of symbol destructions per reel
+                int numDestroyedSymbolsPerReel[slots::BOARD_COLS] = {0};
+                
                 auto destroyedCoordCounter = 0;
                 auto iter = mTumbleResolutionData.mDestroyedCoordsTopToBotom.begin();
                 while (iter != mTumbleResolutionData.mDestroyedCoordsTopToBotom.end())
@@ -309,45 +402,103 @@ void BoardView::Update(const float dtMillis)
                     auto symbolEntryDataToDestroy = *iter;
                     const auto col = symbolEntryDataToDestroy.mCol;
                     
-                    CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TimeDelayAnimation>(destroyedCoordCounter * TUMBLE_ANIMATION_DELAY_PER_TUMBLE_EVENT + 1.0f), [this, col, symbolEntryDataToDestroy, destroyedCoordCounter]()
+                    for (int row = symbolEntryDataToDestroy.mRow - 1; row >= 0; --row)
                     {
-                        // Move all scene objects above the destroyed coord, one position down
-                        for (int row = symbolEntryDataToDestroy.mRow; row > 0; --row)
+                        auto symbolSceneObjects = FindAllSceneObjectsForSymbolCoordinates(mScene, row, col);
+                        
+                        // Lookup symbol type via Scene Object's texture
+                        auto symbolType = slots::SymbolType::COUNT;
+                        for (auto sceneObject: symbolSceneObjects)
                         {
-                            auto targetSymbolPosition = TOP_LEFT_SYMBOL_POSITION;
-                            targetSymbolPosition.x += col * HOR_SYMBOL_DISTANCE;
-                            targetSymbolPosition.y -= row * VER_SYMBOL_DISTANCE;
-                            
-                            auto symbolSceneObjects = FindAllSceneObjectsForSymbolCoordinates(mScene, row - 1, col);
-                            
-                            for (auto sceneObject: symbolSceneObjects)
+                            if (!IsSceneObjectNameSymbolFrame(sceneObject->mName))
                             {
-                                // Adjust z for symbol frames
-                                auto finalTargetPosition = targetSymbolPosition;
-                                if (IsSceneObjectNameSymbolFrame(sceneObject->mName))
-                                {
-                                    finalTargetPosition.z += SYMBOL_FRAME_Z_OFFSET;
-                                }
-                            
-                                CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenPositionScaleAnimation>(sceneObject, finalTargetPosition, sceneObject->mScale, TIME_TO_FINALIZE_SYMBOL_POSITION, animation_flags::NONE, 0.0f, math::ElasticFunction, math::TweeningMode::EASE_IN), [this, row, col, sceneObject]()
-                                {
-                                    sceneObject->mName = IsSceneObjectNameSymbolFrame(sceneObject->mName) ? GetSymbolFrameSoName(row, col) : GetSymbolSoName(row, col);
-                                });
-                            
+                                symbolType = LookupSceneObjectSymbolType(sceneObject->mTextureResourceId);
+                                break;
                             }
                         }
                         
-                        // Get the next symbol that spawns at the top of the reel and create it
-                        const auto& nextNewlyCreatedSymbolData = mTumbleResolutionData.mNewlyCreatedSymbolData.at(destroyedCoordCounter);
-                        CreateSymbolSceneObjects(nextNewlyCreatedSymbolData.mSymbolType, nextNewlyCreatedSymbolData.mRow, nextNewlyCreatedSymbolData.mCol);
-                    });
+                        if (!symbolSceneObjects.empty())
+                        {
+                            assert(symbolType != slots::SymbolType::COUNT);
+                            slots::SymbolEntryData key = {symbolType, col, row};
+                            
+                            auto foundIter = symbolNextPositionsMap.find(key);
+                            
+                            // Update existing next position entry
+                            if (foundIter != symbolNextPositionsMap.cend())
+                            {
+                                symbolNextPositionsMap[key].mSymbolEntryData.mRow++;
+                                symbolNextPositionsMap[key].mSymbolPosition.y -= VER_SYMBOL_DISTANCE;
+                            }
+                            // Create new next position entry
+                            else
+                            {
+                                auto nextSymbolEntryData = key;
+                                nextSymbolEntryData.mRow++;
+                                
+                                auto targetSymbolPosition = TOP_LEFT_SYMBOL_POSITION;
+                                targetSymbolPosition.x += col * HOR_SYMBOL_DISTANCE;
+                                targetSymbolPosition.y -= (row + 1) * VER_SYMBOL_DISTANCE;
+                                
+                                symbolNextPositionsMap[key] = NextPositionEntry{nextSymbolEntryData, targetSymbolPosition};
+                            }
+                        }
+                    }
                     
+                    // Update counters
+                    numDestroyedSymbolsPerReel[col]++;
                     iter = mTumbleResolutionData.mDestroyedCoordsTopToBotom.erase(iter);
                     destroyedCoordCounter++;
                 }
                 
+                // Animate all affected symbols to their target positions
+                for (int reelIndex = 0; reelIndex < slots::BOARD_COLS; ++reelIndex)
+                {
+                    for (const auto& nextPositionEntry: symbolNextPositionsMap)
+                    {
+                        if (nextPositionEntry.first.mCol != reelIndex)
+                        {
+                            continue;
+                        }
+                        
+                        auto symbolSceneObjects = FindAllSceneObjectsForSymbolCoordinatesWithSymbolType(mScene, nextPositionEntry.first.mRow, nextPositionEntry.first.mCol, nextPositionEntry.first.mSymbolType);
+                        
+                        for (auto sceneObject: symbolSceneObjects)
+                        {
+                            // Adjust z for symbol frames
+                            auto finalTargetPosition = nextPositionEntry.second.mSymbolPosition;
+                            if (IsSceneObjectNameSymbolFrame(sceneObject->mName))
+                            {
+                                finalTargetPosition.z += SYMBOL_FRAME_Z_OFFSET;
+                            }
+                            
+                            auto nextRow = nextPositionEntry.second.mSymbolEntryData.mRow;
+                            auto nextCol = nextPositionEntry.second.mSymbolEntryData.mCol;
+                            
+                            CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenPositionScaleAnimation>(sceneObject, finalTargetPosition, sceneObject->mScale, TIME_TO_FINALIZE_SYMBOL_POSITION, animation_flags::NONE, reelIndex * TUMBLE_ANIMATION_DELAY_PER_REEL, math::ElasticFunction, math::TweeningMode::EASE_IN), [this, nextRow, nextCol, sceneObject]()
+                            {
+                                sceneObject->mName = IsSceneObjectNameSymbolFrame(sceneObject->mName) ? GetSymbolFrameSoName(nextRow, nextCol) : GetSymbolSoName(nextRow, nextCol);
+                            });
+                        }
+                    }
+                }
+                
+                // Create new symbols
+                for (int reelIndex = 0; reelIndex < slots::BOARD_COLS; ++reelIndex)
+                {
+                    auto addedInReelCount = 0;
+                    for (const auto& newlyCreatedSymbolData: mTumbleResolutionData.mNewlyCreatedSymbolData)
+                    {
+                        if (newlyCreatedSymbolData.mCol == reelIndex)
+                        {
+                            CreateSymbolSceneObjects(newlyCreatedSymbolData.mSymbolType, newlyCreatedSymbolData.mRow + numDestroyedSymbolsPerReel[reelIndex] - addedInReelCount - 1, newlyCreatedSymbolData.mCol);
+                            addedInReelCount++;
+                        }
+                    }
+                }
+                
                 mSpinAnimationState = SpinAnimationState::TUMBLING;
-                CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TimeDelayAnimation>((destroyedCoordCounter + 1) * TUMBLE_ANIMATION_DELAY_PER_TUMBLE_EVENT + 1.0f), [this](){ mSpinAnimationState = SpinAnimationState::POST_SPINNING; });
+                CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TimeDelayAnimation>(slots::BOARD_COLS * TUMBLE_ANIMATION_DELAY_PER_REEL + TIME_TO_FINALIZE_SYMBOL_POSITION), [this](){ mSpinAnimationState = SpinAnimationState::POST_SPINNING; });
             }
         } break;
             

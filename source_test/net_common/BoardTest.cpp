@@ -108,7 +108,7 @@ TEST(BoardTest, TestWildAndScatterAppearOnlyOnceInEachReelInRandomBoardPopulatio
 
 TEST(BoardTest, TestRandomBoardWinStats)
 {
-    static const long long SIMULATIONS = 100000;
+    static const long long SIMULATIONS = 1000000;
     static const long long COINS_PER_SPIN = 1;
     
     slots::Board b;
@@ -131,17 +131,17 @@ TEST(BoardTest, TestRandomBoardWinStats)
             const auto& boardStateResolution = b.ResolveBoardState();
             totalReturn += COINS_PER_SPIN * boardStateResolution.mTotalWinMultiplier;
             
-//            if (boardStateResolution.mShouldTumble)
-//            {
-//                if (boardStateResolution.mWinningPaylines.size() == 4 &&
-//                    boardStateResolution.mWinningPaylines[0].mCombo &&
-//                    boardStateResolution.mWinningPaylines[1].mCombo &&
-//                    boardStateResolution.mWinningPaylines[2].mCombo &&
-//                    boardStateResolution.mWinningPaylines[3].mCombo)
+            if (boardStateResolution.mShouldTumble)
+            {
+//                if (boardStateResolution.mWinningPaylines.size() == 3 &&
+//                    boardStateResolution.mWinningPaylines[0].mCombo && boardStateResolution.mWinningPaylines[0].mPayline == slots::PaylineType::PAYLINE_1 &&
+//                    boardStateResolution.mWinningPaylines[1].mCombo && boardStateResolution.mWinningPaylines[1].mPayline == slots::PaylineType::PAYLINE_2 &&
+//                    boardStateResolution.mWinningPaylines[2].mCombo && boardStateResolution.mWinningPaylines[2].mPayline == slots::PaylineType::PAYLINE_3)
 //                {
 //                    DEBUG_BREAKPOINT();
 //                }
-//            }
+            }
+            
             if (b.GetSymbolCountInPlayableBoard(slots::SymbolType::WILD) == 5)
             {
                 numberOf5Wilds++;

@@ -640,8 +640,8 @@ void Game::OnServerSpinResponse(const nlohmann::json& responseJson)
     spinResponse.DeserializeFromJson(responseJson);
     
     mSpinId = spinResponse.spinId;
-    //mSpinId = 828030532; roast_chicken and chicken_soup
-    mSpinId = 1539116524;
+    //mSpinId = 828030532; //roast_chicken and chicken_soup
+    //mSpinId = 1539116524;
 #else
     mSpinId = math::RandomInt();
 #endif
