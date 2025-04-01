@@ -9,6 +9,8 @@
 #include <net_common/Board.h>
 #include <engine/utils/MathUtils.h>
 #include <engine/utils/PlatformMacros.h>
+#include <engine/utils/StringUtils.h>
+#include <SDL.h>
 
 ///------------------------------------------------------------------------------------------------
 
@@ -27,12 +29,22 @@ void runSimulation(const std::string& simulationName, const int simulationSteps,
     std::cout << simulationSepString << std::endl;
     std::cout << "Simulating " << simulationSteps << " iterations" << std::endl;
     
+    auto currentMillisSinceInit = static_cast<float>(SDL_GetTicks());
     for (long long i = 0LL; i < simulationSteps; ++i)
     {
         if (i % (simulationSteps/10) == 0)
         {
             auto percentComplete = static_cast<int>((i/static_cast<float>(simulationSteps)) * 100.0f);
-            std::cout << "Simulation " << percentComplete << "% complete" << std::endl;
+            std::cout << "Simulation " << percentComplete << "% complete";
+            
+            if (!math::FloatsSufficientlyClose(currentMillisSinceInit, static_cast<float>(SDL_GetTicks())))
+            {
+                auto secsSinceLastPrint = (static_cast<float>(SDL_GetTicks()) - currentMillisSinceInit)/1000.0f;
+                std::cout << " (Estimated duration left: " << strutils::GetHoursMinutesSecondsStringFromSeconds(static_cast<int>((100.0f - percentComplete)/10 * secsSinceLastPrint))  << ")";
+                currentMillisSinceInit = static_cast<float>(SDL_GetTicks());
+            }
+            
+            std::cout << std::endl;
         }
         
         iterationLambda(i);
@@ -108,7 +120,7 @@ TEST(BoardTest, TestWildAndScatterAppearOnlyOnceInEachReelInRandomBoardPopulatio
 
 TEST(BoardTest, TestRandomBoardWinStats)
 {
-    static const long long SIMULATIONS = 1000000;
+    static const long long SIMULATIONS = 10000000;
     static const long long COINS_PER_SPIN = 1;
     
     slots::Board b;
