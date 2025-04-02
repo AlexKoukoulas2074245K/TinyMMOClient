@@ -2,7 +2,7 @@
 ///  DebugGameWidgets.cpp
 ///  TinyMMOClient
 ///
-///  Created by Alex Koukoulas on 31/03/2023
+///  Created by Alex Koukoulas on 31/03/2025
 ///------------------------------------------------------------------------------------------------
 
 #include <engine/CoreSystemsEngine.h>
@@ -12,6 +12,7 @@
 #include <engine/scene/Scene.h>
 #include <engine/scene/SceneObject.h>
 #include <engine/scene/SceneObjectUtils.h>
+#include <engine/utils/Logging.h>
 #include <game/DebugGameWidgets.h>
 #include <game/BoardView.h>
 #include <game/Game.h>
@@ -34,6 +35,11 @@ void DebugGameWidgets::CreateDebugWidgets(Game& game)
     {
         SDL_SetClipboardText(std::to_string(game.mSpinId).c_str());
     }
+    
+    ImGui::SeparatorText("Scatter Data");
+    ImGui::Text("Scatter Spins Left: %d", game.mBoardModel.GetOustandingScatterSpins());
+    ImGui::Text("Scatter Multiplier: %d", game.mBoardModel.GetScatterMultiplier());
+    ImGui::Text("Scatter Selected Combo: %s", slots::Board::GetSymbolDebugName(game.mBoardModel.GetSelectedScatterComboSymbol()).c_str());
     
     if (game.mBoardView)
     {
@@ -122,6 +128,7 @@ void DebugGameWidgets::CreateDebugWidgets(Game& game)
                 }
                 
                 game.mSpinId = spinId;
+                logging::Log(logging::LogType::INFO, "Magic Spin %d!", game.mSpinId);
                 
                 game.mBoardView->ResetBoardSymbols();
                 game.mBoardModel.PopulateBoardForSpin(game.mSpinId);

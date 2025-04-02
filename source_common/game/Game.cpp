@@ -232,14 +232,36 @@ void Game::UpdateGUI(const float dtMillis)
         mLoginButton->Update(dtMillis);
     }
     
-    if (mCreditsWagerPlusButton && mBoardView->GetSpinAnimationState() == BoardView::SpinAnimationState::IDLE)
+    if (mCreditsWagerPlusButton && !mScatterOngoing && mBoardView->GetSpinAnimationState() == BoardView::SpinAnimationState::IDLE)
     {
+        if (mCreditsWagerPlusButton->GetSceneObjects().front()->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] <= 1.0f)
+        {
+            mCreditsWagerPlusButton->GetSceneObjects().front()->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] += dtMillis/1000.0f;
+        }
         mCreditsWagerPlusButton->Update(dtMillis);
     }
-    
-    if (mCreditsWagerMinusButton && mBoardView->GetSpinAnimationState() == BoardView::SpinAnimationState::IDLE)
+    else if (mCreditsWagerPlusButton && mScatterOngoing)
     {
+        if (mCreditsWagerPlusButton->GetSceneObjects().front()->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] >= 0.0f)
+        {
+            mCreditsWagerPlusButton->GetSceneObjects().front()->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] -= dtMillis/1000.0f;
+        }
+    }
+    
+    if (mCreditsWagerMinusButton && !mScatterOngoing && mBoardView->GetSpinAnimationState() == BoardView::SpinAnimationState::IDLE)
+    {
+        if (mCreditsWagerMinusButton->GetSceneObjects().front()->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] <= 1.0f)
+        {
+            mCreditsWagerMinusButton->GetSceneObjects().front()->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] += dtMillis/1000.0f;
+        }
         mCreditsWagerMinusButton->Update(dtMillis);
+    }
+    else if (mCreditsWagerMinusButton && mScatterOngoing)
+    {
+        if (mCreditsWagerMinusButton->GetSceneObjects().front()->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] >= 0.0f)
+        {
+            mCreditsWagerMinusButton->GetSceneObjects().front()->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] -= dtMillis/1000.0f;
+        }
     }
     
     auto spinButton = scene->FindSceneObject(SPIN_BUTTON_NAME);
@@ -247,36 +269,66 @@ void Game::UpdateGUI(const float dtMillis)
 
     if (spinButton)
     {
-        while (spinButton->mRotation.z < -2.0f * math::PI)
+        if (mScatterOngoing)
         {
-            spinButton->mRotation.z += 2.0f * math::PI;
-        }
-        
-        if (animationManager.GetAnimationCountPlayingForSceneObject(SPIN_BUTTON_NAME) == 0 && mBoardView->GetSpinAnimationState() == BoardView::SpinAnimationState::IDLE)
-        {
-            if (spinButtonEffect->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] < 1.0f)
+            if (spinButton->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] > 0.0f)
             {
-                spinButtonEffect->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] += dtMillis/1000.0f;
+                spinButton->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] -= dtMillis/1000.0f;
+            }
+            if (spinButtonEffect->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] > 0.0f)
+            {
+                spinButtonEffect->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] -= dtMillis/1000.0f;
             }
             
-            auto worldTouchPos = inputStateManager.VGetPointingPosInWorldSpace(scene->GetCamera().GetViewMatrix(), scene->GetCamera().GetProjMatrix());
-            
-            auto sceneObjectRect = scene_object_utils::GetSceneObjectBoundingRect(*spinButton);
-            bool cursorInSceneObject = math::IsPointInsideRectangle(sceneObjectRect.bottomLeft, sceneObjectRect.topRight, worldTouchPos);
-            
-            if (cursorInSceneObject && inputStateManager.VButtonTapped(input::Button::MAIN_BUTTON) && mCredits >= mCreditsWagerPerSpin)
+            if (mBoardView->GetSpinAnimationState() == BoardView::SpinAnimationState::IDLE)
             {
-                auto initScale = spinButton->mScale;
-                animationManager.StartAnimation(std::make_unique<rendering::TweenPositionScaleAnimation>(spinButton, spinButton->mPosition, initScale * SPIN_BUTTON_DEPRESSED_SCALE_FACTOR, SPIN_BUTTON_ANIMATION_DURATION), [this, initScale, spinButton]()
+                if (mBoardModel.GetOustandingScatterSpins() > 1)
                 {
                     OnSpinButtonPressed();
-                    CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenPositionScaleAnimation>(spinButton, spinButton->mPosition, initScale, SPIN_BUTTON_ANIMATION_DURATION, animation_flags::NONE), [](){});
-                });
+                }
+                else
+                {
+                    mScatterOngoing = false;
+                }
+            }
+        }
+        else
+        {
+            while (spinButton->mRotation.z < -2.0f * math::PI)
+            {
+                spinButton->mRotation.z += 2.0f * math::PI;
+            }
+            
+            if (animationManager.GetAnimationCountPlayingForSceneObject(SPIN_BUTTON_NAME) == 0 && mBoardView->GetSpinAnimationState() == BoardView::SpinAnimationState::IDLE)
+            {
+                if (spinButton->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] < 1.0f)
+                {
+                    spinButton->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] += dtMillis/1000.0f;
+                }
+                if (spinButtonEffect->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] < 1.0f)
+                {
+                    spinButtonEffect->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] += dtMillis/1000.0f;
+                }
                 
-                auto currentRotation = spinButton->mRotation;
-                animationManager.StartAnimation(std::make_unique<rendering::TweenRotationAnimation>(spinButton, glm::vec3(currentRotation.x, currentRotation.y, currentRotation.z - 2.0f * math::PI), 1.0f), [](){});
+                auto worldTouchPos = inputStateManager.VGetPointingPosInWorldSpace(scene->GetCamera().GetViewMatrix(), scene->GetCamera().GetProjMatrix());
                 
-                animationManager.StartAnimation(std::make_unique<rendering::TweenAlphaAnimation>(spinButtonEffect, 0.0f, SPIN_BUTTON_EFFECT_ANIMATION_DURATION), [](){});
+                auto sceneObjectRect = scene_object_utils::GetSceneObjectBoundingRect(*spinButton);
+                bool cursorInSceneObject = math::IsPointInsideRectangle(sceneObjectRect.bottomLeft, sceneObjectRect.topRight, worldTouchPos);
+                
+                if (cursorInSceneObject && inputStateManager.VButtonTapped(input::Button::MAIN_BUTTON) && mCredits >= mCreditsWagerPerSpin)
+                {
+                    auto initScale = spinButton->mScale;
+                    animationManager.StartAnimation(std::make_unique<rendering::TweenPositionScaleAnimation>(spinButton, spinButton->mPosition, initScale * SPIN_BUTTON_DEPRESSED_SCALE_FACTOR, SPIN_BUTTON_ANIMATION_DURATION), [this, initScale, spinButton]()
+                    {
+                        OnSpinButtonPressed();
+                        CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenPositionScaleAnimation>(spinButton, spinButton->mPosition, initScale, SPIN_BUTTON_ANIMATION_DURATION, animation_flags::NONE), [](){});
+                    });
+                    
+                    auto currentRotation = spinButton->mRotation;
+                    animationManager.StartAnimation(std::make_unique<rendering::TweenRotationAnimation>(spinButton, glm::vec3(currentRotation.x, currentRotation.y, currentRotation.z - 2.0f * math::PI), 1.0f), [](){});
+                    
+                    animationManager.StartAnimation(std::make_unique<rendering::TweenAlphaAnimation>(spinButtonEffect, 0.0f, SPIN_BUTTON_EFFECT_ANIMATION_DURATION), [](){});
+                }
             }
         }
     }
@@ -319,6 +371,13 @@ void Game::UpdateGUI(const float dtMillis)
                         mBoardView->BeginTumble(tumbleResolutionData);
                     });
                 }
+                else if (mBoardModel.GetSymbolCountInPlayableBoard(slots::SymbolType::SCATTER) >= 3)
+                {
+                    animationManager.StartAnimation(std::make_unique<rendering::TimeDelayAnimation>((boardStateResolutionData.mWinningPaylines.size() + 1) * PAYLINE_ANIMATION_DURATION), [this]()
+                    {
+                        mBoardView->BeginScatter();
+                    });
+                }
                 else
                 {
                     animationManager.StartAnimation(std::make_unique<rendering::TimeDelayAnimation>(boardStateResolutionData.mWinningPaylines.size() * PAYLINE_ANIMATION_DURATION), [this]()
@@ -327,6 +386,11 @@ void Game::UpdateGUI(const float dtMillis)
                     });
                 }
             }
+        }
+        else if (mBoardView->GetSpinAnimationState() == BoardView::SpinAnimationState::SCATTER_ANIMATION_FINISHED)
+        {
+            mScatterOngoing = true;
+            OnSpinButtonPressed();
         }
     }
     
@@ -539,12 +603,17 @@ void Game::OnServerSpinResponse(const nlohmann::json& responseJson)
     spinResponse.DeserializeFromJson(responseJson);
     
     mSpinId = spinResponse.spinId;
+    //mSpinId = 1030580430; // 3 Scatter and Combo madness after
     //mSpinId = 828030532; //roast_chicken and chicken_soup
     //mSpinId = 1539116524;
 #else
     mSpinId = math::RandomInt();
 #endif
-    mCredits -= mCreditsWagerPerSpin;
+    if (!mScatterOngoing)
+    {
+        mCredits -= mCreditsWagerPerSpin;
+    }
+    
     mDisplayedCredits = static_cast<int>(mCredits);
     UpdateSpinButtonEffectAura();
 

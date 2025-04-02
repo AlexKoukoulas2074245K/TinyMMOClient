@@ -44,6 +44,7 @@ int main(int argc, char** argv)
 ///------------------------------------------------------------------------------------------------
 #else
 #include <game/Game.h>
+#include <game/SimulationRunner.h>
 #include <stdlib.h>
 #include <SDL.h>
 
@@ -51,6 +52,7 @@ int main(int argc, char** argv)
 
 int main(int argc, char** argv)
 {
+    //simulation::RunStatsSimulation(10000000);
     Game game(argc, argv);
     return 0;
 }

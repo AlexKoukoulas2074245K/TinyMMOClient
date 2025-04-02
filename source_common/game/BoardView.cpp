@@ -8,6 +8,7 @@
 ///------------------------------------------------------------------------------------------------
 
 #include <game/BoardView.h>
+#include <game/ScatterAnimationFlow.h>
 #include <engine/input/IInputStateManager.h>
 #include <engine/rendering/Animations.h>
 #include <engine/rendering/AnimationManager.h>
@@ -120,7 +121,9 @@ static const std::unordered_map<BoardView::SpinAnimationState, std::string> SPIN
     { BoardView::SpinAnimationState::COMBO_PRE_TUMBLING, "COMBO_PRE_TUMBLING" },
     { BoardView::SpinAnimationState::TUMBLING, "TUMBLING" },
     { BoardView::SpinAnimationState::POST_SPINNING, "POST_SPINNING" },
-    { BoardView::SpinAnimationState::WAITING_FOR_PAYLINES, "WAITING_FOR_PAYLINES" }
+    { BoardView::SpinAnimationState::WAITING_FOR_PAYLINES, "WAITING_FOR_PAYLINES" },
+    { BoardView::SpinAnimationState::SCATTER_ANIMATION, "SCATTER_ANIMATION" },
+    { BoardView::SpinAnimationState::SCATTER_ANIMATION_FINISHED, "SCATTER_ANIMATION_FINISHED" }
 };
 
 static const std::unordered_map<BoardView::PendingSymbolData::PendingSymbolDataState, std::string> PENDING_SYMBOL_DATA_STATE_NAMES =
@@ -585,7 +588,13 @@ void BoardView::BeginTumble(const slots::TumbleResolutionData& tumbleResolutionD
     std::set<slots::SymbolEntryData, slots::SymbolEntryDataPlacementComparator> alreadyAnimatingIngredientsSymbolData;
     for (const auto placedComboData: tumbleResolutionData.mPlacedCombosCoords)
     {
-        auto comboSymbolPosition = mScene.FindSceneObject(GetSymbolSoName(placedComboData.mRow, placedComboData.mCol))->mPosition;
+        auto comboSymbol = mScene.FindSceneObject(GetSymbolSoName(placedComboData.mRow, placedComboData.mCol));
+        if (!comboSymbol)
+        {
+            continue;
+        }
+
+        auto comboSymbolPosition = comboSymbol->mPosition;
         
         CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TimeDelayAnimation>(placedComboCounter * TUMBLE_ANIMATION_DELAY_PER_COMBO_EVENT), [placedComboData, this]()
         {
@@ -615,6 +624,11 @@ void BoardView::BeginTumble(const slots::TumbleResolutionData& tumbleResolutionD
             auto symbol = mScene.FindSceneObject(symbolSoName);
             auto symbolFrame = mScene.FindSceneObject(symbolFrameSoName);
             
+            if (!symbol || !symbolFrame)
+            {
+                continue;
+            }
+
             auto newNamePrefix = TUMBLE_TEMP_PREFIX + std::to_string(placedComboCounter) + "_" + std::to_string(i - secondIngredientIndex);
     
             if (alreadyAnimatingIngredientsSymbolData.contains(ingredientSymbolData) || tumbleResolutionData.mPlacedCombosCoords.contains(ingredientSymbolData))
@@ -652,6 +666,19 @@ void BoardView::BeginTumble(const slots::TumbleResolutionData& tumbleResolutionD
         
         placedComboCounter++;
     }
+}
+
+///------------------------------------------------------------------------------------------------
+
+void BoardView::BeginScatter()
+{
+    mSpinAnimationState = SpinAnimationState::SCATTER_ANIMATION;
+    auto totalDelay = StartScatterAnimationFlow(mScene, resources::ResourceLoadingService::RES_TEXTURES_ROOT + SYMBOL_TEXTURE_PATHS.at(mBoardModel.GetSelectedScatterComboSymbol()));
+    
+    CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TimeDelayAnimation>(totalDelay), [this]()
+    {
+        mSpinAnimationState = SpinAnimationState::SCATTER_ANIMATION_FINISHED;
+    });
 }
 
 ///------------------------------------------------------------------------------------------------
@@ -718,6 +745,10 @@ void BoardView::ResetBoardSymbols()
             mScene.RemoveSceneObject(symbolFrameSoName);
         }
     }
+    
+    // Panic cleanup
+    mScene.RemoveAllSceneObjectsWithNameEndingIn("symbol");
+    mScene.RemoveAllSceneObjectsWithNameEndingIn("symbol_frame");
 
     for (int row = 0; row < slots::REEL_LENGTH; ++row)
     {
@@ -754,8 +785,15 @@ void BoardView::AnimatePaylineReveal(const slots::PaylineResolutionData& payline
 
             auto& animationManager = CoreSystemsEngine::GetInstance().GetAnimationManager();
             
-            animationManager.StartAnimation(std::make_unique<rendering::PulseAnimation>(symbol, WINNING_SYMBOL_PULSE_SCALE_FACTOR, WINNING_SYMBOL_PULSE_ANIMATION_DURATION, animation_flags::NONE), [](){});
-            animationManager.StartAnimation(std::make_unique<rendering::PulseAnimation>(symbolFrame, WINNING_SYMBOL_PULSE_SCALE_FACTOR, WINNING_SYMBOL_PULSE_ANIMATION_DURATION, animation_flags::NONE), [](){});
+            if (symbol)
+            {
+                animationManager.StartAnimation(std::make_unique<rendering::PulseAnimation>(symbol, WINNING_SYMBOL_PULSE_SCALE_FACTOR, WINNING_SYMBOL_PULSE_ANIMATION_DURATION, animation_flags::NONE), [](){});
+            }
+            
+            if (symbolFrame)
+            {
+                animationManager.StartAnimation(std::make_unique<rendering::PulseAnimation>(symbolFrame, WINNING_SYMBOL_PULSE_SCALE_FACTOR, WINNING_SYMBOL_PULSE_ANIMATION_DURATION, animation_flags::NONE), [](){});
+            }
         });
     }
 }
@@ -810,19 +848,39 @@ void BoardView::UpdateSceneObjectDuringReelAnimation(std::shared_ptr<scene::Scen
                     }
                 }
             }
-            while (slots::SymbolDataRepository::GetInstance().GetAllRecipesAndIngredientsMap().count(newSymbolType) ||
-                   (newSymbolType == slots::SymbolType::WILD && existingWildInReel) ||
-                   (newSymbolType == slots::SymbolType::SCATTER && existingScatterInReel))
+            
+            if (mBoardModel.GetOustandingScatterSpins() <= 0)
             {
-                newSymbolType = static_cast<slots::SymbolType>(math::RandomInt() % static_cast<int>(slots::SymbolType::COUNT));
+                while (slots::SymbolDataRepository::GetInstance().GetAllRecipesAndIngredientsMap().count(newSymbolType) ||
+                       (newSymbolType == slots::SymbolType::WILD && existingWildInReel) ||
+                       (newSymbolType == slots::SymbolType::SCATTER && existingScatterInReel))
+                {
+                    newSymbolType = static_cast<slots::SymbolType>(math::RandomInt() % static_cast<int>(slots::SymbolType::COUNT));
+                }
+            }
+            else
+            {
+                const auto& ingredientsOfSelectedRecipe = slots::SymbolDataRepository::GetInstance().GetIngredientsForRecipeSymbol(mBoardModel.GetSelectedScatterComboSymbol());
+                
+                while (std::find(ingredientsOfSelectedRecipe.begin(), ingredientsOfSelectedRecipe.end(), newSymbolType) == ingredientsOfSelectedRecipe.end() && newSymbolType != slots::SymbolType::WILD)
+                {
+                    newSymbolType = static_cast<slots::SymbolType>(math::ControlledRandomInt() % static_cast<int>(slots::SymbolType::COUNT));
+                }
             }
             
             // If we have started feeding the final symbols in the reel adjust
             // the new symbol type with the one from the final symbols
             if (mPendingSymbolData[reelIndex].mState == PendingSymbolData::PendingSymbolDataState::UNLOCKED)
             {
-                newSymbolType = mPendingSymbolData[reelIndex].mSymbols.back();
-                mPendingSymbolData[reelIndex].mSymbols.pop_back();
+                if (!mPendingSymbolData[reelIndex].mSymbols.empty())
+                {
+                    newSymbolType = mPendingSymbolData[reelIndex].mSymbols.back();
+                    mPendingSymbolData[reelIndex].mSymbols.pop_back();
+                }
+                else
+                {
+                    newSymbolType = LookupSceneObjectSymbolType(sceneObject->mTextureResourceId);
+                }
             }
             
             // Update assets for "new" symbol

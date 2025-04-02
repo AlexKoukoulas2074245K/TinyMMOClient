@@ -1,25 +1,22 @@
 ///------------------------------------------------------------------------------------------------
-///  DebugGameWidgets.h
+///  ScatterAnimationFlow.h
 ///  TinyMMOClient
 ///                                                                                                
-///  Created by Alex Koukoulas on 31/03/2025
+///  Created by Alex Koukoulas on 01/04/2025
 ///------------------------------------------------------------------------------------------------
 
-#ifndef DebugGameWidgets_h
-#define DebugGameWidgets_h
-
-///------------------------------------------------------------------------------------------------
-
-class Game;
-class DebugGameWidgets final
-{
-public:
-    static void CreateDebugWidgets(Game& game);
-
-private:
-    DebugGameWidgets() = delete;
-};
+#ifndef ScatterAnimationFlow_h
+#define ScatterAnimationFlow_h
 
 ///------------------------------------------------------------------------------------------------
 
-#endif /* DebugGameWidgets_h */
+#include <engine/utils/StringUtils.h>
+
+///------------------------------------------------------------------------------------------------
+
+namespace scene { class Scene; }
+float StartScatterAnimationFlow(scene::Scene& scene, const std::string& selectedSymbolPath);
+
+///------------------------------------------------------------------------------------------------
+
+#endif /* ScatterAnimationFlow_h */

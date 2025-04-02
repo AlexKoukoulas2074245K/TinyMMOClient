@@ -70,6 +70,7 @@ private:
     long long mCreditsWagerPerSpin = 0LL;
     float mDisplayedCredits = 0.0f;
     int mSpinId = 0;
+    bool mScatterOngoing = false;
     ThreadSafeQueue<std::string> mQueuedServerResponses;
     ThreadSafeQueue<std::string> mQueuedServerErrors;
 };

@@ -11,7 +11,9 @@
 		0118CE0544990425D47F3A12 /* ShaderResource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB4F4B243BF9EE66291B3910 /* ShaderResource.cpp */; };
 		02E7DF925FD7370A12023A23 /* Camera.h in Sources */ = {isa = PBXBuildFile; fileRef = 70EE9661089211DACFF22288 /* Camera.h */; };
 		03B28C98FAB2D3C8F86DF546 /* IInputStateManager.h in Sources */ = {isa = PBXBuildFile; fileRef = D099CB93E6198C3BE5F73FDE /* IInputStateManager.h */; };
+		03DD0138D7AA1D374249697A /* ScatterAnimationFlow.h in Sources */ = {isa = PBXBuildFile; fileRef = 0C58A39EE307C4A178EA236F /* ScatterAnimationFlow.h */; };
 		03E73D821A06B9DC86BF7271 /* BoardView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D97ACDDDC0FA3D2B6C8764F6 /* BoardView.cpp */; };
+		0756972AEB34AC98363B67A3 /* SimulationRunner.h in Sources */ = {isa = PBXBuildFile; fileRef = A51F003838BA152A99113548 /* SimulationRunner.h */; };
 		0DCA3A1C508D33D2C69D6B8A /* Reel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 006393D9627BF00BE369EC69 /* Reel.cpp */; };
 		0F4B59D06F0D49D0DEBFFE28 /* BoardTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3A6852110D6B134074083490 /* BoardTest.cpp */; };
 		120CF200D56449CFC3BD99AF /* AppleSoundUtils.h in Sources */ = {isa = PBXBuildFile; fileRef = D8216CC78F9B7DEB0BEC7678 /* AppleSoundUtils.h */; };
@@ -24,6 +26,7 @@
 		1D2E7634ACFD852B1CF9C5E0 /* DebugGameWidgets.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 138D8F5DC22716F66372E08E /* DebugGameWidgets.cpp */; };
 		1E51657DEC156E190649EDB0 /* SymbolDataRepository.h in Sources */ = {isa = PBXBuildFile; fileRef = 33BB453DEBDE9661C88609E7 /* SymbolDataRepository.h */; };
 		1ECC3C6E351A36D1C71615E0 /* Logging.h in Sources */ = {isa = PBXBuildFile; fileRef = 43A25A1E55390D38AC6A5742 /* Logging.h */; };
+		1F4997C6F095FFC9461A6B63 /* SimulationRunner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D73F77D3245FB6DC49126D04 /* SimulationRunner.cpp */; };
 		216990DC394003275C5EA33D /* Fonts.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB8C2E3FACC90180DAAE4F40 /* Fonts.cpp */; };
 		21EC3AD81A23E93548A1D76F /* BoardView.h in Sources */ = {isa = PBXBuildFile; fileRef = 2BFFC6441342229428E33195 /* BoardView.h */; };
 		2459A2AD382EE0AA9153A204 /* wglew.h in Sources */ = {isa = PBXBuildFile; fileRef = D64C3227BB47CA8611283D51 /* wglew.h */; };
@@ -37,11 +40,15 @@
 		2F07E8202DDD53253B38EF21 /* OpenGL.h in Sources */ = {isa = PBXBuildFile; fileRef = 0724B463AFC06A5A52F1047E /* OpenGL.h */; };
 		308ED2F39D5A19DC22EB87B3 /* glew.h in Sources */ = {isa = PBXBuildFile; fileRef = 051E00BF71689A5C0A9F91D2 /* glew.h */; };
 		309CA5C19E3574B35486EBD4 /* Version.h in Sources */ = {isa = PBXBuildFile; fileRef = 0B5602AB7CC28E6EA08AAED6 /* Version.h */; };
+		320EA727C6D6ED7DC74FFFBA /* ScatterAnimationFlow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 17C2D128E2502155BD5C3747 /* ScatterAnimationFlow.cpp */; };
 		33CC4D39831F836C2D367D51 /* PlatformMacros.h in Sources */ = {isa = PBXBuildFile; fileRef = 7961514C3AA5315045E54E7E /* PlatformMacros.h */; };
 		3404AFE81C1263670F2BD149 /* MathUtils.h in Sources */ = {isa = PBXBuildFile; fileRef = 2096C38A74EAF730ECCA5E36 /* MathUtils.h */; };
+		34B84E039CED115E04A6DC25 /* ScatterAnimationFlow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 17C2D128E2502155BD5C3747 /* ScatterAnimationFlow.cpp */; };
 		354623B6EE97CC4A7A37F182 /* SymbolDataRepository.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04F6915C7D49428A4BF1A4FA /* SymbolDataRepository.cpp */; };
 		37460013CABAA8BD2E424B2F /* PaylineView.h in Sources */ = {isa = PBXBuildFile; fileRef = 0FD0557BEDD5E251752E1792 /* PaylineView.h */; };
 		3800CC997FE9DCC2CADAF5E2 /* TypeTraits.h in Sources */ = {isa = PBXBuildFile; fileRef = 6E2183A368D71198F98D6738 /* TypeTraits.h */; };
+		3978828472E95170B2C18ED9 /* SimulationRunner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D73F77D3245FB6DC49126D04 /* SimulationRunner.cpp */; };
+		3ACC3DB80357A8CF0483E5B5 /* SimulationRunner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D73F77D3245FB6DC49126D04 /* SimulationRunner.cpp */; };
 		3D0B74E401CD9DB2D3AF3061 /* RenderingUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 59B053AEBDD62B4FCAB8E05D /* RenderingUtils.cpp */; };
 		3E0686E0364F1D3BFC522A92 /* CommonUniforms.h in Sources */ = {isa = PBXBuildFile; fileRef = 9CC1A200C9B794A05E296C21 /* CommonUniforms.h */; };
 		3E3B65024B721F5CCC0D71E0 /* Animations.h in Sources */ = {isa = PBXBuildFile; fileRef = 82DFED0E0B1AB607780AED60 /* Animations.h */; };
@@ -51,6 +58,7 @@
 		4D0513581BFF046081AADA26 /* Editor.h in Sources */ = {isa = PBXBuildFile; fileRef = AB2400E817D39628656BEFF1 /* Editor.h */; };
 		4E9ADD55CB0B5CA8962F347E /* StringUtils.h in Sources */ = {isa = PBXBuildFile; fileRef = EF61AB7D638A80B4ABD5D5B7 /* StringUtils.h */; };
 		4EC7FEA252F40C0286D148D0 /* BoardView.h in Sources */ = {isa = PBXBuildFile; fileRef = 2BFFC6441342229428E33195 /* BoardView.h */; };
+		4EF55A98FBD6BE321E82EEE1 /* SimulationRunner.h in Sources */ = {isa = PBXBuildFile; fileRef = A51F003838BA152A99113548 /* SimulationRunner.h */; };
 		5285724978640648FFD94960 /* TextureResource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93D83DB41AD868D09B2A3C94 /* TextureResource.cpp */; };
 		532521F009DF925259026C23 /* SerializationDefinitions.h in Sources */ = {isa = PBXBuildFile; fileRef = F05BCACB9D0D7193765BB311 /* SerializationDefinitions.h */; };
 		53BF5611CC60F79F57D910F8 /* PaylineView.h in Sources */ = {isa = PBXBuildFile; fileRef = 0FD0557BEDD5E251752E1792 /* PaylineView.h */; };
@@ -65,9 +73,11 @@
 		69A3B6CA894565C4F51E1123 /* SoundManager.h in Sources */ = {isa = PBXBuildFile; fileRef = 7AC3E452BAA560B6D8B1349E /* SoundManager.h */; };
 		6B03252E24CF56D73B9C3DC7 /* Editor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A49D33C4F1B1DC1C02DB9E05 /* Editor.cpp */; };
 		6B29A2EA7B3D661771AB8A2D /* RenderingUtils.h in Sources */ = {isa = PBXBuildFile; fileRef = 8AE4C68818CCB619974358E0 /* RenderingUtils.h */; };
+		6CF3A7A3AE144F71916C3248 /* ScatterAnimationFlow.h in Sources */ = {isa = PBXBuildFile; fileRef = 0C58A39EE307C4A178EA236F /* ScatterAnimationFlow.h */; };
 		6D827E1ADCEBBFD2A690675C /* CommonUniforms.h in Sources */ = {isa = PBXBuildFile; fileRef = 9CC1A200C9B794A05E296C21 /* CommonUniforms.h */; };
 		6E1A780876A016C76FFF66C6 /* OBJMeshLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 06291EA0D3FF12CB3058DEF2 /* OBJMeshLoader.cpp */; };
 		6E4B2E1884BE8DC6D5DBC433 /* Reel.h in Sources */ = {isa = PBXBuildFile; fileRef = 0808F578545FADE323B82471 /* Reel.h */; };
+		6FC00D99BE07E3EA513849CE /* ScatterAnimationFlow.h in Sources */ = {isa = PBXBuildFile; fileRef = 0C58A39EE307C4A178EA236F /* ScatterAnimationFlow.h */; };
 		70DA52B0EC52AD7686AA32C0 /* DebugGameWidgets.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 138D8F5DC22716F66372E08E /* DebugGameWidgets.cpp */; };
 		71319CF262B3FEA0241CE51E /* RendererPlatformImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68CBCF02480A4F7771578514 /* RendererPlatformImpl.cpp */; };
 		71DEABFBFD9A818B6DFD8412 /* TextureLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E0D05FD28DC001514531A214 /* TextureLoader.cpp */; };
@@ -77,6 +87,7 @@
 		793BCBA94EDC60F508E16A5A /* Reel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 006393D9627BF00BE369EC69 /* Reel.cpp */; };
 		7A14147B43076FC43E6D5662 /* SoundManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F701DBE1A8A6D1664BEF16A3 /* SoundManager.cpp */; };
 		7A35378576E3FCE89E70ABA4 /* SceneManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FB79D70FA4FA614F184AFE40 /* SceneManager.cpp */; };
+		7B7EF5FD0FE4079C80D9D03F /* SimulationRunner.h in Sources */ = {isa = PBXBuildFile; fileRef = A51F003838BA152A99113548 /* SimulationRunner.h */; };
 		7C959AE38E5D848AF2C4A4BA /* EditorImGuiCommands.inc in Sources */ = {isa = PBXBuildFile; fileRef = 3A0B70DC7ADA228D909C7E71 /* EditorImGuiCommands.inc */; };
 		7CA340B584BA7BDBF8857C4C /* OBJMeshLoader.h in Sources */ = {isa = PBXBuildFile; fileRef = 46BB489973B1ACFF46F552DB /* OBJMeshLoader.h */; };
 		7CB6A0994CA90DE98BB4026F /* PaylineView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7D6743D12656359B9F94AE23 /* PaylineView.cpp */; };
@@ -457,6 +468,7 @@
 		FB76936B366FDA6E237509AD /* Reel.h in Sources */ = {isa = PBXBuildFile; fileRef = 0808F578545FADE323B82471 /* Reel.h */; };
 		FC7CB5DD2DD48F46BC3CAF9D /* MathUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 393520815AD90C67A6A6989C /* MathUtils.cpp */; };
 		FD5A1939A87EF301F061BCED /* SymbolDataRepository.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04F6915C7D49428A4BF1A4FA /* SymbolDataRepository.cpp */; };
+		FDF00AC67C41C1AA06F13F12 /* ScatterAnimationFlow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 17C2D128E2502155BD5C3747 /* ScatterAnimationFlow.cpp */; };
 		FE081503D7B9E0EE6A0752EC /* Date.h in Sources */ = {isa = PBXBuildFile; fileRef = E20949AA76405DC09B2C07EC /* Date.h */; };
 		FF10C06D59F9228C0A2C9E43 /* ShaderLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 255CBE3395586957104E385D /* ShaderLoader.cpp */; };
 		FFC2DBB68CE0D48497767EEC /* Logging.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3BF946C1B449BB4FE7DF288A /* Logging.cpp */; };
@@ -514,11 +526,13 @@
 		08AAC0562233A3F34613E310 /* DataFileResource.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = DataFileResource.h; sourceTree = "<group>"; };
 		0A05CE2983C7CEA1D2A25585 /* BaseDataFileDeserializer.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = BaseDataFileDeserializer.cpp; sourceTree = "<group>"; };
 		0B5602AB7CC28E6EA08AAED6 /* Version.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = Version.h; path = Version.h; sourceTree = "<group>"; };
+		0C58A39EE307C4A178EA236F /* ScatterAnimationFlow.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = ScatterAnimationFlow.h; path = ScatterAnimationFlow.h; sourceTree = "<group>"; };
 		0D09AB023B7A329D725F2F2F /* FileUtils.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = FileUtils.h; sourceTree = "<group>"; };
 		0FD0557BEDD5E251752E1792 /* PaylineView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = PaylineView.h; path = PaylineView.h; sourceTree = "<group>"; };
 		138D8F5DC22716F66372E08E /* DebugGameWidgets.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = DebugGameWidgets.cpp; path = DebugGameWidgets.cpp; sourceTree = "<group>"; };
 		13FDFD19955883B3085E4725 /* ShaderResource.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = ShaderResource.h; sourceTree = "<group>"; };
 		14207B709EC0713AAB9C29C8 /* ParticleManager.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = ParticleManager.cpp; sourceTree = "<group>"; };
+		17C2D128E2502155BD5C3747 /* ScatterAnimationFlow.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = ScatterAnimationFlow.cpp; path = ScatterAnimationFlow.cpp; sourceTree = "<group>"; };
 		17FD62578C4E3F684EA56CBC /* Symbols.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = Symbols.h; sourceTree = "<group>"; };
 		1B15A1EEB522F75EE7E24E55 /* CoreSystemsEngine.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CoreSystemsEngine.h; sourceTree = "<group>"; };
 		2096C38A74EAF730ECCA5E36 /* MathUtils.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = MathUtils.h; sourceTree = "<group>"; };
@@ -649,6 +663,7 @@
 		9F1941D1E63978B2B9C05A1E /* SceneObject.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = SceneObject.h; sourceTree = "<group>"; };
 		A49D33C4F1B1DC1C02DB9E05 /* Editor.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = Editor.cpp; sourceTree = "<group>"; };
 		A4ADBD10E11C136014CDB469 /* Animations.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = Animations.cpp; sourceTree = "<group>"; };
+		A51F003838BA152A99113548 /* SimulationRunner.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SimulationRunner.h; path = SimulationRunner.h; sourceTree = "<group>"; };
 		A7F720915E74A51C6579763C /* SerializableNetworkObjects.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = SerializableNetworkObjects.h; sourceTree = "<group>"; };
 		AB2400E817D39628656BEFF1 /* Editor.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = Editor.h; sourceTree = "<group>"; };
 		AB4F4B243BF9EE66291B3910 /* ShaderResource.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = ShaderResource.cpp; sourceTree = "<group>"; };
@@ -661,6 +676,7 @@
 		CF33F7C72612B80A9AB49895 /* InputStateManagerPlatformImpl.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = InputStateManagerPlatformImpl.cpp; sourceTree = "<group>"; };
 		D099CB93E6198C3BE5F73FDE /* IInputStateManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = IInputStateManager.h; sourceTree = "<group>"; };
 		D64C3227BB47CA8611283D51 /* wglew.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = wglew.h; sourceTree = "<group>"; };
+		D73F77D3245FB6DC49126D04 /* SimulationRunner.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = SimulationRunner.cpp; path = SimulationRunner.cpp; sourceTree = "<group>"; };
 		D8216CC78F9B7DEB0BEC7678 /* AppleSoundUtils.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = AppleSoundUtils.h; sourceTree = "<group>"; };
 		D979EC9B74F12857F47E4007 /* ImageSurfaceLoader.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = ImageSurfaceLoader.h; sourceTree = "<group>"; };
 		D97ACDDDC0FA3D2B6C8764F6 /* BoardView.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = BoardView.cpp; path = BoardView.cpp; sourceTree = "<group>"; };
@@ -1064,6 +1080,10 @@
 				0FD0557BEDD5E251752E1792 /* PaylineView.h */,
 				138D8F5DC22716F66372E08E /* DebugGameWidgets.cpp */,
 				5BA0718CE65BB4B003826244 /* DebugGameWidgets.h */,
+				17C2D128E2502155BD5C3747 /* ScatterAnimationFlow.cpp */,
+				0C58A39EE307C4A178EA236F /* ScatterAnimationFlow.h */,
+				D73F77D3245FB6DC49126D04 /* SimulationRunner.cpp */,
+				A51F003838BA152A99113548 /* SimulationRunner.h */,
 			);
 			path = game;
 			sourceTree = "<group>";
@@ -1523,6 +1543,10 @@
 				AD3849EC3D7BF58FBE796328 /* Version.h in Sources */,
 				70DA52B0EC52AD7686AA32C0 /* DebugGameWidgets.cpp in Sources */,
 				E97469C65DF7F329D6F88B4B /* DebugGameWidgets.h in Sources */,
+				FDF00AC67C41C1AA06F13F12 /* ScatterAnimationFlow.cpp in Sources */,
+				6CF3A7A3AE144F71916C3248 /* ScatterAnimationFlow.h in Sources */,
+				3ACC3DB80357A8CF0483E5B5 /* SimulationRunner.cpp in Sources */,
+				0756972AEB34AC98363B67A3 /* SimulationRunner.h in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1652,6 +1676,10 @@
 				7F8095DD8B9472184A88DC91 /* Version.h in Sources */,
 				1D2E7634ACFD852B1CF9C5E0 /* DebugGameWidgets.cpp in Sources */,
 				8A788C6FBEE20A908140AD22 /* DebugGameWidgets.h in Sources */,
+				320EA727C6D6ED7DC74FFFBA /* ScatterAnimationFlow.cpp in Sources */,
+				03DD0138D7AA1D374249697A /* ScatterAnimationFlow.h in Sources */,
+				3978828472E95170B2C18ED9 /* SimulationRunner.cpp in Sources */,
+				4EF55A98FBD6BE321E82EEE1 /* SimulationRunner.h in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1781,6 +1809,10 @@
 				309CA5C19E3574B35486EBD4 /* Version.h in Sources */,
 				57D0B11DC08C35BFA242AC11 /* DebugGameWidgets.cpp in Sources */,
 				2A7CB3DE9E5C1FF57FB76E93 /* DebugGameWidgets.h in Sources */,
+				34B84E039CED115E04A6DC25 /* ScatterAnimationFlow.cpp in Sources */,
+				6FC00D99BE07E3EA513849CE /* ScatterAnimationFlow.h in Sources */,
+				1F4997C6F095FFC9461A6B63 /* SimulationRunner.cpp in Sources */,
+				7B7EF5FD0FE4079C80D9D03F /* SimulationRunner.h in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -35,7 +35,9 @@ public:
         COMBO_PRE_TUMBLING,
         TUMBLING,
         POST_SPINNING,
-        WAITING_FOR_PAYLINES
+        WAITING_FOR_PAYLINES,
+        SCATTER_ANIMATION,
+        SCATTER_ANIMATION_FINISHED
     };
     
     struct PendingSymbolData
@@ -67,6 +69,7 @@ public:
 
     void BeginSpin();
     void BeginTumble(const slots::TumbleResolutionData& tumbleResolutionData);
+    void BeginScatter();
     void WaitForPaylines(const slots::BoardStateResolutionData& boardResolutionData);
     void CompleteSpin();
     void ResetBoardSymbols();

@@ -50,6 +50,7 @@ public:
     void RecalculatePositionOfEdgeSnappingSceneObjects();
     void RemoveSceneObject(const strutils::StringId& sceneObjectName);
     void RemoveAllSceneObjectsWithName(const strutils::StringId& sceneObjectName);
+    void RemoveAllSceneObjectsWithNameEndingIn(const std::string& sceneObjectNameEndingPattern);
     void RemoveAllSceneObjectsButTheOnesNamed(const std::unordered_set<strutils::StringId, strutils::StringIdHasher>& sceneObjectNames);
     void RemoveAllParticleEffects();
     

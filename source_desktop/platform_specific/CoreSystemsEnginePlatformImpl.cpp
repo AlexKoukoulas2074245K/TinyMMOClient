@@ -371,7 +371,9 @@ void CoreSystemsEngine::Start(std::function<void()> clientInitFunction, std::fun
         mSystems->mInputStateManager.VUpdate();
     }
     
+#if defined(USE_IMGUI)
     ImGui::DestroyContext();
+#endif
     clientApplicationMovingToBackgroundFunction();
 }
 
