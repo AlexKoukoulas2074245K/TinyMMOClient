@@ -37,7 +37,8 @@ public:
         POST_SPINNING,
         WAITING_FOR_PAYLINES,
         SCATTER_ANIMATION,
-        SCATTER_ANIMATION_FINISHED
+        SCATTER_ANIMATION_FINISHED,
+        WAITING_FOR_SCATTER_STATS_UPDATE
     };
     
     struct PendingSymbolData
@@ -71,6 +72,7 @@ public:
     void BeginTumble(const slots::TumbleResolutionData& tumbleResolutionData);
     void BeginScatter();
     void WaitForPaylines(const slots::BoardStateResolutionData& boardResolutionData);
+    void WaitForScatterStatsUpdate();
     void CompleteSpin();
     void ResetBoardSymbols();
     void AnimatePaylineReveal(const slots::PaylineResolutionData& paylineResolutionData, const float revealAnimationDurationSecs, const float hidingAnimationDurationSecs, const float delaySecs = 0.0f);

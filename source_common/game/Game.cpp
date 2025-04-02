@@ -56,6 +56,8 @@ static const strutils::StringId BACKGROUND_NAME = strutils::StringId("background
 static const strutils::StringId BACKGROUND_MASK_NAME = strutils::StringId("background_mask");
 static const strutils::StringId CREDITS_NAME = strutils::StringId("credits");
 static const strutils::StringId CREDITS_WAGER_NAME = strutils::StringId("credits_wager");
+static const strutils::StringId SCATTER_REMAINING_SPINS_NAME = strutils::StringId("scatter_remaining_spins");
+static const strutils::StringId SCATTER_MULTIPLIER_NAME = strutils::StringId("scatter_multiplier");
 static const strutils::StringId CREDIT_UPDATE_ANIMATION_NAME = strutils::StringId("credit_update_animation");
 static const strutils::StringId CREDITS_WAGER_PLUS_BUTTON_NAME = strutils::StringId("credit_wager_plus");
 static const strutils::StringId CREDITS_WAGER_MINUS_BUTTON_NAME = strutils::StringId("credit_wager_minus");
@@ -76,7 +78,9 @@ static const glm::vec3 SPIN_BUTTON_POSITION = glm::vec3(0.403f, -0.05f, 2.0f);
 static const glm::vec3 BACKGROUND_POSITION = glm::vec3(0.0f, 0.0f, 1.0f);
 static const glm::vec3 LOGIN_BUTTON_POSITION = glm::vec3(-0.075f, 0.134f, 2.0f);
 static const glm::vec3 CREDITS_TEXT_POSITION = glm::vec3(-0.3f, 0.292f, 2.0f);
-static const glm::vec3 CREDITS_WAGER_TEXT_POSITION = glm::vec3(0.05f, 0.292f, 2.0f);
+static const glm::vec3 CREDITS_WAGER_TEXT_POSITION = glm::vec3(0.333f, 0.197f, 2.0f);
+static const glm::vec3 SCATTER_REMAINING_SPINS_POSITION = glm::vec3(-0.157f, -0.204f, 2.0f);
+static const glm::vec3 SCATTER_MULTIPLIER_TEXT_POSITION = glm::vec3(0.051f, 0.292f, 2.0f);
 static const glm::vec3 CREDITS_WAGER_PLUS_BUTTON_POSITION = glm::vec3(0.35f, 0.15f, 2.0f);
 static const glm::vec3 CREDITS_WAGER_MINUS_BUTTON_POSITION = glm::vec3(0.45f, 0.15f, 2.0f);
 static const glm::vec3 SCATTER_BACKGROUND_POSITION = glm::vec3(0.0f, 0.0f, -0.1f);
@@ -144,9 +148,29 @@ void Game::Init()
     creditsSceneObject->mScale = CREDITS_TEXT_SCALE;
     creditsSceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 0.0f;
     
+    scene::TextSceneObjectData scatterRemainingSpinsTextData;
+    scatterRemainingSpinsTextData.mFontName = game_constants::DEFAULT_FONT_NAME;
+    scatterRemainingSpinsTextData.mText = "Bonus Spins: 3";
+    
+    auto scatterSpinsSceneObject = scene->CreateSceneObject(SCATTER_REMAINING_SPINS_NAME);
+    scatterSpinsSceneObject->mSceneObjectTypeData = std::move(scatterRemainingSpinsTextData);
+    scatterSpinsSceneObject->mPosition = SCATTER_REMAINING_SPINS_POSITION;
+    scatterSpinsSceneObject->mScale = CREDITS_TEXT_SCALE;
+    scatterSpinsSceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 0.0f;
+    
+    scene::TextSceneObjectData scatterMultiplierTextData;
+    scatterMultiplierTextData.mFontName = game_constants::DEFAULT_FONT_NAME;
+    scatterMultiplierTextData.mText = "5x Bonus Multiplier";
+    
+    auto scatterMultiplierSceneObject = scene->CreateSceneObject(SCATTER_MULTIPLIER_NAME);
+    scatterMultiplierSceneObject->mSceneObjectTypeData = std::move(scatterMultiplierTextData);
+    scatterMultiplierSceneObject->mPosition = SCATTER_MULTIPLIER_TEXT_POSITION;
+    scatterMultiplierSceneObject->mScale = CREDITS_TEXT_SCALE;
+    scatterMultiplierSceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 0.0f;
+
     scene::TextSceneObjectData creditsWagerTextData;
     creditsWagerTextData.mFontName = game_constants::DEFAULT_FONT_NAME;
-    creditsWagerTextData.mText = "Wager Per Spin: " + std::to_string(mCreditsWagerPerSpin);
+    creditsWagerTextData.mText = "Wager: " + std::to_string(mCreditsWagerPerSpin);
     
     auto creditsWagerSceneObject = scene->CreateSceneObject(CREDITS_WAGER_NAME);
     creditsWagerSceneObject->mSceneObjectTypeData = std::move(creditsWagerTextData);
@@ -238,6 +262,8 @@ void Game::UpdateGUI(const float dtMillis)
     auto spinButton = scene->FindSceneObject(SPIN_BUTTON_NAME);
     auto spinButtonEffect = scene->FindSceneObject(SPIN_BUTTON_EFFECT_NAME);
     auto scatterBackground = scene->FindSceneObject(SCATTER_BACKGROUND_NAME);
+    auto scatterFreeSpins = scene->FindSceneObject(SCATTER_REMAINING_SPINS_NAME);
+    auto scatterMultiplier = scene->FindSceneObject(SCATTER_MULTIPLIER_NAME);
 
     if (mLoginButton)
     {
@@ -276,6 +302,42 @@ void Game::UpdateGUI(const float dtMillis)
         }
     }
     
+    if (scatterFreeSpins)
+    {
+        if (mScatterOngoing)
+        {
+            if (scatterFreeSpins->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] <= 1.0f)
+            {
+                scatterFreeSpins->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] += dtMillis/1000.0f;
+            }
+        }
+        else
+        {
+            if (scatterFreeSpins->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] >= 0.0f)
+            {
+                scatterFreeSpins->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] -= dtMillis/1000.0f;
+            }
+        }
+    }
+    
+    if (scatterMultiplier)
+    {
+        if (mScatterOngoing)
+        {
+            if (scatterMultiplier->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] <= 1.0f)
+            {
+                scatterMultiplier->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] += dtMillis/1000.0f;
+            }
+        }
+        else
+        {
+            if (scatterMultiplier->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] >= 0.0f)
+            {
+                scatterMultiplier->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] -= dtMillis/1000.0f;
+            }
+        }
+    }
+    
     if (scatterBackground)
     {
         if (mScatterOngoing)
@@ -311,7 +373,20 @@ void Game::UpdateGUI(const float dtMillis)
             {
                 if (mBoardModel.GetOustandingScatterSpins() > 1)
                 {
-                    OnSpinButtonPressed();
+                    mBoardView->WaitForScatterStatsUpdate();
+                    
+                    CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TimeDelayAnimation>(1.0f), [this, scatterMultiplier, scatterFreeSpins]()
+                    {
+                        std::get<scene::TextSceneObjectData>(scatterMultiplier->mSceneObjectTypeData).mText[0] = '0' + (mBoardModel.GetScatterMultiplier() + 1);
+                        CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::PulseAnimation>(scatterMultiplier, 1.2f, 0.25f), [scatterFreeSpins, this]()
+                        {
+                            std::get<scene::TextSceneObjectData>(scatterFreeSpins->mSceneObjectTypeData).mText.back() = '0' + (mBoardModel.GetOustandingScatterSpins() - 1);
+                            CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::PulseAnimation>(scatterFreeSpins, 0.9f, 0.25f), [this]()
+                            {
+                                CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TimeDelayAnimation>(1.0f), [this](){ OnSpinButtonPressed(); });
+                            });
+                        });
+                    });
                 }
                 else
                 {
@@ -416,6 +491,12 @@ void Game::UpdateGUI(const float dtMillis)
         }
         else if (mBoardView->GetSpinAnimationState() == BoardView::SpinAnimationState::SCATTER_ANIMATION_FINISHED)
         {
+            auto scatterFreeSpins = scene->FindSceneObject(SCATTER_REMAINING_SPINS_NAME);
+            auto scatterMultiplier = scene->FindSceneObject(SCATTER_MULTIPLIER_NAME);
+            
+            std::get<scene::TextSceneObjectData>(scatterMultiplier->mSceneObjectTypeData).mText[0] = '1';
+            std::get<scene::TextSceneObjectData>(scatterFreeSpins->mSceneObjectTypeData).mText.back() = '0' + (mBoardModel.GetOustandingScatterSpins() - 1);
+
             mScatterOngoing = true;
             OnSpinButtonPressed();
         }
@@ -430,7 +511,7 @@ void Game::UpdateGUI(const float dtMillis)
     auto creditsWagerSceneObject = scene->FindSceneObject(CREDITS_WAGER_NAME);
     if (creditsWagerSceneObject)
     {
-        std::get<scene::TextSceneObjectData>(creditsWagerSceneObject->mSceneObjectTypeData).mText = "Wager Per Spin: " + std::to_string(static_cast<int>(mCreditsWagerPerSpin));
+        std::get<scene::TextSceneObjectData>(creditsWagerSceneObject->mSceneObjectTypeData).mText = "Wager: " + std::to_string(static_cast<int>(mCreditsWagerPerSpin));
     }
 }
 

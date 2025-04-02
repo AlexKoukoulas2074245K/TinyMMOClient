@@ -123,7 +123,8 @@ static const std::unordered_map<BoardView::SpinAnimationState, std::string> SPIN
     { BoardView::SpinAnimationState::POST_SPINNING, "POST_SPINNING" },
     { BoardView::SpinAnimationState::WAITING_FOR_PAYLINES, "WAITING_FOR_PAYLINES" },
     { BoardView::SpinAnimationState::SCATTER_ANIMATION, "SCATTER_ANIMATION" },
-    { BoardView::SpinAnimationState::SCATTER_ANIMATION_FINISHED, "SCATTER_ANIMATION_FINISHED" }
+    { BoardView::SpinAnimationState::SCATTER_ANIMATION_FINISHED, "SCATTER_ANIMATION_FINISHED" },
+    { BoardView::SpinAnimationState::WAITING_FOR_SCATTER_STATS_UPDATE, "WAITING_FOR_SCATTER_STATS_UPDATE" }
 };
 
 static const std::unordered_map<BoardView::PendingSymbolData::PendingSymbolDataState, std::string> PENDING_SYMBOL_DATA_STATE_NAMES =
@@ -718,6 +719,13 @@ void BoardView::WaitForPaylines(const slots::BoardStateResolutionData& boardReso
     });
                                 
     mSpinAnimationState = SpinAnimationState::WAITING_FOR_PAYLINES;
+}
+
+///------------------------------------------------------------------------------------------------
+
+void BoardView::WaitForScatterStatsUpdate()
+{
+    mSpinAnimationState = SpinAnimationState::WAITING_FOR_SCATTER_STATS_UPDATE;
 }
 
 ///------------------------------------------------------------------------------------------------
