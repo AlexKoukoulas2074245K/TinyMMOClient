@@ -50,7 +50,7 @@ AnimationUpdateResult BaseAnimation::VUpdate(const float dtMillis)
         }
     }
     
-    if (mSecsDuration <= 0.0f)
+    if (mSecsDuration <= 0.0f && !IS_FLAG_SET(animation_flags::ANIMATE_CONTINUOUSLY))
     {
         return AnimationUpdateResult::FINISHED;
     }

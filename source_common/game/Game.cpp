@@ -59,6 +59,11 @@ static const strutils::StringId CREDITS_WAGER_NAME = strutils::StringId("credits
 static const strutils::StringId CREDIT_UPDATE_ANIMATION_NAME = strutils::StringId("credit_update_animation");
 static const strutils::StringId CREDITS_WAGER_PLUS_BUTTON_NAME = strutils::StringId("credit_wager_plus");
 static const strutils::StringId CREDITS_WAGER_MINUS_BUTTON_NAME = strutils::StringId("credit_wager_minus");
+static const strutils::StringId SCATTER_BACKGROUND_NAME = strutils::StringId("scatter_background");
+
+static const std::string SCATTER_GRANDMA_TEXTURE_PATH = "game/food_slot_images/scatter_grandma.png";
+static const std::string SCATTER_MASK_TEXTURE_PATH = "game/food_slot_images/scatter_selected_symbol_mask.png";
+static const std::string SCATTER_MASK_SHADER_PATH = "scatter_selected_symbol.vs";
 
 static const glm::vec3 BACKGROUND_SCALE = glm::vec3(1.370f, 1.04f, 1.0f);
 
@@ -74,6 +79,8 @@ static const glm::vec3 CREDITS_TEXT_POSITION = glm::vec3(-0.3f, 0.292f, 2.0f);
 static const glm::vec3 CREDITS_WAGER_TEXT_POSITION = glm::vec3(0.05f, 0.292f, 2.0f);
 static const glm::vec3 CREDITS_WAGER_PLUS_BUTTON_POSITION = glm::vec3(0.35f, 0.15f, 2.0f);
 static const glm::vec3 CREDITS_WAGER_MINUS_BUTTON_POSITION = glm::vec3(0.45f, 0.15f, 2.0f);
+static const glm::vec3 SCATTER_BACKGROUND_POSITION = glm::vec3(0.0f, 0.0f, -0.1f);
+static const glm::vec3 SCATTER_BACKGROUND_SCALE = glm::vec3(0.092f * 5.0f, 0.06624f * 5.0f, 1.0f);
 
 static const float GAME_ELEMENTS_PRESENTATION_TIME = 1.0f;
 static const float PAYLINE_REVEAL_ANIMATION_DURATION = 1.0f;
@@ -83,6 +90,7 @@ static const float SPIN_BUTTON_DEPRESSED_SCALE_FACTOR = 0.85f;
 static const float SPIN_BUTTON_ANIMATION_DURATION = 0.15f;
 static const float SPIN_BUTTON_EFFECT_ANIMATION_DURATION = 0.5f;
 static const float CREDIT_UPDATE_ANIMATION_DURATION = 1.0f;
+static const float SCATTER_BACKGROUND_MAX_ALPHA = 0.5f;
 
 
 ///------------------------------------------------------------------------------------------------
@@ -227,6 +235,10 @@ void Game::UpdateGUI(const float dtMillis)
     auto& animationManager = CoreSystemsEngine::GetInstance().GetAnimationManager();
     auto scene = sceneManager.FindScene(game_constants::WORLD_SCENE_NAME);
     
+    auto spinButton = scene->FindSceneObject(SPIN_BUTTON_NAME);
+    auto spinButtonEffect = scene->FindSceneObject(SPIN_BUTTON_EFFECT_NAME);
+    auto scatterBackground = scene->FindSceneObject(SCATTER_BACKGROUND_NAME);
+
     if (mLoginButton)
     {
         mLoginButton->Update(dtMillis);
@@ -240,7 +252,7 @@ void Game::UpdateGUI(const float dtMillis)
         }
         mCreditsWagerPlusButton->Update(dtMillis);
     }
-    else if (mCreditsWagerPlusButton && mScatterOngoing)
+    else if (mCreditsWagerPlusButton && (mScatterOngoing || mBoardView->GetSpinAnimationState() != BoardView::SpinAnimationState::IDLE))
     {
         if (mCreditsWagerPlusButton->GetSceneObjects().front()->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] >= 0.0f)
         {
@@ -256,7 +268,7 @@ void Game::UpdateGUI(const float dtMillis)
         }
         mCreditsWagerMinusButton->Update(dtMillis);
     }
-    else if (mCreditsWagerMinusButton && mScatterOngoing)
+    else if (mCreditsWagerMinusButton && (mScatterOngoing || mBoardView->GetSpinAnimationState() != BoardView::SpinAnimationState::IDLE))
     {
         if (mCreditsWagerMinusButton->GetSceneObjects().front()->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] >= 0.0f)
         {
@@ -264,8 +276,23 @@ void Game::UpdateGUI(const float dtMillis)
         }
     }
     
-    auto spinButton = scene->FindSceneObject(SPIN_BUTTON_NAME);
-    auto spinButtonEffect = scene->FindSceneObject(SPIN_BUTTON_EFFECT_NAME);
+    if (scatterBackground)
+    {
+        if (mScatterOngoing)
+        {
+            if (scatterBackground->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] <= SCATTER_BACKGROUND_MAX_ALPHA)
+            {
+                scatterBackground->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] += dtMillis/1000.0f;
+            }
+        }
+        else
+        {
+            if (scatterBackground->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] >= 0.0f)
+            {
+                scatterBackground->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] -= dtMillis/1000.0f;
+            }
+        }
+    }
 
     if (spinButton)
     {
@@ -542,6 +569,15 @@ void Game::OnServerLoginResponse(const nlohmann::json& responseJson)
         
         auto background = scene->FindSceneObject(BACKGROUND_NAME);
         CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenValueAnimation>(background->mShaderFloatUniformValues[strutils::StringId("mask_alpha_comp")], 0.0f, GAME_ELEMENTS_PRESENTATION_TIME), [](){});
+        
+        auto scatterBackground = scene->CreateSceneObject(SCATTER_BACKGROUND_NAME);
+        scatterBackground->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 0.0f;
+        scatterBackground->mPosition = SCATTER_BACKGROUND_POSITION;
+        scatterBackground->mScale = SCATTER_BACKGROUND_SCALE;
+        scatterBackground->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + SCATTER_GRANDMA_TEXTURE_PATH);
+        scatterBackground->mEffectTextureResourceIds[0] =  CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + SCATTER_MASK_TEXTURE_PATH);
+        scatterBackground->mShaderResourceId =  CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + SCATTER_MASK_SHADER_PATH);
+        CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::PulseAnimation>(scatterBackground, 1.1f, 2.0f, animation_flags::ANIMATE_CONTINUOUSLY), [](){});
         
         auto spinButton = scene->CreateSceneObject(SPIN_BUTTON_NAME);
         spinButton->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + "game/wheel.png");
