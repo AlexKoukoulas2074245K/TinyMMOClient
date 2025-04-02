@@ -95,7 +95,7 @@ static const float SPIN_BUTTON_ANIMATION_DURATION = 0.15f;
 static const float SPIN_BUTTON_EFFECT_ANIMATION_DURATION = 0.5f;
 static const float CREDIT_UPDATE_ANIMATION_DURATION = 1.0f;
 static const float SCATTER_BACKGROUND_MAX_ALPHA = 0.5f;
-
+static const float SCATTER_DELAY_PER_EVENT = 1.0f;
 
 ///------------------------------------------------------------------------------------------------
 
@@ -272,121 +272,41 @@ void Game::UpdateGUI(const float dtMillis)
     
     if (mCreditsWagerPlusButton && !mScatterOngoing && mBoardView->GetSpinAnimationState() == BoardView::SpinAnimationState::IDLE)
     {
-        if (mCreditsWagerPlusButton->GetSceneObjects().front()->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] <= 1.0f)
-        {
-            mCreditsWagerPlusButton->GetSceneObjects().front()->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] += dtMillis/1000.0f;
-        }
+        AnimateSceneObjectVisibility(mCreditsWagerPlusButton->GetSceneObjects().front(), dtMillis, true);
         mCreditsWagerPlusButton->Update(dtMillis);
     }
     else if (mCreditsWagerPlusButton && (mScatterOngoing || mBoardView->GetSpinAnimationState() != BoardView::SpinAnimationState::IDLE))
     {
-        if (mCreditsWagerPlusButton->GetSceneObjects().front()->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] >= 0.0f)
-        {
-            mCreditsWagerPlusButton->GetSceneObjects().front()->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] -= dtMillis/1000.0f;
-        }
+        AnimateSceneObjectVisibility(mCreditsWagerPlusButton->GetSceneObjects().front(), dtMillis, false);
     }
     
     if (mCreditsWagerMinusButton && !mScatterOngoing && mBoardView->GetSpinAnimationState() == BoardView::SpinAnimationState::IDLE)
     {
-        if (mCreditsWagerMinusButton->GetSceneObjects().front()->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] <= 1.0f)
-        {
-            mCreditsWagerMinusButton->GetSceneObjects().front()->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] += dtMillis/1000.0f;
-        }
+        AnimateSceneObjectVisibility(mCreditsWagerMinusButton->GetSceneObjects().front(), dtMillis, true);
         mCreditsWagerMinusButton->Update(dtMillis);
     }
     else if (mCreditsWagerMinusButton && (mScatterOngoing || mBoardView->GetSpinAnimationState() != BoardView::SpinAnimationState::IDLE))
     {
-        if (mCreditsWagerMinusButton->GetSceneObjects().front()->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] >= 0.0f)
-        {
-            mCreditsWagerMinusButton->GetSceneObjects().front()->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] -= dtMillis/1000.0f;
-        }
+        AnimateSceneObjectVisibility(mCreditsWagerMinusButton->GetSceneObjects().front(), dtMillis, false);
     }
     
-    if (scatterFreeSpins)
-    {
-        if (mScatterOngoing)
-        {
-            if (scatterFreeSpins->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] <= 1.0f)
-            {
-                scatterFreeSpins->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] += dtMillis/1000.0f;
-            }
-        }
-        else
-        {
-            if (scatterFreeSpins->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] >= 0.0f)
-            {
-                scatterFreeSpins->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] -= dtMillis/1000.0f;
-            }
-        }
-    }
-    
-    if (scatterMultiplier)
-    {
-        if (mScatterOngoing)
-        {
-            if (scatterMultiplier->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] <= 1.0f)
-            {
-                scatterMultiplier->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] += dtMillis/1000.0f;
-            }
-        }
-        else
-        {
-            if (scatterMultiplier->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] >= 0.0f)
-            {
-                scatterMultiplier->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] -= dtMillis/1000.0f;
-            }
-        }
-    }
-    
-    if (scatterBackground)
-    {
-        if (mScatterOngoing)
-        {
-            if (scatterBackground->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] <= SCATTER_BACKGROUND_MAX_ALPHA)
-            {
-                scatterBackground->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] += dtMillis/1000.0f;
-            }
-        }
-        else
-        {
-            if (scatterBackground->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] >= 0.0f)
-            {
-                scatterBackground->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] -= dtMillis/1000.0f;
-            }
-        }
-    }
+    AnimateSceneObjectVisibility(scatterFreeSpins, dtMillis, mScatterOngoing);
+    AnimateSceneObjectVisibility(scatterMultiplier, dtMillis, mScatterOngoing);
+    AnimateSceneObjectVisibility(scatterBackground, dtMillis, mScatterOngoing, SCATTER_BACKGROUND_MAX_ALPHA);
 
     if (spinButton)
     {
         if (mScatterOngoing)
         {
-            if (spinButton->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] > 0.0f)
-            {
-                spinButton->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] -= dtMillis/1000.0f;
-            }
-            if (spinButtonEffect->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] > 0.0f)
-            {
-                spinButtonEffect->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] -= dtMillis/1000.0f;
-            }
-            
+            AnimateSceneObjectVisibility(spinButton, dtMillis, false);
+            AnimateSceneObjectVisibility(spinButtonEffect, dtMillis, false);
+                 
             if (mBoardView->GetSpinAnimationState() == BoardView::SpinAnimationState::IDLE)
             {
                 if (mBoardModel.GetOustandingScatterSpins() > 1)
                 {
                     mBoardView->WaitForScatterStatsUpdate();
-                    
-                    CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TimeDelayAnimation>(1.0f), [this, scatterMultiplier, scatterFreeSpins]()
-                    {
-                        std::get<scene::TextSceneObjectData>(scatterMultiplier->mSceneObjectTypeData).mText[0] = '0' + (mBoardModel.GetScatterMultiplier() + 1);
-                        CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::PulseAnimation>(scatterMultiplier, 1.2f, 0.25f), [scatterFreeSpins, this]()
-                        {
-                            std::get<scene::TextSceneObjectData>(scatterFreeSpins->mSceneObjectTypeData).mText.back() = '0' + (mBoardModel.GetOustandingScatterSpins() - 1);
-                            CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::PulseAnimation>(scatterFreeSpins, 0.9f, 0.25f), [this]()
-                            {
-                                CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TimeDelayAnimation>(1.0f), [this](){ OnSpinButtonPressed(); });
-                            });
-                        });
-                    });
+                    UpdateAndAnimateScatterStats();
                 }
                 else
                 {
@@ -403,14 +323,8 @@ void Game::UpdateGUI(const float dtMillis)
             
             if (animationManager.GetAnimationCountPlayingForSceneObject(SPIN_BUTTON_NAME) == 0 && mBoardView->GetSpinAnimationState() == BoardView::SpinAnimationState::IDLE)
             {
-                if (spinButton->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] < 1.0f)
-                {
-                    spinButton->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] += dtMillis/1000.0f;
-                }
-                if (spinButtonEffect->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] < 1.0f)
-                {
-                    spinButtonEffect->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] += dtMillis/1000.0f;
-                }
+                AnimateSceneObjectVisibility(spinButton, dtMillis, true);
+                AnimateSceneObjectVisibility(spinButtonEffect, dtMillis, true);
                 
                 auto worldTouchPos = inputStateManager.VGetPointingPosInWorldSpace(scene->GetCamera().GetViewMatrix(), scene->GetCamera().GetProjMatrix());
                 
@@ -817,6 +731,55 @@ void Game::UpdateSpinButtonEffectAura()
         {
             spinButtonEffect->mShaderFloatUniformValues[strutils::StringId("perlin_color_r_multipier")] = 0.0f;
             spinButtonEffect->mShaderFloatUniformValues[strutils::StringId("perlin_color_g_multipier")] = 1.0f;
+        }
+    }
+}
+
+///------------------------------------------------------------------------------------------------
+
+void Game::UpdateAndAnimateScatterStats()
+{
+    auto& systemsEngine = CoreSystemsEngine::GetInstance();
+    auto& sceneManager = systemsEngine.GetSceneManager();
+    auto scene = sceneManager.FindScene(game_constants::WORLD_SCENE_NAME);
+    auto scatterFreeSpins = scene->FindSceneObject(SCATTER_REMAINING_SPINS_NAME);
+    auto scatterMultiplier = scene->FindSceneObject(SCATTER_MULTIPLIER_NAME);
+    
+    CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TimeDelayAnimation>(SCATTER_DELAY_PER_EVENT), [this, scatterMultiplier, scatterFreeSpins]()
+    {
+        std::get<scene::TextSceneObjectData>(scatterMultiplier->mSceneObjectTypeData).mText[0] = '0' + (mBoardModel.GetScatterMultiplier() + 1);
+        CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::PulseAnimation>(scatterMultiplier, 1.2f, 0.25f), [scatterFreeSpins, this]()
+        {
+            std::get<scene::TextSceneObjectData>(scatterFreeSpins->mSceneObjectTypeData).mText.back() = '0' + (mBoardModel.GetOustandingScatterSpins() - 1);
+            CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::PulseAnimation>(scatterFreeSpins, 0.9f, 0.25f), [this]()
+            {
+                CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TimeDelayAnimation>(SCATTER_DELAY_PER_EVENT), [this](){ OnSpinButtonPressed(); });
+            });
+        });
+    });
+}
+
+///------------------------------------------------------------------------------------------------
+
+void Game::AnimateSceneObjectVisibility(std::shared_ptr<scene::SceneObject> sceneObject, const float dtMillis, const bool isVisible, const float maxAlpha /* = 1.0f */)
+{
+    if (!sceneObject)
+    {
+        return;
+    }
+
+    if (isVisible)
+    {
+        if (sceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] <= maxAlpha)
+        {
+            sceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] += dtMillis/1000.0f;
+        }
+    }
+    else
+    {
+        if (sceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] >= 0.0f)
+        {
+            sceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] -= dtMillis/1000.0f;
         }
     }
 }

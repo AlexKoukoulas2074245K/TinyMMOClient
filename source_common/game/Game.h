@@ -56,6 +56,8 @@ private:
     void OnSpinButtonPressed();
     void UpdateCredits(const int wonCreditMultiplier);
     void UpdateSpinButtonEffectAura();
+    void UpdateAndAnimateScatterStats();
+    void AnimateSceneObjectVisibility(std::shared_ptr<scene::SceneObject> sceneObject, const float dtMillis, const bool isVisible, const float maxAlpha = 1.0f);
     
 private:
     std::atomic<int> mLastPingMillis = 0;
