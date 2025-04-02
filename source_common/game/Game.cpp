@@ -639,6 +639,7 @@ void Game::OnServerSpinResponse(const nlohmann::json& responseJson)
     spinResponse.DeserializeFromJson(responseJson);
     
     mSpinId = spinResponse.spinId;
+    mSpinId = -394595341;
     //mSpinId = 1030580430; // 3 Scatter and Combo madness after
     //mSpinId = 828030532; //roast_chicken and chicken_soup
     //mSpinId = 1539116524;

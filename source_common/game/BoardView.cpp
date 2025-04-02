@@ -624,11 +624,6 @@ void BoardView::BeginTumble(const slots::TumbleResolutionData& tumbleResolutionD
             auto symbol = mScene.FindSceneObject(symbolSoName);
             auto symbolFrame = mScene.FindSceneObject(symbolFrameSoName);
             
-            if (!symbol || !symbolFrame)
-            {
-                continue;
-            }
-
             auto newNamePrefix = TUMBLE_TEMP_PREFIX + std::to_string(placedComboCounter) + "_" + std::to_string(i - secondIngredientIndex);
     
             if (alreadyAnimatingIngredientsSymbolData.contains(ingredientSymbolData) || tumbleResolutionData.mPlacedCombosCoords.contains(ingredientSymbolData))
@@ -639,6 +634,11 @@ void BoardView::BeginTumble(const slots::TumbleResolutionData& tumbleResolutionD
             }
             else
             {
+                if (!symbol || !symbolFrame)
+                {
+                    continue;
+                }
+                
                 symbol->mName = strutils::StringId(newNamePrefix + "_symbol");
                 symbolFrame->mName = strutils::StringId(newNamePrefix + "_symbol_frame");
             }
