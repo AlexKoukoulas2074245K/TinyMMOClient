@@ -165,11 +165,11 @@ void RunStatsSimulation(const int simulationIterations)
             std::cout << "    [" << slots::WIN_SOURCE_TYPE_NAMES.at(winSourceTypeContribution.mWinSourceType) << " = " << winSourceTypeContribution.mContribution << "%]" << std::endl;
         }
 
-        std::cout << "5 Wild Chance: " << (numberOf5Wilds/float(simulationIterations)) * 100.0f << "%" << std::endl;
-        std::cout << "5 Scatter Chance: " << (numberOf5Scatters/float(simulationIterations)) * 100.0f << "%" << std::endl;
-        std::cout << "4 Scatter Chance: " << (numberOf4Scatters/float(simulationIterations)) * 100.0f << "%" << std::endl;
-        std::cout << "3 Scatter Chance: " << (numberOf3Scatters/float(simulationIterations)) * 100.0f << "%" << std::endl;
-        std::cout << "Tumble Chance: " << (numberOfCombos/float(simulationIterations)) * 100.0f << "%" << std::endl;
+        std::cout << "5 Wild Chance: " << (numberOf5Wilds/float(simulationIterations)) * 100.0f << "%  (" << numberOf5Wilds << " in " << simulationIterations << ")" << std::endl;
+        std::cout << "5 Scatter Chance: " << (numberOf5Scatters/float(simulationIterations)) * 100.0f << "%  (" << numberOf5Scatters << " in " << simulationIterations << ")" << std::endl;
+        std::cout << "4 Scatter Chance: " << (numberOf4Scatters/float(simulationIterations)) * 100.0f << "%  (" << numberOf4Scatters << " in " << simulationIterations << ")" << std::endl;
+        std::cout << "3 Scatter Chance: " << (numberOf3Scatters/float(simulationIterations)) * 100.0f << "%  (" << numberOf3Scatters << " in " << simulationIterations << ")" << std::endl;
+        std::cout << "Tumble Chance: " << (numberOfCombos/float(simulationIterations)) * 100.0f << "%  (" << numberOfCombos << " in " << simulationIterations << ")" << std::endl;
     });
 }
 
