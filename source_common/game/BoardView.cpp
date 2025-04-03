@@ -775,7 +775,7 @@ void BoardView::AnimatePaylineReveal(const slots::PaylineResolutionData& payline
 {
     if (!paylineResolutionData.mScatter)
     {
-        mPaylines[static_cast<int>(paylineResolutionData.mPayline)].AnimatePaylineReveal(revealAnimationDurationSecs, hidingAnimationDurationSecs, delaySecs);
+        mPaylines[static_cast<int>(paylineResolutionData.mPayline)].AnimatePaylineReveal(static_cast<int>(paylineResolutionData.mSymbolData.size()), revealAnimationDurationSecs, hidingAnimationDurationSecs, delaySecs);
     }
     
     auto winningSymbolData = paylineResolutionData.mSymbolData;

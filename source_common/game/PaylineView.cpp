@@ -11,13 +11,24 @@
 #include <engine/rendering/CommonUniforms.h>
 #include <engine/scene/Scene.h>
 #include <engine/scene/SceneObjectUtils.h>
+#include <net_common/Board.h>
 
 ///------------------------------------------------------------------------------------------------
 
 static const strutils::StringId HOR_REVEAL_THRESHOLD_UNIFORM_NAME = strutils::StringId("hor_reveal_threshold");
+static const strutils::StringId HOR_REVEAL_THRESHOLD_STOP_VALUE_UNIFORM_NAME = strutils::StringId("hor_reveal_threshold_stop_value");
 
 static const glm::vec3 PAYLINE_POSITION = glm::vec3(0.0f, 0.0f, 2.0f);
 static const glm::vec3 PAYLINE_SCALE = glm::vec3(0.5f * 1.28f, 0.5f, 1.0f);
+
+// Where should the animated payline go grayscale
+static const std::unordered_map<int, float> PAYLINE_REVEAL_STOP_VALUES =
+{
+    { 3, 0.45f },
+    { 4, 0.66f },
+    { 5, 1.00f }
+};
+
 static const std::unordered_map<slots::PaylineType, std::string> PAYLINE_NAMES =
 {
     { slots::PaylineType::PAYLINE_1, "payline_1"},
@@ -61,11 +72,13 @@ PaylineView::PaylineView(scene::Scene& scene, const slots::PaylineType payline)
 
 ///------------------------------------------------------------------------------------------------
 
-void PaylineView::AnimatePaylineReveal(const float revealAnimationDurationSecs, const float hidingAnimationDurationSecs, const float delaySecs /* = 0.0f */)
+void PaylineView::AnimatePaylineReveal(const int winningSymbolCount, const float revealAnimationDurationSecs, const float hidingAnimationDurationSecs, const float delaySecs /* = 0.0f */)
 {
     ResetAnimationVars();
     CoreSystemsEngine::GetInstance().GetAnimationManager().StopAllAnimationsPlayingForSceneObject(mSceneObject->mName);
     
+    mSceneObject->mShaderFloatUniformValues[HOR_REVEAL_THRESHOLD_STOP_VALUE_UNIFORM_NAME] = PAYLINE_REVEAL_STOP_VALUES.at(winningSymbolCount);
+
     CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenValueAnimation>(mSceneObject->mShaderFloatUniformValues[HOR_REVEAL_THRESHOLD_UNIFORM_NAME], 1.0f, revealAnimationDurationSecs, animation_flags::NONE, delaySecs), [this, hidingAnimationDurationSecs]()
     {
         CoreSystemsEngine::GetInstance().GetAnimationManager().StartAnimation(std::make_unique<rendering::TweenAlphaAnimation>(mSceneObject, 0.0f, hidingAnimationDurationSecs), [this]()
