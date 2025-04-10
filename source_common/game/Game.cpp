@@ -36,7 +36,7 @@
 #include <mutex>
 #include <SDL.h>
 
-//#define ALLOW_OFFLINE_PLAY
+#define ALLOW_OFFLINE_PLAY
 #if defined(MOBILE_FLOW)
 #include <platform_specific/IOSUtils.h>
 #endif
@@ -547,6 +547,7 @@ void Game::OnServerLoginResponse(const nlohmann::json& responseJson)
         offlinePlaySceneObject->mPosition = CREDITS_TEXT_POSITION;
         offlinePlaySceneObject->mPosition.x = -0.075f;
         offlinePlaySceneObject->mPosition.y = -0.226f;
+        offlinePlaySceneObject->mPosition.z += 0.226f;
         offlinePlaySceneObject->mScale = CREDITS_TEXT_SCALE/2.0f;
         offlinePlaySceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 1.0f;
         

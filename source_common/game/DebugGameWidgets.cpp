@@ -5,6 +5,7 @@
 ///  Created by Alex Koukoulas on 31/03/2025
 ///------------------------------------------------------------------------------------------------
 
+#if defined(USE_IMGUI)
 #include <engine/CoreSystemsEngine.h>
 #include <engine/input/IInputStateManager.h>
 #include <engine/rendering/AnimationManager.h>
@@ -221,3 +222,5 @@ void DebugGameWidgets::CreateDebugWidgets(Game& game)
 }
 
 ///------------------------------------------------------------------------------------------------
+
+#endif
