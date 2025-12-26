@@ -111,10 +111,13 @@ void Game::Init()
 
 void Game::Update(const float dtMillis)
 {
+    static float accum = 0.0f;
+    accum += dtMillis;
+    
     // Fake movement
     MoveMessage move{};
     move.playerId = 0;
-    move.position = { std::cos(dtMillis), std::sin(dtMillis) };
+    move.position = { std::cos(accum), std::sin(accum) };
     move.velocity = { 0.0f, 0.0f };
     
     ENetPacket* movePacket = enet_packet_create(
@@ -126,7 +129,7 @@ void Game::Update(const float dtMillis)
     enet_peer_send(sPeer, 0, movePacket);
     
     // Occasionally send reliable event
-    if (static_cast<int>(dtMillis) % 5 == 0)
+    if (static_cast<int>(accum) % 5 == 0)
     {
         AttackMessage atk{};
         atk.attackerId = 0;
