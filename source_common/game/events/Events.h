@@ -11,9 +11,6 @@
 ///------------------------------------------------------------------------------------------------
 
 #include <engine/utils/StringUtils.h>
-#include <engine/resloading/ResourceLoadingService.h>
-#include <nlohmann/json.hpp>
-#include <net_common/NetworkMessages.h>
 
 ///------------------------------------------------------------------------------------------------
 
@@ -25,23 +22,6 @@ namespace events
 class DummyEvent
 {
     
-};
-
-///------------------------------------------------------------------------------------------------
-
-class SendNetworkMessageEvent
-{
-public:
-    SendNetworkMessageEvent(const nlohmann::json& messageJson, const networking::MessageType messageType, const networking::MessagePriority messagePriority)
-        : mMessageJson(messageJson)
-        , mMessageType(messageType)
-        , mMessagePriority(messagePriority)
-    {
-    }
-    
-    const nlohmann::json mMessageJson;
-    const networking::MessageType mMessageType;
-    const networking::MessagePriority mMessagePriority;
 };
 
 ///------------------------------------------------------------------------------------------------

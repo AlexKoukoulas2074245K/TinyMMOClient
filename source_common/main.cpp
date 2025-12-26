@@ -44,7 +44,6 @@ int main(int argc, char** argv)
 ///------------------------------------------------------------------------------------------------
 #else
 #include <game/Game.h>
-#include <game/SimulationRunner.h>
 #include <stdlib.h>
 #include <SDL.h>
 
