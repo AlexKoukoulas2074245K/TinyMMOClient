@@ -32,6 +32,9 @@
 #include <game/AnimatedButton.h>
 #include <game/Game.h>
 #include <game/events/EventSystem.h>
+#include <game/LocalPlayerInputController.h>
+#include <game/PlayerAnimationController.h>
+#include <imgui/imgui.h>
 #include <net_common/NetworkMessages.h>
 #include <mutex>
 #include <SDL.h>
@@ -126,8 +129,18 @@ void Game::Init()
 
 ///------------------------------------------------------------------------------------------------
 
+static float sPlayerVelocityMultiplier = 1.0f;
 void Game::Update(const float dtMillis)
 {
+    auto& systemsEngine = CoreSystemsEngine::GetInstance();
+    auto inputDirection = LocalPlayerInputController::GetMovementDirection();
+    auto velocity = glm::vec3(inputDirection.x, inputDirection.y, 0.0f) * 0.0003f * sPlayerVelocityMultiplier * dtMillis;
+
+    auto player = systemsEngine.GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME)->FindSceneObject(strutils::StringId("player"));
+    
+    player->mPosition += velocity;
+    PlayerAnimationController::UpdatePlayerAnimation(player, velocity, dtMillis);
+    
     static float accum = 0.0f;
     accum += dtMillis;
     
@@ -202,6 +215,9 @@ void Game::WindowResize()
 #if defined(USE_IMGUI)
 void Game::CreateDebugWidgets()
 {
+    ImGui::Begin("Game Data", nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
+    ImGui::SliderFloat("Player velocity Multiplier", &sPlayerVelocityMultiplier, 0.01f, 10.0f);
+    ImGui::End();
 }
 #else
 void Game::CreateDebugWidgets()
