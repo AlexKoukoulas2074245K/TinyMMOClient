@@ -139,7 +139,7 @@ void Game::Update(const float dtMillis)
     auto player = systemsEngine.GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME)->FindSceneObject(strutils::StringId("player"));
     
     player->mPosition += velocity;
-    PlayerAnimationController::UpdatePlayerAnimation(player, velocity, dtMillis);
+    PlayerAnimationController::UpdatePlayerAnimation(player, 0.0003f * sPlayerVelocityMultiplier, velocity, dtMillis);
     
     static float accum = 0.0f;
     accum += dtMillis;

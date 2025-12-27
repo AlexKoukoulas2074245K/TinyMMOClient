@@ -18,22 +18,22 @@ glm::vec2 LocalPlayerInputController::GetMovementDirection()
     
     if (ism.VKeyPressed(input::Key::W))
     {
-        direction.y = 1.0f;
+        direction.y += 1.0f;
     }
     
     if (ism.VKeyPressed(input::Key::D))
     {
-        direction.x = 1.0f;
+        direction.x += 1.0f;
     }
     
     if (ism.VKeyPressed(input::Key::S))
     {
-        direction.y = -1.0f;
+        direction.y -= 1.0f;
     }
     
     if (ism.VKeyPressed(input::Key::A))
     {
-        direction.x = -1.0f;
+        direction.x -= 1.0f;
     }
     
     if (glm::length(direction) > 0.0f)

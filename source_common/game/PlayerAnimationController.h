@@ -19,7 +19,7 @@ namespace scene { class SceneObject; }
 class PlayerAnimationController
 {
 public:
-    static void UpdatePlayerAnimation(std::shared_ptr<scene::SceneObject> player, const glm::vec3& velocity, const float dtMillis);
+    static void UpdatePlayerAnimation(std::shared_ptr<scene::SceneObject> player, const float playerSpeed, const glm::vec3& velocity, const float dtMillis);
     
 private:
     PlayerAnimationController(){};

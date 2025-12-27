@@ -14,6 +14,7 @@
 
 static const float UV_X_STEP = 0.3333f; // Assuming 3 columns
 static const float UV_Y_STEP = 0.2f;    // Assuming 5 rows
+static const float ANIMATION_TIME_CONSTANT = 0.000024f;
 
 static const std::pair<glm::vec2, glm::vec2> ANIMATION_UV_MAP[5][3] =
 {
@@ -24,17 +25,10 @@ static const std::pair<glm::vec2, glm::vec2> ANIMATION_UV_MAP[5][3] =
     {{ {0.0f, 0.0f}, {UV_X_STEP, UV_Y_STEP} }, { {UV_X_STEP, 0.0f}, {UV_X_STEP * 2.0f, UV_Y_STEP} }, { {UV_X_STEP * 2.0f, 0.0f}, { UV_X_STEP * 3.0f, UV_Y_STEP } }}
 };
 
-void PlayerAnimationController::UpdatePlayerAnimation(std::shared_ptr<scene::SceneObject> player, const glm::vec3& velocity, const float dtMillis)
+void PlayerAnimationController::UpdatePlayerAnimation(std::shared_ptr<scene::SceneObject> player, const float playerSpeed, const glm::vec3& velocity, const float dtMillis)
 {
     static int animationIndex = 0;
     static float accum = 0.0f;
-    accum += dtMillis/1000.0f;
-    
-    if (accum > 0.08f)
-    {
-        accum -= 0.08f;
-        animationIndex = (animationIndex + 1)%3;
-    }
     
     static int rowIndex = 0;
     static bool flip = false;
@@ -45,6 +39,15 @@ void PlayerAnimationController::UpdatePlayerAnimation(std::shared_ptr<scene::Sce
     }
     else
     {
+        accum += dtMillis/1000.0f;
+        
+        float targetAnimationTime = ANIMATION_TIME_CONSTANT/playerSpeed;
+        if (accum > targetAnimationTime)
+        {
+            accum -= targetAnimationTime;
+            animationIndex = (animationIndex + 1) % 3;
+        }
+
         // NE
         if (velocity.x > 0.0f && velocity.y > 0.0f)
         {
