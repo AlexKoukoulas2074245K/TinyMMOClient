@@ -36,7 +36,6 @@
 		3E0686E0364F1D3BFC522A92 /* CommonUniforms.h in Sources */ = {isa = PBXBuildFile; fileRef = 9CC1A200C9B794A05E296C21 /* CommonUniforms.h */; };
 		3E3B65024B721F5CCC0D71E0 /* Animations.h in Sources */ = {isa = PBXBuildFile; fileRef = 82DFED0E0B1AB607780AED60 /* Animations.h */; };
 		45963ED9A5DA3C4EB9144646 /* TextureResource.h in Sources */ = {isa = PBXBuildFile; fileRef = 989BFF482B72A00F213431FE /* TextureResource.h */; };
-		4B7892A96BE923867CA18DAD /* NetworkMessages.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 903ABC16F13CB2EC58E1C140 /* NetworkMessages.cpp */; };
 		4D0513581BFF046081AADA26 /* Editor.h in Sources */ = {isa = PBXBuildFile; fileRef = AB2400E817D39628656BEFF1 /* Editor.h */; };
 		4E9ADD55CB0B5CA8962F347E /* StringUtils.h in Sources */ = {isa = PBXBuildFile; fileRef = EF61AB7D638A80B4ABD5D5B7 /* StringUtils.h */; };
 		5285724978640648FFD94960 /* TextureResource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93D83DB41AD868D09B2A3C94 /* TextureResource.cpp */; };
@@ -51,7 +50,6 @@
 		69A3B6CA894565C4F51E1123 /* SoundManager.h in Sources */ = {isa = PBXBuildFile; fileRef = 7AC3E452BAA560B6D8B1349E /* SoundManager.h */; };
 		6B03252E24CF56D73B9C3DC7 /* Editor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A49D33C4F1B1DC1C02DB9E05 /* Editor.cpp */; };
 		6B29A2EA7B3D661771AB8A2D /* RenderingUtils.h in Sources */ = {isa = PBXBuildFile; fileRef = 8AE4C68818CCB619974358E0 /* RenderingUtils.h */; };
-		6CDEE9052C0AC308ADBF2846 /* NetworkMessages.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 903ABC16F13CB2EC58E1C140 /* NetworkMessages.cpp */; };
 		6D827E1ADCEBBFD2A690675C /* CommonUniforms.h in Sources */ = {isa = PBXBuildFile; fileRef = 9CC1A200C9B794A05E296C21 /* CommonUniforms.h */; };
 		6E1A780876A016C76FFF66C6 /* OBJMeshLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 06291EA0D3FF12CB3058DEF2 /* OBJMeshLoader.cpp */; };
 		71319CF262B3FEA0241CE51E /* RendererPlatformImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68CBCF02480A4F7771578514 /* RendererPlatformImpl.cpp */; };
@@ -369,7 +367,6 @@
 		92B8A59F2BE13B00006EC56F /* AnimatedButton.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 92B8A59E2BE13B00006EC56F /* AnimatedButton.cpp */; };
 		92CA97412B65132C00B53B01 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92CA97402B65132B00B53B01 /* StoreKit.framework */; };
 		95BF1C18A001B37A45C9BF9E /* IRenderer.h in Sources */ = {isa = PBXBuildFile; fileRef = E0599E67CDFA7350C55C73A5 /* IRenderer.h */; };
-		9E54DFE976400D987DDB2770 /* NetworkMessages.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 903ABC16F13CB2EC58E1C140 /* NetworkMessages.cpp */; };
 		9F60F6BEA7D20AB4B5EFA323 /* ResourceLoadingService.h in Sources */ = {isa = PBXBuildFile; fileRef = 7C92E4EC0FBCD6AFCA53FD77 /* ResourceLoadingService.h */; };
 		A190FCD102A510B7AF224622 /* AnimationManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E9824F6D620FAB012DF0BC78 /* AnimationManager.cpp */; };
 		A24C468FFD129BCDF0B2E5B2 /* InputStateManagerPlatformImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CF33F7C72612B80A9AB49895 /* InputStateManagerPlatformImpl.cpp */; };
@@ -499,7 +496,6 @@
 		8AE4C68818CCB619974358E0 /* RenderingUtils.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = RenderingUtils.h; sourceTree = "<group>"; };
 		8D6E209DDF4F577F8C87C6A0 /* BaseDataFileDeserializer.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = BaseDataFileDeserializer.h; sourceTree = "<group>"; };
 		903005ABB6F4A9CB6247ABDC /* BaseDataFileSerializer.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = BaseDataFileSerializer.cpp; sourceTree = "<group>"; };
-		903ABC16F13CB2EC58E1C140 /* NetworkMessages.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = NetworkMessages.cpp; path = NetworkMessages.cpp; sourceTree = "<group>"; };
 		920C54042B80E41A006F6743 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
 		9233DAB12B5E760200C55555 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		925592CA2BA0B101001D7B97 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -596,11 +592,11 @@
 		CF33F7C72612B80A9AB49895 /* InputStateManagerPlatformImpl.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = InputStateManagerPlatformImpl.cpp; sourceTree = "<group>"; };
 		D099CB93E6198C3BE5F73FDE /* IInputStateManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = IInputStateManager.h; sourceTree = "<group>"; };
 		D64C3227BB47CA8611283D51 /* wglew.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = wglew.h; sourceTree = "<group>"; };
-		D69EC97B0CE7E31CCBB20FE5 /* NetworkMessages.inc */ = {isa = PBXFileReference; includeInIndex = 1; name = NetworkMessages.inc; path = NetworkMessages.inc; sourceTree = "<group>"; };
+		D69EC97B0CE7E31CCBB20FE5 /* NetworkMessages.inc */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.pascal; path = NetworkMessages.inc; sourceTree = "<group>"; };
 		D8216CC78F9B7DEB0BEC7678 /* AppleSoundUtils.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = AppleSoundUtils.h; sourceTree = "<group>"; };
 		D979EC9B74F12857F47E4007 /* ImageSurfaceLoader.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = ImageSurfaceLoader.h; sourceTree = "<group>"; };
 		DDD0E1D0B63F40D725F02A35 /* MeshResource.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = MeshResource.cpp; sourceTree = "<group>"; };
-		DFC34F8592BEA1C75C5FDA48 /* NetworkMessages.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = NetworkMessages.h; path = NetworkMessages.h; sourceTree = "<group>"; };
+		DFC34F8592BEA1C75C5FDA48 /* NetworkMessages.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = NetworkMessages.h; sourceTree = "<group>"; };
 		E0599E67CDFA7350C55C73A5 /* IRenderer.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = IRenderer.h; sourceTree = "<group>"; };
 		E0D05FD28DC001514531A214 /* TextureLoader.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = TextureLoader.cpp; sourceTree = "<group>"; };
 		E20949AA76405DC09B2C07EC /* Date.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = Date.h; sourceTree = "<group>"; };
@@ -1118,7 +1114,6 @@
 				0B5602AB7CC28E6EA08AAED6 /* Version.h */,
 				DFC34F8592BEA1C75C5FDA48 /* NetworkMessages.h */,
 				D69EC97B0CE7E31CCBB20FE5 /* NetworkMessages.inc */,
-				903ABC16F13CB2EC58E1C140 /* NetworkMessages.cpp */,
 			);
 			path = net_common;
 			sourceTree = "<group>";
@@ -1418,7 +1413,6 @@
 				AD3849EC3D7BF58FBE796328 /* Version.h in Sources */,
 				66D340BC45CB67247263B47A /* NetworkMessages.h in Sources */,
 				811D9B06954C8AC807911B84 /* NetworkMessages.inc in Sources */,
-				4B7892A96BE923867CA18DAD /* NetworkMessages.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1530,7 +1524,6 @@
 				7F8095DD8B9472184A88DC91 /* Version.h in Sources */,
 				1245FE302D596926AB6DF879 /* NetworkMessages.h in Sources */,
 				8A1FA1DA153996FA13017967 /* NetworkMessages.inc in Sources */,
-				6CDEE9052C0AC308ADBF2846 /* NetworkMessages.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1642,7 +1635,6 @@
 				309CA5C19E3574B35486EBD4 /* Version.h in Sources */,
 				2190AC12581B9D533E7F7D21 /* NetworkMessages.h in Sources */,
 				FB01BFB8FF965282DBD762A2 /* NetworkMessages.inc in Sources */,
-				9E54DFE976400D987DDB2770 /* NetworkMessages.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -77,6 +77,27 @@ void Game::Init()
     systemsEngine.GetFontRepository().LoadFont(game_constants::DEFAULT_FONT_NAME.GetString(), resources::ResourceReloadMode::DONT_RELOAD);
     systemsEngine.GetSoundManager().SetAudioEnabled(false);
     
+    auto scene = systemsEngine.GetSceneManager().CreateScene(game_constants::WORLD_SCENE_NAME);
+    scene->GetCamera().SetZoomFactor(50.0f);
+    scene->SetLoaded(true);
+    
+    auto player = scene->CreateSceneObject(strutils::StringId("player"));
+    player->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + "game/char.png");
+
+    player->mPosition = glm::vec3(0.0f, 0.0f, 0.1f);
+    player->mScale = glm::vec3(0.1f, 0.1f, 0.1f);
+    player->mShaderBoolUniformValues[IS_TEXTURE_SHEET_UNIFORM_NAME] = true;
+    player->mShaderFloatUniformValues[MIN_U_UNIFORM_NAME] = 0.0f;
+    player->mShaderFloatUniformValues[MIN_V_UNIFORM_NAME] = 0.8f;
+    player->mShaderFloatUniformValues[MAX_U_UNIFORM_NAME] = 0.333f;
+    player->mShaderFloatUniformValues[MAX_V_UNIFORM_NAME] = 1.0f;
+    
+    
+    auto bg = scene->CreateSceneObject(strutils::StringId("background"));
+    bg->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + "game/entry_map_bottom_layer.png");
+    bg->mPosition = glm::vec3(0.0f, 0.0f, 0.0f);
+    bg->mScale = glm::vec3(5.0f, 5.0f, 0.5f);
+    
     enet_initialize();
     atexit(enet_deinitialize);
     
@@ -101,10 +122,6 @@ void Game::Init()
     }
 
     logging::Log(logging::LogType::INFO, "Connected to server");
-    
-    auto scene = systemsEngine.GetSceneManager().CreateScene(game_constants::WORLD_SCENE_NAME);
-    scene->GetCamera().SetZoomFactor(50.0f);
-    scene->SetLoaded(true);
 }
 
 ///------------------------------------------------------------------------------------------------
