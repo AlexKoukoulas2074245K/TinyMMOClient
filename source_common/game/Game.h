@@ -24,6 +24,7 @@ namespace scene
     struct SceneObject;
 }
 
+class PlayerAnimationController;
 class Game final
 {
 public:
@@ -37,6 +38,8 @@ public:
     void OnOneSecondElapsed();
     void CreateDebugWidgets();
     
+private:
+    std::unique_ptr<PlayerAnimationController> mPlayerAnimationController;
 };
 
 ///------------------------------------------------------------------------------------------------

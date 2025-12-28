@@ -84,23 +84,13 @@ void Game::Init()
     scene->GetCamera().SetZoomFactor(50.0f);
     scene->SetLoaded(true);
     
-    auto player = scene->CreateSceneObject(strutils::StringId("player"));
-    player->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + "game/char.png");
-
-    player->mPosition = glm::vec3(0.0f, 0.0f, 0.1f);
-    player->mScale = glm::vec3(0.1f, 0.1f, 0.1f);
-    player->mShaderBoolUniformValues[IS_TEXTURE_SHEET_UNIFORM_NAME] = true;
-    player->mShaderFloatUniformValues[MIN_U_UNIFORM_NAME] = 0.0f;
-    player->mShaderFloatUniformValues[MIN_V_UNIFORM_NAME] = 0.8f;
-    player->mShaderFloatUniformValues[MAX_U_UNIFORM_NAME] = 0.333f;
-    player->mShaderFloatUniformValues[MAX_V_UNIFORM_NAME] = 1.0f;
-    
-    
     auto bg = scene->CreateSceneObject(strutils::StringId("background"));
     bg->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + "game/entry_map_bottom_layer.png");
     bg->mPosition = glm::vec3(0.0f, 0.0f, 0.0f);
     bg->mScale = glm::vec3(5.0f, 5.0f, 0.5f);
     
+    mPlayerAnimationController = std::make_unique<PlayerAnimationController>();
+
     enet_initialize();
     atexit(enet_deinitialize);
     
@@ -123,54 +113,78 @@ void Game::Init()
     {
         logging::Log(logging::LogType::ERROR, "Connection failed");
     }
-
-    logging::Log(logging::LogType::INFO, "Connected to server");
+    else
+    {
+        logging::Log(logging::LogType::INFO, "Connected to server");
+    }
 }
 
 ///------------------------------------------------------------------------------------------------
 
 static float sPlayerVelocityMultiplier = 1.0f;
+static uint32_t sLocalPlayerId = 0;
+static std::unordered_map<uint32_t, glm::vec3> sProjectedPositions;
+static std::unordered_map<uint32_t, glm::vec3> sProjectedVelocities;
+static std::unordered_map<uint32_t, int> sProjectedAnimationIndices;
+static std::string sDebugVelocity;
+
 void Game::Update(const float dtMillis)
 {
-    auto& systemsEngine = CoreSystemsEngine::GetInstance();
-    auto inputDirection = LocalPlayerInputController::GetMovementDirection();
-    auto velocity = glm::vec3(inputDirection.x, inputDirection.y, 0.0f) * 0.0003f * sPlayerVelocityMultiplier * dtMillis;
-
-    auto player = systemsEngine.GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME)->FindSceneObject(strutils::StringId("player"));
-    
-    player->mPosition += velocity;
-    PlayerAnimationController::UpdatePlayerAnimation(player, 0.0003f * sPlayerVelocityMultiplier, velocity, dtMillis);
-    
-    static float accum = 0.0f;
-    accum += dtMillis;
-    
-    // Fake movement
-    MoveMessage move{};
-    move.playerId = 0;
-    move.position = { std::cos(accum), std::sin(accum) };
-    move.velocity = { 0.0f, 0.0f };
-    
-    ENetPacket* movePacket = enet_packet_create(
-                                                &move,
-                                                sizeof(move),
-                                                0 // UNRELIABLE
-                                                );
-    
-    enet_peer_send(sPeer, 0, movePacket);
-    
-    // Occasionally send reliable event
-    if (static_cast<int>(accum) % 5 == 0)
+    if (sLocalPlayerId > 0)
     {
-        AttackMessage atk{};
-        atk.attackerId = 0;
+        auto& systemsEngine = CoreSystemsEngine::GetInstance();
+        auto inputDirection = LocalPlayerInputController::GetMovementDirection();
+        auto velocity = glm::vec3(inputDirection.x, inputDirection.y, 0.0f) * 0.0003f * sPlayerVelocityMultiplier * dtMillis;
+
+        auto player = systemsEngine.GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME)->FindSceneObject(strutils::StringId("player-" + std::to_string(sLocalPlayerId)));
         
-        ENetPacket* atkPacket = enet_packet_create(
-                                                   &atk,
-                                                   sizeof(atk),
-                                                   ENET_PACKET_FLAG_RELIABLE
-                                                   );
+        player->mPosition += velocity;
         
-        enet_peer_send(sPeer, 1, atkPacket);
+        const auto& animationInfoResult = mPlayerAnimationController->UpdatePlayerAnimation(player, 0.0003f * sPlayerVelocityMultiplier, velocity, dtMillis);
+        
+        static float accum = 0.0f;
+        accum += dtMillis;
+        
+        // Fake movement
+        MoveMessage move{};
+        move.playerId = 0;
+        move.position = player->mPosition;
+        move.velocity = velocity;
+        move.animationIndex = animationInfoResult.mAnimationIndex;
+        
+        SendMessage(sPeer, &move, sizeof(move), channels::UNRELIABLE);
+        
+        // Occasionally send reliable event
+        if (static_cast<int>(accum) % 5 == 0)
+        {
+            AttackMessage atk{};
+            atk.attackerId = 0;
+            
+            SendMessage(sPeer, &atk, sizeof(atk), channels::RELIABLE);
+        }
+    }
+    
+    for (const auto& [peerId, projectedPosition]: sProjectedPositions)
+    {
+        if (peerId != sLocalPlayerId)
+        {
+            auto player = CoreSystemsEngine::GetInstance().GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME)->FindSceneObject(strutils::StringId("player-" + std::to_string(peerId)));
+            if (player)
+            {
+                auto vecToPosition = projectedPosition - player->mPosition;
+                if (glm::length(vecToPosition) > 0.002f)
+                {
+                    auto direction = glm::normalize(vecToPosition);
+                    auto velocity = glm::vec3(direction.x, direction.y, 0.0f) * 0.0003f * sPlayerVelocityMultiplier * dtMillis;
+                    player->mPosition += velocity;
+                    mPlayerAnimationController->UpdatePlayerAnimation(player, 0.0003f * sPlayerVelocityMultiplier, sProjectedVelocities.at(peerId), dtMillis, sProjectedAnimationIndices.at(peerId));
+                }
+                else
+                {
+                    mPlayerAnimationController->UpdatePlayerAnimation(player, 0.0003f * sPlayerVelocityMultiplier, sProjectedVelocities.at(peerId), dtMillis, sProjectedAnimationIndices.at(peerId));
+                }
+            }
+        }
     }
 
     ENetEvent event;
@@ -182,7 +196,62 @@ void Game::Update(const float dtMillis)
             if (type == MessageType::SnapshotMessage)
             {
                 auto* snap = reinterpret_cast<SnapshotMessage*>(event.packet->data);
-                logging::Log(logging::LogType::INFO, "Snapshot: Player %d at %.6f,%.6f", snap->playerId, snap->position.x, snap->position.y);
+                //logging::Log(logging::LogType::INFO, "Snapshot: Player %d at %.6f,%.6f", snap->playerId, snap->position.x, snap->position.y);
+                
+                auto player = CoreSystemsEngine::GetInstance().GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME)->FindSceneObject(strutils::StringId("player-" + std::to_string(snap->playerId)));
+
+                if (!player)
+                {
+                    auto playerId = snap->playerId;
+                    auto player = CoreSystemsEngine::GetInstance().GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME)->CreateSceneObject(strutils::StringId("player-" + std::to_string(playerId)));
+                    
+                    player->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + "game/char.png");
+                    player->mShaderResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT  + "player.vs");
+                    player->mShaderBoolUniformValues[IS_TEXTURE_SHEET_UNIFORM_NAME] = true;
+                    player->mShaderBoolUniformValues[strutils::StringId("is_local")] = false;
+                    player->mPosition = glm::vec3(snap->position.x,snap->position.y, math::RandomFloat(0.01f, 0.1f));
+                    player->mScale = glm::vec3(0.1f, 0.1f, 0.1f);
+                    sProjectedPositions[playerId] = player->mPosition;
+                    sProjectedVelocities[playerId] = glm::vec3(0.0f);
+                    sProjectedAnimationIndices[playerId] = -1;
+                }
+                else
+                {
+                    auto playerId = snap->playerId;
+                    sProjectedPositions[playerId].x = snap->position.x;
+                    sProjectedPositions[playerId].y = snap->position.y;
+                    sProjectedVelocities[playerId].x = snap->velocity.x;
+                    sProjectedVelocities[playerId].y = snap->velocity.y;
+                    sProjectedAnimationIndices[playerId] = snap->animationIndex;
+                }
+            }
+            else if (type == MessageType::AssignPlayerIdMessage)
+            {
+                auto* message = reinterpret_cast<SnapshotMessage*>(event.packet->data);
+                sLocalPlayerId = message->playerId;
+                logging::Log(logging::LogType::INFO, "Received player ID %d", sLocalPlayerId);
+                
+                auto player = CoreSystemsEngine::GetInstance().GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME)->CreateSceneObject(strutils::StringId("player-" + std::to_string(sLocalPlayerId)));
+                player->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + "game/char.png");
+                player->mShaderResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT  + "player.vs");
+                
+                player->mPosition = glm::vec3(math::RandomFloat(-0.3f, 0.3f), math::RandomFloat(-0.18f, 0.18f), math::RandomFloat(0.01f, 0.1f));
+                player->mScale = glm::vec3(0.1f, 0.1f, 0.1f);
+                player->mShaderBoolUniformValues[IS_TEXTURE_SHEET_UNIFORM_NAME] = true;
+                player->mShaderBoolUniformValues[strutils::StringId("is_local")] = true;
+                sProjectedPositions[sLocalPlayerId] = player->mPosition;
+                sProjectedVelocities[sLocalPlayerId] = glm::vec3(0.0f);
+                sProjectedAnimationIndices[sLocalPlayerId] = -1;
+            }
+            else if (type == MessageType::PlayerDisconnectedMessage)
+            {
+                auto* message = reinterpret_cast<PlayerDisconnectedMessage*>(event.packet->data);
+                auto playerId = message->playerId;
+                mPlayerAnimationController->OnPlayerDisconnected(strutils::StringId("player-" + std::to_string(playerId)));
+                sProjectedPositions.erase(playerId);
+                sProjectedVelocities.erase(playerId);
+                sProjectedAnimationIndices.erase(playerId);
+                CoreSystemsEngine::GetInstance().GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME)->RemoveSceneObject(strutils::StringId("player-" + std::to_string(playerId)));
             }
             
             enet_packet_destroy(event.packet);
@@ -217,6 +286,7 @@ void Game::CreateDebugWidgets()
 {
     ImGui::Begin("Game Data", nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
     ImGui::SliderFloat("Player velocity Multiplier", &sPlayerVelocityMultiplier, 0.01f, 10.0f);
+    ImGui::Text("Other velocity: %s", sDebugVelocity.c_str());
     ImGui::End();
 }
 #else
