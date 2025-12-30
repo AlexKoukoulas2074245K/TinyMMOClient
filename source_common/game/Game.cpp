@@ -33,7 +33,7 @@
 #include <game/Game.h>
 #include <game/events/EventSystem.h>
 #include <game/LocalPlayerInputController.h>
-#include <game/PlayerAnimationController.h>
+#include <game/ObjectAnimationController.h>
 #include <imgui/imgui.h>
 #include <net_common/NetworkMessages.h>
 #include <mutex>
@@ -72,7 +72,7 @@ Game::~Game(){}
 
 ///------------------------------------------------------------------------------------------------
 static ENetHost* sClient;
-static ENetPeer* sPeer;
+static ENetPeer* sServer;
 
 void Game::Init()
 {
@@ -89,7 +89,7 @@ void Game::Init()
     bg->mPosition = glm::vec3(0.0f, 0.0f, 0.0f);
     bg->mScale = glm::vec3(5.0f, 5.0f, 0.5f);
     
-    mPlayerAnimationController = std::make_unique<PlayerAnimationController>();
+    mObjectAnimationController = std::make_unique<ObjectAnimationController>();
     mLocalPlayerId = 0;
 
     enet_initialize();
@@ -101,8 +101,8 @@ void Game::Init()
     enet_address_set_host(&address, "127.0.0.1");
     address.port = 7777;
 
-    sPeer = enet_host_connect(sClient, &address, 2, 0);
-    if (!sPeer)
+    sServer = enet_host_connect(sClient, &address, 2, 0);
+    if (!sServer)
     {
         logging::Log(logging::LogType::ERROR, "Failed to connect");
         return;
@@ -123,7 +123,7 @@ void Game::Init()
 ///------------------------------------------------------------------------------------------------
 
 float sDebugPlayerVelocityMultiplier = 1.0f;
-static const float sPlayerSpeed = 0.0003f;
+
 
 void Game::Update(const float dtMillis)
 {
@@ -162,7 +162,8 @@ void Game::Update(const float dtMillis)
                 case network::MessageType::PlayerDisconnectedMessage:
                 {
                     auto* message = reinterpret_cast<network::PlayerDisconnectedMessage*>(event.packet->data);
-                    mPlayerAnimationController->OnPlayerDisconnected(strutils::StringId("object-" + std::to_string(message->objectId)));
+                    events::EventSystem::GetInstance().DispatchEvent<events::ObjectDestroyedEvent>(strutils::StringId("object-" + std::to_string(message->objectId)));
+
                     DestroyObject(message->objectId);
                 } break;
                     
@@ -197,20 +198,31 @@ void Game::Update(const float dtMillis)
 
         if (objectId == mLocalPlayerId)
         {
+            if (CoreSystemsEngine::GetInstance().GetInputStateManager().VButtonTapped(input::Button::MAIN_BUTTON))
+            {
+                network::AttackMessage attackMessage = {};
+                attackMessage.attackerId = mLocalPlayerId;
+                attackMessage.attackType = network::AttackType::PROJECTILE;
+                attackMessage.projectileType = network::ProjectileType::FIREBALL;
+                
+                SendMessage(sServer, &attackMessage, sizeof(attackMessage), network::channels::RELIABLE);
+            }
+
             auto inputDirection = LocalPlayerInputController::GetMovementDirection();
-            auto velocity = glm::vec3(inputDirection.x, inputDirection.y, 0.0f) * sPlayerSpeed * sDebugPlayerVelocityMultiplier * dtMillis;
+            auto velocity = glm::vec3(inputDirection.x, inputDirection.y, 0.0f) * objectData.speed * sDebugPlayerVelocityMultiplier * dtMillis;
             
-            const auto& animationInfoResult = mPlayerAnimationController->UpdatePlayerAnimation(sceneObject, sPlayerSpeed * sDebugPlayerVelocityMultiplier, velocity, dtMillis);
+            const auto& animationInfoResult = mObjectAnimationController->UpdateObjectAnimation(sceneObject, velocity, dtMillis, std::nullopt);
             sceneObject->mPosition += velocity;
             
             mLocalObjectDataMap[mLocalPlayerId].position = sceneObject->mPosition;
             mLocalObjectDataMap[mLocalPlayerId].velocity = velocity;
-            mLocalObjectDataMap[mLocalPlayerId].animationIndex = animationInfoResult.mAnimationIndex;
+            mLocalObjectDataMap[mLocalPlayerId].currentAnimation = network::AnimationType::RUNNING;
+            mLocalObjectDataMap[mLocalPlayerId].facingDirection = animationInfoResult.mFacingDirection;
             
             network::ObjectStateUpdateMessage stateUpdateMessage = {};
             stateUpdateMessage.objectData = mLocalObjectDataMap[mLocalPlayerId];
             
-            SendMessage(sPeer, &stateUpdateMessage, sizeof(stateUpdateMessage), network::channels::UNRELIABLE);
+            SendMessage(sServer, &stateUpdateMessage, sizeof(stateUpdateMessage), network::channels::UNRELIABLE);
         }
         else
         {
@@ -218,11 +230,14 @@ void Game::Update(const float dtMillis)
             if (glm::length(vecToPosition) > 0.002f)
             {
                 auto direction = glm::normalize(vecToPosition);
-                auto velocity = glm::vec3(direction.x, direction.y, 0.0f) * sPlayerSpeed * sDebugPlayerVelocityMultiplier * dtMillis;
+                auto velocity = glm::vec3(direction.x, direction.y, 0.0f) * objectData.speed * dtMillis;
                 sceneObject->mPosition += velocity;
             }
             
-            mPlayerAnimationController->UpdatePlayerAnimation(sceneObject, sPlayerSpeed * sDebugPlayerVelocityMultiplier, mLocalObjectDataMap.at(objectId).velocity, dtMillis, mLocalObjectDataMap.at(objectId).animationIndex);
+            if (objectData.objectType != network::ObjectType::ATTACK || objectData.attackType != network::AttackType::PROJECTILE)
+            {
+                mObjectAnimationController->UpdateObjectAnimation(sceneObject, mLocalObjectDataMap.at(objectId).velocity, dtMillis, mLocalObjectDataMap.at(objectId).facingDirection);
+            }
         }
     }
 
@@ -274,7 +289,21 @@ void Game::CreateObject(const network::ObjectData& objectData)
                 sceneObject->mPosition = glm::vec3(objectData.position.x, objectData.position.y, objectData.position.z);
                 sceneObject->mScale = glm::vec3(0.1f, 0.1f, 0.1f);
             } break;
-                
+            
+            case network::ObjectType::ATTACK:
+            {
+                if (objectData.attackType == network::AttackType::PROJECTILE && objectData.projectileType == network::ProjectileType::FIREBALL)
+                {
+                    sceneObject->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + "game/projectile.png");
+                    sceneObject->mPosition = glm::vec3(objectData.position.x, objectData.position.y, objectData.position.z);
+                    sceneObject->mScale = glm::vec3(0.03f, 0.03f, 0.03f);
+                }
+                else
+                {
+                    assert(false);
+                }
+            } break;
+
             case network::ObjectType::NPC:
             case network::ObjectType::STATIC:
             {

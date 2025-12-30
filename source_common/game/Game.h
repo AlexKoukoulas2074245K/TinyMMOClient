@@ -25,7 +25,7 @@ namespace scene
     struct SceneObject;
 }
 
-class PlayerAnimationController;
+class ObjectAnimationController;
 class Game final
 {
 public:
@@ -43,7 +43,7 @@ public:
     
 private:
     network::objectId_t mLocalPlayerId;
-    std::unique_ptr<PlayerAnimationController> mPlayerAnimationController;
+    std::unique_ptr<ObjectAnimationController> mObjectAnimationController;
     std::unordered_map<network::objectId_t, network::ObjectData> mLocalObjectDataMap;
 };
 

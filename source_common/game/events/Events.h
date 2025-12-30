@@ -26,6 +26,17 @@ class DummyEvent
 
 ///------------------------------------------------------------------------------------------------
 
+class ObjectDestroyedEvent
+{
+public:
+    ObjectDestroyedEvent(const strutils::StringId& sceneObjectName)
+        : mSceneObjectName(sceneObjectName) {}
+
+    const strutils::StringId mSceneObjectName;
+};
+
+///------------------------------------------------------------------------------------------------
+
 }
 
 ///------------------------------------------------------------------------------------------------

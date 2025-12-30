@@ -11,7 +11,7 @@
 		0118CE0544990425D47F3A12 /* ShaderResource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB4F4B243BF9EE66291B3910 /* ShaderResource.cpp */; };
 		02E7DF925FD7370A12023A23 /* Camera.h in Sources */ = {isa = PBXBuildFile; fileRef = 70EE9661089211DACFF22288 /* Camera.h */; };
 		03B28C98FAB2D3C8F86DF546 /* IInputStateManager.h in Sources */ = {isa = PBXBuildFile; fileRef = D099CB93E6198C3BE5F73FDE /* IInputStateManager.h */; };
-		0B19950EE3ADDE1721BB9ADA /* PlayerAnimationController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B5E6F0D1307253CFDDD9805 /* PlayerAnimationController.cpp */; };
+		0B19950EE3ADDE1721BB9ADA /* ObjectAnimationController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B5E6F0D1307253CFDDD9805 /* ObjectAnimationController.cpp */; };
 		120CF200D56449CFC3BD99AF /* AppleSoundUtils.h in Sources */ = {isa = PBXBuildFile; fileRef = D8216CC78F9B7DEB0BEC7678 /* AppleSoundUtils.h */; };
 		1245FE302D596926AB6DF879 /* NetworkMessages.h in Sources */ = {isa = PBXBuildFile; fileRef = DFC34F8592BEA1C75C5FDA48 /* NetworkMessages.h */; };
 		16092693C24E8507EFDFBB70 /* Editor.h in Sources */ = {isa = PBXBuildFile; fileRef = AB2400E817D39628656BEFF1 /* Editor.h */; };
@@ -42,7 +42,7 @@
 		45963ED9A5DA3C4EB9144646 /* TextureResource.h in Sources */ = {isa = PBXBuildFile; fileRef = 989BFF482B72A00F213431FE /* TextureResource.h */; };
 		4D0513581BFF046081AADA26 /* Editor.h in Sources */ = {isa = PBXBuildFile; fileRef = AB2400E817D39628656BEFF1 /* Editor.h */; };
 		4E9ADD55CB0B5CA8962F347E /* StringUtils.h in Sources */ = {isa = PBXBuildFile; fileRef = EF61AB7D638A80B4ABD5D5B7 /* StringUtils.h */; };
-		4F2000295DC81FE8BE682C2D /* PlayerAnimationController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B5E6F0D1307253CFDDD9805 /* PlayerAnimationController.cpp */; };
+		4F2000295DC81FE8BE682C2D /* ObjectAnimationController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B5E6F0D1307253CFDDD9805 /* ObjectAnimationController.cpp */; };
 		5285724978640648FFD94960 /* TextureResource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93D83DB41AD868D09B2A3C94 /* TextureResource.cpp */; };
 		532521F009DF925259026C23 /* SerializationDefinitions.h in Sources */ = {isa = PBXBuildFile; fileRef = F05BCACB9D0D7193765BB311 /* SerializationDefinitions.h */; };
 		55A949B09D185B35C8B0D135 /* Logging.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3BF946C1B449BB4FE7DF288A /* Logging.cpp */; };
@@ -50,7 +50,7 @@
 		590BC49901179FB522AD2223 /* OSMessageBox.h in Sources */ = {isa = PBXBuildFile; fileRef = EEC2E35013E2E8B9B7A912C6 /* OSMessageBox.h */; };
 		5BEFD96D266F53B603C278C1 /* TypeTraits.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 988043F06556266668BE5677 /* TypeTraits.cpp */; };
 		63011B7BE17965C680A05EAD /* BaseDataFileSerializer.h in Sources */ = {isa = PBXBuildFile; fileRef = 30D02CEC6861EBD7441E2004 /* BaseDataFileSerializer.h */; };
-		631992CC76308ADAE018D80B /* PlayerAnimationController.h in Sources */ = {isa = PBXBuildFile; fileRef = B580A197EA030F09D007D31F /* PlayerAnimationController.h */; };
+		631992CC76308ADAE018D80B /* ObjectAnimationController.h in Sources */ = {isa = PBXBuildFile; fileRef = B580A197EA030F09D007D31F /* ObjectAnimationController.h */; };
 		66D340BC45CB67247263B47A /* NetworkMessages.h in Sources */ = {isa = PBXBuildFile; fileRef = DFC34F8592BEA1C75C5FDA48 /* NetworkMessages.h */; };
 		67D1938FF041F0D5033321B3 /* Editor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A49D33C4F1B1DC1C02DB9E05 /* Editor.cpp */; };
 		69A3B6CA894565C4F51E1123 /* SoundManager.h in Sources */ = {isa = PBXBuildFile; fileRef = 7AC3E452BAA560B6D8B1349E /* SoundManager.h */; };
@@ -60,7 +60,7 @@
 		6E1A780876A016C76FFF66C6 /* OBJMeshLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 06291EA0D3FF12CB3058DEF2 /* OBJMeshLoader.cpp */; };
 		71319CF262B3FEA0241CE51E /* RendererPlatformImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68CBCF02480A4F7771578514 /* RendererPlatformImpl.cpp */; };
 		71DEABFBFD9A818B6DFD8412 /* TextureLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E0D05FD28DC001514531A214 /* TextureLoader.cpp */; };
-		73793DFAFB2934BB6D90CBA9 /* PlayerAnimationController.h in Sources */ = {isa = PBXBuildFile; fileRef = B580A197EA030F09D007D31F /* PlayerAnimationController.h */; };
+		73793DFAFB2934BB6D90CBA9 /* ObjectAnimationController.h in Sources */ = {isa = PBXBuildFile; fileRef = B580A197EA030F09D007D31F /* ObjectAnimationController.h */; };
 		77F8C741493973A71A6DBA22 /* ImageSurfaceResource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53CDE03B92A8F220738E44FE /* ImageSurfaceResource.cpp */; };
 		7A14147B43076FC43E6D5662 /* SoundManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F701DBE1A8A6D1664BEF16A3 /* SoundManager.cpp */; };
 		7A35378576E3FCE89E70ABA4 /* SceneManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FB79D70FA4FA614F184AFE40 /* SceneManager.cpp */; };
@@ -378,7 +378,7 @@
 		9F60F6BEA7D20AB4B5EFA323 /* ResourceLoadingService.h in Sources */ = {isa = PBXBuildFile; fileRef = 7C92E4EC0FBCD6AFCA53FD77 /* ResourceLoadingService.h */; };
 		A190FCD102A510B7AF224622 /* AnimationManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E9824F6D620FAB012DF0BC78 /* AnimationManager.cpp */; };
 		A24C468FFD129BCDF0B2E5B2 /* InputStateManagerPlatformImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CF33F7C72612B80A9AB49895 /* InputStateManagerPlatformImpl.cpp */; };
-		A2C6C2F9E3FA6DE0B9D66E84 /* PlayerAnimationController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B5E6F0D1307253CFDDD9805 /* PlayerAnimationController.cpp */; };
+		A2C6C2F9E3FA6DE0B9D66E84 /* ObjectAnimationController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B5E6F0D1307253CFDDD9805 /* ObjectAnimationController.cpp */; };
 		A50C73CD4B3C9E1668BFADDD /* SfxPlayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5B33DAF295D4E7E164154510 /* SfxPlayer.mm */; };
 		A7B97E4491771F3812AD0124 /* ParticleManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 14207B709EC0713AAB9C29C8 /* ParticleManager.cpp */; };
 		AD3849EC3D7BF58FBE796328 /* Version.h in Sources */ = {isa = PBXBuildFile; fileRef = 0B5602AB7CC28E6EA08AAED6 /* Version.h */; };
@@ -417,7 +417,7 @@
 		F51ECBEA53C3E1BE870B0612 /* ShaderResource.h in Sources */ = {isa = PBXBuildFile; fileRef = 13FDFD19955883B3085E4725 /* ShaderResource.h */; };
 		F7A5A5A1C07E56B0E105A3E2 /* CoreSystemsEngine.h in Sources */ = {isa = PBXBuildFile; fileRef = 1B15A1EEB522F75EE7E24E55 /* CoreSystemsEngine.h */; };
 		F9DA16800D685DE43C29BCDE /* Animations.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A4ADBD10E11C136014CDB469 /* Animations.cpp */; };
-		FA20EED994CF4C0B763D456F /* PlayerAnimationController.h in Sources */ = {isa = PBXBuildFile; fileRef = B580A197EA030F09D007D31F /* PlayerAnimationController.h */; };
+		FA20EED994CF4C0B763D456F /* ObjectAnimationController.h in Sources */ = {isa = PBXBuildFile; fileRef = B580A197EA030F09D007D31F /* ObjectAnimationController.h */; };
 		FB01BFB8FF965282DBD762A2 /* NetworkMessages.inc in Sources */ = {isa = PBXBuildFile; fileRef = D69EC97B0CE7E31CCBB20FE5 /* NetworkMessages.inc */; };
 		FC7CB5DD2DD48F46BC3CAF9D /* MathUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 393520815AD90C67A6A6989C /* MathUtils.cpp */; };
 		FE081503D7B9E0EE6A0752EC /* Date.h in Sources */ = {isa = PBXBuildFile; fileRef = E20949AA76405DC09B2C07EC /* Date.h */; };
@@ -466,7 +466,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		001CE6A7EB6E3DB35E9F7BDC /* NetworkCommon.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = NetworkCommon.h; path = NetworkCommon.h; sourceTree = "<group>"; };
+		001CE6A7EB6E3DB35E9F7BDC /* NetworkCommon.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = NetworkCommon.h; sourceTree = "<group>"; };
 		0106479588E4C78D4F938113 /* DataFileLoader.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = DataFileLoader.cpp; sourceTree = "<group>"; };
 		051E00BF71689A5C0A9F91D2 /* glew.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = glew.h; sourceTree = "<group>"; };
 		052939A977343440F86F0858 /* ResourceLoadingService.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = ResourceLoadingService.cpp; sourceTree = "<group>"; };
@@ -492,12 +492,12 @@
 		431D52A0E0BD619E5CEDBCA7 /* DataFileResource.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = DataFileResource.cpp; sourceTree = "<group>"; };
 		43A25A1E55390D38AC6A5742 /* Logging.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = Logging.h; sourceTree = "<group>"; };
 		46BB489973B1ACFF46F552DB /* OBJMeshLoader.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = OBJMeshLoader.h; sourceTree = "<group>"; };
-		4B1438D1408BE048FE78171E /* LocalPlayerInputController.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = LocalPlayerInputController.cpp; path = LocalPlayerInputController.cpp; sourceTree = "<group>"; };
+		4B1438D1408BE048FE78171E /* LocalPlayerInputController.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = LocalPlayerInputController.cpp; sourceTree = "<group>"; };
 		53CDE03B92A8F220738E44FE /* ImageSurfaceResource.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = ImageSurfaceResource.cpp; sourceTree = "<group>"; };
 		543F0360AEBB87C61E32D84B /* ThreadSafeQueue.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = ThreadSafeQueue.h; sourceTree = "<group>"; };
 		59B053AEBDD62B4FCAB8E05D /* RenderingUtils.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = RenderingUtils.cpp; sourceTree = "<group>"; };
 		5B33DAF295D4E7E164154510 /* SfxPlayer.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; path = SfxPlayer.mm; sourceTree = "<group>"; };
-		5B5E6F0D1307253CFDDD9805 /* PlayerAnimationController.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = PlayerAnimationController.cpp; path = PlayerAnimationController.cpp; sourceTree = "<group>"; };
+		5B5E6F0D1307253CFDDD9805 /* ObjectAnimationController.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = ObjectAnimationController.cpp; sourceTree = "<group>"; };
 		642B84557417F85C19410FDE /* ShaderLoader.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = ShaderLoader.h; sourceTree = "<group>"; };
 		6544FC0C6E5993C9E3957773 /* Scene.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = Scene.cpp; sourceTree = "<group>"; };
 		659D24C3A310C59893EE9475 /* Scene.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = Scene.h; sourceTree = "<group>"; };
@@ -507,7 +507,7 @@
 		70EE9661089211DACFF22288 /* Camera.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = Camera.h; sourceTree = "<group>"; };
 		7961514C3AA5315045E54E7E /* PlatformMacros.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = PlatformMacros.h; sourceTree = "<group>"; };
 		7AC3E452BAA560B6D8B1349E /* SoundManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = SoundManager.h; sourceTree = "<group>"; };
-		7BC4A40B354A0E76D40FBB15 /* LocalPlayerInputController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = LocalPlayerInputController.h; path = LocalPlayerInputController.h; sourceTree = "<group>"; };
+		7BC4A40B354A0E76D40FBB15 /* LocalPlayerInputController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = LocalPlayerInputController.h; sourceTree = "<group>"; };
 		7C92E4EC0FBCD6AFCA53FD77 /* ResourceLoadingService.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = ResourceLoadingService.h; sourceTree = "<group>"; };
 		7F068929D88F95729D0195E3 /* BackgroundMusicPlayer.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; path = BackgroundMusicPlayer.mm; sourceTree = "<group>"; };
 		82DFED0E0B1AB607780AED60 /* Animations.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = Animations.h; sourceTree = "<group>"; };
@@ -604,7 +604,7 @@
 		AB2400E817D39628656BEFF1 /* Editor.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = Editor.h; sourceTree = "<group>"; };
 		AB4F4B243BF9EE66291B3910 /* ShaderResource.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = ShaderResource.cpp; sourceTree = "<group>"; };
 		AD86196C948CE14DCBBE5446 /* IResourceLoader.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = IResourceLoader.h; sourceTree = "<group>"; };
-		B580A197EA030F09D007D31F /* PlayerAnimationController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = PlayerAnimationController.h; path = PlayerAnimationController.h; sourceTree = "<group>"; };
+		B580A197EA030F09D007D31F /* ObjectAnimationController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = ObjectAnimationController.h; sourceTree = "<group>"; };
 		B645F5160C1B36C70F708518 /* ImageSurfaceLoader.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = ImageSurfaceLoader.cpp; sourceTree = "<group>"; };
 		B83F90BE48846F5019309046 /* DataFileLoader.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = DataFileLoader.h; sourceTree = "<group>"; };
 		BB8C2E3FACC90180DAAE4F40 /* Fonts.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = Fonts.cpp; sourceTree = "<group>"; };
@@ -1001,8 +1001,8 @@
 				928B0BBE2B5C3C850025DF3F /* Game.h */,
 				928B0BCF2B5C3C850025DF3F /* Game.cpp */,
 				928B0BC72B5C3C850025DF3F /* events */,
-				5B5E6F0D1307253CFDDD9805 /* PlayerAnimationController.cpp */,
-				B580A197EA030F09D007D31F /* PlayerAnimationController.h */,
+				5B5E6F0D1307253CFDDD9805 /* ObjectAnimationController.cpp */,
+				B580A197EA030F09D007D31F /* ObjectAnimationController.h */,
 				4B1438D1408BE048FE78171E /* LocalPlayerInputController.cpp */,
 				7BC4A40B354A0E76D40FBB15 /* LocalPlayerInputController.h */,
 			);
@@ -1438,8 +1438,8 @@
 				AD3849EC3D7BF58FBE796328 /* Version.h in Sources */,
 				66D340BC45CB67247263B47A /* NetworkMessages.h in Sources */,
 				811D9B06954C8AC807911B84 /* NetworkMessages.inc in Sources */,
-				4F2000295DC81FE8BE682C2D /* PlayerAnimationController.cpp in Sources */,
-				73793DFAFB2934BB6D90CBA9 /* PlayerAnimationController.h in Sources */,
+				4F2000295DC81FE8BE682C2D /* ObjectAnimationController.cpp in Sources */,
+				73793DFAFB2934BB6D90CBA9 /* ObjectAnimationController.h in Sources */,
 				F0A5A8059A9CAFA63A853D37 /* LocalPlayerInputController.cpp in Sources */,
 				DA375BD3C40B8AE1FBC1D705 /* LocalPlayerInputController.h in Sources */,
 				97077022B2BEC6176F7D03CC /* NetworkCommon.h in Sources */,
@@ -1554,8 +1554,8 @@
 				7F8095DD8B9472184A88DC91 /* Version.h in Sources */,
 				1245FE302D596926AB6DF879 /* NetworkMessages.h in Sources */,
 				8A1FA1DA153996FA13017967 /* NetworkMessages.inc in Sources */,
-				A2C6C2F9E3FA6DE0B9D66E84 /* PlayerAnimationController.cpp in Sources */,
-				631992CC76308ADAE018D80B /* PlayerAnimationController.h in Sources */,
+				A2C6C2F9E3FA6DE0B9D66E84 /* ObjectAnimationController.cpp in Sources */,
+				631992CC76308ADAE018D80B /* ObjectAnimationController.h in Sources */,
 				28390BD5156136B5DEE39871 /* LocalPlayerInputController.cpp in Sources */,
 				CDE612C365A4F0EAE74D2542 /* LocalPlayerInputController.h in Sources */,
 				EB260157021BAEBC7EC82B4C /* NetworkCommon.h in Sources */,
@@ -1670,8 +1670,8 @@
 				309CA5C19E3574B35486EBD4 /* Version.h in Sources */,
 				2190AC12581B9D533E7F7D21 /* NetworkMessages.h in Sources */,
 				FB01BFB8FF965282DBD762A2 /* NetworkMessages.inc in Sources */,
-				0B19950EE3ADDE1721BB9ADA /* PlayerAnimationController.cpp in Sources */,
-				FA20EED994CF4C0B763D456F /* PlayerAnimationController.h in Sources */,
+				0B19950EE3ADDE1721BB9ADA /* ObjectAnimationController.cpp in Sources */,
+				FA20EED994CF4C0B763D456F /* ObjectAnimationController.h in Sources */,
 				3257278F32615EE218889DC7 /* LocalPlayerInputController.cpp in Sources */,
 				D77F8AC18F3C63C5013F3919 /* LocalPlayerInputController.h in Sources */,
 				16CB4F28D6AE2B9BEFDE3CC4 /* NetworkCommon.h in Sources */,
