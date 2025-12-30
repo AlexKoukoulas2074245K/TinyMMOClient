@@ -14,6 +14,7 @@
 #include <memory>
 #include <engine/utils/MathUtils.h>
 #include <engine/utils/StringUtils.h>
+#include <net_common/NetworkCommon.h>
 #include <game/events/EventSystem.h>
 #include <vector>
 
@@ -36,10 +37,14 @@ public:
     void ApplicationMovedToBackground();
     void WindowResize();
     void OnOneSecondElapsed();
+    void CreateObject(const network::ObjectData& objectData);
+    void DestroyObject(const network::objectId_t objectId);
     void CreateDebugWidgets();
     
 private:
+    network::objectId_t mLocalPlayerId;
     std::unique_ptr<PlayerAnimationController> mPlayerAnimationController;
+    std::unordered_map<network::objectId_t, network::ObjectData> mLocalObjectDataMap;
 };
 
 ///------------------------------------------------------------------------------------------------

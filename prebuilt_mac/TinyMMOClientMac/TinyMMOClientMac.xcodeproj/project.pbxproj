@@ -15,6 +15,7 @@
 		120CF200D56449CFC3BD99AF /* AppleSoundUtils.h in Sources */ = {isa = PBXBuildFile; fileRef = D8216CC78F9B7DEB0BEC7678 /* AppleSoundUtils.h */; };
 		1245FE302D596926AB6DF879 /* NetworkMessages.h in Sources */ = {isa = PBXBuildFile; fileRef = DFC34F8592BEA1C75C5FDA48 /* NetworkMessages.h */; };
 		16092693C24E8507EFDFBB70 /* Editor.h in Sources */ = {isa = PBXBuildFile; fileRef = AB2400E817D39628656BEFF1 /* Editor.h */; };
+		16CB4F28D6AE2B9BEFDE3CC4 /* NetworkCommon.h in Sources */ = {isa = PBXBuildFile; fileRef = 001CE6A7EB6E3DB35E9F7BDC /* NetworkCommon.h */; };
 		174B1673DD1B94C2743829E9 /* Editor.h in Sources */ = {isa = PBXBuildFile; fileRef = AB2400E817D39628656BEFF1 /* Editor.h */; };
 		1821BE0D6457687787E1571F /* Scene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6544FC0C6E5993C9E3957773 /* Scene.cpp */; };
 		191617E17721C2C19E20E920 /* IResource.h in Sources */ = {isa = PBXBuildFile; fileRef = 99B2042795EEDA27C28F2D84 /* IResource.h */; };
@@ -373,6 +374,7 @@
 		92B8A59F2BE13B00006EC56F /* AnimatedButton.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 92B8A59E2BE13B00006EC56F /* AnimatedButton.cpp */; };
 		92CA97412B65132C00B53B01 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92CA97402B65132B00B53B01 /* StoreKit.framework */; };
 		95BF1C18A001B37A45C9BF9E /* IRenderer.h in Sources */ = {isa = PBXBuildFile; fileRef = E0599E67CDFA7350C55C73A5 /* IRenderer.h */; };
+		97077022B2BEC6176F7D03CC /* NetworkCommon.h in Sources */ = {isa = PBXBuildFile; fileRef = 001CE6A7EB6E3DB35E9F7BDC /* NetworkCommon.h */; };
 		9F60F6BEA7D20AB4B5EFA323 /* ResourceLoadingService.h in Sources */ = {isa = PBXBuildFile; fileRef = 7C92E4EC0FBCD6AFCA53FD77 /* ResourceLoadingService.h */; };
 		A190FCD102A510B7AF224622 /* AnimationManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E9824F6D620FAB012DF0BC78 /* AnimationManager.cpp */; };
 		A24C468FFD129BCDF0B2E5B2 /* InputStateManagerPlatformImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CF33F7C72612B80A9AB49895 /* InputStateManagerPlatformImpl.cpp */; };
@@ -407,6 +409,7 @@
 		E2240B574B476A510E0FEE8A /* AppleSoundUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = EFF6CA715340BD63F4562F60 /* AppleSoundUtils.mm */; };
 		E24F8BEB335EFB8866189742 /* BaseDataFileSerializer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 903005ABB6F4A9CB6247ABDC /* BaseDataFileSerializer.cpp */; };
 		E7F3EF85172DB9E9D9AF8321 /* ImageSurfaceLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B645F5160C1B36C70F708518 /* ImageSurfaceLoader.cpp */; };
+		EB260157021BAEBC7EC82B4C /* NetworkCommon.h in Sources */ = {isa = PBXBuildFile; fileRef = 001CE6A7EB6E3DB35E9F7BDC /* NetworkCommon.h */; };
 		F0A5A8059A9CAFA63A853D37 /* LocalPlayerInputController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B1438D1408BE048FE78171E /* LocalPlayerInputController.cpp */; };
 		F2C17A279E5E5256D4401C90 /* DataFileLoader.h in Sources */ = {isa = PBXBuildFile; fileRef = B83F90BE48846F5019309046 /* DataFileLoader.h */; };
 		F420E735CA3AE6AC068AD22E /* CommonUniforms.h in Sources */ = {isa = PBXBuildFile; fileRef = 9CC1A200C9B794A05E296C21 /* CommonUniforms.h */; };
@@ -463,6 +466,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		001CE6A7EB6E3DB35E9F7BDC /* NetworkCommon.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = NetworkCommon.h; path = NetworkCommon.h; sourceTree = "<group>"; };
 		0106479588E4C78D4F938113 /* DataFileLoader.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = DataFileLoader.cpp; sourceTree = "<group>"; };
 		051E00BF71689A5C0A9F91D2 /* glew.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = glew.h; sourceTree = "<group>"; };
 		052939A977343440F86F0858 /* ResourceLoadingService.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = ResourceLoadingService.cpp; sourceTree = "<group>"; };
@@ -1134,6 +1138,7 @@
 				0B5602AB7CC28E6EA08AAED6 /* Version.h */,
 				DFC34F8592BEA1C75C5FDA48 /* NetworkMessages.h */,
 				D69EC97B0CE7E31CCBB20FE5 /* NetworkMessages.inc */,
+				001CE6A7EB6E3DB35E9F7BDC /* NetworkCommon.h */,
 			);
 			path = net_common;
 			sourceTree = "<group>";
@@ -1437,6 +1442,7 @@
 				73793DFAFB2934BB6D90CBA9 /* PlayerAnimationController.h in Sources */,
 				F0A5A8059A9CAFA63A853D37 /* LocalPlayerInputController.cpp in Sources */,
 				DA375BD3C40B8AE1FBC1D705 /* LocalPlayerInputController.h in Sources */,
+				97077022B2BEC6176F7D03CC /* NetworkCommon.h in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1552,6 +1558,7 @@
 				631992CC76308ADAE018D80B /* PlayerAnimationController.h in Sources */,
 				28390BD5156136B5DEE39871 /* LocalPlayerInputController.cpp in Sources */,
 				CDE612C365A4F0EAE74D2542 /* LocalPlayerInputController.h in Sources */,
+				EB260157021BAEBC7EC82B4C /* NetworkCommon.h in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1667,6 +1674,7 @@
 				FA20EED994CF4C0B763D456F /* PlayerAnimationController.h in Sources */,
 				3257278F32615EE218889DC7 /* LocalPlayerInputController.cpp in Sources */,
 				D77F8AC18F3C63C5013F3919 /* LocalPlayerInputController.h in Sources */,
+				16CB4F28D6AE2B9BEFDE3CC4 /* NetworkCommon.h in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -40,8 +40,8 @@ static constexpr int MIN_WINDOW_HEIGHT     = 1200;
 //static constexpr int DEFAULT_WINDOW_WIDTH  = 1688;
 static constexpr int DEFAULT_WINDOW_WIDTH  = 1288;
 static constexpr int DEFAULT_WINDOW_HEIGHT = 780;
-static constexpr int MIN_WINDOW_WIDTH      = 1000;
-static constexpr int MIN_WINDOW_HEIGHT     = 780;
+static constexpr int MIN_WINDOW_WIDTH      = 500;
+static constexpr int MIN_WINDOW_HEIGHT     = 390;
 #endif
 
 static const float DEFAULT_FRAME_MILLIS = 1000.0f/60.0f;
