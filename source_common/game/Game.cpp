@@ -441,14 +441,14 @@ void Game::CreateDebugWidgets()
             auto sceneObject = scene->CreateSceneObject(strutils::StringId("string-" + std::to_string(stringNameId++)));
             sceneObject->mShaderResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + game_constants::DEFAULT_FONT_SHADER_NAME);
             sceneObject->mSceneObjectTypeData = std::move(textData);
-            sceneObject->mPosition = glm::vec3(math::RandomFloat(-0.3f, 0.3f), math::RandomFloat(-0.2f, 0.2f), 0.1f);
+            sceneObject->mPosition = glm::vec3(math::RandomFloat(-0.3f, 0.3f), math::RandomFloat(-0.2f, 0.2f), 1.0f);
             //sceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 1.0f;
             sceneObject->mScale = glm::vec3(0.0001f);
             
             auto& animationManager = CoreSystemsEngine::GetInstance().GetAnimationManager();
             
             auto initScale = sceneObject->mScale;
-            static const float animationDuration = 20.0f;
+            static const float animationDuration = 2.0f;
             static const float maxScaleFactor = 4.0f;
             animationManager.StartAnimation(std::make_unique<rendering::TweenPositionScaleAnimation>(sceneObject, sceneObject->mPosition, initScale * maxScaleFactor, animationDuration), [=]()
             {

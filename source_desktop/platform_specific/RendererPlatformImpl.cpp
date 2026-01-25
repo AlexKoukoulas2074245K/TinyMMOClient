@@ -152,35 +152,10 @@ public:
         }
 
         auto& currentFontRenderData = innerFontRenderingMap.at(mSceneObject.mShaderResourceId);
-        
-//        auto* currentShader = &(resService.GetResource<resources::ShaderResource>(mSceneObject.mShaderResourceId));
-//        GL_CALL(glUseProgram(currentShader->GetProgramId()));
-//        
-//        for (size_t i = 0; i < currentShader->GetUniformSamplerNames().size(); ++i)
-//        {
-//            currentShader->SetInt(currentShader->GetUniformSamplerNames().at(i), static_cast<int>(i));
-//        }
-//        
-//        auto* currentMesh = &(resService.GetResource<resources::MeshResource>(mSceneObject.mMeshResourceId));
-//        GL_CALL(glBindVertexArray(currentMesh->GetVertexArrayObject()));
-        
+
         auto fontOpt = CoreSystemsEngine::GetInstance().GetFontRepository().GetFont(sceneObjectTypeData.mFontName);
         assert(fontOpt);
         const auto& font = fontOpt->get();
-        
-//        auto* currentTexture = &(resService.GetResource<resources::TextureResource>(font.mFontTextureResourceId));
-//        GL_CALL(glActiveTexture(GL_TEXTURE0));
-//        GL_CALL(glBindTexture(GL_TEXTURE_2D, currentTexture->GetGLTextureId()));
-        
-//        for (int i = 0; i < scene::EFFECT_TEXTURES_COUNT; ++i)
-//        {
-//            if (mSceneObject.mEffectTextureResourceIds[i] != 0)
-//            {
-//                auto* currentEffectTexture = &(resService.GetResource<resources::TextureResource>(mSceneObject.mEffectTextureResourceIds[i]));
-//                GL_CALL(glActiveTexture(GL_TEXTURE1 + i));
-//                GL_CALL(glBindTexture(GL_TEXTURE_2D, currentEffectTexture->GetGLTextureId()));
-//            }
-//        }
         
         float xCursor = mSceneObject.mPosition.x;
         
@@ -188,7 +163,7 @@ public:
         for (size_t i = 0; i < stringFontGlyphs.size(); ++i)
         {
             const auto& glyph = stringFontGlyphs[i];
-            float yCursor = mSceneObject.mPosition.y - glyph.mHeightPixels/2.0f * mSceneObject.mScale.y;
+            float yCursor = mSceneObject.mPosition.y - glyph.mHeightPixels * mSceneObject.mScale.y;
             
             float targetX = xCursor + glyph.mXOffsetPixels * mSceneObject.mScale.x;
             float targetY = yCursor - glyph.mYOffsetPixels * mSceneObject.mScale.y;
@@ -199,31 +174,9 @@ public:
             currentFontRenderData.mGlyphMaxUVs.emplace_back(glyph.maxU, glyph.maxV);
             currentFontRenderData.mGlyphAlphas.emplace_back(mSceneObject.mShaderFloatUniformValues.contains(CUSTOM_ALPHA_UNIFORM_NAME) ? mSceneObject.mShaderFloatUniformValues.at(CUSTOM_ALPHA_UNIFORM_NAME) : 1.0f);
             
-//            glm::mat4 world(1.0f);
-//            world = glm::translate(world, glm::vec3(targetX, targetY, mSceneObject.mPosition.z));
-//            world = glm::scale(world, glm::vec3(glyph.mWidthPixels * mSceneObject.mScale.x, glyph.mHeightPixels * mSceneObject.mScale.y, 1.0f));
-//            
-//            currentShader->SetFloat(CUSTOM_ALPHA_UNIFORM_NAME, 1.0f);
-//            currentShader->SetBool(IS_TEXTURE_SHEET_UNIFORM_NAME, true);
-//            currentShader->SetFloat(MIN_U_UNIFORM_NAME, glyph.minU);
-//            currentShader->SetFloat(MIN_V_UNIFORM_NAME, glyph.minV);
-//            currentShader->SetFloat(MAX_U_UNIFORM_NAME, glyph.maxU);
-//            currentShader->SetFloat(MAX_V_UNIFORM_NAME, glyph.maxV);
-//            currentShader->SetMatrix4fv(WORLD_MATRIX_UNIFORM_NAME, world);
-//            currentShader->SetMatrix4fv(VIEW_MATRIX_UNIFORM_NAME, mCamera.GetViewMatrix());
-//            currentShader->SetMatrix4fv(PROJ_MATRIX_UNIFORM_NAME, mCamera.GetProjMatrix());
-//            
-//            for (const auto& vec3Entry: mSceneObject.mShaderVec3UniformValues) currentShader->SetFloatVec3(vec3Entry.first, vec3Entry.second);
-//            for (const auto& floatEntry: mSceneObject.mShaderFloatUniformValues) currentShader->SetFloat(floatEntry.first, floatEntry.second);
-//            for (const auto& intEntry: mSceneObject.mShaderIntUniformValues) currentShader->SetInt(intEntry.first, intEntry.second);
-//            for (const auto& boolEntry: mSceneObject.mShaderBoolUniformValues) currentShader->SetBool(boolEntry.first, boolEntry.second);
-//            
-//            GL_CALL(glDrawElements(GL_TRIANGLES, currentMesh->GetElementCount(), GL_UNSIGNED_SHORT, (void*)0));
-//            sDrawCallCounter++;
-            
             if (i != stringFontGlyphs.size() - 1)
             {
-                xCursor += (glyph.mAdvancePixels * mSceneObject.mScale.x)/2.0f + (stringFontGlyphs[i + 1].mAdvancePixels * mSceneObject.mScale.x)/2.0f;
+                xCursor += glyph.mAdvancePixels * mSceneObject.mScale.x;
             }
         }
     }
@@ -489,25 +442,10 @@ void RendererPlatformImpl::RenderSceneText(scene::Scene& scene)
             auto* currentTexture = &(resService.GetResource<resources::TextureResource>(font.mFontTextureResourceId));
             GL_CALL(glActiveTexture(GL_TEXTURE0));
             GL_CALL(glBindTexture(GL_TEXTURE_2D, currentTexture->GetGLTextureId()));
-            
-//            for (int i = 0; i < scene::EFFECT_TEXTURES_COUNT; ++i)
-//            {
-//                if (mSceneObject.mEffectTextureResourceIds[i] != 0)
-//                {
-//                    auto* currentEffectTexture = &(resService.GetResource<resources::TextureResource>(mSceneObject.mEffectTextureResourceIds[i]));
-//                    GL_CALL(glActiveTexture(GL_TEXTURE1 + i));
-//                    GL_CALL(glBindTexture(GL_TEXTURE_2D, currentEffectTexture->GetGLTextureId()));
-//                }
-//            }
-            
+
             currentShader->SetFloat(CUSTOM_ALPHA_UNIFORM_NAME, 1.0f);
             currentShader->SetMatrix4fv(VIEW_MATRIX_UNIFORM_NAME, scene.GetCamera().GetViewMatrix());
             currentShader->SetMatrix4fv(PROJ_MATRIX_UNIFORM_NAME, scene.GetCamera().GetProjMatrix());
-            
-//            for (const auto& vec3Entry: mSceneObject.mShaderVec3UniformValues) currentShader->SetFloatVec3(vec3Entry.first, vec3Entry.second);
-//            for (const auto& floatEntry: mSceneObject.mShaderFloatUniformValues) currentShader->SetFloat(floatEntry.first, floatEntry.second);
-//            for (const auto& intEntry: mSceneObject.mShaderIntUniformValues) currentShader->SetInt(intEntry.first, intEntry.second);
-//            for (const auto& boolEntry: mSceneObject.mShaderBoolUniformValues) currentShader->SetBool(boolEntry.first, boolEntry.second);
             
             GL_CALL(glBindVertexArray(sFontVertexArrayObject));
             
@@ -589,6 +527,8 @@ void RendererPlatformImpl::RenderSceneText(scene::Scene& scene)
             GL_CALL(glDisableVertexAttribArray(6));
             
             GL_CALL(glBindVertexArray(0));
+            
+            sDrawCallCounter++;
         }
     }
 }
@@ -637,7 +577,7 @@ void RendererPlatformImpl::CreateIMGuiWidgets()
         auto viewerName = strutils::StringId("Scene Data Viewer (" + sceneRef.get().GetName().GetString() + ")");
         
         ImGui::Begin(viewerName.GetString().c_str(), nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
-        
+
         // Scene Input propertues
         if (ImGui::CollapsingHeader("Time", ImGuiTreeNodeFlags_None))
         {
