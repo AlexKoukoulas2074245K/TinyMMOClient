@@ -45,7 +45,7 @@ math::Rectangle GetSceneObjectBoundingRect(const scene::SceneObject& sceneObject
         {
             const auto& glyph = stringFontGlyphs[i];
             
-            yCursor = sceneObject.mPosition.y - glyph.mHeightPixels/2.0f * sceneObject.mScale.y;
+            yCursor = sceneObject.mPosition.y - glyph.mHeightPixels * sceneObject.mScale.y;
             
             float targetX = xCursor + glyph.mXOffsetPixels * sceneObject.mScale.x;
             float targetY = yCursor - glyph.mYOffsetPixels * sceneObject.mScale.y;
@@ -57,7 +57,7 @@ math::Rectangle GetSceneObjectBoundingRect(const scene::SceneObject& sceneObject
             
             if (i != stringFontGlyphs.size() - 1)
             {
-                xCursor += (glyph.mAdvancePixels * sceneObject.mScale.x)/2.0f + (stringFontGlyphs[i + 1].mAdvancePixels * sceneObject.mScale.y)/2.0f;
+                xCursor += glyph.mAdvancePixels * sceneObject.mScale.x;
                 
                 if (targetX + glyph.mWidthPixels * sceneObject.mScale.x/2 > maxX) maxX = targetX + glyph.mWidthPixels * sceneObject.mScale.x/2;
                 if (targetX - glyph.mWidthPixels * sceneObject.mScale.x/2 < minX) minX = targetX - glyph.mWidthPixels * sceneObject.mScale.x/2;

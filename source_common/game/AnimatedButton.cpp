@@ -86,6 +86,7 @@ AnimatedButton::AnimatedButton
     textData.mText = text;
     
     mSceneObjects.back()->mSceneObjectTypeData = std::move(textData);
+    mSceneObjects.back()->mShaderResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + game_constants::DEFAULT_FONT_SHADER_NAME);
     mSceneObjects.back()->mPosition = position;
     mSceneObjects.back()->mScale = scale;
     mSceneObjects.back()->mSnapToEdgeBehavior = snapToEdgeBehavior;
@@ -127,6 +128,7 @@ AnimatedButton::AnimatedButton
     textData.mText = text;
     
     mSceneObjects.back()->mSceneObjectTypeData = std::move(textData);
+    mSceneObjects.back()->mShaderResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + game_constants::DEFAULT_FONT_SHADER_NAME);
     mSceneObjects.back()->mPosition = position;
     mSceneObjects.back()->mPosition.z += INNER_BUTTON_OBJECT_Z_OFFSET;
     mSceneObjects.back()->mScale = textScale;
@@ -179,6 +181,7 @@ AnimatedButton::AnimatedButton
     textData.mText = text;
     
     mSceneObjects.back()->mSceneObjectTypeData = std::move(textData);
+    mSceneObjects.back()->mShaderResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + game_constants::DEFAULT_FONT_SHADER_NAME);
     mSceneObjects.back()->mPosition = texturePosition;
     mSceneObjects.back()->mPosition.z += INNER_BUTTON_OBJECT_Z_OFFSET;
     
