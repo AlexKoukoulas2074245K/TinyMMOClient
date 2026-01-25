@@ -68,6 +68,13 @@ math::Rectangle GetSceneObjectBoundingRect(const scene::SceneObject& sceneObject
         
         boundingRect.bottomLeft = glm::vec2(minX, minY);
         boundingRect.topRight = glm::vec2(maxX, maxY);
+        
+        auto width = boundingRect.topRight.x - boundingRect.bottomLeft.x;
+        auto height = boundingRect.topRight.y - boundingRect.bottomLeft.y;
+        
+        const auto halfDims = glm::vec2(width/2.0f, height/2.0f);
+        boundingRect.bottomLeft -= halfDims;
+        boundingRect.topRight -= halfDims;
     }
     else if (std::holds_alternative<scene::DefaultSceneObjectData>(sceneObject.mSceneObjectTypeData))
     {                                                                                                

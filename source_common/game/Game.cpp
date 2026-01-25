@@ -100,11 +100,11 @@ void Game::Init()
     auto guiSceneObject = scene->CreateSceneObject(strutils::StringId("gui"));
     guiSceneObject->mShaderResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + game_constants::DEFAULT_FONT_SHADER_NAME);
     guiSceneObject->mSceneObjectTypeData = std::move(textData);
-    guiSceneObject->mPosition = glm::vec3(-0.192f, -0.235f, 1.0f);
+    guiSceneObject->mPosition = glm::vec3(0.0f, -0.155f, 1.0f);
     guiSceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 1.0f;
     guiSceneObject->mScale = glm::vec3(0.0004f);
     
-    mTestButton = std::make_unique<AnimatedButton>(glm::vec3(-0.2f, 0.0f, 1.0f), glm::vec3(0.0001f), game_constants::DEFAULT_FONT_NAME, "Test my limits, left and right :)", strutils::StringId("test_button"), [](){}, *scene);
+    mTestButton = std::make_unique<AnimatedButton>(glm::vec3(-0.3f, 0.0f, 1.0f), glm::vec3(0.0001f), game_constants::DEFAULT_FONT_NAME, "Test my limits, left and right :)", strutils::StringId("test_button"), [](){}, *scene);
     
     mObjectAnimationController = std::make_unique<ObjectAnimationController>();
     mLocalPlayerId = 0;

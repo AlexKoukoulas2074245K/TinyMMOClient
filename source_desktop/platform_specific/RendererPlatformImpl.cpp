@@ -17,6 +17,7 @@
 #include <engine/resloading/TextureResource.h>
 #include <engine/scene/Scene.h>
 #include <engine/scene/SceneObject.h>
+#include <engine/scene/SceneObjectUtils.h>
 #include <engine/utils/Logging.h>
 #include <imgui/backends/imgui_impl_sdl2.h>
 #include <imgui/backends/imgui_impl_opengl3.h>
@@ -157,6 +158,10 @@ public:
         assert(fontOpt);
         const auto& font = fontOpt->get();
         
+        const auto& stringRect = scene_object_utils::GetSceneObjectBoundingRect(mSceneObject);
+        const auto stringWidth = stringRect.topRight.x - stringRect.bottomLeft.x;
+        const auto stringHeight = stringRect.topRight.y - stringRect.bottomLeft.y;
+
         float xCursor = mSceneObject.mPosition.x;
         
         const auto& stringFontGlyphs = font.FindGlyphs(sceneObjectTypeData.mText);
@@ -168,7 +173,7 @@ public:
             float targetX = xCursor + glyph.mXOffsetPixels * mSceneObject.mScale.x;
             float targetY = yCursor - glyph.mYOffsetPixels * mSceneObject.mScale.y;
             
-            currentFontRenderData.mGlyphPositions.emplace_back(targetX, targetY, mSceneObject.mPosition.z + 0.00001f * i);
+            currentFontRenderData.mGlyphPositions.emplace_back(targetX - stringWidth/2.0f, targetY - stringHeight/2.0f, mSceneObject.mPosition.z + 0.00001f * i);
             currentFontRenderData.mGlyphScales.emplace_back(glyph.mWidthPixels * mSceneObject.mScale.x, glyph.mHeightPixels * mSceneObject.mScale.y, 1.0f);
             currentFontRenderData.mGlyphMinUVs.emplace_back(glyph.minU, glyph.minV);
             currentFontRenderData.mGlyphMaxUVs.emplace_back(glyph.maxU, glyph.maxV);
