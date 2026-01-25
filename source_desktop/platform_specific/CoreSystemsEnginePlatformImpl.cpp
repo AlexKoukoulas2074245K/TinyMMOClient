@@ -259,7 +259,7 @@ void CoreSystemsEngine::Start(std::function<void()> clientInitFunction, std::fun
 #endif
         }
             
-        if (mSystems->mInputStateManager.VButtonTapped(input::Button::MIDDLE_BUTTON))
+        if (mSystems->mInputStateManager.VKeyTapped(input::Key::Z))
         {
 #if defined(USE_IMGUI)
             GLOBAL_IMGUI_WINDOW_FLAGS = GLOBAL_IMGUI_WINDOW_FLAGS == ImGuiWindowFlags_NoMove ? ImGuiWindowFlags_None : ImGuiWindowFlags_NoMove;

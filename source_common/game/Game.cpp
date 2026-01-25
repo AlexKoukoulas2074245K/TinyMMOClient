@@ -391,6 +391,43 @@ void Game::CreateDebugWidgets()
         }
     }
     ImGui::End();
+    
+    ImGui::Begin("String Test", nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
+    auto& systemsEngine = CoreSystemsEngine::GetInstance();
+    auto scene = systemsEngine.GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME);
+    if (scene)
+    {
+        static long long stringNameId = 0;
+        if (ImGui::Button("Add String"))
+        {
+            scene::TextSceneObjectData textData;
+            textData.mFontName = game_constants::DEFAULT_FONT_NAME;
+            textData.mText = "123456789abcdefghijlkmnopqrstuvwxyz";
+            
+            auto& systemsEngine = CoreSystemsEngine::GetInstance();
+            auto scene = systemsEngine.GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME);
+            auto sceneObject = scene->CreateSceneObject(strutils::StringId("string-" + std::to_string(stringNameId++)));
+            
+            sceneObject->mSceneObjectTypeData = std::move(textData);
+            sceneObject->mPosition = glm::vec3(math::RandomFloat(-0.3f, 0.3f), math::RandomFloat(-0.2f, 0.2f), 0.1f);
+            sceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 1.0f;
+            sceneObject->mScale = glm::vec3(0.0004f);
+            
+            auto& animationManager = CoreSystemsEngine::GetInstance().GetAnimationManager();
+            
+            auto initScale = sceneObject->mScale;
+            static const float animationDuration = 10.0f;
+            static const float maxScaleFactor = 4.0f;
+            animationManager.StartAnimation(std::make_unique<rendering::TweenPositionScaleAnimation>(sceneObject, sceneObject->mPosition, initScale * maxScaleFactor, animationDuration), [=]()
+            {
+                scene->RemoveSceneObject(sceneObject->mName);
+            });
+            animationManager.StartAnimation(std::make_unique<rendering::TweenAlphaAnimation>(sceneObject, 0.0f, animationDuration), [](){});
+        }
+        ImGui::SameLine();
+        ImGui::Text("Live Strings: %lu", scene->FindSceneObjectsWhoseNameStartsWith("string-").size());
+    }
+    ImGui::End();
 }
 #else
 void Game::CreateDebugWidgets()
