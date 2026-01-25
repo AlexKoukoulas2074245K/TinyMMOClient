@@ -122,6 +122,35 @@ void Game::Init()
 
 ///------------------------------------------------------------------------------------------------
 
+inline network::FacingDirection VecToDirection(const glm::vec3& vec)
+{
+    // make sure dir is not zero-length
+    if (glm::length(vec) < 1e-6f) {
+        // default or handle error
+        return network::FacingDirection::SOUTH;
+    }
+
+    // angle in radians: atan2 returns angle from -pi to pi
+    float angle = std::atan2(vec.y, vec.x);
+
+    // convert to degrees (optional, but easier to reason about)
+    float degrees = glm::degrees(angle);
+
+    // normalize to [0, 360)
+    if (degrees < 0.0f)
+        degrees += 360.0f;
+
+    // angular sectors: 360/8 = 45 degrees each
+    if      (degrees >= 337.5f || degrees < 22.5f) return network::FacingDirection::EAST;
+    else if (degrees < 67.5f)                      return network::FacingDirection::NORTH_EAST;
+    else if (degrees < 112.5f)                     return network::FacingDirection::NORTH;
+    else if (degrees < 157.5f)                     return network::FacingDirection::NORTH_WEST;
+    else if (degrees < 202.5f)                     return network::FacingDirection::WEST;
+    else if (degrees < 247.5f)                     return network::FacingDirection::SOUTH_WEST;
+    else if (degrees < 292.5f)                     return network::FacingDirection::SOUTH;
+    else                                           return network::FacingDirection::SOUTH_EAST;
+}
+
 float sDebugPlayerVelocityMultiplier = 1.0f;
 
 
@@ -198,31 +227,51 @@ void Game::Update(const float dtMillis)
 
         if (objectId == mLocalPlayerId)
         {
+            // Attacking overrides movement direction
+            bool hasAttacked = false;
             if (CoreSystemsEngine::GetInstance().GetInputStateManager().VButtonTapped(input::Button::MAIN_BUTTON))
             {
+                // Cooldown checks etc..
+                hasAttacked = true;
+                const auto& cam = systemsEngine.GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME)->GetCamera();
+                const auto& pointingPos = CoreSystemsEngine::GetInstance().GetInputStateManager().VGetPointingPosInWorldSpace(cam.GetViewMatrix(), cam.GetProjMatrix());
+                const auto& playerToPointingPos = glm::normalize(glm::vec3(pointingPos.x, pointingPos.y, objectData.position.z) - objectData.position);
+                const auto facingDirection = VecToDirection(playerToPointingPos);
+                
+                mObjectAnimationController->UpdateObjectAnimation(sceneObject, glm::vec3(0.0f), dtMillis, facingDirection);
+                mLocalObjectDataMap[mLocalPlayerId].facingDirection = facingDirection;
+                
+                network::ObjectStateUpdateMessage stateUpdateMessage = {};
+                stateUpdateMessage.objectData = mLocalObjectDataMap[mLocalPlayerId];
+                
+                SendMessage(sServer, &stateUpdateMessage, sizeof(stateUpdateMessage), network::channels::RELIABLE);
+                
                 network::AttackMessage attackMessage = {};
                 attackMessage.attackerId = mLocalPlayerId;
                 attackMessage.attackType = network::AttackType::PROJECTILE;
                 attackMessage.projectileType = network::ProjectileType::FIREBALL;
-                
+
                 SendMessage(sServer, &attackMessage, sizeof(attackMessage), network::channels::RELIABLE);
             }
-
-            auto inputDirection = LocalPlayerInputController::GetMovementDirection();
-            auto velocity = glm::vec3(inputDirection.x, inputDirection.y, 0.0f) * objectData.speed * sDebugPlayerVelocityMultiplier * dtMillis;
             
-            const auto& animationInfoResult = mObjectAnimationController->UpdateObjectAnimation(sceneObject, velocity, dtMillis, std::nullopt);
-            sceneObject->mPosition += velocity;
-            
-            mLocalObjectDataMap[mLocalPlayerId].position = sceneObject->mPosition;
-            mLocalObjectDataMap[mLocalPlayerId].velocity = velocity;
-            mLocalObjectDataMap[mLocalPlayerId].currentAnimation = network::AnimationType::RUNNING;
-            mLocalObjectDataMap[mLocalPlayerId].facingDirection = animationInfoResult.mFacingDirection;
-            
-            network::ObjectStateUpdateMessage stateUpdateMessage = {};
-            stateUpdateMessage.objectData = mLocalObjectDataMap[mLocalPlayerId];
-            
-            SendMessage(sServer, &stateUpdateMessage, sizeof(stateUpdateMessage), network::channels::UNRELIABLE);
+            if (!hasAttacked)
+            {
+                auto inputDirection = LocalPlayerInputController::GetMovementDirection();
+                auto velocity = glm::vec3(inputDirection.x, inputDirection.y, 0.0f) * objectData.speed * sDebugPlayerVelocityMultiplier * dtMillis;
+                
+                const auto& animationInfoResult = mObjectAnimationController->UpdateObjectAnimation(sceneObject, velocity, dtMillis, std::nullopt);
+                sceneObject->mPosition += velocity;
+                
+                mLocalObjectDataMap[mLocalPlayerId].position = sceneObject->mPosition;
+                mLocalObjectDataMap[mLocalPlayerId].velocity = velocity;
+                mLocalObjectDataMap[mLocalPlayerId].currentAnimation = network::AnimationType::RUNNING;
+                mLocalObjectDataMap[mLocalPlayerId].facingDirection = animationInfoResult.mFacingDirection;
+                
+                network::ObjectStateUpdateMessage stateUpdateMessage = {};
+                stateUpdateMessage.objectData = mLocalObjectDataMap[mLocalPlayerId];
+                
+                SendMessage(sServer, &stateUpdateMessage, sizeof(stateUpdateMessage), network::channels::UNRELIABLE);
+            }
         }
         else
         {
@@ -329,6 +378,18 @@ void Game::CreateDebugWidgets()
     ImGui::Begin("Game Data", nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
     ImGui::Text("Local Player Id: %llu", mLocalPlayerId);
     ImGui::SliderFloat("Player velocity Multiplier", &sDebugPlayerVelocityMultiplier, 0.01f, 10.0f);
+    ImGui::SeparatorText("Network Object Data");
+    for (const auto& [objectId, objectData]: mLocalObjectDataMap)
+    {
+        auto name = ("object-" + std::to_string(objectId));
+        if (ImGui::CollapsingHeader(name.c_str(), ImGuiTreeNodeFlags_None))
+        {
+            ImGui::PushID(name.c_str());
+            ImGui::Text("Object Type: %d", static_cast<int>(objectData.objectType));
+            ImGui::Text("Facing Direction: %d", static_cast<int>(objectData.facingDirection));
+            ImGui::PopID();
+        }
+    }
     ImGui::End();
 }
 #else

@@ -149,8 +149,15 @@ const ObjectAnimationController::ObjectAnimationInfo& ObjectAnimationController:
                     return 2;
             }
         };
+        auto shouldFlipAnimation = [](const network::FacingDirection direction)
+        {
+            return direction == network::FacingDirection::NORTH_WEST ||
+                   direction == network::FacingDirection::SOUTH_WEST ||
+                   direction == network::FacingDirection::WEST;
+        };
         
         mObjectAnimationInfoMap[sceneObject->mName].mAnimationRow = facingDirectionToAnimationRow(*facingDirection);
+        mObjectAnimationInfoMap[sceneObject->mName].mFlippedAnimation = shouldFlipAnimation(*facingDirection);
     }
     
     sceneObject->mShaderFloatUniformValues[MIN_U_UNIFORM_NAME] = ANIMATION_UV_MAP[mObjectAnimationInfoMap[sceneObject->mName].mAnimationRow][mObjectAnimationInfoMap[sceneObject->mName].mFrameIndex].first.x;
