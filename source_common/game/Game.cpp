@@ -89,6 +89,22 @@ void Game::Init()
     bg->mPosition = glm::vec3(0.0f, 0.0f, 0.0f);
     bg->mScale = glm::vec3(5.0f, 5.0f, 0.5f);
     
+    
+    scene = systemsEngine.GetSceneManager().CreateScene(game_constants::GUI_SCENE_NAME);
+    scene->GetCamera().SetZoomFactor(50.0f);
+    scene->SetLoaded(true);
+    
+    scene::TextSceneObjectData textData;
+    textData.mFontName = game_constants::DEFAULT_FONT_NAME;
+    textData.mText = "Health Points: 100";
+    auto guiSceneObject = scene->CreateSceneObject(strutils::StringId("gui"));
+    guiSceneObject->mShaderResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + game_constants::DEFAULT_FONT_SHADER_NAME);
+    guiSceneObject->mSceneObjectTypeData = std::move(textData);
+    guiSceneObject->mPosition = glm::vec3(-0.192f, -0.235f, 1.0f);
+    guiSceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 1.0f;
+    guiSceneObject->mScale = glm::vec3(0.0004f);
+    
+    
     mObjectAnimationController = std::make_unique<ObjectAnimationController>();
     mLocalPlayerId = 0;
 
@@ -402,28 +418,42 @@ void Game::CreateDebugWidgets()
         {
             scene::TextSceneObjectData textData;
             textData.mFontName = game_constants::DEFAULT_FONT_NAME;
-            for (int i = 0; i < 500; ++i) {
-                textData.mText += math::RandomInt(48, 90);
-            }
             
+            // Test 1
+//            for (int i = 0; i < 500; ++i) {
+//                textData.mText += math::RandomInt(48, 90);
+//            }
+//            
+//            auto& systemsEngine = CoreSystemsEngine::GetInstance();
+//            auto scene = systemsEngine.GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME);
+//            auto sceneObject = scene->CreateSceneObject(strutils::StringId("string-" + std::to_string(stringNameId++)));
+//            
+//            sceneObject->mShaderResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + game_constants::DEFAULT_FONT_SHADER_NAME);
+//            sceneObject->mSceneObjectTypeData = std::move(textData);
+//            sceneObject->mPosition = glm::vec3(-0.4f, 0.1f - (stringNameId * 0.02f), 0.1f);
+//            sceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 1.0f;
+//            sceneObject->mScale = glm::vec3(0.0001f);
+            
+            // Test 2
+            textData.mText += "1234567890abcdefghijklmnopqrstuvwxyz";
             auto& systemsEngine = CoreSystemsEngine::GetInstance();
             auto scene = systemsEngine.GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME);
             auto sceneObject = scene->CreateSceneObject(strutils::StringId("string-" + std::to_string(stringNameId++)));
-            
+            sceneObject->mShaderResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + game_constants::DEFAULT_FONT_SHADER_NAME);
             sceneObject->mSceneObjectTypeData = std::move(textData);
-            sceneObject->mPosition = glm::vec3(-0.4f, 0.1f - (stringNameId * 0.02f), 0.1f);
-            sceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 1.0f;
+            sceneObject->mPosition = glm::vec3(math::RandomFloat(-0.3f, 0.3f), math::RandomFloat(-0.2f, 0.2f), 0.1f);
+            //sceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 1.0f;
             sceneObject->mScale = glm::vec3(0.0001f);
             
-//            auto& animationManager = CoreSystemsEngine::GetInstance().GetAnimationManager();
+            auto& animationManager = CoreSystemsEngine::GetInstance().GetAnimationManager();
             
-//            auto initScale = sceneObject->mScale;
-//            static const float animationDuration = 20.0f;
-//            static const float maxScaleFactor = 4.0f;
-//            animationManager.StartAnimation(std::make_unique<rendering::TweenPositionScaleAnimation>(sceneObject, sceneObject->mPosition, initScale * maxScaleFactor, animationDuration), [=]()
-//            {
-//                scene->RemoveSceneObject(sceneObject->mName);
-//            });
+            auto initScale = sceneObject->mScale;
+            static const float animationDuration = 20.0f;
+            static const float maxScaleFactor = 4.0f;
+            animationManager.StartAnimation(std::make_unique<rendering::TweenPositionScaleAnimation>(sceneObject, sceneObject->mPosition, initScale * maxScaleFactor, animationDuration), [=]()
+            {
+                scene->RemoveSceneObject(sceneObject->mName);
+            });
             //animationManager.StartAnimation(std::make_unique<rendering::TweenAlphaAnimation>(sceneObject, 0.0f, animationDuration), [](){});
         }
         ImGui::SameLine();

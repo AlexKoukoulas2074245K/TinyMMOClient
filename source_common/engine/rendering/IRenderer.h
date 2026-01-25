@@ -30,6 +30,7 @@ class IRenderer
 {
 public:
     virtual ~IRenderer() = default;
+    virtual void VInitialize() = 0;
     virtual void VBeginRenderPass() = 0;
     virtual void VRenderScene(scene::Scene& scene) = 0;
     virtual void VRenderSceneObjectsToTexture(const std::vector<std::shared_ptr<scene::SceneObject>>& sceneObjects, const rendering::Camera& camera) = 0;

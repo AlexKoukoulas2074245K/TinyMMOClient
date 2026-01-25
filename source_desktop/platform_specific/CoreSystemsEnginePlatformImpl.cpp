@@ -162,6 +162,7 @@ void CoreSystemsEngine::Initialize()
 
     // Systems Initialization
     mSystems = std::make_unique<SystemsImpl>();
+    mSystems->mRenderer.VInitialize();
     mSystems->mResourceLoadingService.Initialize();
     mSystems->mSoundManager.Initialize();
     
@@ -574,8 +575,8 @@ void CoreSystemsEngine::CreateEngineDebugWidgets()
         sGameSpeed = 1.0f;
     }
     ImGui::SeparatorText("Profilling");
-    ImGui::PlotLines("Update Logic Samples", sUpdateLogicMillisSamples, PROFILLING_SAMPLE_COUNT);
-    ImGui::PlotLines("Rendering Samples", sRenderingMillisSamples, PROFILLING_SAMPLE_COUNT);
+    ImGui::PlotLines("Update (millis)", sUpdateLogicMillisSamples, PROFILLING_SAMPLE_COUNT);
+    ImGui::PlotLines("Rendering (millis)", sRenderingMillisSamples, PROFILLING_SAMPLE_COUNT);
     ImGui::SeparatorText("Input");
     const auto& cursorPos = CoreSystemsEngine::GetInstance().GetInputStateManager().VGetPointingPos();
     ImGui::Text("Cursor %.3f,%.3f",cursorPos.x, cursorPos.y);
