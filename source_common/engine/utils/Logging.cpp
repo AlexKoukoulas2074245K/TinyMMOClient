@@ -43,6 +43,23 @@ void Log(const LogType logType, const char* message, ...)
 
 ///------------------------------------------------------------------------------------------------
 
+void LogInfo(const char* message, ...)
+{
+    std::lock_guard<std::mutex> loggingGuard(sLoggingMutex);
+
+    printf("[INFO] ");
+    va_list args;
+    va_start (args, message);
+    vprintf (message, args);
+    va_end (args);
+    
+    printf("\n");
+    
+    fflush(stdout);
+}
+
+///------------------------------------------------------------------------------------------------
+
 }
 
 ///------------------------------------------------------------------------------------------------

@@ -39,8 +39,10 @@ enum class LogType
 /// @param[in] message the message itself as a c-string
 #if !defined(NDEBUG) || defined(LOG_IN_RELEASE)
 void Log(const LogType logType, const char* message, ...);
+void LogInfo(const char* message, ...);
 #else
 void Log(const LogType, const char*, ...) {}
+void LogInfo(const char* message, ...) {}
 #endif /* not NDEBUG */
 
 ///-----------------------------------------------------------------------------------------------

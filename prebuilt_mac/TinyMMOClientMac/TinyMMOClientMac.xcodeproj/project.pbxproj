@@ -8,10 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		005DDF1CA71A424F880BFF85 /* BackgroundMusicPlayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 7F068929D88F95729D0195E3 /* BackgroundMusicPlayer.mm */; };
+		00AA26FEC0D0668DE3C4B9CF /* PlaceTileCommand.h in Sources */ = {isa = PBXBuildFile; fileRef = 78BB20C2667D073C1F6425B5 /* PlaceTileCommand.h */; };
 		0118CE0544990425D47F3A12 /* ShaderResource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB4F4B243BF9EE66291B3910 /* ShaderResource.cpp */; };
 		02E7DF925FD7370A12023A23 /* Camera.h in Sources */ = {isa = PBXBuildFile; fileRef = 70EE9661089211DACFF22288 /* Camera.h */; };
 		03B28C98FAB2D3C8F86DF546 /* IInputStateManager.h in Sources */ = {isa = PBXBuildFile; fileRef = D099CB93E6198C3BE5F73FDE /* IInputStateManager.h */; };
 		0B19950EE3ADDE1721BB9ADA /* ObjectAnimationController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B5E6F0D1307253CFDDD9805 /* ObjectAnimationController.cpp */; };
+		0B1F2B8743E89659ACE8E3D9 /* IEditorCommand.h in Sources */ = {isa = PBXBuildFile; fileRef = 2EAD05F146251AF3CB46F31A /* IEditorCommand.h */; };
+		0F087FF77E200BB2CDE3542F /* EditorImGuiCommands.inc in Sources */ = {isa = PBXBuildFile; fileRef = 0BD39CBDAEDAA304E29EAF51 /* EditorImGuiCommands.inc */; };
 		120CF200D56449CFC3BD99AF /* AppleSoundUtils.h in Sources */ = {isa = PBXBuildFile; fileRef = D8216CC78F9B7DEB0BEC7678 /* AppleSoundUtils.h */; };
 		1245FE302D596926AB6DF879 /* NetworkMessages.h in Sources */ = {isa = PBXBuildFile; fileRef = DFC34F8592BEA1C75C5FDA48 /* NetworkMessages.h */; };
 		16092693C24E8507EFDFBB70 /* Editor.h in Sources */ = {isa = PBXBuildFile; fileRef = AB2400E817D39628656BEFF1 /* Editor.h */; };
@@ -29,44 +32,58 @@
 		28390BD5156136B5DEE39871 /* LocalPlayerInputController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B1438D1408BE048FE78171E /* LocalPlayerInputController.cpp */; };
 		2AA2F6A7573CDD74098EFB98 /* CoreSystemsEnginePlatformImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6D3F63C77D9E3CBD37931ADE /* CoreSystemsEnginePlatformImpl.cpp */; };
 		2CCF496499DF11B16C0F2C43 /* SfxPlayer.h in Sources */ = {isa = PBXBuildFile; fileRef = 3714C4A3B069768E05DD0199 /* SfxPlayer.h */; };
+		2CDAAB19A1719A708B311A1C /* MapResourceController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E4AA20F53963909E8A2A8B66 /* MapResourceController.cpp */; };
+		2D24B2B9525B1C8371666994 /* GlobalMapDataRepository.h in Sources */ = {isa = PBXBuildFile; fileRef = F45F5DE3D1B6D4366CA489D3 /* GlobalMapDataRepository.h */; };
 		2F07E8202DDD53253B38EF21 /* OpenGL.h in Sources */ = {isa = PBXBuildFile; fileRef = 0724B463AFC06A5A52F1047E /* OpenGL.h */; };
+		307F565662A9BE31E63577BE /* GlobalMapDataRepository.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 515F478863F0B056E1D66962 /* GlobalMapDataRepository.cpp */; };
 		308ED2F39D5A19DC22EB87B3 /* glew.h in Sources */ = {isa = PBXBuildFile; fileRef = 051E00BF71689A5C0A9F91D2 /* glew.h */; };
 		309CA5C19E3574B35486EBD4 /* Version.h in Sources */ = {isa = PBXBuildFile; fileRef = 0B5602AB7CC28E6EA08AAED6 /* Version.h */; };
 		3257278F32615EE218889DC7 /* LocalPlayerInputController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B1438D1408BE048FE78171E /* LocalPlayerInputController.cpp */; };
 		33CC4D39831F836C2D367D51 /* PlatformMacros.h in Sources */ = {isa = PBXBuildFile; fileRef = 7961514C3AA5315045E54E7E /* PlatformMacros.h */; };
 		3404AFE81C1263670F2BD149 /* MathUtils.h in Sources */ = {isa = PBXBuildFile; fileRef = 2096C38A74EAF730ECCA5E36 /* MathUtils.h */; };
 		3800CC997FE9DCC2CADAF5E2 /* TypeTraits.h in Sources */ = {isa = PBXBuildFile; fileRef = 6E2183A368D71198F98D6738 /* TypeTraits.h */; };
+		399C52BB9CE11FA48B740674 /* MapConstants.h in Sources */ = {isa = PBXBuildFile; fileRef = E0BC495776CFD93A861F9235 /* MapConstants.h */; };
 		3D0B74E401CD9DB2D3AF3061 /* RenderingUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 59B053AEBDD62B4FCAB8E05D /* RenderingUtils.cpp */; };
 		3E0686E0364F1D3BFC522A92 /* CommonUniforms.h in Sources */ = {isa = PBXBuildFile; fileRef = 9CC1A200C9B794A05E296C21 /* CommonUniforms.h */; };
 		3E3B65024B721F5CCC0D71E0 /* Animations.h in Sources */ = {isa = PBXBuildFile; fileRef = 82DFED0E0B1AB607780AED60 /* Animations.h */; };
 		45963ED9A5DA3C4EB9144646 /* TextureResource.h in Sources */ = {isa = PBXBuildFile; fileRef = 989BFF482B72A00F213431FE /* TextureResource.h */; };
 		4D0513581BFF046081AADA26 /* Editor.h in Sources */ = {isa = PBXBuildFile; fileRef = AB2400E817D39628656BEFF1 /* Editor.h */; };
 		4E9ADD55CB0B5CA8962F347E /* StringUtils.h in Sources */ = {isa = PBXBuildFile; fileRef = EF61AB7D638A80B4ABD5D5B7 /* StringUtils.h */; };
+		4EA48195EEE2DADD4C171E2B /* MapConstants.h in Sources */ = {isa = PBXBuildFile; fileRef = E0BC495776CFD93A861F9235 /* MapConstants.h */; };
 		4F2000295DC81FE8BE682C2D /* ObjectAnimationController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B5E6F0D1307253CFDDD9805 /* ObjectAnimationController.cpp */; };
+		52332D83781E322C4C821B3F /* PlaceTileCommand.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0478D42E22A0C865D7F54E05 /* PlaceTileCommand.cpp */; };
 		5285724978640648FFD94960 /* TextureResource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93D83DB41AD868D09B2A3C94 /* TextureResource.cpp */; };
 		532521F009DF925259026C23 /* SerializationDefinitions.h in Sources */ = {isa = PBXBuildFile; fileRef = F05BCACB9D0D7193765BB311 /* SerializationDefinitions.h */; };
+		54B243ECB30BFD460FF4D2AE /* PlaceTileCommand.h in Sources */ = {isa = PBXBuildFile; fileRef = 78BB20C2667D073C1F6425B5 /* PlaceTileCommand.h */; };
 		55A949B09D185B35C8B0D135 /* Logging.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3BF946C1B449BB4FE7DF288A /* Logging.cpp */; };
 		55B88F03ED55A2709BD2B704 /* SceneObjectUtils.h in Sources */ = {isa = PBXBuildFile; fileRef = FB0E9FCA60AD270C9B09FA51 /* SceneObjectUtils.h */; };
 		590BC49901179FB522AD2223 /* OSMessageBox.h in Sources */ = {isa = PBXBuildFile; fileRef = EEC2E35013E2E8B9B7A912C6 /* OSMessageBox.h */; };
 		5BEFD96D266F53B603C278C1 /* TypeTraits.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 988043F06556266668BE5677 /* TypeTraits.cpp */; };
 		63011B7BE17965C680A05EAD /* BaseDataFileSerializer.h in Sources */ = {isa = PBXBuildFile; fileRef = 30D02CEC6861EBD7441E2004 /* BaseDataFileSerializer.h */; };
 		631992CC76308ADAE018D80B /* ObjectAnimationController.h in Sources */ = {isa = PBXBuildFile; fileRef = B580A197EA030F09D007D31F /* ObjectAnimationController.h */; };
+		647C5658B31642D5BFA0D50F /* MapResourceController.h in Sources */ = {isa = PBXBuildFile; fileRef = DF8CAA6B3A0408C9E803967E /* MapResourceController.h */; };
 		66D340BC45CB67247263B47A /* NetworkMessages.h in Sources */ = {isa = PBXBuildFile; fileRef = DFC34F8592BEA1C75C5FDA48 /* NetworkMessages.h */; };
 		67D1938FF041F0D5033321B3 /* Editor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A49D33C4F1B1DC1C02DB9E05 /* Editor.cpp */; };
 		69A3B6CA894565C4F51E1123 /* SoundManager.h in Sources */ = {isa = PBXBuildFile; fileRef = 7AC3E452BAA560B6D8B1349E /* SoundManager.h */; };
 		6B03252E24CF56D73B9C3DC7 /* Editor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A49D33C4F1B1DC1C02DB9E05 /* Editor.cpp */; };
 		6B29A2EA7B3D661771AB8A2D /* RenderingUtils.h in Sources */ = {isa = PBXBuildFile; fileRef = 8AE4C68818CCB619974358E0 /* RenderingUtils.h */; };
+		6D111656CC54E42296E2BA41 /* FloodFillCommand.h in Sources */ = {isa = PBXBuildFile; fileRef = 2B240882BB9F863E16774A7E /* FloodFillCommand.h */; };
 		6D827E1ADCEBBFD2A690675C /* CommonUniforms.h in Sources */ = {isa = PBXBuildFile; fileRef = 9CC1A200C9B794A05E296C21 /* CommonUniforms.h */; };
 		6E1A780876A016C76FFF66C6 /* OBJMeshLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 06291EA0D3FF12CB3058DEF2 /* OBJMeshLoader.cpp */; };
 		71319CF262B3FEA0241CE51E /* RendererPlatformImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68CBCF02480A4F7771578514 /* RendererPlatformImpl.cpp */; };
 		71DEABFBFD9A818B6DFD8412 /* TextureLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E0D05FD28DC001514531A214 /* TextureLoader.cpp */; };
 		73793DFAFB2934BB6D90CBA9 /* ObjectAnimationController.h in Sources */ = {isa = PBXBuildFile; fileRef = B580A197EA030F09D007D31F /* ObjectAnimationController.h */; };
+		76409D12E43A0CD0BF3657CA /* MapResourceController.h in Sources */ = {isa = PBXBuildFile; fileRef = DF8CAA6B3A0408C9E803967E /* MapResourceController.h */; };
 		77F8C741493973A71A6DBA22 /* ImageSurfaceResource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53CDE03B92A8F220738E44FE /* ImageSurfaceResource.cpp */; };
 		7A14147B43076FC43E6D5662 /* SoundManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F701DBE1A8A6D1664BEF16A3 /* SoundManager.cpp */; };
 		7A35378576E3FCE89E70ABA4 /* SceneManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FB79D70FA4FA614F184AFE40 /* SceneManager.cpp */; };
+		7AA5A56C99FE8072E54DEE6D /* IEditorCommand.h in Sources */ = {isa = PBXBuildFile; fileRef = 2EAD05F146251AF3CB46F31A /* IEditorCommand.h */; };
 		7CA340B584BA7BDBF8857C4C /* OBJMeshLoader.h in Sources */ = {isa = PBXBuildFile; fileRef = 46BB489973B1ACFF46F552DB /* OBJMeshLoader.h */; };
+		7F4E1CF68DBCEAAD5E2BE42E /* GlobalMapDataRepository.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 515F478863F0B056E1D66962 /* GlobalMapDataRepository.cpp */; };
 		7F8095DD8B9472184A88DC91 /* Version.h in Sources */ = {isa = PBXBuildFile; fileRef = 0B5602AB7CC28E6EA08AAED6 /* Version.h */; };
+		80F1BBA35BCDE6D3AC738C66 /* GlobalMapDataRepository.h in Sources */ = {isa = PBXBuildFile; fileRef = F45F5DE3D1B6D4366CA489D3 /* GlobalMapDataRepository.h */; };
 		811D9B06954C8AC807911B84 /* NetworkMessages.inc in Sources */ = {isa = PBXBuildFile; fileRef = D69EC97B0CE7E31CCBB20FE5 /* NetworkMessages.inc */; };
+		83A90E3E16EF14711D5DEE25 /* EditorUtils.h in Sources */ = {isa = PBXBuildFile; fileRef = 8B2FAF8AA036DDC5591F880B /* EditorUtils.h */; };
 		851FBE54CFC3F1C7F292AD3D /* AnimationManager.h in Sources */ = {isa = PBXBuildFile; fileRef = F2FC1889E08EEFD36C0B6476 /* AnimationManager.h */; };
 		8A1FA1DA153996FA13017967 /* NetworkMessages.inc in Sources */ = {isa = PBXBuildFile; fileRef = D69EC97B0CE7E31CCBB20FE5 /* NetworkMessages.inc */; };
 		8C096F9D043616750BC963F8 /* TextureLoader.h in Sources */ = {isa = PBXBuildFile; fileRef = 05D038A4FFCF3C5AA2E85A75 /* TextureLoader.h */; };
@@ -373,31 +390,49 @@
 		92B8A58B2BE0F547006EC56F /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 92B8A5842BE0F547006EC56F /* LICENSE */; };
 		92B8A59F2BE13B00006EC56F /* AnimatedButton.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 92B8A59E2BE13B00006EC56F /* AnimatedButton.cpp */; };
 		92CA97412B65132C00B53B01 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92CA97402B65132B00B53B01 /* StoreKit.framework */; };
+		92F8B1C52F267EA50037B366 /* ENet.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9274A8042EFECBB0004192E4 /* ENet.framework */; };
+		92F8B1C62F267EA50037B366 /* ENet.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9274A8042EFECBB0004192E4 /* ENet.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		92F8B1C72F267EB40037B366 /* ENet.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9274A8042EFECBB0004192E4 /* ENet.framework */; };
+		92F8B1C82F267EB40037B366 /* ENet.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9274A8042EFECBB0004192E4 /* ENet.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		95BF1C18A001B37A45C9BF9E /* IRenderer.h in Sources */ = {isa = PBXBuildFile; fileRef = E0599E67CDFA7350C55C73A5 /* IRenderer.h */; };
 		97077022B2BEC6176F7D03CC /* NetworkCommon.h in Sources */ = {isa = PBXBuildFile; fileRef = 001CE6A7EB6E3DB35E9F7BDC /* NetworkCommon.h */; };
+		977E77334E4D8562D90A6E89 /* GlobalMapDataRepository.h in Sources */ = {isa = PBXBuildFile; fileRef = F45F5DE3D1B6D4366CA489D3 /* GlobalMapDataRepository.h */; };
+		9B41B0A24BF56BB9C156F3F5 /* EditorImGuiCommands.inc in Sources */ = {isa = PBXBuildFile; fileRef = 0BD39CBDAEDAA304E29EAF51 /* EditorImGuiCommands.inc */; };
 		9F60F6BEA7D20AB4B5EFA323 /* ResourceLoadingService.h in Sources */ = {isa = PBXBuildFile; fileRef = 7C92E4EC0FBCD6AFCA53FD77 /* ResourceLoadingService.h */; };
 		A190FCD102A510B7AF224622 /* AnimationManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E9824F6D620FAB012DF0BC78 /* AnimationManager.cpp */; };
+		A233F63DA56CC244C9A3783C /* MapResourceController.h in Sources */ = {isa = PBXBuildFile; fileRef = DF8CAA6B3A0408C9E803967E /* MapResourceController.h */; };
 		A24C468FFD129BCDF0B2E5B2 /* InputStateManagerPlatformImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CF33F7C72612B80A9AB49895 /* InputStateManagerPlatformImpl.cpp */; };
 		A2C6C2F9E3FA6DE0B9D66E84 /* ObjectAnimationController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B5E6F0D1307253CFDDD9805 /* ObjectAnimationController.cpp */; };
 		A50C73CD4B3C9E1668BFADDD /* SfxPlayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5B33DAF295D4E7E164154510 /* SfxPlayer.mm */; };
+		A785EC7727422726A481140E /* GlobalMapDataRepository.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 515F478863F0B056E1D66962 /* GlobalMapDataRepository.cpp */; };
 		A7B97E4491771F3812AD0124 /* ParticleManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 14207B709EC0713AAB9C29C8 /* ParticleManager.cpp */; };
 		AD3849EC3D7BF58FBE796328 /* Version.h in Sources */ = {isa = PBXBuildFile; fileRef = 0B5602AB7CC28E6EA08AAED6 /* Version.h */; };
 		AEBAABE4C4BC0F6D887BFBCB /* ImageSurfaceLoader.h in Sources */ = {isa = PBXBuildFile; fileRef = D979EC9B74F12857F47E4007 /* ImageSurfaceLoader.h */; };
+		B0F4E2ADA4E9E92ADD81A0C9 /* EditorUtils.h in Sources */ = {isa = PBXBuildFile; fileRef = 8B2FAF8AA036DDC5591F880B /* EditorUtils.h */; };
+		B5C774E0AD01FCF847C354D4 /* IEditorCommand.h in Sources */ = {isa = PBXBuildFile; fileRef = 2EAD05F146251AF3CB46F31A /* IEditorCommand.h */; };
+		B6D53143F3EB9D75D4D2E438 /* FloodFillCommand.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1B6820930081243A02139983 /* FloodFillCommand.cpp */; };
+		B888F9E922D728F18B1F61FA /* EditorUtils.h in Sources */ = {isa = PBXBuildFile; fileRef = 8B2FAF8AA036DDC5591F880B /* EditorUtils.h */; };
 		BC81826A579566F5CA5790E9 /* BaseDataFileDeserializer.h in Sources */ = {isa = PBXBuildFile; fileRef = 8D6E209DDF4F577F8C87C6A0 /* BaseDataFileDeserializer.h */; };
 		BD43AFA7713BE8684E4A8ACA /* ShaderLoader.h in Sources */ = {isa = PBXBuildFile; fileRef = 642B84557417F85C19410FDE /* ShaderLoader.h */; };
+		BE6917AF2A437E9ABB02FDCB /* Navmap.h in Sources */ = {isa = PBXBuildFile; fileRef = 925C86DC2958FAB8EADF1C0F /* Navmap.h */; };
 		BE9038402F304B01BC7CAAB8 /* DataFileResource.h in Sources */ = {isa = PBXBuildFile; fileRef = 08AAC0562233A3F34613E310 /* DataFileResource.h */; };
 		C006C977BE7088F71FAC7329 /* Fonts.h in Sources */ = {isa = PBXBuildFile; fileRef = F3DCD97E5C6A637C6DD4BC0B /* Fonts.h */; };
 		C14FB694A5255B1DC21B4A13 /* SceneObjectUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F16121E2A49D2514A725F7AA /* SceneObjectUtils.cpp */; };
 		C303F0F3781FE76FA4F0A754 /* Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EA3B9899242A079FE63DCD1E /* Camera.cpp */; };
 		C406B60810EC8EDBDDA519DA /* Scene.h in Sources */ = {isa = PBXBuildFile; fileRef = 659D24C3A310C59893EE9475 /* Scene.h */; };
 		C47AB43C912958FA00860801 /* ParticleManager.h in Sources */ = {isa = PBXBuildFile; fileRef = 3199A38C1A16A070A579BAB4 /* ParticleManager.h */; };
+		C51D78BFA26CDF84603ED0CC /* MapResourceController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E4AA20F53963909E8A2A8B66 /* MapResourceController.cpp */; };
 		C729734CCEC807E5626787EB /* IResourceLoader.h in Sources */ = {isa = PBXBuildFile; fileRef = AD86196C948CE14DCBBE5446 /* IResourceLoader.h */; };
 		C7D9496C201BF1823858B0C9 /* Editor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A49D33C4F1B1DC1C02DB9E05 /* Editor.cpp */; };
 		C7FF0B8B56D6E0E9E98D535C /* SceneObject.h in Sources */ = {isa = PBXBuildFile; fileRef = 9F1941D1E63978B2B9C05A1E /* SceneObject.h */; };
+		C8154680425476D4C713A339 /* EditorImGuiCommands.inc in Sources */ = {isa = PBXBuildFile; fileRef = 0BD39CBDAEDAA304E29EAF51 /* EditorImGuiCommands.inc */; };
+		C9BB273A7C1615F295F75D38 /* FloodFillCommand.h in Sources */ = {isa = PBXBuildFile; fileRef = 2B240882BB9F863E16774A7E /* FloodFillCommand.h */; };
+		C9CC731B9056836006E1089C /* FloodFillCommand.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1B6820930081243A02139983 /* FloodFillCommand.cpp */; };
 		CA9897BC57F466630194BFE8 /* MeshResource.h in Sources */ = {isa = PBXBuildFile; fileRef = 88B55A70915E2429F0F03C71 /* MeshResource.h */; };
 		CB1B337E51727F74A3851A0E /* BackgroundMusicPlayer.h in Sources */ = {isa = PBXBuildFile; fileRef = 9A0A1CFEB31EB9D7990F0B4B /* BackgroundMusicPlayer.h */; };
 		CCE13A87F90CB8EB69073CD1 /* FileUtils.h in Sources */ = {isa = PBXBuildFile; fileRef = 0D09AB023B7A329D725F2F2F /* FileUtils.h */; };
 		CDE612C365A4F0EAE74D2542 /* LocalPlayerInputController.h in Sources */ = {isa = PBXBuildFile; fileRef = 7BC4A40B354A0E76D40FBB15 /* LocalPlayerInputController.h */; };
+		D0E195A4C826B47F52BF4585 /* PlaceTileCommand.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0478D42E22A0C865D7F54E05 /* PlaceTileCommand.cpp */; };
 		D21664D760A3220A78231910 /* Logging.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3BF946C1B449BB4FE7DF288A /* Logging.cpp */; };
 		D44276B3AAC7224FC2221FC6 /* ImageSurfaceResource.h in Sources */ = {isa = PBXBuildFile; fileRef = CAEF02928D06B177B1091C5F /* ImageSurfaceResource.h */; };
 		D6C5F484EB7FB13F7EB6438F /* BaseDataFileDeserializer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A05CE2983C7CEA1D2A25585 /* BaseDataFileDeserializer.cpp */; };
@@ -405,17 +440,25 @@
 		D7CE3ABE255F8D331D6B9B40 /* DataFileResource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 431D52A0E0BD619E5CEDBCA7 /* DataFileResource.cpp */; };
 		DA375BD3C40B8AE1FBC1D705 /* LocalPlayerInputController.h in Sources */ = {isa = PBXBuildFile; fileRef = 7BC4A40B354A0E76D40FBB15 /* LocalPlayerInputController.h */; };
 		DB820AAFF394F648CD278031 /* stb_image_write.h in Sources */ = {isa = PBXBuildFile; fileRef = 3E13E4D3AA7809E3A06CFF75 /* stb_image_write.h */; };
+		DEE695007A5AA0D113CCC91C /* FloodFillCommand.h in Sources */ = {isa = PBXBuildFile; fileRef = 2B240882BB9F863E16774A7E /* FloodFillCommand.h */; };
 		DFC9D6A2B4A6F0AF0A0416C9 /* DataFileLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0106479588E4C78D4F938113 /* DataFileLoader.cpp */; };
 		E2240B574B476A510E0FEE8A /* AppleSoundUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = EFF6CA715340BD63F4562F60 /* AppleSoundUtils.mm */; };
 		E24F8BEB335EFB8866189742 /* BaseDataFileSerializer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 903005ABB6F4A9CB6247ABDC /* BaseDataFileSerializer.cpp */; };
 		E7F3EF85172DB9E9D9AF8321 /* ImageSurfaceLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B645F5160C1B36C70F708518 /* ImageSurfaceLoader.cpp */; };
+		E84BE09557498B106A5C1C22 /* Navmap.h in Sources */ = {isa = PBXBuildFile; fileRef = 925C86DC2958FAB8EADF1C0F /* Navmap.h */; };
+		EA2AF4FF81063646BE798528 /* PlaceTileCommand.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0478D42E22A0C865D7F54E05 /* PlaceTileCommand.cpp */; };
 		EB260157021BAEBC7EC82B4C /* NetworkCommon.h in Sources */ = {isa = PBXBuildFile; fileRef = 001CE6A7EB6E3DB35E9F7BDC /* NetworkCommon.h */; };
+		EB479C93C5F132D99BFB4C3A /* Navmap.h in Sources */ = {isa = PBXBuildFile; fileRef = 925C86DC2958FAB8EADF1C0F /* Navmap.h */; };
+		EBAAD63C2C9D30771BB8CD7C /* MapConstants.h in Sources */ = {isa = PBXBuildFile; fileRef = E0BC495776CFD93A861F9235 /* MapConstants.h */; };
+		F01DDCE30B7B20953E17A5C1 /* FloodFillCommand.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1B6820930081243A02139983 /* FloodFillCommand.cpp */; };
 		F0A5A8059A9CAFA63A853D37 /* LocalPlayerInputController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B1438D1408BE048FE78171E /* LocalPlayerInputController.cpp */; };
+		F18AAC5C65473D98DE7F108E /* PlaceTileCommand.h in Sources */ = {isa = PBXBuildFile; fileRef = 78BB20C2667D073C1F6425B5 /* PlaceTileCommand.h */; };
 		F2C17A279E5E5256D4401C90 /* DataFileLoader.h in Sources */ = {isa = PBXBuildFile; fileRef = B83F90BE48846F5019309046 /* DataFileLoader.h */; };
 		F420E735CA3AE6AC068AD22E /* CommonUniforms.h in Sources */ = {isa = PBXBuildFile; fileRef = 9CC1A200C9B794A05E296C21 /* CommonUniforms.h */; };
 		F467390ABB511496E18AF585 /* SceneManager.h in Sources */ = {isa = PBXBuildFile; fileRef = 221289B3E3FA84B55F4C25E2 /* SceneManager.h */; };
 		F51ECBEA53C3E1BE870B0612 /* ShaderResource.h in Sources */ = {isa = PBXBuildFile; fileRef = 13FDFD19955883B3085E4725 /* ShaderResource.h */; };
 		F7A5A5A1C07E56B0E105A3E2 /* CoreSystemsEngine.h in Sources */ = {isa = PBXBuildFile; fileRef = 1B15A1EEB522F75EE7E24E55 /* CoreSystemsEngine.h */; };
+		F88F2CB6B1697F6FBF94618A /* MapResourceController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E4AA20F53963909E8A2A8B66 /* MapResourceController.cpp */; };
 		F9DA16800D685DE43C29BCDE /* Animations.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A4ADBD10E11C136014CDB469 /* Animations.cpp */; };
 		FA20EED994CF4C0B763D456F /* ObjectAnimationController.h in Sources */ = {isa = PBXBuildFile; fileRef = B580A197EA030F09D007D31F /* ObjectAnimationController.h */; };
 		FB01BFB8FF965282DBD762A2 /* NetworkMessages.inc in Sources */ = {isa = PBXBuildFile; fileRef = D69EC97B0CE7E31CCBB20FE5 /* NetworkMessages.inc */; };
@@ -447,6 +490,7 @@
 			files = (
 				92B0F2E92BEE230700007ABE /* SDL2.framework in Embed Frameworks */,
 				92B0F2EA2BEE230700007ABE /* SDL2_image.framework in Embed Frameworks */,
+				92F8B1C62F267EA50037B366 /* ENet.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -459,6 +503,7 @@
 			files = (
 				92B0F37A2BEE24CB00007ABE /* SDL2.framework in Embed Frameworks */,
 				92B0F37B2BEE24CB00007ABE /* SDL2_image.framework in Embed Frameworks */,
+				92F8B1C82F267EB40037B366 /* ENet.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -468,6 +513,7 @@
 /* Begin PBXFileReference section */
 		001CE6A7EB6E3DB35E9F7BDC /* NetworkCommon.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = NetworkCommon.h; sourceTree = "<group>"; };
 		0106479588E4C78D4F938113 /* DataFileLoader.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = DataFileLoader.cpp; sourceTree = "<group>"; };
+		0478D42E22A0C865D7F54E05 /* PlaceTileCommand.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = PlaceTileCommand.cpp; sourceTree = "<group>"; };
 		051E00BF71689A5C0A9F91D2 /* glew.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = glew.h; sourceTree = "<group>"; };
 		052939A977343440F86F0858 /* ResourceLoadingService.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = ResourceLoadingService.cpp; sourceTree = "<group>"; };
 		05D038A4FFCF3C5AA2E85A75 /* TextureLoader.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = TextureLoader.h; sourceTree = "<group>"; };
@@ -476,13 +522,17 @@
 		08AAC0562233A3F34613E310 /* DataFileResource.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = DataFileResource.h; sourceTree = "<group>"; };
 		0A05CE2983C7CEA1D2A25585 /* BaseDataFileDeserializer.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = BaseDataFileDeserializer.cpp; sourceTree = "<group>"; };
 		0B5602AB7CC28E6EA08AAED6 /* Version.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = Version.h; sourceTree = "<group>"; };
+		0BD39CBDAEDAA304E29EAF51 /* EditorImGuiCommands.inc */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.pascal; path = EditorImGuiCommands.inc; sourceTree = "<group>"; };
 		0D09AB023B7A329D725F2F2F /* FileUtils.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = FileUtils.h; sourceTree = "<group>"; };
 		13FDFD19955883B3085E4725 /* ShaderResource.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = ShaderResource.h; sourceTree = "<group>"; };
 		14207B709EC0713AAB9C29C8 /* ParticleManager.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = ParticleManager.cpp; sourceTree = "<group>"; };
 		1B15A1EEB522F75EE7E24E55 /* CoreSystemsEngine.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CoreSystemsEngine.h; sourceTree = "<group>"; };
+		1B6820930081243A02139983 /* FloodFillCommand.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = FloodFillCommand.cpp; sourceTree = "<group>"; };
 		2096C38A74EAF730ECCA5E36 /* MathUtils.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = MathUtils.h; sourceTree = "<group>"; };
 		221289B3E3FA84B55F4C25E2 /* SceneManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = SceneManager.h; sourceTree = "<group>"; };
 		255CBE3395586957104E385D /* ShaderLoader.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = ShaderLoader.cpp; sourceTree = "<group>"; };
+		2B240882BB9F863E16774A7E /* FloodFillCommand.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = FloodFillCommand.h; sourceTree = "<group>"; };
+		2EAD05F146251AF3CB46F31A /* IEditorCommand.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = IEditorCommand.h; sourceTree = "<group>"; };
 		30D02CEC6861EBD7441E2004 /* BaseDataFileSerializer.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = BaseDataFileSerializer.h; sourceTree = "<group>"; };
 		3199A38C1A16A070A579BAB4 /* ParticleManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = ParticleManager.h; sourceTree = "<group>"; };
 		3714C4A3B069768E05DD0199 /* SfxPlayer.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = SfxPlayer.h; sourceTree = "<group>"; };
@@ -493,6 +543,7 @@
 		43A25A1E55390D38AC6A5742 /* Logging.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = Logging.h; sourceTree = "<group>"; };
 		46BB489973B1ACFF46F552DB /* OBJMeshLoader.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = OBJMeshLoader.h; sourceTree = "<group>"; };
 		4B1438D1408BE048FE78171E /* LocalPlayerInputController.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = LocalPlayerInputController.cpp; sourceTree = "<group>"; };
+		515F478863F0B056E1D66962 /* GlobalMapDataRepository.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = GlobalMapDataRepository.cpp; sourceTree = "<group>"; };
 		53CDE03B92A8F220738E44FE /* ImageSurfaceResource.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = ImageSurfaceResource.cpp; sourceTree = "<group>"; };
 		543F0360AEBB87C61E32D84B /* ThreadSafeQueue.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = ThreadSafeQueue.h; sourceTree = "<group>"; };
 		59B053AEBDD62B4FCAB8E05D /* RenderingUtils.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = RenderingUtils.cpp; sourceTree = "<group>"; };
@@ -505,6 +556,7 @@
 		6D3F63C77D9E3CBD37931ADE /* CoreSystemsEnginePlatformImpl.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = CoreSystemsEnginePlatformImpl.cpp; sourceTree = "<group>"; };
 		6E2183A368D71198F98D6738 /* TypeTraits.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = TypeTraits.h; sourceTree = "<group>"; };
 		70EE9661089211DACFF22288 /* Camera.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = Camera.h; sourceTree = "<group>"; };
+		78BB20C2667D073C1F6425B5 /* PlaceTileCommand.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = PlaceTileCommand.h; sourceTree = "<group>"; };
 		7961514C3AA5315045E54E7E /* PlatformMacros.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = PlatformMacros.h; sourceTree = "<group>"; };
 		7AC3E452BAA560B6D8B1349E /* SoundManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = SoundManager.h; sourceTree = "<group>"; };
 		7BC4A40B354A0E76D40FBB15 /* LocalPlayerInputController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = LocalPlayerInputController.h; sourceTree = "<group>"; };
@@ -513,11 +565,13 @@
 		82DFED0E0B1AB607780AED60 /* Animations.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = Animations.h; sourceTree = "<group>"; };
 		88B55A70915E2429F0F03C71 /* MeshResource.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = MeshResource.h; sourceTree = "<group>"; };
 		8AE4C68818CCB619974358E0 /* RenderingUtils.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = RenderingUtils.h; sourceTree = "<group>"; };
+		8B2FAF8AA036DDC5591F880B /* EditorUtils.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = EditorUtils.h; path = EditorUtils.h; sourceTree = "<group>"; };
 		8D6E209DDF4F577F8C87C6A0 /* BaseDataFileDeserializer.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = BaseDataFileDeserializer.h; sourceTree = "<group>"; };
 		903005ABB6F4A9CB6247ABDC /* BaseDataFileSerializer.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = BaseDataFileSerializer.cpp; sourceTree = "<group>"; };
 		920C54042B80E41A006F6743 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
 		9233DAB12B5E760200C55555 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		925592CA2BA0B101001D7B97 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		925C86DC2958FAB8EADF1C0F /* Navmap.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = Navmap.h; sourceTree = "<group>"; };
 		926C7C1D2B7239720028766E /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		9272506A2B7D2CCC0010DF26 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		9272506C2B7D2CEF0010DF26 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
@@ -616,10 +670,13 @@
 		D8216CC78F9B7DEB0BEC7678 /* AppleSoundUtils.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = AppleSoundUtils.h; sourceTree = "<group>"; };
 		D979EC9B74F12857F47E4007 /* ImageSurfaceLoader.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = ImageSurfaceLoader.h; sourceTree = "<group>"; };
 		DDD0E1D0B63F40D725F02A35 /* MeshResource.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = MeshResource.cpp; sourceTree = "<group>"; };
+		DF8CAA6B3A0408C9E803967E /* MapResourceController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = MapResourceController.h; sourceTree = "<group>"; };
 		DFC34F8592BEA1C75C5FDA48 /* NetworkMessages.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = NetworkMessages.h; sourceTree = "<group>"; };
 		E0599E67CDFA7350C55C73A5 /* IRenderer.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = IRenderer.h; sourceTree = "<group>"; };
+		E0BC495776CFD93A861F9235 /* MapConstants.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = MapConstants.h; sourceTree = "<group>"; };
 		E0D05FD28DC001514531A214 /* TextureLoader.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = TextureLoader.cpp; sourceTree = "<group>"; };
 		E20949AA76405DC09B2C07EC /* Date.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = Date.h; sourceTree = "<group>"; };
+		E4AA20F53963909E8A2A8B66 /* MapResourceController.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = MapResourceController.cpp; sourceTree = "<group>"; };
 		E9824F6D620FAB012DF0BC78 /* AnimationManager.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = AnimationManager.cpp; sourceTree = "<group>"; };
 		EA3B9899242A079FE63DCD1E /* Camera.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = Camera.cpp; sourceTree = "<group>"; };
 		EEC2E35013E2E8B9B7A912C6 /* OSMessageBox.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = OSMessageBox.h; sourceTree = "<group>"; };
@@ -629,6 +686,7 @@
 		F16121E2A49D2514A725F7AA /* SceneObjectUtils.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = SceneObjectUtils.cpp; sourceTree = "<group>"; };
 		F2FC1889E08EEFD36C0B6476 /* AnimationManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = AnimationManager.h; sourceTree = "<group>"; };
 		F3DCD97E5C6A637C6DD4BC0B /* Fonts.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = Fonts.h; sourceTree = "<group>"; };
+		F45F5DE3D1B6D4366CA489D3 /* GlobalMapDataRepository.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = GlobalMapDataRepository.h; sourceTree = "<group>"; };
 		F701DBE1A8A6D1664BEF16A3 /* SoundManager.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = SoundManager.cpp; sourceTree = "<group>"; };
 		FB0E9FCA60AD270C9B09FA51 /* SceneObjectUtils.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = SceneObjectUtils.h; sourceTree = "<group>"; };
 		FB79D70FA4FA614F184AFE40 /* SceneManager.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = SceneManager.cpp; sourceTree = "<group>"; };
@@ -657,6 +715,7 @@
 			files = (
 				92B0F2CC2BEE230700007ABE /* SDL2_image.framework in Frameworks */,
 				92B0F2CD2BEE230700007ABE /* StoreKit.framework in Frameworks */,
+				92F8B1C52F267EA50037B366 /* ENet.framework in Frameworks */,
 				92B0F2CE2BEE230700007ABE /* AudioToolbox.framework in Frameworks */,
 				92B0F2CF2BEE230700007ABE /* AppKit.framework in Frameworks */,
 				92B0F2D02BEE230700007ABE /* OpenGL.framework in Frameworks */,
@@ -672,6 +731,7 @@
 			files = (
 				92B0F35D2BEE24CB00007ABE /* SDL2_image.framework in Frameworks */,
 				92B0F35E2BEE24CB00007ABE /* StoreKit.framework in Frameworks */,
+				92F8B1C72F267EB40037B366 /* ENet.framework in Frameworks */,
 				92B0F35F2BEE24CB00007ABE /* AudioToolbox.framework in Frameworks */,
 				92B0F3602BEE24CB00007ABE /* AppKit.framework in Frameworks */,
 				92B0F3612BEE24CB00007ABE /* OpenGL.framework in Frameworks */,
@@ -684,6 +744,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		15C4DECD7FA4AB1322588C95 /* commands */ = {
+			isa = PBXGroup;
+			children = (
+				0478D42E22A0C865D7F54E05 /* PlaceTileCommand.cpp */,
+				1B6820930081243A02139983 /* FloodFillCommand.cpp */,
+				2EAD05F146251AF3CB46F31A /* IEditorCommand.h */,
+				2B240882BB9F863E16774A7E /* FloodFillCommand.h */,
+				78BB20C2667D073C1F6425B5 /* PlaceTileCommand.h */,
+			);
+			path = commands;
+			sourceTree = "<group>";
+		};
 		1B447CE9E764CFC91F9368BE /* net_common */ = {
 			isa = PBXGroup;
 			children = (
@@ -784,6 +856,9 @@
 			children = (
 				A49D33C4F1B1DC1C02DB9E05 /* Editor.cpp */,
 				AB2400E817D39628656BEFF1 /* Editor.h */,
+				15C4DECD7FA4AB1322588C95 /* commands */,
+				0BD39CBDAEDAA304E29EAF51 /* EditorImGuiCommands.inc */,
+				8B2FAF8AA036DDC5591F880B /* EditorUtils.h */,
 			);
 			path = editor;
 			sourceTree = "<group>";
@@ -880,6 +955,7 @@
 				928B0C1A2B5C3C850025DF3F /* main.cpp */,
 				9C9C1F62F9CB94CF74AD4252 /* engine */,
 				8E4514132075279E3493D1F6 /* editor */,
+				C4DB7795784124FFEE9FBD88 /* map */,
 			);
 			name = source_common;
 			path = ../../source_common;
@@ -1124,6 +1200,18 @@
 			path = glew;
 			sourceTree = "<group>";
 		};
+		C4DB7795784124FFEE9FBD88 /* map */ = {
+			isa = PBXGroup;
+			children = (
+				E4AA20F53963909E8A2A8B66 /* MapResourceController.cpp */,
+				515F478863F0B056E1D66962 /* GlobalMapDataRepository.cpp */,
+				F45F5DE3D1B6D4366CA489D3 /* GlobalMapDataRepository.h */,
+				DF8CAA6B3A0408C9E803967E /* MapResourceController.h */,
+				E0BC495776CFD93A861F9235 /* MapConstants.h */,
+			);
+			path = map;
+			sourceTree = "<group>";
+		};
 		D96281C7720CC0470C671734 /* input */ = {
 			isa = PBXGroup;
 			children = (
@@ -1139,6 +1227,7 @@
 				DFC34F8592BEA1C75C5FDA48 /* NetworkMessages.h */,
 				D69EC97B0CE7E31CCBB20FE5 /* NetworkMessages.inc */,
 				001CE6A7EB6E3DB35E9F7BDC /* NetworkCommon.h */,
+				925C86DC2958FAB8EADF1C0F /* Navmap.h */,
 			);
 			path = net_common;
 			sourceTree = "<group>";
@@ -1443,6 +1532,19 @@
 				F0A5A8059A9CAFA63A853D37 /* LocalPlayerInputController.cpp in Sources */,
 				DA375BD3C40B8AE1FBC1D705 /* LocalPlayerInputController.h in Sources */,
 				97077022B2BEC6176F7D03CC /* NetworkCommon.h in Sources */,
+				52332D83781E322C4C821B3F /* PlaceTileCommand.cpp in Sources */,
+				B6D53143F3EB9D75D4D2E438 /* FloodFillCommand.cpp in Sources */,
+				9B41B0A24BF56BB9C156F3F5 /* EditorImGuiCommands.inc in Sources */,
+				B5C774E0AD01FCF847C354D4 /* IEditorCommand.h in Sources */,
+				DEE695007A5AA0D113CCC91C /* FloodFillCommand.h in Sources */,
+				F18AAC5C65473D98DE7F108E /* PlaceTileCommand.h in Sources */,
+				C51D78BFA26CDF84603ED0CC /* MapResourceController.cpp in Sources */,
+				7F4E1CF68DBCEAAD5E2BE42E /* GlobalMapDataRepository.cpp in Sources */,
+				977E77334E4D8562D90A6E89 /* GlobalMapDataRepository.h in Sources */,
+				647C5658B31642D5BFA0D50F /* MapResourceController.h in Sources */,
+				399C52BB9CE11FA48B740674 /* MapConstants.h in Sources */,
+				BE6917AF2A437E9ABB02FDCB /* Navmap.h in Sources */,
+				B0F4E2ADA4E9E92ADD81A0C9 /* EditorUtils.h in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1559,6 +1661,19 @@
 				28390BD5156136B5DEE39871 /* LocalPlayerInputController.cpp in Sources */,
 				CDE612C365A4F0EAE74D2542 /* LocalPlayerInputController.h in Sources */,
 				EB260157021BAEBC7EC82B4C /* NetworkCommon.h in Sources */,
+				D0E195A4C826B47F52BF4585 /* PlaceTileCommand.cpp in Sources */,
+				F01DDCE30B7B20953E17A5C1 /* FloodFillCommand.cpp in Sources */,
+				0F087FF77E200BB2CDE3542F /* EditorImGuiCommands.inc in Sources */,
+				7AA5A56C99FE8072E54DEE6D /* IEditorCommand.h in Sources */,
+				C9BB273A7C1615F295F75D38 /* FloodFillCommand.h in Sources */,
+				54B243ECB30BFD460FF4D2AE /* PlaceTileCommand.h in Sources */,
+				F88F2CB6B1697F6FBF94618A /* MapResourceController.cpp in Sources */,
+				A785EC7727422726A481140E /* GlobalMapDataRepository.cpp in Sources */,
+				2D24B2B9525B1C8371666994 /* GlobalMapDataRepository.h in Sources */,
+				76409D12E43A0CD0BF3657CA /* MapResourceController.h in Sources */,
+				4EA48195EEE2DADD4C171E2B /* MapConstants.h in Sources */,
+				EB479C93C5F132D99BFB4C3A /* Navmap.h in Sources */,
+				83A90E3E16EF14711D5DEE25 /* EditorUtils.h in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1675,6 +1790,19 @@
 				3257278F32615EE218889DC7 /* LocalPlayerInputController.cpp in Sources */,
 				D77F8AC18F3C63C5013F3919 /* LocalPlayerInputController.h in Sources */,
 				16CB4F28D6AE2B9BEFDE3CC4 /* NetworkCommon.h in Sources */,
+				EA2AF4FF81063646BE798528 /* PlaceTileCommand.cpp in Sources */,
+				C9CC731B9056836006E1089C /* FloodFillCommand.cpp in Sources */,
+				C8154680425476D4C713A339 /* EditorImGuiCommands.inc in Sources */,
+				0B1F2B8743E89659ACE8E3D9 /* IEditorCommand.h in Sources */,
+				6D111656CC54E42296E2BA41 /* FloodFillCommand.h in Sources */,
+				00AA26FEC0D0668DE3C4B9CF /* PlaceTileCommand.h in Sources */,
+				2CDAAB19A1719A708B311A1C /* MapResourceController.cpp in Sources */,
+				307F565662A9BE31E63577BE /* GlobalMapDataRepository.cpp in Sources */,
+				80F1BBA35BCDE6D3AC738C66 /* GlobalMapDataRepository.h in Sources */,
+				A233F63DA56CC244C9A3783C /* MapResourceController.h in Sources */,
+				EBAAD63C2C9D30771BB8CD7C /* MapConstants.h in Sources */,
+				E84BE09557498B106A5C1C22 /* Navmap.h in Sources */,
+				B888F9E922D728F18B1F61FA /* EditorUtils.h in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1931,7 +2059,10 @@
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = XS89APN396;
 				ENABLE_HARDENED_RUNTIME = YES;
-				FRAMEWORK_SEARCH_PATHS = /Library/Developer/;
+				FRAMEWORK_SEARCH_PATHS = (
+					/Library/Developer/,
+					"\"$(SRCROOT)/../../lib/enet/1.3.18/\"",
+				);
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -1951,6 +2082,7 @@
 					/Users/Code/TinyMMOClient/lib/json,
 					/Users/Code/TinyMMOClient/lib/glm,
 					/Users/Code/TinyMMOClient/lib/googletest/googletest/include/,
+					/Users/Code/TinyMMOClient/lib/enet/1.3.18/include,
 				);
 				INFOPLIST_FILE = "TinyMMOClientMac copy-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = TinyMMOClient;
@@ -1996,7 +2128,10 @@
 					"/Users/Code/TinyMMOClient/source_common/imgui/*/*/*",
 					"/Users/Code/TinyMMOClient/source_test/*/*",
 				);
-				FRAMEWORK_SEARCH_PATHS = /Library/Developer/;
+				FRAMEWORK_SEARCH_PATHS = (
+					/Library/Developer/,
+					"\"$(SRCROOT)/../../lib/enet/1.3.18/\"",
+				);
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_PREPROCESSOR_DEFINITIONS = "NDEBUG=1";
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
@@ -2010,6 +2145,7 @@
 					"/opt/homebrew/include/SDL2/**",
 					/Users/Code/TinyMMOClient/lib/glm,
 					/Users/Code/TinyMMOClient/lib/json,
+					/Users/Code/TinyMMOClient/lib/enet/1.3.18/include,
 				);
 				INFOPLIST_FILE = "TinyMMOClientMac copy-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = TinyMMOClient;
@@ -2045,7 +2181,10 @@
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = XS89APN396;
 				ENABLE_HARDENED_RUNTIME = YES;
-				FRAMEWORK_SEARCH_PATHS = /Library/Developer/;
+				FRAMEWORK_SEARCH_PATHS = (
+					/Library/Developer/,
+					"\"$(SRCROOT)/../../lib/enet/1.3.18/\"",
+				);
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -2066,6 +2205,7 @@
 					/Users/Code/TinyMMOClient/lib/json,
 					/Users/Code/TinyMMOClient/lib/glm,
 					/Users/Code/TinyMMOClient/lib/googletest/googletest/include/,
+					/Users/Code/TinyMMOClient/lib/enet/1.3.18/include,
 				);
 				INFOPLIST_FILE = "TinyMMOClientMac copy2-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = TinyMMOClient;
@@ -2111,7 +2251,10 @@
 					"/Users/Code/TinyMMOClient/source_common/imgui/*/*/*",
 					"/Users/Code/TinyMMOClient/source_test/*/*",
 				);
-				FRAMEWORK_SEARCH_PATHS = /Library/Developer/;
+				FRAMEWORK_SEARCH_PATHS = (
+					/Library/Developer/,
+					"\"$(SRCROOT)/../../lib/enet/1.3.18/\"",
+				);
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"USE_EDITOR=1",
@@ -2129,6 +2272,7 @@
 					"/opt/homebrew/include/SDL2/**",
 					/Users/Code/TinyMMOClient/lib/glm,
 					/Users/Code/TinyMMOClient/lib/json,
+					/Users/Code/TinyMMOClient/lib/enet/1.3.18/include,
 				);
 				INFOPLIST_FILE = "TinyMMOClientMac copy2-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = TinyMMOClient;
