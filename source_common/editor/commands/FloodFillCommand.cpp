@@ -50,8 +50,7 @@ FloodFillCommand::FloodFillCommand(std::shared_ptr<scene::Scene> scene, std::sha
                     
                 case map_constants::LayerType::NAVMAP:
                 {
-                    tileNamePostfix = "_navmap";
-                    tileCoordsString = tileCoordsString.substr(0, tileCoordsString.find(tileNamePostfix));
+                    assert(false);
                 } break;
         
                 default: break;
@@ -95,7 +94,7 @@ void FloodFillCommand::VExecute()
     for (auto tile: mAffectedTiles)
     {
         tile->mTextureResourceId = mNewTextureResourceId;
-        editor_utils::SetTilesetUVs(tile, mNewTilesetCoords, mTileUVSize);
+        editor_utils::SetNormalTileUniforms(tile, mNewTilesetCoords, mTileUVSize);
     }
 }
 
@@ -106,7 +105,7 @@ void FloodFillCommand::VUndo()
     for (auto tile: mAffectedTiles)
     {
         tile->mTextureResourceId = mOldTextureResourceId;
-        editor_utils::SetTilesetUVs(tile, mOldTilesetCoords, mTileUVSize);
+        editor_utils::SetNormalTileUniforms(tile, mOldTilesetCoords, mTileUVSize);
     }
 }
 

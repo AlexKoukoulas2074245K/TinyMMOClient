@@ -7,6 +7,8 @@
 
 #include <editor/commands/FloodFillCommand.h>
 #include <editor/commands/PlaceTileCommand.h>
+#include <editor/commands/NavmapTileTypeFloodFillCommand.h>
+#include <editor/commands/PlaceNavmapTileTypeCommand.h>
 #include <editor/EditorUtils.h>
 #include <engine/CoreSystemsEngine.h>
 #include <engine/input/IInputStateManager.h>
@@ -47,12 +49,6 @@
 
 static const strutils::StringId EDITOR_SCENE = strutils::StringId("editor_scene");
 static const strutils::StringId TILE_HIGHLIGHTED_UNIFORM_NAME = strutils::StringId("highlighted");
-static const strutils::StringId TILE_IS_NAVMAP_TILE_UNIFORM_NAME = strutils::StringId("is_navmap_tile");
-static const strutils::StringId TILE_NAVMAP_TILE_TYPE_UNIFORM_NAME = strutils::StringId("navmap_tile_type");
-static const strutils::StringId TILE_NAVMAP_TILE_COLOR_R_UNIFORM_NAME = strutils::StringId("navmap_tile_color_r");
-static const strutils::StringId TILE_NAVMAP_TILE_COLOR_G_UNIFORM_NAME = strutils::StringId("navmap_tile_color_g");
-static const strutils::StringId TILE_NAVMAP_TILE_COLOR_B_UNIFORM_NAME = strutils::StringId("navmap_tile_color_b");
-static const strutils::StringId TILE_NAVMAP_TILE_COLOR_A_UNIFORM_NAME = strutils::StringId("navmap_tile_color_a");
 static const strutils::StringId TOP_REF_IMAGE_SCENE_OBJECT_NAME = strutils::StringId("top_ref_image");
 static const strutils::StringId RIGHT_REF_IMAGE_SCENE_OBJECT_NAME = strutils::StringId("right_ref_image");
 static const strutils::StringId BOTTOM_REF_IMAGE_SCENE_OBJECT_NAME = strutils::StringId("bottom_ref_image");
@@ -96,24 +92,6 @@ static const glm::vec3 TILE_DEFAULT_SCALE = glm::vec3(TILE_SIZE);
 
 ///------------------------------------------------------------------------------------------------
 
-inline void SetTileUniforms(std::shared_ptr<scene::SceneObject> tile, const glm::ivec2& coords)
-{
-    editor_utils::SetTilesetUVs(tile, coords, TILE_UV_SIZE);
-    
-    // Here we are using the TILE_NAVMAP_TILE_TYPE_UNIFORM_NAME uniform as an optional container
-    // for the tile's navmap type and then translate it into the respective defined color
-    if (tile->mShaderIntUniformValues.contains(TILE_NAVMAP_TILE_TYPE_UNIFORM_NAME))
-    {
-        auto navmapTileTypeColor = networking::GetColorFromNavmapTileType(static_cast<networking::NavmapTileType>(tile->mShaderIntUniformValues.at(TILE_NAVMAP_TILE_TYPE_UNIFORM_NAME)));
-        tile->mShaderFloatUniformValues[TILE_NAVMAP_TILE_COLOR_R_UNIFORM_NAME] = navmapTileTypeColor.r/255.0f;
-        tile->mShaderFloatUniformValues[TILE_NAVMAP_TILE_COLOR_G_UNIFORM_NAME] = navmapTileTypeColor.g/255.0f;
-        tile->mShaderFloatUniformValues[TILE_NAVMAP_TILE_COLOR_B_UNIFORM_NAME] = navmapTileTypeColor.b/255.0f;
-        tile->mShaderFloatUniformValues[TILE_NAVMAP_TILE_COLOR_A_UNIFORM_NAME] = navmapTileTypeColor.a/255.0f;
-    }
-}
-
-///------------------------------------------------------------------------------------------------
-
 Editor::Editor(const int argc, char** argv)
     : mTopImageRefIndex(0)
     , mRightImageRefIndex(0)
@@ -153,14 +131,18 @@ void Editor::Init()
 
     BLANK_TILE_DATA.mTilesetName = BASE_TILESET_NAME;
     BLANK_TILE_DATA.mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + TILESETS_FOLDER + BASE_TILESET_NAME + ".png");
+    BLANK_TILE_DATA.mTextureId = systemsEngine.GetResourceLoadingService().GetResource<resources::TextureResource>(BLANK_TILE_DATA.mTextureResourceId).GetGLTextureId();
     BLANK_TILE_DATA.mTileCoords = {0, 0};
     
     BLANK_TRANSPARENT_TILE_DATA.mTilesetName = BASE_TILESET_NAME;
-    BLANK_TRANSPARENT_TILE_DATA.mTextureResourceId =  BLANK_TILE_DATA.mTextureResourceId;
+    BLANK_TRANSPARENT_TILE_DATA.mTextureResourceId = BLANK_TILE_DATA.mTextureResourceId;
+    BLANK_TRANSPARENT_TILE_DATA.mTextureId = BLANK_TILE_DATA.mTextureId;
     BLANK_TRANSPARENT_TILE_DATA.mTileCoords = {0, 1};
     
     mSelectedPaletteIndex = 0;
     mSelectedPaletteTile = 0;
+    mSelectedNavmapTileType = networking::NavmapTileType::WALKABLE;
+
     mViewOptions.mCameraZoom = scene->GetCamera().GetZoomFactor();
     mViewOptions.mCameraPosition = scene->GetCamera().GetPosition();
     CreateMap(DEFAULT_GRID_ROWS, DEFAULT_GRID_COLS);
@@ -244,17 +226,35 @@ void Editor::Update(const float dtMillis)
         {
             const auto& selectedPaletteTile = mPaletteTileData[mSelectedPaletteIndex][mSelectedPaletteTile];
             
-            switch (mPaintingToolType)
+            if (mActiveLayer != map_constants::LayerType::NAVMAP)
             {
-                case PaintingToolType::PENCIL: TryExecuteCommand(std::make_unique<commands::PlaceTileCommand>(highlightedTileCandidates.front(), selectedPaletteTile.mTileCoords, selectedPaletteTile.mTextureResourceId, TILE_UV_SIZE)); break;
-                case PaintingToolType::BUCKET: TryExecuteCommand(std::make_unique<commands::FloodFillCommand>(scene, highlightedTileCandidates.front(), mActiveLayer, selectedPaletteTile.mTileCoords, selectedPaletteTile.mTextureResourceId, TILE_UV_SIZE)); break;
+                switch (mPaintingToolType)
+                {
+                    case PaintingToolType::PENCIL: TryExecuteCommand(std::make_unique<commands::PlaceTileCommand>(highlightedTileCandidates.front(), selectedPaletteTile.mTileCoords, selectedPaletteTile.mTextureResourceId, TILE_UV_SIZE)); break;
+                    case PaintingToolType::BUCKET: TryExecuteCommand(std::make_unique<commands::FloodFillCommand>(scene, highlightedTileCandidates.front(), mActiveLayer, selectedPaletteTile.mTileCoords, selectedPaletteTile.mTextureResourceId, TILE_UV_SIZE)); break;
+                }
+            }
+            else
+            {
+                switch (mPaintingToolType)
+                {
+                    case PaintingToolType::PENCIL: TryExecuteCommand(std::make_unique<commands::PlaceNavmapTileTypeCommand>(highlightedTileCandidates.front(), mSelectedNavmapTileType)); break;
+                    case PaintingToolType::BUCKET: TryExecuteCommand(std::make_unique<commands::NavmapTileTypeFloodFillCommand>(scene, highlightedTileCandidates.front(), mSelectedNavmapTileType)); break;
+                }
             }
             
         }
         // "Eraser" button, assuming bottom layer blank in index 0 and top layer blank in index 1
         else if (inputStateManager.VButtonPressed(input::Button::SECONDARY_BUTTON))
         {
-            TryExecuteCommand(std::make_unique<commands::PlaceTileCommand>(highlightedTileCandidates.front(), mActiveLayer == map_constants::LayerType::BOTTOM_LAYER ? BLANK_TILE_DATA.mTileCoords : BLANK_TRANSPARENT_TILE_DATA.mTileCoords, mActiveLayer == map_constants::LayerType::BOTTOM_LAYER ? BLANK_TILE_DATA.mTextureResourceId : BLANK_TRANSPARENT_TILE_DATA.mTextureResourceId, TILE_UV_SIZE));
+            if (mActiveLayer != map_constants::LayerType::NAVMAP)
+            {
+                TryExecuteCommand(std::make_unique<commands::PlaceTileCommand>(highlightedTileCandidates.front(), mActiveLayer == map_constants::LayerType::BOTTOM_LAYER ? BLANK_TILE_DATA.mTileCoords : BLANK_TRANSPARENT_TILE_DATA.mTileCoords, mActiveLayer == map_constants::LayerType::BOTTOM_LAYER ? BLANK_TILE_DATA.mTextureResourceId : BLANK_TRANSPARENT_TILE_DATA.mTextureResourceId, TILE_UV_SIZE));
+            }
+            else
+            {
+                TryExecuteCommand(std::make_unique<commands::PlaceNavmapTileTypeCommand>(highlightedTileCandidates.front(), networking::NavmapTileType::WALKABLE));
+            }
         }
     }
  
@@ -373,9 +373,8 @@ void Editor::CreateMap(const int gridRows, const int gridCols)
                 tile->mPosition.z = map_constants::TILE_BOTTOM_LAYER_Z;
                 tile->mScale = TILE_DEFAULT_SCALE;
                 tile->mTextureResourceId = BLANK_TILE_DATA.mTextureResourceId;
-                tile->mShaderIntUniformValues[TILE_IS_NAVMAP_TILE_UNIFORM_NAME] = false;
                 tile->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + EDITOR_MAP_TILE_SHADER);
-                SetTileUniforms(tile, BLANK_TILE_DATA.mTileCoords);
+                editor_utils::SetNormalTileUniforms(tile, BLANK_TILE_DATA.mTileCoords, TILE_UV_SIZE);
             }
             
             {
@@ -385,9 +384,8 @@ void Editor::CreateMap(const int gridRows, const int gridCols)
                 topLayerTile->mPosition.z = map_constants::TILE_TOP_LAYER_Z;
                 topLayerTile->mScale = TILE_DEFAULT_SCALE;
                 topLayerTile->mTextureResourceId = BLANK_TRANSPARENT_TILE_DATA.mTextureResourceId;
-                topLayerTile->mShaderIntUniformValues[TILE_IS_NAVMAP_TILE_UNIFORM_NAME] = false;
                 topLayerTile->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + EDITOR_MAP_TILE_SHADER);
-                SetTileUniforms(topLayerTile, BLANK_TRANSPARENT_TILE_DATA.mTileCoords);
+                editor_utils::SetNormalTileUniforms(topLayerTile, BLANK_TRANSPARENT_TILE_DATA.mTileCoords, TILE_UV_SIZE);
             }
             
             {
@@ -397,9 +395,8 @@ void Editor::CreateMap(const int gridRows, const int gridCols)
                 navmapTile->mPosition.z = map_constants::TILE_NAVMAP_LAYER_Z;
                 navmapTile->mScale = TILE_DEFAULT_SCALE;
                 navmapTile->mShaderIntUniformValues[TILE_NAVMAP_TILE_TYPE_UNIFORM_NAME] = static_cast<int>(networking::NavmapTileType::WALKABLE);
-                navmapTile->mShaderIntUniformValues[TILE_IS_NAVMAP_TILE_UNIFORM_NAME] = true;
                 navmapTile->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + EDITOR_MAP_TILE_SHADER);
-                SetTileUniforms(navmapTile, glm::ivec2(0));
+                editor_utils::SetNavmapTileUniforms(navmapTile);
             }
         }
     }
@@ -1144,39 +1141,82 @@ void Editor::CreateDebugWidgets()
         ImGui::SameLine();
         ImGui::Text("Available Tilesets");
         
-        ImGui::Text("Selected Tile: %d,%d", mPaletteTileData[mSelectedPaletteIndex][mSelectedPaletteTile].mTileCoords.x, mPaletteTileData[mSelectedPaletteIndex][mSelectedPaletteTile].mTileCoords.y);
         
-        for (int row = 0; row < TILESET_SIZE/TILESET_TILE_SIZE; row++)
+        if (mActiveLayer == map_constants::LayerType::NAVMAP)
         {
-            for (int col = 0; col < TILESET_SIZE/TILESET_TILE_SIZE; col++)
+            ImGui::Text("Selected Tile: %s", networking::GetNavmapTileTypeName(static_cast<networking::NavmapTileType>(mSelectedNavmapTileType)));
+
+            for (int i = 0; i < static_cast<int>(networking::NavmapTileType::COUNT); ++i)
             {
-                if (col > 0)
+                if ((i % (TILESET_SIZE/TILESET_TILE_SIZE)) != 0)
                 {
                     ImGui::SameLine();
                 }
                 
-                auto tileIndex = row * (TILESET_SIZE/TILESET_TILE_SIZE) + col;
-                std::string tileName = std::to_string(row) + "," + std::to_string(col);
-                auto tileTextureId = tileIndex >= mPaletteTileData[mSelectedPaletteIndex].size() ? 0 : mPaletteTileData[mSelectedPaletteIndex][tileIndex].mTextureId;
-                
-                ImGui::PushID(tileIndex);
-                
-                if (tileTextureId)
+                auto navmapColor = networking::GetColorFromNavmapTileType(static_cast<networking::NavmapTileType>(i));
+                if (static_cast<networking::NavmapTileType>(i) == networking::NavmapTileType::WALKABLE)
                 {
-                    ImVec4 bgCol = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
-                    ImVec4 tintCol = mSelectedPaletteTile == tileIndex ? ImVec4(1.0f, 1.0f, 1.0f, 1.0f) : ImVec4(0.7f, 0.7f, 0.7f, 0.7f);
-                    
-                    ImVec2 minUVs(mPaletteTileData[mSelectedPaletteIndex][tileIndex].mTileCoords.g * TILE_UV_SIZE, 1.0f - ((TILESET_SIZE/TILESET_TILE_SIZE - 1 - mPaletteTileData[mSelectedPaletteIndex][tileIndex].mTileCoords.r) + 1) * TILE_UV_SIZE);
-                    ImVec2 maxUVs((mPaletteTileData[mSelectedPaletteIndex][tileIndex].mTileCoords.g + 1) * TILE_UV_SIZE, 1.0f - (TILESET_SIZE/TILESET_TILE_SIZE - 1 - mPaletteTileData[mSelectedPaletteIndex][tileIndex].mTileCoords.r) * TILE_UV_SIZE);
-                    
-                    if (ImGui::ImageButton(tileName.c_str(), reinterpret_cast<void*>(tileTextureId), ImVec2(48.0f, 48.0f), minUVs, maxUVs, bgCol, tintCol))
-                    {
-                        mSelectedPaletteTile = tileIndex;
-                    }
+                    // Distinguish walkable from solid in the ImGUI background
+                    navmapColor = glm::ivec4(255.0f, 255.0f, 255.0f, 255.0f);
                 }
                 
+                auto tileIndex = i;
+                std::string tileName = std::to_string(i);
                 
+                ImGui::PushID(tileIndex);
+                ImVec4 bgCol = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+                ImVec4 tintCol = mSelectedPaletteTile == tileIndex ?
+                    ImVec4(navmapColor.r/255.0f, navmapColor.g/255.0f, navmapColor.b/255.0f, navmapColor.a/255.0f) :
+                    ImVec4(navmapColor.r/400.0f, navmapColor.g/400.0f, navmapColor.b/400.0f, navmapColor.a/400.0f);
+                
+                ImVec2 minUVs(0, 1.0f - ((TILESET_SIZE/TILESET_TILE_SIZE - 1) + 1) * TILE_UV_SIZE);
+                ImVec2 maxUVs(TILE_UV_SIZE, 1.0f - (TILESET_SIZE/TILESET_TILE_SIZE - 1) * TILE_UV_SIZE);
+                
+                if (ImGui::ImageButton(tileName.c_str(), reinterpret_cast<void*>(BLANK_TILE_DATA.mTextureId), ImVec2(48.0f, 48.0f), minUVs, maxUVs, bgCol, tintCol))
+                {
+                    mSelectedNavmapTileType = static_cast<networking::NavmapTileType>(i);
+                    mSelectedPaletteTile = tileIndex;
+                }
                 ImGui::PopID();
+            }
+            
+        }
+        else
+        {
+            ImGui::Text("Selected Tile: %d,%d", mPaletteTileData[mSelectedPaletteIndex][mSelectedPaletteTile].mTileCoords.x, mPaletteTileData[mSelectedPaletteIndex][mSelectedPaletteTile].mTileCoords.y);
+
+            for (int row = 0; row < TILESET_SIZE/TILESET_TILE_SIZE; row++)
+            {
+                for (int col = 0; col < TILESET_SIZE/TILESET_TILE_SIZE; col++)
+                {
+                    if (col > 0)
+                    {
+                        ImGui::SameLine();
+                    }
+                    
+                    auto tileIndex = row * (TILESET_SIZE/TILESET_TILE_SIZE) + col;
+                    std::string tileName = std::to_string(row) + "," + std::to_string(col);
+                    auto tileTextureId = tileIndex >= mPaletteTileData[mSelectedPaletteIndex].size() ? 0 : mPaletteTileData[mSelectedPaletteIndex][tileIndex].mTextureId;
+                    
+                    ImGui::PushID(tileIndex);
+                    
+                    if (tileTextureId)
+                    {
+                        ImVec4 bgCol = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+                        ImVec4 tintCol = mSelectedPaletteTile == tileIndex ? ImVec4(1.0f, 1.0f, 1.0f, 1.0f) : ImVec4(0.7f, 0.7f, 0.7f, 0.7f);
+                        
+                        ImVec2 minUVs(mPaletteTileData[mSelectedPaletteIndex][tileIndex].mTileCoords.g * TILE_UV_SIZE, 1.0f - ((TILESET_SIZE/TILESET_TILE_SIZE - 1 - mPaletteTileData[mSelectedPaletteIndex][tileIndex].mTileCoords.r) + 1) * TILE_UV_SIZE);
+                        ImVec2 maxUVs((mPaletteTileData[mSelectedPaletteIndex][tileIndex].mTileCoords.g + 1) * TILE_UV_SIZE, 1.0f - (TILESET_SIZE/TILESET_TILE_SIZE - 1 - mPaletteTileData[mSelectedPaletteIndex][tileIndex].mTileCoords.r) * TILE_UV_SIZE);
+                        
+                        if (ImGui::ImageButton(tileName.c_str(), reinterpret_cast<void*>(tileTextureId), ImVec2(48.0f, 48.0f), minUVs, maxUVs, bgCol, tintCol))
+                        {
+                            mSelectedPaletteTile = tileIndex;
+                        }
+                    }
+                    
+                    
+                    ImGui::PopID();
+                }
             }
         }
         
@@ -1206,6 +1246,7 @@ void Editor::CreateDebugWidgets()
             if (ImGui::RadioButton(layerName.c_str(), &layerIndex, i))
             {
                 mActiveLayer = static_cast<map_constants::LayerType>(layerIndex);
+                logging::LogInfo("Active layer now: %s", layerName.c_str());
             }
             
             ImGui::SameLine();

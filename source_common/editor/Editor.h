@@ -17,6 +17,7 @@
 #include <engine/utils/MathUtils.h>
 #include <engine/utils/StringUtils.h>
 #include <map/MapConstants.h>
+#include <net_common/Navmap.h>
 #include <vector>
 #include <stack>
 
@@ -80,7 +81,7 @@ private:
     int mBottomImageRefIndex;
     int mLeftImageRefIndex;
     int mActivePanel;
-  
+    networking::NavmapTileType mSelectedNavmapTileType;
     std::vector<std::vector<MapTileData>> mPaletteTileData;
     std::stack<std::unique_ptr<commands::IEditorCommand>> mExecutedCommandHistory;
     ViewOptions mViewOptions;

@@ -31,7 +31,7 @@ PlaceTileCommand::PlaceTileCommand(std::shared_ptr<scene::SceneObject> targetTil
 void PlaceTileCommand::VExecute()
 {
     mTargetTileSceneObject->mTextureResourceId = mNewTextureResourceId;
-    editor_utils::SetTilesetUVs(mTargetTileSceneObject, mNewTilesetCoords, mTileUVSize);
+    editor_utils::SetNormalTileUniforms(mTargetTileSceneObject, mNewTilesetCoords, mTileUVSize);
 }
 
 ///------------------------------------------------------------------------------------------------
@@ -39,7 +39,7 @@ void PlaceTileCommand::VExecute()
 void PlaceTileCommand::VUndo()
 {
     mTargetTileSceneObject->mTextureResourceId = mOldTextureResourceId;
-    editor_utils::SetTilesetUVs(mTargetTileSceneObject, mOldTilesetCoords, mTileUVSize);
+    editor_utils::SetNormalTileUniforms(mTargetTileSceneObject, mOldTilesetCoords, mTileUVSize);
 }
 
 ///------------------------------------------------------------------------------------------------
