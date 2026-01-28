@@ -54,14 +54,12 @@ static const strutils::StringId RIGHT_REF_IMAGE_SCENE_OBJECT_NAME = strutils::St
 static const strutils::StringId BOTTOM_REF_IMAGE_SCENE_OBJECT_NAME = strutils::StringId("bottom_ref_image");
 static const strutils::StringId LEFT_REF_IMAGE_SCENE_OBJECT_NAME = strutils::StringId("left_ref_image");
 
-static const std::string NON_SANDBOXED_MAP_GLOBAL_DATA_PATH = "/Users/Code/TinyMMOClient/assets/data/world/map_global_data.json";
-static const std::string NON_SANDBOXED_MAPS_FOLDER = "/Users/Code/TinyMMOClient/assets/data/world/maps/";
+static const std::string NON_SANDBOXED_MAPS_FOLDER = "/Users/Code/TinyMMOClient/assets/data/editor/maps/";
 static const std::string NON_SANDBOXED_MAP_TEXTURES_FOLDER = "/Users/Code/TinyMMOClient/assets/textures/world/maps/";
-static const std::string NON_SANDBOXED_NET_ASSETS_MAP_GLOBAL_DATA_PATH = "/Users/Code/TinyMMOClient/source_net_common/net_assets/data/map_global_data.json";
+static const std::string NON_SANDBOXED_NET_ASSETS_MAP_GLOBAL_DATA_PATH = "/Users/Code/TinyMMOClient/source_net_common/net_assets/map_global_data.json";
 static const std::string NON_SANDBOXED_NET_ASSETS_NAVMAPS_FOLDER = "/Users/Code/TinyMMOClient/source_net_common/net_assets/navmaps/";
 
 #if defined(USE_IMGUI)
-static const std::string ENTRY_MAP_NAME = "entry_map.json";
 static const std::string MAP_FILES_FOLDER = "world/maps/";
 #endif
 
@@ -447,6 +445,29 @@ void Editor::CreateDebugWidgets()
     static std::unordered_map<std::string, std::unordered_map<std::string, std::pair<int, std::string>>> sMapConnections;
     static int sDimensionsX = DEFAULT_GRID_COLS;
     static int sDimensionsY = DEFAULT_GRID_ROWS;
+    static std::vector<std::pair<std::string, resources::ResourceId>> paletteNamesAndTextures;
+    static int sSelectedExportEntryMapIndex = 0;
+
+    if (mPaletteTileData.empty() && paletteNamesAndTextures.empty())
+    {
+        auto mapTilesetFileNames = fileutils::GetAllFilenamesAndFolderNamesInDirectory(resources::ResourceLoadingService::RES_TEXTURES_ROOT + TILESETS_FOLDER);
+        
+        for (const auto& mapTilesetFileName: mapTilesetFileNames)
+        {
+            auto loadedResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + TILESETS_FOLDER + mapTilesetFileName);
+            const auto& tileTextureResource = CoreSystemsEngine::GetInstance().GetResourceLoadingService().GetResource<resources::TextureResource>(loadedResourceId);
+            paletteNamesAndTextures.emplace_back(strutils::StringSplit(mapTilesetFileName, '.').front(), loadedResourceId);
+            
+            mPaletteTileData.emplace_back();
+            for (int row = 0; row < TILESET_SIZE/TILESET_TILE_SIZE; ++row)
+            {
+                for (int col = 0; col < TILESET_SIZE/TILESET_TILE_SIZE; ++col)
+                {
+                    mPaletteTileData.back().push_back({ mapTilesetFileName, glm::ivec2(row, col), loadedResourceId, tileTextureResource.GetGLTextureId() });
+                }
+            }
+        }
+    }
     
     auto RefreshGlobalMapFilesLambda = [&]()
     {
@@ -485,7 +506,7 @@ void Editor::CreateDebugWidgets()
             sMapConnections[mapFileNameConnection]["left"] = std::make_pair(0, "None");
         }
         
-        std::ifstream globalMapDataFile(NON_SANDBOXED_MAP_GLOBAL_DATA_PATH);
+        std::ifstream globalMapDataFile(NON_SANDBOXED_NET_ASSETS_MAP_GLOBAL_DATA_PATH);
         
         if (globalMapDataFile.is_open())
         {
@@ -522,9 +543,10 @@ void Editor::CreateDebugWidgets()
     
     {
         static constexpr int TILEMAP_NAME_BUFFER_SIZE = 64;
-        static char sMapNameBuffer[TILEMAP_NAME_BUFFER_SIZE] = { "entry_map.json" };
+        static char sMapNameBuffer[TILEMAP_NAME_BUFFER_SIZE] = { "" };
         static size_t sSelectedMapFileIndex = 0;
         static int sActivePanelType = 0;
+        static std::string sLastLoadedMap;
         
         if (sMapFileNames.empty())
         {
@@ -581,6 +603,20 @@ void Editor::CreateDebugWidgets()
                 sDimensionsX = mapJson["metadata"]["cols"].get<int>();
                 CreateMap(sDimensionsY, sDimensionsX);
                 
+                if (mapJson["metadata"].contains("palettes") && !mapJson["metadata"]["palettes"].is_null())
+                {
+                    for (const auto& paletteJson: mapJson["metadata"]["palettes"])
+                    {
+                        if (std::find_if(paletteNamesAndTextures.cbegin(), paletteNamesAndTextures.cend(), [=](const std::pair<std::string, resources::ResourceId>& entry)
+                        {
+                            return entry.first == paletteJson["name"].get<std::string>();
+                        }) == paletteNamesAndTextures.cend())
+                        {
+                            ospopups::ShowInfoMessageBox(ospopups::MessageBoxType::WARNING, "Map Loading Issue", "Missing palette: " + paletteJson["name"].get<std::string>());
+                        }
+                    }
+                }
+                
                 {
                     auto rowCounter = 0;
                     auto colCounter = 0;
@@ -590,7 +626,10 @@ void Editor::CreateDebugWidgets()
                         for (auto tileJson: rowJson)
                         {
                             auto tileSceneObject = scene->FindSceneObject(strutils::StringId(std::to_string(colCounter) + "," + std::to_string(rowCounter)));
-                            tileSceneObject->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_ROOT + tileJson["tile_texture"].get<std::string>());
+                            tileSceneObject->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + TILESETS_FOLDER + tileJson["plt"].get<std::string>() + ".png");
+                            auto coordsString = strutils::StringSplit(tileJson["crd"].get<std::string>(), ',');
+                            assert(coordsString.size() == 2);
+                            editor_utils::SetNormalTileUniforms(tileSceneObject, glm::ivec2(std::stoi(coordsString[0]), std::stoi(coordsString[1])), TILE_UV_SIZE);
                             colCounter++;
                         }
                         rowCounter++;
@@ -609,7 +648,10 @@ void Editor::CreateDebugWidgets()
                             for (auto tileJson: rowJson)
                             {
                                 auto tileSceneObject = scene->FindSceneObject(strutils::StringId(std::to_string(colCounter) + "," + std::to_string(rowCounter) + "_top"));
-                                tileSceneObject->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_ROOT + tileJson["tile_texture"].get<std::string>());
+                                tileSceneObject->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + TILESETS_FOLDER + tileJson["plt"].get<std::string>() + ".png");
+                                auto coordsString = strutils::StringSplit(tileJson["crd"].get<std::string>(), ',');
+                                assert(coordsString.size() == 2);
+                                editor_utils::SetNormalTileUniforms(tileSceneObject, glm::ivec2(std::stoi(coordsString[0]), std::stoi(coordsString[1])), TILE_UV_SIZE);
                                 colCounter++;
                             }
                             rowCounter++;
@@ -629,7 +671,8 @@ void Editor::CreateDebugWidgets()
                             for (auto tileJson: rowJson)
                             {
                                 auto tileSceneObject = scene->FindSceneObject(strutils::StringId(std::to_string(colCounter) + "," + std::to_string(rowCounter) + "_navmap"));
-                                tileSceneObject->mShaderIntUniformValues[TILE_NAVMAP_TILE_TYPE_UNIFORM_NAME] = tileJson["tile_type"].get<int>();
+                                tileSceneObject->mShaderIntUniformValues[TILE_NAVMAP_TILE_TYPE_UNIFORM_NAME] = tileJson["nvt"].get<int>();
+                                editor_utils::SetNavmapTileUniforms(tileSceneObject);
                                 colCounter++;
                             }
                             rowCounter++;
@@ -637,15 +680,20 @@ void Editor::CreateDebugWidgets()
                     }
                 }
                 
-                logging::Log(logging::LogType::ERROR, "Successfully loaded %s", (resources::ResourceLoadingService::RES_DATA_ROOT + MAP_FILES_FOLDER + sMapNameBuffer).c_str());
+                sLastLoadedMap = std::string(sMapNameBuffer);
+                logging::Log(logging::LogType::INFO, "Successfully loaded %s", (resources::ResourceLoadingService::RES_DATA_ROOT + MAP_FILES_FOLDER + sMapNameBuffer).c_str());
+            }
+            else if (strlen(sMapNameBuffer) == 0 || std::string(sMapNameBuffer) == ".json")
+            {
+                ospopups::ShowInfoMessageBox(ospopups::MessageBoxType::ERROR, "A name for the map must be specified");
             }
             else
             {
-                logging::Log(logging::LogType::ERROR, "Could not load %s", (resources::ResourceLoadingService::RES_DATA_ROOT + MAP_FILES_FOLDER + sMapNameBuffer).c_str());
+                ospopups::ShowInfoMessageBox(ospopups::MessageBoxType::ERROR, "Could not load map: " +  (resources::ResourceLoadingService::RES_DATA_ROOT + MAP_FILES_FOLDER + sMapNameBuffer));
             }
         }
         ImGui::SameLine();
-        ImGui::Dummy(ImVec2(20.0f, 0.0f));
+        ImGui::Dummy(ImVec2(10.0f, 0.0f));
         ImGui::SameLine();
         if (ImGui::Button("  Save  "))
         {
@@ -668,6 +716,7 @@ void Editor::CreateDebugWidgets()
                     
                     nlohmann::json mapJson;
                     nlohmann::json mapMetaDataJson;
+                    nlohmann::json mapPaletteDataJson;
                     nlohmann::json mapTileDataJson;
                     nlohmann::json bottomLayerMapTileDataJson;
                     nlohmann::json topLayerMapTileDataJson;
@@ -676,8 +725,28 @@ void Editor::CreateDebugWidgets()
                     mapMetaDataJson["rows"] = mGridRows;
                     mapMetaDataJson["cols"] = mGridCols;
                     
+                    // Write palette lookup data
+                    for (int i = 0; i < paletteNamesAndTextures.size(); ++i)
+                    {
+                        nlohmann::json paletteJson;
+                        paletteJson["name"] = paletteNamesAndTextures[i].first;
+                        mapPaletteDataJson.push_back(paletteJson);
+                    }
+                    mapMetaDataJson["palettes"] = mapPaletteDataJson;
+                    
                     auto& systemsEngine = CoreSystemsEngine::GetInstance();
                     auto scene = systemsEngine.GetSceneManager().FindScene(EDITOR_SCENE);
+                    
+                    auto paletteNameLookup = [&](const resources::ResourceId textureResourceId)
+                    {
+                        auto iter = std::find_if(paletteNamesAndTextures.cbegin(), paletteNamesAndTextures.cend(), [=](const std::pair<std::string, resources::ResourceId>& entry)
+                                                 {
+                            return entry.second == textureResourceId;
+                        });
+                        
+                        assert(iter != paletteNamesAndTextures.cend());
+                        return iter->first;
+                    };
                     
                     for (auto y = 0; y < mGridRows; ++y)
                     {
@@ -690,22 +759,29 @@ void Editor::CreateDebugWidgets()
                             {
                                 auto bottomLayerTileSceneObject = scene->FindSceneObject(strutils::StringId(std::to_string(x) + "," + std::to_string(y)));
                                 nlohmann::json tileJson;
-                                tileJson["tile_texture"] = CoreSystemsEngine::GetInstance().GetResourceLoadingService().GetResourcePath(bottomLayerTileSceneObject->mTextureResourceId);
+                                
+                                auto coords = editor_utils::GetTilesetCoords(bottomLayerTileSceneObject, TILE_UV_SIZE);
+                                tileJson["crd"] = std::to_string(coords.r) + "," + std::to_string(coords.g);
+                                tileJson["plt"] = paletteNameLookup(bottomLayerTileSceneObject->mTextureResourceId);
+                                
                                 bottomLayerRowJson.push_back(tileJson);
                             }
                             
                             {
                                 auto topLayerTileSceneObject = scene->FindSceneObject(strutils::StringId(std::to_string(x) + "," + std::to_string(y) + "_top"));
                                 nlohmann::json tileJson;
-                                tileJson["tile_texture"] = CoreSystemsEngine::GetInstance().GetResourceLoadingService().GetResourcePath(topLayerTileSceneObject->mTextureResourceId);
+                                
+                                auto coords = editor_utils::GetTilesetCoords(topLayerTileSceneObject, TILE_UV_SIZE);
+                                tileJson["crd"] = std::to_string(coords.r) + "," + std::to_string(coords.g);
+                                tileJson["plt"] = paletteNameLookup(topLayerTileSceneObject->mTextureResourceId);
                                 topLayerRowJson.push_back(tileJson);
                             }
                             
                             {
                                 auto navmapTileSceneObject = scene->FindSceneObject(strutils::StringId(std::to_string(x) + "," + std::to_string(y) + "_navmap"));
                                 nlohmann::json tileJson;
-                                tileJson["tile_type"] = navmapTileSceneObject->mShaderIntUniformValues.at(TILE_NAVMAP_TILE_TYPE_UNIFORM_NAME);
-                                topLayerRowJson.push_back(tileJson);
+                                tileJson["nvt"] = navmapTileSceneObject->mShaderIntUniformValues.at(TILE_NAVMAP_TILE_TYPE_UNIFORM_NAME);
+                                navmapRowJson.push_back(tileJson);
                             }
                         }
                         bottomLayerMapTileDataJson.push_back(bottomLayerRowJson);
@@ -751,28 +827,33 @@ void Editor::CreateDebugWidgets()
                             cachedTileImages[topTileTexturePath] = topTileSurface;
                             cachedTileImages[botTileTexturePath] = botTileSurface;
                             
-                            auto RenderTileOnSurface = [](SDL_Surface* surface, unsigned char* pixels, int x, int y, int colOffset, int rowOffset, bool oddWidth, bool oddHeight)
+                            auto RenderTileOnSurface = [](SDL_Surface* surface, unsigned char* pixels, glm::ivec2 tilesetCoords, int x, int y, int colOffset, int rowOffset, bool oddWidth, bool oddHeight)
                             {
                                 SDL_LockSurface(surface);
-                                for (auto tileImageY = 0; tileImageY < surface->h; ++tileImageY)
+                                int tileRowCounter = 0;
+                                for (auto tileImageY = tilesetCoords.r * TILESET_TILE_SIZE; tileImageY < (tilesetCoords.r + 1) * TILESET_TILE_SIZE; ++tileImageY)
                                 {
-                                    for (auto tileImageX = 0; tileImageX < surface->w; ++tileImageX)
+                                    int tileColCounter = 0;
+                                    for (auto tileImageX = tilesetCoords.g * TILESET_TILE_SIZE; tileImageX < (tilesetCoords.g + 1) * TILESET_TILE_SIZE; ++tileImageX)
                                     {
                                         Uint8 r,g,b,a;
                                         auto pixel = *(Uint32*)((Uint8*)surface->pixels + tileImageY * surface->pitch + tileImageX * surface->format->BytesPerPixel);
                                         SDL_GetRGBA(pixel, surface->format, &r, &g, &b, &a);
                                         
-                                        pixels[(((y + rowOffset) * 64 + (oddHeight ? 32 : 0) + tileImageY) * map_constants::CLIENT_WORLD_MAP_IMAGE_SIZE * 4) + ((x + colOffset) * 64 + (oddWidth ? 32 : 0) + tileImageX) * 4 + 0] = r;
-                                        pixels[(((y + rowOffset) * 64 + (oddHeight ? 32 : 0) + tileImageY) * map_constants::CLIENT_WORLD_MAP_IMAGE_SIZE * 4) + ((x + colOffset) * 64 + (oddWidth ? 32 : 0) + tileImageX) * 4 + 1] = g;
-                                        pixels[(((y + rowOffset) * 64 + (oddHeight ? 32 : 0) + tileImageY) * map_constants::CLIENT_WORLD_MAP_IMAGE_SIZE * 4) + ((x + colOffset) * 64 + (oddWidth ? 32 : 0) + tileImageX) * 4 + 2] = b;
-                                        pixels[(((y + rowOffset) * 64 + (oddHeight ? 32 : 0) + tileImageY) * map_constants::CLIENT_WORLD_MAP_IMAGE_SIZE * 4) + ((x + colOffset) * 64 + (oddWidth ? 32 : 0) + tileImageX) * 4 + 3] = a;
+                                        pixels[(((y + rowOffset) * 16 + (oddHeight ? 8 : 0) + tileRowCounter) * map_constants::CLIENT_WORLD_MAP_IMAGE_SIZE * 4) + ((x + colOffset) * 16 + (oddWidth ? 8 : 0) + tileColCounter) * 4 + 0] = r;
+                                        pixels[(((y + rowOffset) * 16 + (oddHeight ? 8 : 0) + tileRowCounter) * map_constants::CLIENT_WORLD_MAP_IMAGE_SIZE * 4) + ((x + colOffset) * 16 + (oddWidth ? 8 : 0) + tileColCounter) * 4 + 1] = g;
+                                        pixels[(((y + rowOffset) * 16 + (oddHeight ? 8 : 0) + tileRowCounter) * map_constants::CLIENT_WORLD_MAP_IMAGE_SIZE * 4) + ((x + colOffset) * 16 + (oddWidth ? 8 : 0) + tileColCounter) * 4 + 2] = b;
+                                        pixels[(((y + rowOffset) * 16 + (oddHeight ? 8 : 0) + tileRowCounter) * map_constants::CLIENT_WORLD_MAP_IMAGE_SIZE * 4) + ((x + colOffset) * 16 + (oddWidth ? 8 : 0) + tileColCounter) * 4 + 3] = a;
+                                        
+                                        tileColCounter++;
                                     }
+                                    tileRowCounter++;
                                 }
                                 SDL_UnlockSurface(surface);
                             };
                             
-                            RenderTileOnSurface(topTileSurface, &topLayerPixels[0], x, y, colOffset, rowOffset, oddWidth, oddHeight);
-                            RenderTileOnSurface(botTileSurface, &botLayerPixels[0], x, y, colOffset, rowOffset, oddWidth, oddHeight);
+                            RenderTileOnSurface(topTileSurface, &topLayerPixels[0], editor_utils::GetTilesetCoords(topLayerTileSceneObject, TILE_UV_SIZE), x, y, colOffset, rowOffset, oddWidth, oddHeight);
+                            RenderTileOnSurface(botTileSurface, &botLayerPixels[0], editor_utils::GetTilesetCoords(bottomLayerTileSceneObject, TILE_UV_SIZE), x, y, colOffset, rowOffset, oddWidth, oddHeight);
                         }
                     }
                     
@@ -789,7 +870,7 @@ void Editor::CreateDebugWidgets()
                     
                     // Render map navmap texture
                     unsigned char navmapPixels[map_constants::CLIENT_NAVMAP_IMAGE_SIZE * map_constants::CLIENT_NAVMAP_IMAGE_SIZE * 4] = { 0 };
-                
+                    
                     for (auto y = 0; y < mGridRows; ++y)
                     {
                         for (auto x = 0; x < mGridCols; ++x)
@@ -810,8 +891,8 @@ void Editor::CreateDebugWidgets()
                             }
                         }
                     }
-        
-                    rendering::ExportPixelsToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + mapName + "/" + mapName + "_navmap.png", navmapPixels, map_constants::CLIENT_NAVMAP_IMAGE_SIZE);
+                    
+                    //                    rendering::ExportPixelsToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + mapName + "/" + mapName + "_navmap.png", navmapPixels, map_constants::CLIENT_NAVMAP_IMAGE_SIZE);
                     rendering::ExportPixelsToPNG(NON_SANDBOXED_NET_ASSETS_NAVMAPS_FOLDER + mapName + "_navmap.png", navmapPixels, map_constants::CLIENT_NAVMAP_IMAGE_SIZE);
                     
                     logging::Log(logging::LogType::ERROR, "Successfully saved %s", (NON_SANDBOXED_MAPS_FOLDER + std::string(sMapNameBuffer)).c_str());
@@ -824,7 +905,117 @@ void Editor::CreateDebugWidgets()
                 }
             }
         }
-        
+        ImGui::SameLine();
+        ImGui::Dummy(ImVec2(80.0f, 0.0f));
+        ImGui::SameLine();
+        ImGui::PushID("DeleteButton");
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.6f, 0.0f, 0.0f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.0f, 0.0f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.75f, 0.0f, 0.0f, 1.0f));
+        if (ImGui::Button("  Delete  "))
+        {
+            if (strlen(sMapNameBuffer) == 0 || std::string(sMapNameBuffer) == ".json")
+            {
+                ospopups::ShowInfoMessageBox(ospopups::MessageBoxType::ERROR, "Map Deletion Error", "A name for the map must be specified.");
+            }
+            else if (std::find(sMapFileNames.begin(), sMapFileNames.end(), std::string(sMapNameBuffer)) == sMapFileNames.end())
+            {
+                ospopups::ShowInfoMessageBox(ospopups::MessageBoxType::ERROR, "Map Deletion Error", "The specified map could not be found.");
+            }
+            else if (ospopups::ShowOkayCancelMessageBox(ospopups::MessageBoxType::INFO, "Deletion Confirmation", "The existing map data, textures and associated connections for " + std::string(sMapNameBuffer) + " will be permanently deleted. Proceed? ") == 1)
+            {
+                const auto& mapName = std::string(sMapNameBuffer);
+                if (sLastLoadedMap == std::string(sMapNameBuffer))
+                {
+                    memset(sMapNameBuffer, 0, sizeof(sMapNameBuffer));
+                    DestroyMap();
+                    CreateMap(sDimensionsY, sDimensionsX);
+                }
+                
+                auto& systemsEngine = CoreSystemsEngine::GetInstance();
+                auto scene = systemsEngine.GetSceneManager().FindScene(EDITOR_SCENE);
+                
+                // Cleanup visual references
+                mTopImageRefIndex = 0;
+                mRightImageRefIndex = 0;
+                mBottomImageRefIndex = 0;
+                mLeftImageRefIndex = 0;
+                sSelectedMapFileIndex = 0;
+                sSelectedExportEntryMapIndex = 0;
+                scene->RemoveSceneObject(TOP_REF_IMAGE_SCENE_OBJECT_NAME);
+                scene->RemoveSceneObject(RIGHT_REF_IMAGE_SCENE_OBJECT_NAME);
+                scene->RemoveSceneObject(BOTTOM_REF_IMAGE_SCENE_OBJECT_NAME);
+                scene->RemoveSceneObject(LEFT_REF_IMAGE_SCENE_OBJECT_NAME);
+                
+                std::error_code errorCode;
+                if (!std::filesystem::remove(NON_SANDBOXED_MAPS_FOLDER + mapName, errorCode))
+                {
+                    ospopups::ShowInfoMessageBox(ospopups::MessageBoxType::ERROR, "Map Deletion Error", "The .json map file could not be deleted:\n" + errorCode.message());
+                }
+                
+                if (!std::filesystem::remove_all(NON_SANDBOXED_MAP_TEXTURES_FOLDER + strutils::StringSplit(mapName, '.')[0], errorCode))
+                {
+                    ospopups::ShowInfoMessageBox(ospopups::MessageBoxType::ERROR, "Map Deletion Error", "The map texture files could not be deleted:\n" + errorCode.message());
+                }
+                
+                if (!std::filesystem::remove_all(NON_SANDBOXED_NET_ASSETS_NAVMAPS_FOLDER + strutils::StringSplit(mapName, '.')[0] + "_navmap.png", errorCode))
+                {
+                    ospopups::ShowInfoMessageBox(ospopups::MessageBoxType::ERROR, "Map Deletion Error", "The navmap files could not be deleted:\n" + errorCode.message());
+                }
+
+                
+                std::ifstream globalMapDataFile(NON_SANDBOXED_NET_ASSETS_MAP_GLOBAL_DATA_PATH);
+                
+                if (globalMapDataFile.is_open())
+                {
+                    std::stringstream buffer;
+                    buffer << globalMapDataFile.rdbuf();
+                    auto globalMapDataJson = nlohmann::json::parse(buffer.str());
+                    
+                    globalMapDataJson["map_connections"].erase(mapName);
+                    globalMapDataJson["map_transforms"].erase(mapName);
+                    
+                    for (auto& connectionEntry: globalMapDataJson["map_connections"].items())
+                    {
+                        if (connectionEntry.value()["bottom"].get<std::string>() == mapName)
+                        {
+                            connectionEntry.value()["bottom"] = "None";
+                        }
+                        
+                        if (connectionEntry.value()["left"].get<std::string>() == mapName)
+                        {
+                            connectionEntry.value()["left"] = "None";
+                        }
+                        
+                        if (connectionEntry.value()["right"].get<std::string>() == mapName)
+                        {
+                            connectionEntry.value()["right"] = "None";
+                        }
+                        
+                        if (connectionEntry.value()["top"].get<std::string>() == mapName)
+                        {
+                            connectionEntry.value()["top"] = "None";
+                        }
+                    }
+                    
+                    globalMapDataFile.close();
+                    
+                    std::ofstream outputGMDFile(NON_SANDBOXED_NET_ASSETS_MAP_GLOBAL_DATA_PATH);
+                    if (outputGMDFile.is_open())
+                    {
+                        outputGMDFile << globalMapDataJson.dump(4);
+                        outputGMDFile.close();
+                    }
+                    
+                    ospopups::ShowInfoMessageBox(ospopups::MessageBoxType::INFO, "Deleted all data for map " + mapName + " successfully.");
+                }
+                    
+                RefreshGlobalMapFilesLambda();
+            }
+        }
+        ImGui::PopStyleColor(3);
+        ImGui::PopID();
+
         ImGui::SeparatorText("Modify/Create");
         
         if (ImGui::InputInt("x", &sDimensionsX))
@@ -921,7 +1112,7 @@ void Editor::CreateDebugWidgets()
                 
                 mTopImageRefIndex = mRightImageRefIndex = mBottomImageRefIndex = mLeftImageRefIndex = 0;
                 
-                std::ifstream globalMapDataFile(NON_SANDBOXED_MAP_GLOBAL_DATA_PATH);
+                std::ifstream globalMapDataFile(NON_SANDBOXED_NET_ASSETS_MAP_GLOBAL_DATA_PATH);
                 if (globalMapDataFile.is_open())
                 {
                     std::stringstream buffer;
@@ -1097,36 +1288,13 @@ void Editor::CreateDebugWidgets()
         ImGui::PopID();
         
         ImGui::SeparatorText("Tilesets");
-        
-        static std::vector<std::string> paletteNames;
-        if (mPaletteTileData.empty() && paletteNames.empty())
-        {
-            auto mapTilesetFileNames = fileutils::GetAllFilenamesAndFolderNamesInDirectory(resources::ResourceLoadingService::RES_TEXTURES_ROOT + TILESETS_FOLDER);
-            
-            for (const auto& mapTilesetFileName: mapTilesetFileNames)
-            {
-                paletteNames.push_back(strutils::StringSplit(mapTilesetFileName, '.').front());
-                auto loadedResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + TILESETS_FOLDER + mapTilesetFileName);
-                const auto& tileTextureResource = CoreSystemsEngine::GetInstance().GetResourceLoadingService().GetResource<resources::TextureResource>(loadedResourceId);
-                
-                mPaletteTileData.emplace_back();
-                for (int row = 0; row < TILESET_SIZE/TILESET_TILE_SIZE; ++row)
-                {
-                    for (int col = 0; col < TILESET_SIZE/TILESET_TILE_SIZE; ++col)
-                    {
-                        mPaletteTileData.back().push_back({ mapTilesetFileName, glm::ivec2(row, col), loadedResourceId, tileTextureResource.GetGLTextureId() });
-                    }
-                }
-            }
-        }
-        
         ImGui::PushID("Tilesets");
-        if (ImGui::BeginCombo(" ", paletteNames.at(mSelectedPaletteIndex).c_str()))
+        if (ImGui::BeginCombo(" ", paletteNamesAndTextures.at(mSelectedPaletteIndex).first.c_str()))
         {
-            for (size_t n = 0U; n < paletteNames.size(); n++)
+            for (size_t n = 0U; n < paletteNamesAndTextures.size(); n++)
             {
                 const bool isSelected = (mSelectedPaletteIndex == n);
-                if (ImGui::Selectable(paletteNames.at(n).c_str(), isSelected))
+                if (ImGui::Selectable(paletteNamesAndTextures.at(n).first.c_str(), isSelected))
                 {
                     mSelectedPaletteIndex = static_cast<int>(n);
                 }
@@ -1138,9 +1306,6 @@ void Editor::CreateDebugWidgets()
             ImGui::EndCombo();
         }
         ImGui::PopID();
-        ImGui::SameLine();
-        ImGui::Text("Available Tilesets");
-        
         
         if (mActiveLayer == map_constants::LayerType::NAVMAP)
         {
@@ -1246,7 +1411,6 @@ void Editor::CreateDebugWidgets()
             if (ImGui::RadioButton(layerName.c_str(), &layerIndex, i))
             {
                 mActiveLayer = static_cast<map_constants::LayerType>(layerIndex);
-                logging::LogInfo("Active layer now: %s", layerName.c_str());
             }
             
             ImGui::SameLine();
@@ -1345,12 +1509,30 @@ void Editor::CreateDebugWidgets()
             }
         }
         ImGui::SeparatorText("Export");
+        ImGui::PushID("ExportEntryMap");
+
+        if (ImGui::BeginCombo(" ", sMapFileNames.at(sSelectedExportEntryMapIndex).c_str()))
+        {
+            for (int n = 0; n < static_cast<int>(sMapFileNames.size()); n++)
+            {
+                const bool isSelected = (sSelectedExportEntryMapIndex == n);
+                if (ImGui::Selectable(sMapFileNames.at(n).c_str(), isSelected))
+                {
+                    sSelectedExportEntryMapIndex = n;
+                }
+                if (isSelected)
+                {
+                    ImGui::SetItemDefaultFocus();
+                }
+            }
+            ImGui::EndCombo();
+        }
+        ImGui::PopID();
+        ImGui::SameLine();
         if (ImGui::Button("Save Global Map Data"))
         {
-            std::ofstream netAssetsGlobalMapDataFile(NON_SANDBOXED_NET_ASSETS_MAP_GLOBAL_DATA_PATH);
-            std::ofstream globalMapDataFile(NON_SANDBOXED_MAP_GLOBAL_DATA_PATH);
-            
-            if (globalMapDataFile.is_open() && netAssetsGlobalMapDataFile.is_open())
+            std::ofstream globalMapDataFile(NON_SANDBOXED_NET_ASSETS_MAP_GLOBAL_DATA_PATH);
+            if (globalMapDataFile.is_open())
             {
                 nlohmann::json globalMapDataJson;
                 
@@ -1443,16 +1625,13 @@ void Editor::CreateDebugWidgets()
                     }
                 };
                 
-                MapPositionCalculationLambda(ENTRY_MAP_NAME, "", "");
+                MapPositionCalculationLambda(sMapFileNames.at(sSelectedExportEntryMapIndex), "", "");
                 
                 globalMapDataJson["map_connections"] = exportedConnectionsJson;
                 globalMapDataJson["map_transforms"] = mapTransformsJson;
 
                 globalMapDataFile << globalMapDataJson.dump(4);
                 globalMapDataFile.close();
-                
-                netAssetsGlobalMapDataFile << globalMapDataJson.dump(4);
-                netAssetsGlobalMapDataFile.close();
             }
             ospopups::ShowInfoMessageBox(ospopups::MessageBoxType::INFO, "Export complete", "Finished exporting global map data.");
             RefreshGlobalMapFilesLambda();

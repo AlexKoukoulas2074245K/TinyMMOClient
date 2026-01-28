@@ -36,7 +36,7 @@ inline const float TILE_NAVMAP_LAYER_Z = 20.0f;
 ///------------------------------------------------------------------------------------------------
 
 inline constexpr int CLIENT_NAVMAP_IMAGE_SIZE = 128;
-inline constexpr int CLIENT_WORLD_MAP_IMAGE_SIZE = 4096;
+inline constexpr int CLIENT_WORLD_MAP_IMAGE_SIZE = 1024;
 
 ///------------------------------------------------------------------------------------------------
 
