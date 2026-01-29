@@ -1,0 +1,2934 @@
+{
+    "metadata": {
+        "cols": 16,
+        "palettes": [
+            {
+                "name": "base_tileset"
+            },
+            {
+                "name": "tileset"
+            }
+        ],
+        "rows": 16
+    },
+    "tiledata": {
+        "bottomlayer": [
+            [
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                }
+            ],
+            [
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                }
+            ],
+            [
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "1,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "1,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                }
+            ],
+            [
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "2,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "2,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                }
+            ],
+            [
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                }
+            ],
+            [
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                }
+            ],
+            [
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                }
+            ],
+            [
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                }
+            ],
+            [
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                }
+            ],
+            [
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                }
+            ],
+            [
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                }
+            ],
+            [
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                }
+            ],
+            [
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                }
+            ],
+            [
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                }
+            ],
+            [
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                }
+            ],
+            [
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                }
+            ]
+        ],
+        "navmaplayer": [
+            [
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 1
+                }
+            ],
+            [
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 1
+                }
+            ],
+            [
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 1
+                }
+            ],
+            [
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 1
+                }
+            ],
+            [
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 1
+                }
+            ],
+            [
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 1
+                }
+            ],
+            [
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 1
+                }
+            ],
+            [
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 1
+                }
+            ],
+            [
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 1
+                }
+            ],
+            [
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 1
+                }
+            ],
+            [
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 1
+                }
+            ],
+            [
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 1
+                }
+            ],
+            [
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 1
+                }
+            ],
+            [
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 1
+                }
+            ],
+            [
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 1
+                }
+            ],
+            [
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 1
+                }
+            ]
+        ],
+        "toplayer": [
+            [
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                }
+            ],
+            [
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                }
+            ],
+            [
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                }
+            ],
+            [
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                }
+            ],
+            [
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                }
+            ],
+            [
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                }
+            ],
+            [
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                }
+            ],
+            [
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                }
+            ],
+            [
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                }
+            ],
+            [
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                }
+            ],
+            [
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                }
+            ],
+            [
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                }
+            ],
+            [
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                }
+            ],
+            [
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                }
+            ],
+            [
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                }
+            ],
+            [
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "base_tileset"
+                }
+            ]
+        ]
+    }
+}
