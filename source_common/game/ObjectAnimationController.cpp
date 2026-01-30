@@ -99,7 +99,7 @@ const ObjectAnimationController::ObjectAnimationInfo& ObjectAnimationController:
         {
             mObjectAnimationInfoMap[sceneObject->mName].mAnimationRow = 4;
             mObjectAnimationInfoMap[sceneObject->mName].mFlippedAnimation = false;
-            mObjectAnimationInfoMap[sceneObject->mName].mFacingDirection = network::FacingDirection::WEST;
+            mObjectAnimationInfoMap[sceneObject->mName].mFacingDirection = network::FacingDirection::NORTH;
         }
         // S
         else if (velocity.y < 0.0f)
