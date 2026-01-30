@@ -13,7 +13,9 @@
 #include <engine/resloading/DataFileResource.h>
 #include <engine/resloading/ImageSurfaceResource.h>
 #include <engine/resloading/ResourceLoadingService.h>
+#include <imgui/imgui.h>
 #include <nlohmann/json.hpp>
+
 
 ///------------------------------------------------------------------------------------------------
 
@@ -21,10 +23,10 @@ static constexpr int MAX_MAP_LOADING_RECURSE_LEVEL = 2;
 
 ///------------------------------------------------------------------------------------------------
 
-static std::shared_ptr<networking::Navmap> CreateNavmap(resources::ResourceId navmapImageResourceId)
+static std::shared_ptr<network::Navmap> CreateNavmap(resources::ResourceId navmapImageResourceId)
 {
     auto surface = CoreSystemsEngine::GetInstance().GetResourceLoadingService().GetResource<resources::ImageSurfaceResource>(navmapImageResourceId).GetSurface();
-    return std::make_shared<networking::Navmap>(static_cast<unsigned char*>(surface->pixels), map_constants::CLIENT_NAVMAP_IMAGE_SIZE);
+    return std::make_shared<network::Navmap>(static_cast<unsigned char*>(surface->pixels), map_constants::CLIENT_NAVMAP_IMAGE_SIZE);
 }
 
 ///------------------------------------------------------------------------------------------------
@@ -80,7 +82,7 @@ void MapResourceController::Update(const strutils::StringId& currentMapName)
                 systemsEngine.GetResourceLoadingService().UnloadResource(iter->second.mBottomLayerTextureResourceId);
                 systemsEngine.GetResourceLoadingService().UnloadResource(iter->second.mTopLayerTextureResourceId);
                 systemsEngine.GetResourceLoadingService().UnloadResource(iter->second.mNavmapImageResourceId);
-                //events::EventSystem::GetInstance().DispatchEvent<events::MapSupersessionEvent>(iter->first);
+                events::EventSystem::GetInstance().DispatchEvent<events::MapSupersessionEvent>(iter->first);
                 iter = mLoadedMapResourceTree.erase(iter);
             }
             else
@@ -102,7 +104,7 @@ void MapResourceController::Update(const strutils::StringId& currentMapName)
             {
                 mapResourceEntry.second.mNavmap = CreateNavmap(mapResourceEntry.second.mNavmapImageResourceId);
                 mapResourceEntry.second.mMapResourcesState = MapResourcesState::LOADED;
-                //events::EventSystem::GetInstance().DispatchEvent<events::MapResourcesReadyEvent>(mapResourceEntry.first);
+                events::EventSystem::GetInstance().DispatchEvent<events::MapResourcesReadyEvent>(mapResourceEntry.first);
             }
         }
     }
@@ -112,7 +114,7 @@ void MapResourceController::Update(const strutils::StringId& currentMapName)
 
 void MapResourceController::LoadMapResourceTree(const strutils::StringId& mapName, const int recurseLevel, const bool asyncLoading)
 {
-    if (recurseLevel > MAX_MAP_LOADING_RECURSE_LEVEL || mapName == map_constants::NO_CONNECTION_NAME)
+    if (recurseLevel > MAX_MAP_LOADING_RECURSE_LEVEL || mapName == map_constants::NO_MAP_CONNECTION_NAME)
     {
         return;
     }
@@ -150,3 +152,25 @@ void MapResourceController::LoadMapResources(const strutils::StringId& mapName, 
     MapResources mapResources = { asyncLoading ? MapResourcesState::PENDING : MapResourcesState::LOADED, mapTopLayerTextureResourceId, mapBottomLayerTextureResourceId, mapNavmapTextureResourceId, asyncLoading ? nullptr : CreateNavmap(mapNavmapTextureResourceId) };
     mLoadedMapResourceTree.emplace(std::make_pair(mapName, std::move(mapResources)));
 }
+
+#if defined(USE_IMGUI)
+void MapResourceController::CreateDebugWidgets()
+{
+    std::lock_guard<std::mutex> mapResourceLock(mMapResourceMutex);
+    for (const auto& [mapName, mapResources]: mLoadedMapResourceTree)
+    {
+        std::string loadStatus = "";
+        switch (mapResources.mMapResourcesState)
+        {
+            case MapResourcesState::LOADED:      loadStatus = "LOADED"; break;
+            case MapResourcesState::PENDING:     loadStatus = "PENDING"; break;
+            case MapResourcesState::INVALIDATED: loadStatus = "INVALIDATED"; break;
+        }
+        ImGui::BulletText("%s: %s", mapName.GetString().c_str(), loadStatus.c_str());
+    }
+}
+#else
+void MapResourceController::CreateDebugWidgets()
+{
+}
+#endif

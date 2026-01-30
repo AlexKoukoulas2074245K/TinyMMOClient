@@ -56,6 +56,7 @@ static const strutils::StringId LEFT_REF_IMAGE_SCENE_OBJECT_NAME = strutils::Str
 
 static const std::string NON_SANDBOXED_MAPS_FOLDER = "/Users/Code/TinyMMOClient/assets/data/editor/maps/";
 static const std::string NON_SANDBOXED_MAP_TEXTURES_FOLDER = "/Users/Code/TinyMMOClient/assets/textures/world/maps/";
+static const std::string NON_SANDBOXED_MAP_GLOBAL_DATA_PATH = "/Users/Code/TinyMMOClient/assets/data/world/map_global_data.json";
 static const std::string NON_SANDBOXED_NET_ASSETS_MAP_GLOBAL_DATA_PATH = "/Users/Code/TinyMMOClient/source_net_common/net_assets/map_global_data.json";
 static const std::string NON_SANDBOXED_NET_ASSETS_NAVMAPS_FOLDER = "/Users/Code/TinyMMOClient/source_net_common/net_assets/navmaps/";
 
@@ -139,7 +140,7 @@ void Editor::Init()
     
     mSelectedPaletteIndex = 0;
     mSelectedPaletteTile = 0;
-    mSelectedNavmapTileType = networking::NavmapTileType::WALKABLE;
+    mSelectedNavmapTileType = network::NavmapTileType::WALKABLE;
 
     mViewOptions.mCameraZoom = scene->GetCamera().GetZoomFactor();
     mViewOptions.mCameraPosition = scene->GetCamera().GetPosition();
@@ -251,7 +252,7 @@ void Editor::Update(const float dtMillis)
             }
             else
             {
-                TryExecuteCommand(std::make_unique<commands::PlaceNavmapTileTypeCommand>(highlightedTileCandidates.front(), networking::NavmapTileType::WALKABLE));
+                TryExecuteCommand(std::make_unique<commands::PlaceNavmapTileTypeCommand>(highlightedTileCandidates.front(), network::NavmapTileType::WALKABLE));
             }
         }
     }
@@ -392,7 +393,7 @@ void Editor::CreateMap(const int gridRows, const int gridCols)
                 navmapTile->mPosition.y = gridStartingY - y * TILE_SIZE;
                 navmapTile->mPosition.z = map_constants::TILE_NAVMAP_LAYER_Z;
                 navmapTile->mScale = TILE_DEFAULT_SCALE;
-                navmapTile->mShaderIntUniformValues[TILE_NAVMAP_TILE_TYPE_UNIFORM_NAME] = static_cast<int>(networking::NavmapTileType::WALKABLE);
+                navmapTile->mShaderIntUniformValues[TILE_NAVMAP_TILE_TYPE_UNIFORM_NAME] = static_cast<int>(network::NavmapTileType::WALKABLE);
                 navmapTile->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + EDITOR_MAP_TILE_SHADER);
                 editor_utils::SetNavmapTileUniforms(navmapTile);
             }
@@ -877,7 +878,7 @@ void Editor::CreateDebugWidgets()
                         {
                             auto navmapTileSceneObject = scene->FindSceneObject(strutils::StringId(std::to_string(x) + "," + std::to_string(y) + "_navmap"));
                             
-                            auto navmapTileTypeColor = networking::GetColorFromNavmapTileType(static_cast<networking::NavmapTileType>(navmapTileSceneObject->mShaderIntUniformValues.at(TILE_NAVMAP_TILE_TYPE_UNIFORM_NAME)));
+                            auto navmapTileTypeColor = network::GetColorFromNavmapTileType(static_cast<network::NavmapTileType>(navmapTileSceneObject->mShaderIntUniformValues.at(TILE_NAVMAP_TILE_TYPE_UNIFORM_NAME)));
                             
                             for (auto tileImageY = 0; tileImageY < map_constants::CLIENT_NAVMAP_IMAGE_SIZE/64; ++tileImageY)
                             {
@@ -892,7 +893,7 @@ void Editor::CreateDebugWidgets()
                         }
                     }
                     
-                    //                    rendering::ExportPixelsToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + mapName + "/" + mapName + "_navmap.png", navmapPixels, map_constants::CLIENT_NAVMAP_IMAGE_SIZE);
+                    rendering::ExportPixelsToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + mapName + "/" + mapName + "_navmap.png", navmapPixels, map_constants::CLIENT_NAVMAP_IMAGE_SIZE);
                     rendering::ExportPixelsToPNG(NON_SANDBOXED_NET_ASSETS_NAVMAPS_FOLDER + mapName + "_navmap.png", navmapPixels, map_constants::CLIENT_NAVMAP_IMAGE_SIZE);
                     
                     logging::Log(logging::LogType::ERROR, "Successfully saved %s", (NON_SANDBOXED_MAPS_FOLDER + std::string(sMapNameBuffer)).c_str());
@@ -958,7 +959,7 @@ void Editor::CreateDebugWidgets()
                     ospopups::ShowInfoMessageBox(ospopups::MessageBoxType::ERROR, "Map Deletion Error", "The map texture files could not be deleted:\n" + errorCode.message());
                 }
                 
-                if (!std::filesystem::remove_all(NON_SANDBOXED_NET_ASSETS_NAVMAPS_FOLDER + strutils::StringSplit(mapName, '.')[0] + "_navmap.png", errorCode))
+                if (!std::filesystem::remove(NON_SANDBOXED_NET_ASSETS_NAVMAPS_FOLDER + strutils::StringSplit(mapName, '.')[0] + "_navmap.png", errorCode))
                 {
                     ospopups::ShowInfoMessageBox(ospopups::MessageBoxType::ERROR, "Map Deletion Error", "The navmap files could not be deleted:\n" + errorCode.message());
                 }
@@ -1000,11 +1001,18 @@ void Editor::CreateDebugWidgets()
                     
                     globalMapDataFile.close();
                     
-                    std::ofstream outputGMDFile(NON_SANDBOXED_NET_ASSETS_MAP_GLOBAL_DATA_PATH);
+                    std::ofstream outputGMDFile(NON_SANDBOXED_MAP_GLOBAL_DATA_PATH);
                     if (outputGMDFile.is_open())
                     {
                         outputGMDFile << globalMapDataJson.dump(4);
                         outputGMDFile.close();
+                    }
+                    
+                    std::ofstream outputNetGMDFile(NON_SANDBOXED_NET_ASSETS_MAP_GLOBAL_DATA_PATH);
+                    if (outputNetGMDFile.is_open())
+                    {
+                        outputNetGMDFile << globalMapDataJson.dump(4);
+                        outputNetGMDFile.close();
                     }
                     
                     ospopups::ShowInfoMessageBox(ospopups::MessageBoxType::INFO, "Deleted all data for map " + mapName + " successfully.");
@@ -1130,8 +1138,8 @@ void Editor::CreateDebugWidgets()
                         mapBottomLayer->mScale *= game_constants::MAP_RENDERED_SCALE;
                         mapBottomLayer->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(NON_SANDBOXED_MAP_TEXTURES_FOLDER + mapName + "/" + mapName + "_bottom_layer.png", resources::ResourceReloadMode::DONT_RELOAD, resources::ResourceLoadingPathType::ABSOLUTE);
                         mapBottomLayer->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + "world_map.vs");
-                        mapBottomLayer->mShaderFloatUniformValues[strutils::StringId("map_width")] = mapTransformIter.value()["width"].get<float>();
-                        mapBottomLayer->mShaderFloatUniformValues[strutils::StringId("map_height")] = mapTransformIter.value()["height"].get<float>();
+                        mapBottomLayer->mShaderFloatUniformValues[strutils::StringId("map_width")] = mapTransformIter.value()["width"].get<float>() + map_constants::MAP_RENDERING_SEAMS_BIAS;
+                        mapBottomLayer->mShaderFloatUniformValues[strutils::StringId("map_height")] = mapTransformIter.value()["height"].get<float>() + map_constants::MAP_RENDERING_SEAMS_BIAS;
                         
                         auto mapTopLayer = scene->CreateSceneObject(strutils::StringId(mapName  + "_top_stich"));
                         mapTopLayer->mPosition.x = mapTransformIter.value()["x"].get<float>() * game_constants::MAP_RENDERED_SCALE;
@@ -1140,8 +1148,8 @@ void Editor::CreateDebugWidgets()
                         mapTopLayer->mScale *= game_constants::MAP_RENDERED_SCALE;
                         mapTopLayer->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(NON_SANDBOXED_MAP_TEXTURES_FOLDER + mapName + "/" + mapName + "_top_layer.png", resources::ResourceReloadMode::DONT_RELOAD, resources::ResourceLoadingPathType::ABSOLUTE);
                         mapTopLayer->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + "world_map.vs");
-                        mapTopLayer->mShaderFloatUniformValues[strutils::StringId("map_width")] = mapTransformIter.value()["width"].get<float>();
-                        mapTopLayer->mShaderFloatUniformValues[strutils::StringId("map_height")] = mapTransformIter.value()["height"].get<float>();
+                        mapTopLayer->mShaderFloatUniformValues[strutils::StringId("map_width")] = mapTransformIter.value()["width"].get<float>() + map_constants::MAP_RENDERING_SEAMS_BIAS;
+                        mapTopLayer->mShaderFloatUniformValues[strutils::StringId("map_height")] = mapTransformIter.value()["height"].get<float>() + map_constants::MAP_RENDERING_SEAMS_BIAS;
                         
                     }
                 }
@@ -1309,17 +1317,17 @@ void Editor::CreateDebugWidgets()
         
         if (mActiveLayer == map_constants::LayerType::NAVMAP)
         {
-            ImGui::Text("Selected Tile: %s", networking::GetNavmapTileTypeName(static_cast<networking::NavmapTileType>(mSelectedNavmapTileType)));
+            ImGui::Text("Selected Tile: %s", network::GetNavmapTileTypeName(static_cast<network::NavmapTileType>(mSelectedNavmapTileType)));
 
-            for (int i = 0; i < static_cast<int>(networking::NavmapTileType::COUNT); ++i)
+            for (int i = 0; i < static_cast<int>(network::NavmapTileType::COUNT); ++i)
             {
                 if ((i % (TILESET_SIZE/TILESET_TILE_SIZE)) != 0)
                 {
                     ImGui::SameLine();
                 }
                 
-                auto navmapColor = networking::GetColorFromNavmapTileType(static_cast<networking::NavmapTileType>(i));
-                if (static_cast<networking::NavmapTileType>(i) == networking::NavmapTileType::WALKABLE)
+                auto navmapColor = network::GetColorFromNavmapTileType(static_cast<network::NavmapTileType>(i));
+                if (static_cast<network::NavmapTileType>(i) == network::NavmapTileType::WALKABLE)
                 {
                     // Distinguish walkable from solid in the ImGUI background
                     navmapColor = glm::ivec4(255.0f, 255.0f, 255.0f, 255.0f);
@@ -1339,7 +1347,7 @@ void Editor::CreateDebugWidgets()
                 
                 if (ImGui::ImageButton(tileName.c_str(), reinterpret_cast<void*>(BLANK_TILE_DATA.mTextureId), ImVec2(48.0f, 48.0f), minUVs, maxUVs, bgCol, tintCol))
                 {
-                    mSelectedNavmapTileType = static_cast<networking::NavmapTileType>(i);
+                    mSelectedNavmapTileType = static_cast<network::NavmapTileType>(i);
                     mSelectedPaletteTile = tileIndex;
                 }
                 ImGui::PopID();
@@ -1531,8 +1539,10 @@ void Editor::CreateDebugWidgets()
         ImGui::SameLine();
         if (ImGui::Button("Save Global Map Data"))
         {
-            std::ofstream globalMapDataFile(NON_SANDBOXED_NET_ASSETS_MAP_GLOBAL_DATA_PATH);
-            if (globalMapDataFile.is_open())
+            std::ofstream globalMapDataFile(NON_SANDBOXED_MAP_GLOBAL_DATA_PATH);
+            std::ofstream netGlobalMapDataFile(NON_SANDBOXED_NET_ASSETS_MAP_GLOBAL_DATA_PATH);
+            
+            if (globalMapDataFile.is_open() && netGlobalMapDataFile.is_open())
             {
                 nlohmann::json globalMapDataJson;
                 
@@ -1632,6 +1642,9 @@ void Editor::CreateDebugWidgets()
 
                 globalMapDataFile << globalMapDataJson.dump(4);
                 globalMapDataFile.close();
+                
+                netGlobalMapDataFile << globalMapDataJson.dump(4);
+                netGlobalMapDataFile.close();
             }
             ospopups::ShowInfoMessageBox(ospopups::MessageBoxType::INFO, "Export complete", "Finished exporting global map data.");
             RefreshGlobalMapFilesLambda();

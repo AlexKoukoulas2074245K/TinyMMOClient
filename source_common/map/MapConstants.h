@@ -25,10 +25,11 @@ enum class LayerType
 
 ///------------------------------------------------------------------------------------------------
 
-inline const strutils::StringId NO_CONNECTION_NAME = strutils::StringId("None");
+inline const strutils::StringId NO_MAP_CONNECTION_NAME = strutils::StringId("None");
 
 ///------------------------------------------------------------------------------------------------
 
+inline const float MAP_RENDERING_SEAMS_BIAS = 0.001f;
 inline const float TILE_BOTTOM_LAYER_Z = 0.1f;
 inline const float TILE_TOP_LAYER_Z = 10.0f;
 inline const float TILE_NAVMAP_LAYER_Z = 20.0f;

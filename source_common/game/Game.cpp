@@ -36,6 +36,9 @@
 #include <game/ObjectAnimationController.h>
 #include <imgui/imgui.h>
 #include <net_common/NetworkMessages.h>
+#include <map/GlobalMapDataRepository.h>
+#include <map/MapConstants.h>
+#include <map/MapResourceController.h>
 #include <mutex>
 #include <SDL.h>
 
@@ -49,6 +52,10 @@
 #elif defined(WINDOWS)
 #include <platform_utilities/WindowsUtils.h>
 #endif
+
+///------------------------------------------------------------------------------------------------
+
+static const strutils::StringId NAVMAP_DEBUG_SCENE_OBJECT_NAME = strutils::StringId("debug_navmap");
 
 ///------------------------------------------------------------------------------------------------
 
@@ -79,16 +86,29 @@ void Game::Init()
     auto& systemsEngine = CoreSystemsEngine::GetInstance();
     systemsEngine.GetFontRepository().LoadFont(game_constants::DEFAULT_FONT_NAME.GetString(), resources::ResourceReloadMode::DONT_RELOAD);
     systemsEngine.GetSoundManager().SetAudioEnabled(false);
+    GlobalMapDataRepository::GetInstance().LoadMapDefinitions();
     
     auto scene = systemsEngine.GetSceneManager().CreateScene(game_constants::WORLD_SCENE_NAME);
     scene->GetCamera().SetZoomFactor(50.0f);
     scene->SetLoaded(true);
     
-    auto bg = scene->CreateSceneObject(strutils::StringId("background"));
-    bg->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + "game/entry_map_bottom_layer.png");
-    bg->mPosition = glm::vec3(0.0f, 0.0f, 0.0f);
-    bg->mScale = glm::vec3(5.0f, 5.0f, 0.5f);
-    
+    auto& eventSystem = events::EventSystem::GetInstance();
+    mMapChangeEventListener = eventSystem.RegisterForEvent<events::MapChangeEvent>([this](const events::MapChangeEvent& event)
+    {
+        const auto& mapResources = mMapResourceController->GetMapResources(event.mNewMapName);
+        mCurrentNavmap = mapResources.mNavmap;
+    });
+  
+    mMapSupersessionEventListener = eventSystem.RegisterForEvent<events::MapSupersessionEvent>([=](const events::MapSupersessionEvent& event)
+    {
+        scene->RemoveSceneObject(strutils::StringId(event.mSupersededMapName.GetString() + "_top"));
+        scene->RemoveSceneObject(strutils::StringId(event.mSupersededMapName.GetString() + "_bottom"));
+    });
+  
+    mMapResourcesReadyEventListener = eventSystem.RegisterForEvent<events::MapResourcesReadyEvent>([this](const events::MapResourcesReadyEvent& event)
+    {
+        CreateMapSceneObjects(event.mMapName);
+    });
     
     scene = systemsEngine.GetSceneManager().CreateScene(game_constants::GUI_SCENE_NAME);
     scene->GetCamera().SetZoomFactor(50.0f);
@@ -234,11 +254,12 @@ void Game::Update(const float dtMillis)
         }
     }
     
+    auto& systemsEngine = CoreSystemsEngine::GetInstance();
+    auto scene = systemsEngine.GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME);
+    
     for (const auto& [objectId, objectData]: mLocalObjectDataMap)
     {
-        auto& systemsEngine = CoreSystemsEngine::GetInstance();
-        
-        auto sceneObject = systemsEngine.GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME)->FindSceneObject(strutils::StringId("object-" + std::to_string(objectId)));
+        auto sceneObject = scene->FindSceneObject(strutils::StringId("object-" + std::to_string(objectId)));
         
         assert(sceneObject);
 
@@ -249,26 +270,26 @@ void Game::Update(const float dtMillis)
             if (CoreSystemsEngine::GetInstance().GetInputStateManager().VButtonTapped(input::Button::MAIN_BUTTON))
             {
                 // Cooldown checks etc..
-                hasAttacked = true;
-                const auto& cam = systemsEngine.GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME)->GetCamera();
-                const auto& pointingPos = CoreSystemsEngine::GetInstance().GetInputStateManager().VGetPointingPosInWorldSpace(cam.GetViewMatrix(), cam.GetProjMatrix());
-                const auto& playerToPointingPos = glm::normalize(glm::vec3(pointingPos.x, pointingPos.y, objectData.position.z) - objectData.position);
-                const auto facingDirection = VecToDirection(playerToPointingPos);
-                
-                mObjectAnimationController->UpdateObjectAnimation(sceneObject, glm::vec3(0.0f), dtMillis, facingDirection);
-                mLocalObjectDataMap[mLocalPlayerId].facingDirection = facingDirection;
-                
-                network::ObjectStateUpdateMessage stateUpdateMessage = {};
-                stateUpdateMessage.objectData = mLocalObjectDataMap[mLocalPlayerId];
-                
-                SendMessage(sServer, &stateUpdateMessage, sizeof(stateUpdateMessage), network::channels::RELIABLE);
-                
-                network::AttackMessage attackMessage = {};
-                attackMessage.attackerId = mLocalPlayerId;
-                attackMessage.attackType = network::AttackType::PROJECTILE;
-                attackMessage.projectileType = network::ProjectileType::FIREBALL;
-
-                SendMessage(sServer, &attackMessage, sizeof(attackMessage), network::channels::RELIABLE);
+//                hasAttacked = true;
+//                const auto& cam = systemsEngine.GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME)->GetCamera();
+//                const auto& pointingPos = CoreSystemsEngine::GetInstance().GetInputStateManager().VGetPointingPosInWorldSpace(cam.GetViewMatrix(), cam.GetProjMatrix());
+//                const auto& playerToPointingPos = glm::normalize(glm::vec3(pointingPos.x, pointingPos.y, objectData.position.z) - objectData.position);
+//                const auto facingDirection = VecToDirection(playerToPointingPos);
+//                
+//                mObjectAnimationController->UpdateObjectAnimation(sceneObject, glm::vec3(0.0f), dtMillis, facingDirection);
+//                mLocalObjectDataMap[mLocalPlayerId].facingDirection = facingDirection;
+//                
+//                network::ObjectStateUpdateMessage stateUpdateMessage = {};
+//                stateUpdateMessage.objectData = mLocalObjectDataMap[mLocalPlayerId];
+//                
+//                SendMessage(sServer, &stateUpdateMessage, sizeof(stateUpdateMessage), network::channels::RELIABLE);
+//                
+//                network::AttackMessage attackMessage = {};
+//                attackMessage.attackerId = mLocalPlayerId;
+//                attackMessage.attackType = network::AttackType::PROJECTILE;
+//                attackMessage.projectileType = network::ProjectileType::FIREBALL;
+//
+//                SendMessage(sServer, &attackMessage, sizeof(attackMessage), network::channels::RELIABLE);
             }
             
             if (!hasAttacked)
@@ -279,10 +300,54 @@ void Game::Update(const float dtMillis)
                 const auto& animationInfoResult = mObjectAnimationController->UpdateObjectAnimation(sceneObject, velocity, dtMillis, std::nullopt);
                 sceneObject->mPosition += velocity;
                 
+                const auto& globalMapDataRepo = GlobalMapDataRepository::GetInstance();
+                const auto& currentMapDefinition = globalMapDataRepo.GetMapDefinition(mCurrentMap);
+                
+                // Determine map change direction
+                static const float MAP_TRANSITION_THRESHOLD = 0.00f;
+                strutils::StringId nextMapName = map_constants::NO_MAP_CONNECTION_NAME;
+                if (sceneObject->mPosition.x > currentMapDefinition.mMapPosition.x * game_constants::MAP_RENDERED_SCALE + (currentMapDefinition.mMapDimensions.x * game_constants::MAP_RENDERED_SCALE)/2.0f - MAP_TRANSITION_THRESHOLD)
+                {
+                    nextMapName = globalMapDataRepo.GetConnectedMapName(mCurrentMap, MapConnectionDirection::EAST);
+                }
+                else if (sceneObject->mPosition.x < currentMapDefinition.mMapPosition.x * game_constants::MAP_RENDERED_SCALE - (currentMapDefinition.mMapDimensions.x * game_constants::MAP_RENDERED_SCALE)/2.0f + MAP_TRANSITION_THRESHOLD)
+                {
+                    nextMapName = globalMapDataRepo.GetConnectedMapName(mCurrentMap, MapConnectionDirection::WEST);
+                }
+                else if (sceneObject->mPosition.y > currentMapDefinition.mMapPosition.y * game_constants::MAP_RENDERED_SCALE + (currentMapDefinition.mMapDimensions.y * game_constants::MAP_RENDERED_SCALE)/2.0f - MAP_TRANSITION_THRESHOLD)
+                {
+                    nextMapName = globalMapDataRepo.GetConnectedMapName(mCurrentMap, MapConnectionDirection::NORTH);
+                }
+                else if (sceneObject->mPosition.y < currentMapDefinition.mMapPosition.y * game_constants::MAP_RENDERED_SCALE - (currentMapDefinition.mMapDimensions.y * game_constants::MAP_RENDERED_SCALE)/2.0f + MAP_TRANSITION_THRESHOLD)
+                {
+                    nextMapName = globalMapDataRepo.GetConnectedMapName(mCurrentMap, MapConnectionDirection::SOUTH);
+                }
+                
+                if (nextMapName != map_constants::NO_MAP_CONNECTION_NAME)
+                {
+                    // Give a further push to the player to bring them concretely
+                    // into the next navmap
+//                    objectData.objectPosition += objectData.objectVelocity;
+//                    playerSceneObject->mPosition += objectData.objectVelocity;
+//                    playerNameSceneObject->mPosition += objectData.objectVelocity;
+//                    
+                    mCurrentMap = nextMapName;
+                    
+                    
+                    events::EventSystem::GetInstance().DispatchEvent<events::MapChangeEvent>(mCurrentMap);
+                    
+                    if (scene->FindSceneObject(NAVMAP_DEBUG_SCENE_OBJECT_NAME))
+                    {
+                        HideDebugNavmap();
+                        ShowDebugNavmap();
+                    }
+                }
+                
                 mLocalObjectDataMap[mLocalPlayerId].position = sceneObject->mPosition;
                 mLocalObjectDataMap[mLocalPlayerId].velocity = velocity;
                 mLocalObjectDataMap[mLocalPlayerId].currentAnimation = network::AnimationType::RUNNING;
                 mLocalObjectDataMap[mLocalPlayerId].facingDirection = animationInfoResult.mFacingDirection;
+                network::SetCurrentMap(mLocalObjectDataMap[mLocalPlayerId], mCurrentMap.GetString());
                 
                 network::ObjectStateUpdateMessage stateUpdateMessage = {};
                 stateUpdateMessage.objectData = mLocalObjectDataMap[mLocalPlayerId];
@@ -309,6 +374,18 @@ void Game::Update(const float dtMillis)
 
     enet_host_flush(sClient);
     
+    // Camera updates
+    auto sceneObject = scene->FindSceneObject(strutils::StringId("object-" + std::to_string(mLocalPlayerId)));
+    if (sceneObject)
+    {
+        scene->GetCamera().SetPosition(glm::vec3(sceneObject->mPosition.x, sceneObject->mPosition.y, scene->GetCamera().GetPosition().z));
+    }
+    
+    if (mMapResourceController)
+    {
+        mMapResourceController->Update(mCurrentMap);
+    }
+    
     mTestButton->Update(dtMillis);
 }
 
@@ -334,6 +411,19 @@ void Game::WindowResize()
 
 void Game::CreateObject(const network::ObjectData& objectData)
 {
+    if (objectData.objectId == mLocalPlayerId)
+    {
+        assert(!mMapResourceController);
+        mCurrentMap = strutils::StringId(network::GetCurrentMapString(objectData));
+        mMapResourceController = std::make_unique<MapResourceController>(mCurrentMap);
+        mCurrentNavmap = mMapResourceController->GetMapResources(mCurrentMap).mNavmap;
+        auto loadedMapResources = mMapResourceController->GetAllLoadedMapResources();
+        for (const auto& mapResources: loadedMapResources)
+        {
+            CreateMapSceneObjects(mapResources.first);
+        }
+    }
+    
     mLocalObjectDataMap[objectData.objectId] = objectData;
     auto sceneObjectName = strutils::StringId("object-" + std::to_string(objectData.objectId));
 
@@ -391,6 +481,76 @@ void Game::DestroyObject(const network::objectId_t objectId)
 
 ///------------------------------------------------------------------------------------------------
 
+void Game::CreateMapSceneObjects(const strutils::StringId& mapName)
+{
+    auto& systemsEngine = CoreSystemsEngine::GetInstance();
+    auto scene = systemsEngine.GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME);
+    
+    const auto& mapDefinition = GlobalMapDataRepository::GetInstance().GetMapDefinition(mapName);
+    const auto& mapResources = mMapResourceController->GetMapResources(mapName);
+    
+    assert(mapResources.mMapResourcesState == MapResourcesState::LOADED);
+    
+    auto mapBottomLayer = scene->CreateSceneObject(strutils::StringId(mapDefinition.mMapName.GetString()  + "_bottom"));
+    mapBottomLayer->mPosition.x = mapDefinition.mMapPosition.x * game_constants::MAP_RENDERED_SCALE;
+    mapBottomLayer->mPosition.y = mapDefinition.mMapPosition.y * game_constants::MAP_RENDERED_SCALE;
+    mapBottomLayer->mPosition.z = map_constants::TILE_BOTTOM_LAYER_Z;
+    mapBottomLayer->mScale *= game_constants::MAP_RENDERED_SCALE;
+    mapBottomLayer->mTextureResourceId = mapResources.mBottomLayerTextureResourceId;
+    mapBottomLayer->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + "world_map.vs");
+    mapBottomLayer->mShaderFloatUniformValues[strutils::StringId("map_width")] = mapDefinition.mMapDimensions.x + map_constants::MAP_RENDERING_SEAMS_BIAS;
+    mapBottomLayer->mShaderFloatUniformValues[strutils::StringId("map_height")] = mapDefinition.mMapDimensions.y + map_constants::MAP_RENDERING_SEAMS_BIAS;
+    
+    auto mapTopLayer = scene->CreateSceneObject(strutils::StringId(mapDefinition.mMapName.GetString()  + "_top"));
+    mapTopLayer->mPosition.x = mapDefinition.mMapPosition.x * game_constants::MAP_RENDERED_SCALE;
+    mapTopLayer->mPosition.y = mapDefinition.mMapPosition.y * game_constants::MAP_RENDERED_SCALE;
+    mapTopLayer->mPosition.z = map_constants::TILE_TOP_LAYER_Z;
+    mapTopLayer->mScale *= game_constants::MAP_RENDERED_SCALE;
+    mapTopLayer->mTextureResourceId = mapResources.mTopLayerTextureResourceId;
+    mapTopLayer->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + "world_map.vs");
+    mapTopLayer->mShaderFloatUniformValues[strutils::StringId("map_width")] = mapDefinition.mMapDimensions.x + map_constants::MAP_RENDERING_SEAMS_BIAS;
+    mapTopLayer->mShaderFloatUniformValues[strutils::StringId("map_height")] = mapDefinition.mMapDimensions.y + map_constants::MAP_RENDERING_SEAMS_BIAS;
+}
+
+///------------------------------------------------------------------------------------------------
+
+void Game::ShowDebugNavmap()
+{
+    auto& systemsEngine = CoreSystemsEngine::GetInstance();
+    auto scene = systemsEngine.GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME);
+
+    const auto& globalMapDataRepo = GlobalMapDataRepository::GetInstance();
+    const auto& currentMapDefinition = globalMapDataRepo.GetMapDefinition(mCurrentMap);
+    
+    auto navmapSceneObject = scene->CreateSceneObject(NAVMAP_DEBUG_SCENE_OBJECT_NAME);
+    navmapSceneObject->mPosition.x = currentMapDefinition.mMapPosition.x * game_constants::MAP_RENDERED_SCALE;
+    navmapSceneObject->mPosition.y = currentMapDefinition.mMapPosition.y * game_constants::MAP_RENDERED_SCALE;
+    navmapSceneObject->mPosition.z = map_constants::TILE_NAVMAP_LAYER_Z;
+    navmapSceneObject->mScale *= game_constants::MAP_RENDERED_SCALE;
+    
+    auto navmapSurface = CoreSystemsEngine::GetInstance().GetResourceLoadingService().GetResource<resources::ImageSurfaceResource>(mMapResourceController->GetMapResources(mCurrentMap).mNavmapImageResourceId).GetSurface();
+    
+    GLuint glTextureId; int mode;
+    rendering::CreateGLTextureFromSurface(navmapSurface, glTextureId, mode, true);
+    
+    navmapSceneObject->mTextureResourceId = systemsEngine.GetResourceLoadingService().AddDynamicallyCreatedTextureResourceId(NAVMAP_DEBUG_SCENE_OBJECT_NAME.GetString(), glTextureId, map_constants::CLIENT_NAVMAP_IMAGE_SIZE, map_constants::CLIENT_NAVMAP_IMAGE_SIZE);
+    navmapSceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 0.6f;
+}
+
+///------------------------------------------------------------------------------------------------
+
+void Game::HideDebugNavmap()
+{
+    auto& systemsEngine = CoreSystemsEngine::GetInstance();
+    auto scene = systemsEngine.GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME);
+
+    auto navmapSceneObject = scene->FindSceneObject(NAVMAP_DEBUG_SCENE_OBJECT_NAME);
+    systemsEngine.GetResourceLoadingService().UnloadResource(navmapSceneObject->mTextureResourceId);
+    scene->RemoveSceneObject(NAVMAP_DEBUG_SCENE_OBJECT_NAME);
+}
+
+///------------------------------------------------------------------------------------------------
+
 #if defined(USE_IMGUI)
 void Game::CreateDebugWidgets()
 {
@@ -405,9 +565,37 @@ void Game::CreateDebugWidgets()
         {
             ImGui::PushID(name.c_str());
             ImGui::Text("Object Type: %d", static_cast<int>(objectData.objectType));
+            ImGui::Text("Current Map: %s", network::GetCurrentMapString(objectData).c_str());
             ImGui::Text("Facing Direction: %d", static_cast<int>(objectData.facingDirection));
             ImGui::PopID();
         }
+    }
+    ImGui::End();
+    
+    static bool sShowNavmap = false;
+    ImGui::Begin("Map", nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
+    ImGui::Text("Current Map: %s", mCurrentMap.GetString().c_str());
+    ImGui::Text("Show Navmap: ");
+    ImGui::SameLine();
+    if (ImGui::Checkbox("##", &sShowNavmap))
+    {
+        if (mMapResourceController)
+        {
+            if (sShowNavmap)
+            {
+                ShowDebugNavmap();
+            }
+            else
+            {
+                HideDebugNavmap();
+            }
+        }
+    }
+    
+    if (mMapResourceController)
+    {
+        ImGui::SeparatorText("LoadedMaps");
+        mMapResourceController->CreateDebugWidgets();
     }
     ImGui::End();
 }

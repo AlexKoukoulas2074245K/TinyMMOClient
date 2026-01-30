@@ -33,7 +33,7 @@ struct MapResources
     resources::ResourceId mTopLayerTextureResourceId = 0;
     resources::ResourceId mBottomLayerTextureResourceId = 0;
     resources::ResourceId mNavmapImageResourceId = 0;
-    std::shared_ptr<networking::Navmap> mNavmap = nullptr;
+    std::shared_ptr<network::Navmap> mNavmap = nullptr;
 };
 
 ///------------------------------------------------------------------------------------------------
@@ -56,6 +56,8 @@ public:
     void LoadMapResourceTree(const strutils::StringId& mapName, const int recurseLevel, const bool asyncLoading);
     void LoadMapResources(const strutils::StringId& mapName, const bool asyncLoading);
     
+    void CreateDebugWidgets();
+
 private:
     std::mutex mMapResourceMutex;
     strutils::StringId mCurrentMapName;

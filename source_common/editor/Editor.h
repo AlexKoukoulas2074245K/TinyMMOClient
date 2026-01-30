@@ -81,7 +81,7 @@ private:
     int mBottomImageRefIndex;
     int mLeftImageRefIndex;
     int mActivePanel;
-    networking::NavmapTileType mSelectedNavmapTileType;
+    network::NavmapTileType mSelectedNavmapTileType;
     std::vector<std::vector<MapTileData>> mPaletteTileData;
     std::stack<std::unique_ptr<commands::IEditorCommand>> mExecutedCommandHistory;
     ViewOptions mViewOptions;

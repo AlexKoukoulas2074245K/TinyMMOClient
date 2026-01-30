@@ -33,7 +33,7 @@ namespace commands
 class PlaceNavmapTileTypeCommand final: public IEditorCommand
 {
 public:
-    PlaceNavmapTileTypeCommand(std::shared_ptr<scene::SceneObject> targetTileSceneObject, const networking::NavmapTileType navmapTileType);
+    PlaceNavmapTileTypeCommand(std::shared_ptr<scene::SceneObject> targetTileSceneObject, const network::NavmapTileType navmapTileType);
     
     void VExecute() override;
     void VUndo() override;
@@ -41,8 +41,8 @@ public:
     
 private:
     std::shared_ptr<scene::SceneObject> mTargetTileSceneObject;
-    const networking::NavmapTileType mOldNavmapTileType;
-    const networking::NavmapTileType mNewNavmapTileType;
+    const network::NavmapTileType mOldNavmapTileType;
+    const network::NavmapTileType mNewNavmapTileType;
 };
 
 ///------------------------------------------------------------------------------------------------

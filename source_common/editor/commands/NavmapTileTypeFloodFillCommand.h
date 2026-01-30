@@ -36,7 +36,7 @@ namespace commands
 class NavmapTileTypeFloodFillCommand final: public IEditorCommand
 {
 public:
-    NavmapTileTypeFloodFillCommand(std::shared_ptr<scene::Scene> scene, std::shared_ptr<scene::SceneObject> targetTileSceneObject, const networking::NavmapTileType navmapTileType);
+    NavmapTileTypeFloodFillCommand(std::shared_ptr<scene::Scene> scene, std::shared_ptr<scene::SceneObject> targetTileSceneObject, const network::NavmapTileType navmapTileType);
     
     void VExecute() override;
     void VUndo() override;
@@ -44,8 +44,8 @@ public:
     
 private:
     std::shared_ptr<scene::Scene> mScene;
-    const networking::NavmapTileType mOldNavmapTileType;
-    const networking::NavmapTileType mNewNavmapTileType;
+    const network::NavmapTileType mOldNavmapTileType;
+    const network::NavmapTileType mNewNavmapTileType;
     std::vector<std::shared_ptr<scene::SceneObject>> mAffectedTiles;
 };
 

@@ -50,7 +50,7 @@ namespace editor_utils
 
     inline void SetNavmapTileUniforms(std::shared_ptr<scene::SceneObject> tile)
     {
-        auto navmapTileTypeColor = networking::GetColorFromNavmapTileType(static_cast<networking::NavmapTileType>(tile->mShaderIntUniformValues.at(TILE_NAVMAP_TILE_TYPE_UNIFORM_NAME)));
+        auto navmapTileTypeColor = network::GetColorFromNavmapTileType(static_cast<network::NavmapTileType>(tile->mShaderIntUniformValues.at(TILE_NAVMAP_TILE_TYPE_UNIFORM_NAME)));
         tile->mShaderBoolUniformValues[TILE_IS_NAVMAP_TILE_UNIFORM_NAME] = true;
         tile->mShaderFloatUniformValues[TILE_NAVMAP_TILE_COLOR_R_UNIFORM_NAME] = navmapTileTypeColor.r/255.0f;
         tile->mShaderFloatUniformValues[TILE_NAVMAP_TILE_COLOR_G_UNIFORM_NAME] = navmapTileTypeColor.g/255.0f;

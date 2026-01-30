@@ -16,9 +16,9 @@ namespace commands
 
 ///------------------------------------------------------------------------------------------------
 
-PlaceNavmapTileTypeCommand::PlaceNavmapTileTypeCommand(std::shared_ptr<scene::SceneObject> targetTileSceneObject, const networking::NavmapTileType navmapTileType)
+PlaceNavmapTileTypeCommand::PlaceNavmapTileTypeCommand(std::shared_ptr<scene::SceneObject> targetTileSceneObject, const network::NavmapTileType navmapTileType)
     : mTargetTileSceneObject(targetTileSceneObject)
-    , mOldNavmapTileType(static_cast<networking::NavmapTileType>(targetTileSceneObject->mShaderIntUniformValues.at(TILE_NAVMAP_TILE_TYPE_UNIFORM_NAME)))
+    , mOldNavmapTileType(static_cast<network::NavmapTileType>(targetTileSceneObject->mShaderIntUniformValues.at(TILE_NAVMAP_TILE_TYPE_UNIFORM_NAME)))
     , mNewNavmapTileType(navmapTileType)
 {
     assert(targetTileSceneObject->mShaderBoolUniformValues.at(TILE_IS_NAVMAP_TILE_UNIFORM_NAME));

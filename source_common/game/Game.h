@@ -25,8 +25,14 @@ namespace scene
     struct SceneObject;
 }
 
+namespace network
+{
+    class Navmap;
+}
+
 class ObjectAnimationController;
 class AnimatedButton;
+class MapResourceController;
 class Game final
 {
 public:
@@ -40,12 +46,23 @@ public:
     void OnOneSecondElapsed();
     void CreateObject(const network::ObjectData& objectData);
     void DestroyObject(const network::objectId_t objectId);
+    void CreateMapSceneObjects(const strutils::StringId& mapName);
     void CreateDebugWidgets();
     
+private:
+    void ShowDebugNavmap();
+    void HideDebugNavmap();
+
 private:
     network::objectId_t mLocalPlayerId;
     std::unique_ptr<AnimatedButton> mTestButton;
     std::unique_ptr<ObjectAnimationController> mObjectAnimationController;
+    std::unique_ptr<events::IListener> mMapChangeEventListener;
+    std::unique_ptr<events::IListener> mMapSupersessionEventListener;
+    std::unique_ptr<events::IListener> mMapResourcesReadyEventListener;
+    std::unique_ptr<MapResourceController> mMapResourceController;
+    std::shared_ptr<network::Navmap> mCurrentNavmap;
+    strutils::StringId mCurrentMap;
     std::unordered_map<network::objectId_t, network::ObjectData> mLocalObjectDataMap;
 };
 
