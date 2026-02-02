@@ -279,26 +279,26 @@ void Game::Update(const float dtMillis)
             if (CoreSystemsEngine::GetInstance().GetInputStateManager().VButtonTapped(input::Button::MAIN_BUTTON))
             {
                 // Cooldown checks etc..
-                hasAttacked = true;
-                const auto& cam = systemsEngine.GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME)->GetCamera();
-                const auto& pointingPos = CoreSystemsEngine::GetInstance().GetInputStateManager().VGetPointingPosInWorldSpace(cam.GetViewMatrix(), cam.GetProjMatrix());
-                const auto& playerToPointingPos = glm::normalize(glm::vec3(pointingPos.x, pointingPos.y, objectWrapperData.mObjectData.position.z) - objectWrapperData.mObjectData.position);
-                const auto facingDirection = VecToDirection(playerToPointingPos);
-                
-                mObjectAnimationController->UpdateObjectAnimation(rootSceneObject, glm::vec3(0.0f), dtMillis, facingDirection);
-                objectWrapperData.mObjectData.facingDirection = facingDirection;
-                
-                network::ObjectStateUpdateMessage stateUpdateMessage = {};
-                stateUpdateMessage.objectData = objectWrapperData.mObjectData;
-                
-                SendMessage(sServer, &stateUpdateMessage, sizeof(stateUpdateMessage), network::channels::RELIABLE);
-                
-                network::AttackMessage attackMessage = {};
-                attackMessage.attackerId = mLocalPlayerId;
-                attackMessage.attackType = network::AttackType::PROJECTILE;
-                attackMessage.projectileType = network::ProjectileType::FIREBALL;
-
-                SendMessage(sServer, &attackMessage, sizeof(attackMessage), network::channels::RELIABLE);
+//                hasAttacked = true;
+//                const auto& cam = systemsEngine.GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME)->GetCamera();
+//                const auto& pointingPos = CoreSystemsEngine::GetInstance().GetInputStateManager().VGetPointingPosInWorldSpace(cam.GetViewMatrix(), cam.GetProjMatrix());
+//                const auto& playerToPointingPos = glm::normalize(glm::vec3(pointingPos.x, pointingPos.y, objectWrapperData.mObjectData.position.z) - objectWrapperData.mObjectData.position);
+//                const auto facingDirection = VecToDirection(playerToPointingPos);
+//                
+//                mObjectAnimationController->UpdateObjectAnimation(rootSceneObject, glm::vec3(0.0f), dtMillis, facingDirection);
+//                objectWrapperData.mObjectData.facingDirection = facingDirection;
+//                
+//                network::ObjectStateUpdateMessage stateUpdateMessage = {};
+//                stateUpdateMessage.objectData = objectWrapperData.mObjectData;
+//                
+//                SendMessage(sServer, &stateUpdateMessage, sizeof(stateUpdateMessage), network::channels::RELIABLE);
+//                
+//                network::AttackMessage attackMessage = {};
+//                attackMessage.attackerId = mLocalPlayerId;
+//                attackMessage.attackType = network::AttackType::PROJECTILE;
+//                attackMessage.projectileType = network::ProjectileType::FIREBALL;
+//
+//                SendMessage(sServer, &attackMessage, sizeof(attackMessage), network::channels::RELIABLE);
             }
             
             if (!hasAttacked)
@@ -641,6 +641,20 @@ void Game::CreateDebugWidgets()
             ImGui::Text("Object Type: %d", static_cast<int>(objectWrapperData.mObjectData.objectType));
             ImGui::Text("Current Map: %s", network::GetCurrentMapString(objectWrapperData.mObjectData).c_str());
             ImGui::Text("Facing Direction: %d", static_cast<int>(objectWrapperData.mObjectData.facingDirection));
+            
+            const auto& globalMapDataRepo = GlobalMapDataRepository::GetInstance();
+            const auto& mapName = strutils::StringId(network::GetCurrentMapString(objectWrapperData.mObjectData));
+            if (mMapResourceController && mMapResourceController->GetAllLoadedMapResources().contains(mapName) && mMapResourceController->GetAllLoadedMapResources().at(mapName).mMapResourcesState == MapResourcesState::LOADED)
+            {
+                const auto& mapDefinition = globalMapDataRepo.GetMapDefinition(mapName);
+                auto navmap = mMapResourceController->GetAllLoadedMapResources().at(mapName).mNavmap;
+                auto currentNavmapCoords = navmap->GetNavmapCoord(objectWrapperData.mSceneObjects.front()->mPosition, mapDefinition.mMapPosition, game_constants::MAP_RENDERED_SCALE);
+                auto currentNavmapTileType = navmap->GetNavmapTileAt(currentNavmapCoords);
+                
+                ImGui::Text("Navmap Tile: x:%d, y:%d", currentNavmapCoords.y, currentNavmapCoords.x);
+                ImGui::Text("Navmap Type: %s", network::GetNavmapTileTypeName(currentNavmapTileType));
+            }
+            
             ImGui::PopID();
         }
     }
