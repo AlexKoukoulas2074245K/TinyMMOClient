@@ -45,6 +45,7 @@ public:
     void WindowResize();
     void OnOneSecondElapsed();
     void CreateObject(const network::ObjectData& objectData);
+    void CreateObjectCollider(const network::ObjectData& objectData);
     void DestroyObject(const network::objectId_t objectId);
     void CreateMapSceneObjects(const strutils::StringId& mapName);
     void CreateDebugWidgets();
@@ -52,6 +53,15 @@ public:
 private:
     void ShowDebugNavmap();
     void HideDebugNavmap();
+
+private:
+    struct LocalObjectWrapper
+    {
+        // Anim(equipment) layers
+        network::ObjectData mObjectData;
+        network::ObjectColliderData mColliderData;
+        std::vector<std::shared_ptr<scene::SceneObject>> mSceneObjects;
+    };
 
 private:
     network::objectId_t mLocalPlayerId;
@@ -63,7 +73,7 @@ private:
     std::unique_ptr<MapResourceController> mMapResourceController;
     std::shared_ptr<network::Navmap> mCurrentNavmap;
     strutils::StringId mCurrentMap;
-    std::unordered_map<network::objectId_t, network::ObjectData> mLocalObjectDataMap;
+    std::unordered_map<network::objectId_t, LocalObjectWrapper> mLocalObjectWrappers;
 };
 
 ///------------------------------------------------------------------------------------------------

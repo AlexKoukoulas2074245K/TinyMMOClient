@@ -3,7 +3,7 @@
     [
         {
             "name": "test_particle",
-            "texture": "debug.png",
+            "texture": "debug/debug_square.png",
             "particle_count": 20,
             "prefilled": true,
             "continuous_generation": false,

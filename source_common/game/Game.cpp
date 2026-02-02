@@ -80,6 +80,10 @@ Game::~Game(){}
 ///------------------------------------------------------------------------------------------------
 static ENetHost* sClient;
 static ENetPeer* sServer;
+static enet_uint32 sRTTAccum = 0;
+static enet_uint32 sRTTSampleCount = 0;
+static enet_uint32 sCurrentRTT = 0;
+static bool sShowColliders = false;
 
 void Game::Init()
 {
@@ -196,6 +200,9 @@ void Game::Update(const float dtMillis)
     ENetEvent event;
     while (enet_host_service(sClient, &event, 0) > 0)
     {
+        sRTTAccum += sServer->roundTripTime;
+        sRTTSampleCount++;
+
         if (event.type == ENET_EVENT_TYPE_RECEIVE)
         {
             auto messageType = static_cast<network::MessageType>(event.packet->data[0]);
@@ -206,15 +213,16 @@ void Game::Update(const float dtMillis)
                     auto* message = reinterpret_cast<network::ObjectStateUpdateMessage*>(event.packet->data);
                     
                     // Pre-existing object
-                    if (!mLocalObjectDataMap.contains(message->objectData.objectId))
+                    if (!mLocalObjectWrappers.contains(message->objectData.objectId))
                     {
                         CreateObject(message->objectData);
+                        CreateObjectCollider(message->objectData);
                     }
                     
                     // Update everything but local player's data (for now)
                     if (message->objectData.objectId != mLocalPlayerId)
                     {
-                        mLocalObjectDataMap[message->objectData.objectId] = message->objectData;
+                        mLocalObjectWrappers[message->objectData.objectId].mObjectData = message->objectData;
                     }
                 } break;
                 
@@ -237,6 +245,7 @@ void Game::Update(const float dtMillis)
                 {
                     auto* message = reinterpret_cast<network::ObjectCreatedMessage*>(event.packet->data);
                     CreateObject(message->objectData);
+                    CreateObjectCollider(message->objectData);
                 } break;
                 
                 case network::MessageType::ObjectDestroyedMessage:
@@ -257,7 +266,7 @@ void Game::Update(const float dtMillis)
     auto& systemsEngine = CoreSystemsEngine::GetInstance();
     auto scene = systemsEngine.GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME);
     
-    for (const auto& [objectId, objectData]: mLocalObjectDataMap)
+    for (auto& [objectId, objectWrapperData]: mLocalObjectWrappers)
     {
         auto sceneObject = scene->FindSceneObject(strutils::StringId("object-" + std::to_string(objectId)));
         
@@ -270,32 +279,32 @@ void Game::Update(const float dtMillis)
             if (CoreSystemsEngine::GetInstance().GetInputStateManager().VButtonTapped(input::Button::MAIN_BUTTON))
             {
                 // Cooldown checks etc..
-//                hasAttacked = true;
-//                const auto& cam = systemsEngine.GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME)->GetCamera();
-//                const auto& pointingPos = CoreSystemsEngine::GetInstance().GetInputStateManager().VGetPointingPosInWorldSpace(cam.GetViewMatrix(), cam.GetProjMatrix());
-//                const auto& playerToPointingPos = glm::normalize(glm::vec3(pointingPos.x, pointingPos.y, objectData.position.z) - objectData.position);
-//                const auto facingDirection = VecToDirection(playerToPointingPos);
-//                
-//                mObjectAnimationController->UpdateObjectAnimation(sceneObject, glm::vec3(0.0f), dtMillis, facingDirection);
-//                mLocalObjectDataMap[mLocalPlayerId].facingDirection = facingDirection;
-//                
-//                network::ObjectStateUpdateMessage stateUpdateMessage = {};
-//                stateUpdateMessage.objectData = mLocalObjectDataMap[mLocalPlayerId];
-//                
-//                SendMessage(sServer, &stateUpdateMessage, sizeof(stateUpdateMessage), network::channels::RELIABLE);
-//                
-//                network::AttackMessage attackMessage = {};
-//                attackMessage.attackerId = mLocalPlayerId;
-//                attackMessage.attackType = network::AttackType::PROJECTILE;
-//                attackMessage.projectileType = network::ProjectileType::FIREBALL;
-//
-//                SendMessage(sServer, &attackMessage, sizeof(attackMessage), network::channels::RELIABLE);
+                hasAttacked = true;
+                const auto& cam = systemsEngine.GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME)->GetCamera();
+                const auto& pointingPos = CoreSystemsEngine::GetInstance().GetInputStateManager().VGetPointingPosInWorldSpace(cam.GetViewMatrix(), cam.GetProjMatrix());
+                const auto& playerToPointingPos = glm::normalize(glm::vec3(pointingPos.x, pointingPos.y, objectWrapperData.mObjectData.position.z) - objectWrapperData.mObjectData.position);
+                const auto facingDirection = VecToDirection(playerToPointingPos);
+                
+                mObjectAnimationController->UpdateObjectAnimation(sceneObject, glm::vec3(0.0f), dtMillis, facingDirection);
+                objectWrapperData.mObjectData.facingDirection = facingDirection;
+                
+                network::ObjectStateUpdateMessage stateUpdateMessage = {};
+                stateUpdateMessage.objectData = objectWrapperData.mObjectData;
+                
+                SendMessage(sServer, &stateUpdateMessage, sizeof(stateUpdateMessage), network::channels::RELIABLE);
+                
+                network::AttackMessage attackMessage = {};
+                attackMessage.attackerId = mLocalPlayerId;
+                attackMessage.attackType = network::AttackType::PROJECTILE;
+                attackMessage.projectileType = network::ProjectileType::FIREBALL;
+
+                SendMessage(sServer, &attackMessage, sizeof(attackMessage), network::channels::RELIABLE);
             }
             
             if (!hasAttacked)
             {
                 auto inputDirection = LocalPlayerInputController::GetMovementDirection();
-                auto velocity = glm::vec3(inputDirection.x, inputDirection.y, 0.0f) * objectData.speed * sDebugPlayerVelocityMultiplier * dtMillis;
+                auto velocity = glm::vec3(inputDirection.x, inputDirection.y, 0.0f) * objectWrapperData.mObjectData.speed * sDebugPlayerVelocityMultiplier * dtMillis;
                 
                 const auto& animationInfoResult = mObjectAnimationController->UpdateObjectAnimation(sceneObject, velocity, dtMillis, std::nullopt);
                 sceneObject->mPosition += velocity;
@@ -343,31 +352,32 @@ void Game::Update(const float dtMillis)
                     }
                 }
                 
-                mLocalObjectDataMap[mLocalPlayerId].position = sceneObject->mPosition;
-                mLocalObjectDataMap[mLocalPlayerId].velocity = velocity;
-                mLocalObjectDataMap[mLocalPlayerId].currentAnimation = network::AnimationType::RUNNING;
-                mLocalObjectDataMap[mLocalPlayerId].facingDirection = animationInfoResult.mFacingDirection;
-                network::SetCurrentMap(mLocalObjectDataMap[mLocalPlayerId], mCurrentMap.GetString());
+                
+                objectWrapperData.mObjectData.position = sceneObject->mPosition;
+                objectWrapperData.mObjectData.velocity = velocity;
+                objectWrapperData.mObjectData.currentAnimation = network::AnimationType::RUNNING;
+                objectWrapperData.mObjectData.facingDirection = animationInfoResult.mFacingDirection;
+                network::SetCurrentMap(objectWrapperData.mObjectData, mCurrentMap.GetString());
                 
                 network::ObjectStateUpdateMessage stateUpdateMessage = {};
-                stateUpdateMessage.objectData = mLocalObjectDataMap[mLocalPlayerId];
+                stateUpdateMessage.objectData = mLocalObjectWrappers[mLocalPlayerId].mObjectData;
                 
                 SendMessage(sServer, &stateUpdateMessage, sizeof(stateUpdateMessage), network::channels::UNRELIABLE);
             }
         }
         else
         {
-            auto vecToPosition = mLocalObjectDataMap.at(objectId).position - sceneObject->mPosition;
+            auto vecToPosition = objectWrapperData.mObjectData.position - sceneObject->mPosition;
             if (glm::length(vecToPosition) > 0.002f)
             {
                 auto direction = glm::normalize(vecToPosition);
-                auto velocity = glm::vec3(direction.x, direction.y, 0.0f) * objectData.speed * dtMillis;
+                auto velocity = glm::vec3(direction.x, direction.y, 0.0f) * objectWrapperData.mObjectData.speed * dtMillis;
                 sceneObject->mPosition += velocity;
             }
             
-            if (objectData.objectType != network::ObjectType::ATTACK || objectData.attackType != network::AttackType::PROJECTILE)
+            if (objectWrapperData.mObjectData.objectType != network::ObjectType::ATTACK || objectWrapperData.mObjectData.attackType != network::AttackType::PROJECTILE)
             {
-                mObjectAnimationController->UpdateObjectAnimation(sceneObject, mLocalObjectDataMap.at(objectId).velocity, dtMillis, mLocalObjectDataMap.at(objectId).facingDirection);
+                mObjectAnimationController->UpdateObjectAnimation(sceneObject, objectWrapperData.mObjectData.velocity, dtMillis, objectWrapperData.mObjectData.facingDirection);
             }
         }
     }
@@ -399,6 +409,9 @@ void Game::ApplicationMovedToBackground()
 
 void Game::OnOneSecondElapsed()
 {
+    sCurrentRTT = sRTTAccum/(math::Max(1U, sRTTSampleCount));
+    sRTTAccum = 0;
+    sRTTSampleCount = 0;
 }
 
 ///------------------------------------------------------------------------------------------------
@@ -424,7 +437,8 @@ void Game::CreateObject(const network::ObjectData& objectData)
         }
     }
     
-    mLocalObjectDataMap[objectData.objectId] = objectData;
+    mLocalObjectWrappers[objectData.objectId].mObjectData = objectData;
+
     auto sceneObjectName = strutils::StringId("object-" + std::to_string(objectData.objectId));
 
     auto sceneObject = CoreSystemsEngine::GetInstance().GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME)->FindSceneObject(sceneObjectName);
@@ -436,6 +450,7 @@ void Game::CreateObject(const network::ObjectData& objectData)
     else
     {
         sceneObject = CoreSystemsEngine::GetInstance().GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME)->CreateSceneObject(sceneObjectName);
+        mLocalObjectWrappers[objectData.objectId].mSceneObjects.push_back(sceneObject);
         switch (objectData.objectType)
         {
             case network::ObjectType::PLAYER:
@@ -473,10 +488,46 @@ void Game::CreateObject(const network::ObjectData& objectData)
 
 ///------------------------------------------------------------------------------------------------
 
+void Game::CreateObjectCollider(const network::ObjectData& objectData)
+{
+    mLocalObjectWrappers[objectData.objectId].mColliderData = objectData.colliderData;
+
+    // IF DEBUG
+    auto& systemsEngine = CoreSystemsEngine::GetInstance();
+    auto sceneObjectName = strutils::StringId("object-" + std::to_string(objectData.objectId) + "-collider");
+    auto sceneObject = systemsEngine.GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME)->CreateSceneObject(sceneObjectName);
+    
+    switch (objectData.colliderData.colliderType)
+    {
+        case network::ColliderType::CIRCLE:
+        {
+            sceneObject->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "debug/debug_circle.png");
+        } break;
+        
+        case network::ColliderType::RECTANGLE:
+        {
+            
+        } break;
+    }
+
+    sceneObject->mScale = glm::vec3(objectData.colliderData.colliderRelativeDimentions.x, objectData.colliderData.colliderRelativeDimentions.y, 1.0f);
+    sceneObject->mScale *= mLocalObjectWrappers[objectData.objectId].mSceneObjects.front()->mScale;
+    sceneObject->mPosition = mLocalObjectWrappers[objectData.objectId].mObjectData.position;
+    sceneObject->mPosition.z = map_constants::TILE_NAVMAP_LAYER_Z;
+    sceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 0.5f;
+    sceneObject->mInvisible = !sShowColliders;
+    mLocalObjectWrappers[objectData.objectId].mSceneObjects.push_back(sceneObject);
+}
+
+///------------------------------------------------------------------------------------------------
+
 void Game::DestroyObject(const network::objectId_t objectId)
 {
-    mLocalObjectDataMap.erase(objectId);
-    CoreSystemsEngine::GetInstance().GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME)->RemoveSceneObject(strutils::StringId("object-" + std::to_string(objectId)));
+    for (auto sceneObject: mLocalObjectWrappers.at(objectId).mSceneObjects)
+    {
+        CoreSystemsEngine::GetInstance().GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME)->RemoveSceneObject(sceneObject->mName);
+    }
+    mLocalObjectWrappers.erase(objectId);
 }
 
 ///------------------------------------------------------------------------------------------------
@@ -555,18 +606,36 @@ void Game::HideDebugNavmap()
 void Game::CreateDebugWidgets()
 {
     ImGui::Begin("Game Data", nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
+    ImGui::Text("Ping (millis): %d", sCurrentRTT);
     ImGui::Text("Local Player Id: %llu", mLocalPlayerId);
-    ImGui::SliderFloat("Player velocity Multiplier", &sDebugPlayerVelocityMultiplier, 0.01f, 10.0f);
-    ImGui::SeparatorText("Network Object Data");
-    for (const auto& [objectId, objectData]: mLocalObjectDataMap)
+    ImGui::SliderFloat("PVM", &sDebugPlayerVelocityMultiplier, 0.01f, 10.0f);
+    ImGui::Text("Show Colliders: ");
+    ImGui::SameLine();
+    if (ImGui::Checkbox("##", &sShowColliders))
     {
-        auto name = ("object-" + std::to_string(objectId));
+        for (const auto& [objectId, objectWrapperData]: mLocalObjectWrappers)
+        {
+            for (auto sceneObject: objectWrapperData.mSceneObjects)
+            {
+                if (strutils::StringEndsWith(sceneObject->mName.GetString(), "collider"))
+                {
+                    sceneObject->mInvisible = !sShowColliders;
+                }
+            }
+        }
+        // Toggle SO invisibility of colliders in object wrappers
+    }
+    
+    ImGui::SeparatorText("Network Object Data");
+    for (const auto& [objectId, objectWrapperData]: mLocalObjectWrappers)
+    {
+        auto name = objectId == mLocalPlayerId ? std::string("localPlayer") : ("object-" + std::to_string(objectId));
         if (ImGui::CollapsingHeader(name.c_str(), ImGuiTreeNodeFlags_None))
         {
             ImGui::PushID(name.c_str());
-            ImGui::Text("Object Type: %d", static_cast<int>(objectData.objectType));
-            ImGui::Text("Current Map: %s", network::GetCurrentMapString(objectData).c_str());
-            ImGui::Text("Facing Direction: %d", static_cast<int>(objectData.facingDirection));
+            ImGui::Text("Object Type: %d", static_cast<int>(objectWrapperData.mObjectData.objectType));
+            ImGui::Text("Current Map: %s", network::GetCurrentMapString(objectWrapperData.mObjectData).c_str());
+            ImGui::Text("Facing Direction: %d", static_cast<int>(objectWrapperData.mObjectData.facingDirection));
             ImGui::PopID();
         }
     }

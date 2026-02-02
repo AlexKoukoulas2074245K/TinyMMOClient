@@ -22,7 +22,7 @@ namespace game_constants
     inline const std::string DEFAULT_MESH_NAME = "quad.obj";
     inline const std::string DEFAULT_SHADER_NAME = "basic.vs";
     inline const std::string DEFAULT_FONT_SHADER_NAME = "font.vs";
-    inline const std::string DEFAULT_TEXTURE_NAME = "debug.png";
+    inline const std::string DEFAULT_TEXTURE_NAME = "debug/debug_square.png";
 
     // Fonts
     inline const strutils::StringId DEFAULT_FONT_NAME = strutils::StringId("font");
