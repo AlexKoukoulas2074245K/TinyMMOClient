@@ -268,9 +268,9 @@ void Game::Update(const float dtMillis)
     
     for (auto& [objectId, objectWrapperData]: mLocalObjectWrappers)
     {
-        auto sceneObject = scene->FindSceneObject(strutils::StringId("object-" + std::to_string(objectId)));
+        auto rootSceneObject = objectWrapperData.mSceneObjects.front();
         
-        assert(sceneObject);
+        assert(rootSceneObject);
 
         if (objectId == mLocalPlayerId)
         {
@@ -285,7 +285,7 @@ void Game::Update(const float dtMillis)
                 const auto& playerToPointingPos = glm::normalize(glm::vec3(pointingPos.x, pointingPos.y, objectWrapperData.mObjectData.position.z) - objectWrapperData.mObjectData.position);
                 const auto facingDirection = VecToDirection(playerToPointingPos);
                 
-                mObjectAnimationController->UpdateObjectAnimation(sceneObject, glm::vec3(0.0f), dtMillis, facingDirection);
+                mObjectAnimationController->UpdateObjectAnimation(rootSceneObject, glm::vec3(0.0f), dtMillis, facingDirection);
                 objectWrapperData.mObjectData.facingDirection = facingDirection;
                 
                 network::ObjectStateUpdateMessage stateUpdateMessage = {};
@@ -306,8 +306,8 @@ void Game::Update(const float dtMillis)
                 auto inputDirection = LocalPlayerInputController::GetMovementDirection();
                 auto velocity = glm::vec3(inputDirection.x, inputDirection.y, 0.0f) * objectWrapperData.mObjectData.speed * sDebugPlayerVelocityMultiplier * dtMillis;
                 
-                const auto& animationInfoResult = mObjectAnimationController->UpdateObjectAnimation(sceneObject, velocity, dtMillis, std::nullopt);
-                sceneObject->mPosition += velocity;
+                const auto& animationInfoResult = mObjectAnimationController->UpdateObjectAnimation(rootSceneObject, velocity, dtMillis, std::nullopt);
+                rootSceneObject->mPosition += velocity;
                 
                 const auto& globalMapDataRepo = GlobalMapDataRepository::GetInstance();
                 const auto& currentMapDefinition = globalMapDataRepo.GetMapDefinition(mCurrentMap);
@@ -315,19 +315,19 @@ void Game::Update(const float dtMillis)
                 // Determine map change direction
                 static const float MAP_TRANSITION_THRESHOLD = 0.00f;
                 strutils::StringId nextMapName = map_constants::NO_MAP_CONNECTION_NAME;
-                if (sceneObject->mPosition.x > currentMapDefinition.mMapPosition.x * game_constants::MAP_RENDERED_SCALE + (currentMapDefinition.mMapDimensions.x * game_constants::MAP_RENDERED_SCALE)/2.0f - MAP_TRANSITION_THRESHOLD)
+                if (rootSceneObject->mPosition.x > currentMapDefinition.mMapPosition.x * game_constants::MAP_RENDERED_SCALE + (currentMapDefinition.mMapDimensions.x * game_constants::MAP_RENDERED_SCALE)/2.0f - MAP_TRANSITION_THRESHOLD)
                 {
                     nextMapName = globalMapDataRepo.GetConnectedMapName(mCurrentMap, MapConnectionDirection::EAST);
                 }
-                else if (sceneObject->mPosition.x < currentMapDefinition.mMapPosition.x * game_constants::MAP_RENDERED_SCALE - (currentMapDefinition.mMapDimensions.x * game_constants::MAP_RENDERED_SCALE)/2.0f + MAP_TRANSITION_THRESHOLD)
+                else if (rootSceneObject->mPosition.x < currentMapDefinition.mMapPosition.x * game_constants::MAP_RENDERED_SCALE - (currentMapDefinition.mMapDimensions.x * game_constants::MAP_RENDERED_SCALE)/2.0f + MAP_TRANSITION_THRESHOLD)
                 {
                     nextMapName = globalMapDataRepo.GetConnectedMapName(mCurrentMap, MapConnectionDirection::WEST);
                 }
-                else if (sceneObject->mPosition.y > currentMapDefinition.mMapPosition.y * game_constants::MAP_RENDERED_SCALE + (currentMapDefinition.mMapDimensions.y * game_constants::MAP_RENDERED_SCALE)/2.0f - MAP_TRANSITION_THRESHOLD)
+                else if (rootSceneObject->mPosition.y > currentMapDefinition.mMapPosition.y * game_constants::MAP_RENDERED_SCALE + (currentMapDefinition.mMapDimensions.y * game_constants::MAP_RENDERED_SCALE)/2.0f - MAP_TRANSITION_THRESHOLD)
                 {
                     nextMapName = globalMapDataRepo.GetConnectedMapName(mCurrentMap, MapConnectionDirection::NORTH);
                 }
-                else if (sceneObject->mPosition.y < currentMapDefinition.mMapPosition.y * game_constants::MAP_RENDERED_SCALE - (currentMapDefinition.mMapDimensions.y * game_constants::MAP_RENDERED_SCALE)/2.0f + MAP_TRANSITION_THRESHOLD)
+                else if (rootSceneObject->mPosition.y < currentMapDefinition.mMapPosition.y * game_constants::MAP_RENDERED_SCALE - (currentMapDefinition.mMapDimensions.y * game_constants::MAP_RENDERED_SCALE)/2.0f + MAP_TRANSITION_THRESHOLD)
                 {
                     nextMapName = globalMapDataRepo.GetConnectedMapName(mCurrentMap, MapConnectionDirection::SOUTH);
                 }
@@ -353,7 +353,7 @@ void Game::Update(const float dtMillis)
                 }
                 
                 
-                objectWrapperData.mObjectData.position = sceneObject->mPosition;
+                objectWrapperData.mObjectData.position = rootSceneObject->mPosition;
                 objectWrapperData.mObjectData.velocity = velocity;
                 objectWrapperData.mObjectData.currentAnimation = network::AnimationType::RUNNING;
                 objectWrapperData.mObjectData.facingDirection = animationInfoResult.mFacingDirection;
@@ -367,18 +367,23 @@ void Game::Update(const float dtMillis)
         }
         else
         {
-            auto vecToPosition = objectWrapperData.mObjectData.position - sceneObject->mPosition;
+            auto vecToPosition = objectWrapperData.mObjectData.position - rootSceneObject->mPosition;
             if (glm::length(vecToPosition) > 0.002f)
             {
                 auto direction = glm::normalize(vecToPosition);
                 auto velocity = glm::vec3(direction.x, direction.y, 0.0f) * objectWrapperData.mObjectData.speed * dtMillis;
-                sceneObject->mPosition += velocity;
+                rootSceneObject->mPosition += velocity;
             }
             
             if (objectWrapperData.mObjectData.objectType != network::ObjectType::ATTACK || objectWrapperData.mObjectData.attackType != network::AttackType::PROJECTILE)
             {
-                mObjectAnimationController->UpdateObjectAnimation(sceneObject, objectWrapperData.mObjectData.velocity, dtMillis, objectWrapperData.mObjectData.facingDirection);
+                mObjectAnimationController->UpdateObjectAnimation(rootSceneObject, objectWrapperData.mObjectData.velocity, dtMillis, objectWrapperData.mObjectData.facingDirection);
             }
+        }
+        
+        for (auto otherSceneObject: objectWrapperData.mSceneObjects)
+        {
+            otherSceneObject->mPosition = glm::vec3(rootSceneObject->mPosition.x, rootSceneObject->mPosition.y, otherSceneObject->mPosition.z);
         }
     }
 
