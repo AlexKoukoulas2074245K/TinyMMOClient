@@ -867,7 +867,7 @@
                     "plt": "tileset"
                 },
                 {
-                    "crd": "0,2",
+                    "crd": "0,0",
                     "plt": "tileset"
                 }
             ],
@@ -2727,8 +2727,8 @@
                     "plt": "base_tileset"
                 },
                 {
-                    "crd": "0,1",
-                    "plt": "base_tileset"
+                    "crd": "1,3",
+                    "plt": "tileset"
                 }
             ],
             [

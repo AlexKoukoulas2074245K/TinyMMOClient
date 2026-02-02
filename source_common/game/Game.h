@@ -53,7 +53,7 @@ public:
 private:
     void ShowDebugNavmap();
     void HideDebugNavmap();
-
+    
 private:
     struct LocalObjectWrapper
     {

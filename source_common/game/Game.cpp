@@ -303,14 +303,30 @@ void Game::Update(const float dtMillis)
             
             if (!hasAttacked)
             {
+                const auto& globalMapDataRepo = GlobalMapDataRepository::GetInstance();
+                const auto& currentMapDefinition = globalMapDataRepo.GetMapDefinition(mCurrentMap);
+                
                 auto inputDirection = LocalPlayerInputController::GetMovementDirection();
                 auto velocity = glm::vec3(inputDirection.x, inputDirection.y, 0.0f) * objectWrapperData.mObjectData.speed * sDebugPlayerVelocityMultiplier * dtMillis;
                 
                 const auto& animationInfoResult = mObjectAnimationController->UpdateObjectAnimation(rootSceneObject, velocity, dtMillis, std::nullopt);
-                rootSceneObject->mPosition += velocity;
                 
-                const auto& globalMapDataRepo = GlobalMapDataRepository::GetInstance();
-                const auto& currentMapDefinition = globalMapDataRepo.GetMapDefinition(mCurrentMap);
+                // Movement integration first horizontally
+                rootSceneObject->mPosition.x += velocity.x;
+                
+                auto speculativeNavmapCoord = mCurrentNavmap->GetNavmapCoord(rootSceneObject->mPosition, currentMapDefinition.mMapPosition, game_constants::MAP_RENDERED_SCALE);
+                if (mCurrentNavmap->GetNavmapTileAt(speculativeNavmapCoord) == network::NavmapTileType::SOLID)
+                {
+                    rootSceneObject->mPosition.x -= velocity.x;
+                }
+                
+                // ... then vertically
+                rootSceneObject->mPosition.y += velocity.y;
+                speculativeNavmapCoord = mCurrentNavmap->GetNavmapCoord(rootSceneObject->mPosition, currentMapDefinition.mMapPosition, game_constants::MAP_RENDERED_SCALE);
+                if (mCurrentNavmap->GetNavmapTileAt(speculativeNavmapCoord) == network::NavmapTileType::SOLID)
+                {
+                    rootSceneObject->mPosition.y -= velocity.y;
+                }
                 
                 // Determine map change direction
                 static const float MAP_TRANSITION_THRESHOLD = 0.00f;
@@ -334,15 +350,8 @@ void Game::Update(const float dtMillis)
                 
                 if (nextMapName != map_constants::NO_MAP_CONNECTION_NAME)
                 {
-                    // Give a further push to the player to bring them concretely
-                    // into the next navmap
-//                    objectData.objectPosition += objectData.objectVelocity;
-//                    playerSceneObject->mPosition += objectData.objectVelocity;
-//                    playerNameSceneObject->mPosition += objectData.objectVelocity;
-//                    
                     mCurrentMap = nextMapName;
-                    
-                    
+                       
                     events::EventSystem::GetInstance().DispatchEvent<events::MapChangeEvent>(mCurrentMap);
                     
                     if (scene->FindSceneObject(NAVMAP_DEBUG_SCENE_OBJECT_NAME))
@@ -350,8 +359,14 @@ void Game::Update(const float dtMillis)
                         HideDebugNavmap();
                         ShowDebugNavmap();
                     }
+                    
+                    // Rubberband out of any new solid tiles we land in after map change
+                    speculativeNavmapCoord = mCurrentNavmap->GetNavmapCoord(rootSceneObject->mPosition, currentMapDefinition.mMapPosition, game_constants::MAP_RENDERED_SCALE);
+                    if (mCurrentNavmap->GetNavmapTileAt(speculativeNavmapCoord) == network::NavmapTileType::SOLID)
+                    {
+                        rootSceneObject->mPosition -= velocity;
+                    }
                 }
-                
                 
                 objectWrapperData.mObjectData.position = rootSceneObject->mPosition;
                 objectWrapperData.mObjectData.velocity = velocity;
