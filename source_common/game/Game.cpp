@@ -480,7 +480,7 @@ void Game::CreateObject(const network::ObjectData& objectData)
                 sceneObject->mShaderBoolUniformValues[IS_TEXTURE_SHEET_UNIFORM_NAME] = true;
                 sceneObject->mShaderBoolUniformValues[strutils::StringId("is_local")] = objectData.objectId == mLocalPlayerId;
                 sceneObject->mPosition = glm::vec3(objectData.position.x, objectData.position.y, objectData.position.z);
-                sceneObject->mScale = glm::vec3(0.1f, 0.1f, 0.1f);
+                sceneObject->mScale = glm::vec3(objectData.objectScale);
             } break;
             
             case network::ObjectType::ATTACK:
@@ -489,7 +489,7 @@ void Game::CreateObject(const network::ObjectData& objectData)
                 {
                     sceneObject->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + "game/projectile.png");
                     sceneObject->mPosition = glm::vec3(objectData.position.x, objectData.position.y, objectData.position.z);
-                    sceneObject->mScale = glm::vec3(0.03f, 0.03f, 0.03f);
+                    sceneObject->mScale = glm::vec3(objectData.objectScale);
                 }
                 else
                 {
