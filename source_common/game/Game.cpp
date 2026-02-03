@@ -163,35 +163,6 @@ void Game::Init()
 
 ///------------------------------------------------------------------------------------------------
 
-inline network::FacingDirection VecToDirection(const glm::vec3& vec)
-{
-    // make sure dir is not zero-length
-    if (glm::length(vec) < 1e-6f) {
-        // default or handle error
-        return network::FacingDirection::SOUTH;
-    }
-
-    // angle in radians: atan2 returns angle from -pi to pi
-    float angle = std::atan2(vec.y, vec.x);
-
-    // convert to degrees (optional, but easier to reason about)
-    float degrees = glm::degrees(angle);
-
-    // normalize to [0, 360)
-    if (degrees < 0.0f)
-        degrees += 360.0f;
-
-    // angular sectors: 360/8 = 45 degrees each
-    if      (degrees >= 337.5f || degrees < 22.5f) return network::FacingDirection::EAST;
-    else if (degrees < 67.5f)                      return network::FacingDirection::NORTH_EAST;
-    else if (degrees < 112.5f)                     return network::FacingDirection::NORTH;
-    else if (degrees < 157.5f)                     return network::FacingDirection::NORTH_WEST;
-    else if (degrees < 202.5f)                     return network::FacingDirection::WEST;
-    else if (degrees < 247.5f)                     return network::FacingDirection::SOUTH_WEST;
-    else if (degrees < 292.5f)                     return network::FacingDirection::SOUTH;
-    else                                           return network::FacingDirection::SOUTH_EAST;
-}
-
 float sDebugPlayerVelocityMultiplier = 1.0f;
 
 
@@ -279,26 +250,26 @@ void Game::Update(const float dtMillis)
             if (CoreSystemsEngine::GetInstance().GetInputStateManager().VButtonTapped(input::Button::MAIN_BUTTON))
             {
                 // Cooldown checks etc..
-//                hasAttacked = true;
-//                const auto& cam = systemsEngine.GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME)->GetCamera();
-//                const auto& pointingPos = CoreSystemsEngine::GetInstance().GetInputStateManager().VGetPointingPosInWorldSpace(cam.GetViewMatrix(), cam.GetProjMatrix());
-//                const auto& playerToPointingPos = glm::normalize(glm::vec3(pointingPos.x, pointingPos.y, objectWrapperData.mObjectData.position.z) - objectWrapperData.mObjectData.position);
-//                const auto facingDirection = VecToDirection(playerToPointingPos);
-//                
-//                mObjectAnimationController->UpdateObjectAnimation(rootSceneObject, glm::vec3(0.0f), dtMillis, facingDirection);
-//                objectWrapperData.mObjectData.facingDirection = facingDirection;
-//                
-//                network::ObjectStateUpdateMessage stateUpdateMessage = {};
-//                stateUpdateMessage.objectData = objectWrapperData.mObjectData;
-//                
-//                SendMessage(sServer, &stateUpdateMessage, sizeof(stateUpdateMessage), network::channels::RELIABLE);
-//                
-//                network::AttackMessage attackMessage = {};
-//                attackMessage.attackerId = mLocalPlayerId;
-//                attackMessage.attackType = network::AttackType::PROJECTILE;
-//                attackMessage.projectileType = network::ProjectileType::FIREBALL;
-//
-//                SendMessage(sServer, &attackMessage, sizeof(attackMessage), network::channels::RELIABLE);
+                hasAttacked = true;
+                const auto& cam = systemsEngine.GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME)->GetCamera();
+                const auto& pointingPos = CoreSystemsEngine::GetInstance().GetInputStateManager().VGetPointingPosInWorldSpace(cam.GetViewMatrix(), cam.GetProjMatrix());
+                const auto& playerToPointingPos = glm::normalize(glm::vec3(pointingPos.x, pointingPos.y, objectWrapperData.mObjectData.position.z) - objectWrapperData.mObjectData.position);
+                const auto facingDirection = network::VecToFacingDirection(playerToPointingPos);
+                
+                mObjectAnimationController->UpdateObjectAnimation(rootSceneObject, glm::vec3(0.0f), dtMillis, facingDirection);
+                objectWrapperData.mObjectData.facingDirection = facingDirection;
+                
+                network::ObjectStateUpdateMessage stateUpdateMessage = {};
+                stateUpdateMessage.objectData = objectWrapperData.mObjectData;
+                
+                SendMessage(sServer, &stateUpdateMessage, sizeof(stateUpdateMessage), network::channels::RELIABLE);
+                
+                network::AttackMessage attackMessage = {};
+                attackMessage.attackerId = mLocalPlayerId;
+                attackMessage.attackType = network::AttackType::PROJECTILE;
+                attackMessage.projectileType = network::ProjectileType::FIREBALL;
+
+                SendMessage(sServer, &attackMessage, sizeof(attackMessage), network::channels::RELIABLE);
             }
             
             if (!hasAttacked)
@@ -329,21 +300,20 @@ void Game::Update(const float dtMillis)
                 }
                 
                 // Determine map change direction
-                static const float MAP_TRANSITION_THRESHOLD = 0.00f;
                 strutils::StringId nextMapName = map_constants::NO_MAP_CONNECTION_NAME;
-                if (rootSceneObject->mPosition.x > currentMapDefinition.mMapPosition.x * game_constants::MAP_RENDERED_SCALE + (currentMapDefinition.mMapDimensions.x * game_constants::MAP_RENDERED_SCALE)/2.0f - MAP_TRANSITION_THRESHOLD)
+                if (rootSceneObject->mPosition.x > currentMapDefinition.mMapPosition.x * game_constants::MAP_RENDERED_SCALE + (currentMapDefinition.mMapDimensions.x * game_constants::MAP_RENDERED_SCALE)/2.0f)
                 {
                     nextMapName = globalMapDataRepo.GetConnectedMapName(mCurrentMap, MapConnectionDirection::EAST);
                 }
-                else if (rootSceneObject->mPosition.x < currentMapDefinition.mMapPosition.x * game_constants::MAP_RENDERED_SCALE - (currentMapDefinition.mMapDimensions.x * game_constants::MAP_RENDERED_SCALE)/2.0f + MAP_TRANSITION_THRESHOLD)
+                else if (rootSceneObject->mPosition.x < currentMapDefinition.mMapPosition.x * game_constants::MAP_RENDERED_SCALE - (currentMapDefinition.mMapDimensions.x * game_constants::MAP_RENDERED_SCALE)/2.0f)
                 {
                     nextMapName = globalMapDataRepo.GetConnectedMapName(mCurrentMap, MapConnectionDirection::WEST);
                 }
-                else if (rootSceneObject->mPosition.y > currentMapDefinition.mMapPosition.y * game_constants::MAP_RENDERED_SCALE + (currentMapDefinition.mMapDimensions.y * game_constants::MAP_RENDERED_SCALE)/2.0f - MAP_TRANSITION_THRESHOLD)
+                else if (rootSceneObject->mPosition.y > currentMapDefinition.mMapPosition.y * game_constants::MAP_RENDERED_SCALE + (currentMapDefinition.mMapDimensions.y * game_constants::MAP_RENDERED_SCALE)/2.0f)
                 {
                     nextMapName = globalMapDataRepo.GetConnectedMapName(mCurrentMap, MapConnectionDirection::NORTH);
                 }
-                else if (rootSceneObject->mPosition.y < currentMapDefinition.mMapPosition.y * game_constants::MAP_RENDERED_SCALE - (currentMapDefinition.mMapDimensions.y * game_constants::MAP_RENDERED_SCALE)/2.0f + MAP_TRANSITION_THRESHOLD)
+                else if (rootSceneObject->mPosition.y < currentMapDefinition.mMapPosition.y * game_constants::MAP_RENDERED_SCALE - (currentMapDefinition.mMapDimensions.y * game_constants::MAP_RENDERED_SCALE)/2.0f)
                 {
                     nextMapName = globalMapDataRepo.GetConnectedMapName(mCurrentMap, MapConnectionDirection::SOUTH);
                 }
@@ -487,7 +457,7 @@ void Game::CreateObject(const network::ObjectData& objectData)
             {
                 if (objectData.attackType == network::AttackType::PROJECTILE && objectData.projectileType == network::ProjectileType::FIREBALL)
                 {
-                    sceneObject->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + "game/projectile.png");
+                    sceneObject->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + "game/fireball_fx.png");
                     sceneObject->mPosition = glm::vec3(objectData.position.x, objectData.position.y, objectData.position.z);
                     sceneObject->mScale = glm::vec3(objectData.objectScale);
                 }

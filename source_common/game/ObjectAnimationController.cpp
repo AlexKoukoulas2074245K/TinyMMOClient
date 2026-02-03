@@ -15,7 +15,7 @@
 
 static const float UV_X_STEP = 0.3333f; // Assuming 3 columns
 static const float UV_Y_STEP = 0.2f;    // Assuming 5 rows
-static const float ANIMATION_TIME_CONSTANT = 0.000492f;
+static const float ANIMATION_TIME_CONSTANT = 0.000292f;
 
 ///------------------------------------------------------------------------------------------------
 
