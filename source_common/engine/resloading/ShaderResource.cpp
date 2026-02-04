@@ -133,7 +133,7 @@ bool ShaderResource::SetFloatVec4(const strutils::StringId& uniformName, const g
 {
     if (mShaderUniformNamesToLocations.count(uniformName) > 0)
     {
-        GL_CALL(glUniform4f(mShaderUniformNamesToLocations.at(uniformName), vec.x, vec.y, vec.z, vec.w));
+        GL_CALL(glUniform4f(mShaderUniformNamesToLocations.at(uniformName), vec.r, vec.g, vec.b, vec.a));
         return true;
     }
     return false;

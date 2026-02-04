@@ -29,7 +29,8 @@
 #include <engine/utils/PlatformMacros.h>
 #include <enet/enet.h>
 #include <fstream>
-#include <game/AnimatedButton.h>
+#include <game/ui/AnimatedButton.h>
+#include <game/CastBarController.h>
 #include <game/Game.h>
 #include <game/events/EventSystem.h>
 #include <game/LocalPlayerInputController.h>
@@ -118,18 +119,21 @@ void Game::Init()
     scene->GetCamera().SetZoomFactor(50.0f);
     scene->SetLoaded(true);
     
-    scene::TextSceneObjectData textData;
-    textData.mFontName = game_constants::DEFAULT_FONT_NAME;
-    textData.mText = "Health Points: 100";
-    auto guiSceneObject = scene->CreateSceneObject(strutils::StringId("gui"));
-    guiSceneObject->mShaderResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + game_constants::DEFAULT_FONT_SHADER_NAME);
-    guiSceneObject->mSceneObjectTypeData = std::move(textData);
-    guiSceneObject->mPosition = glm::vec3(0.0f, -0.155f, 1.0f);
-    guiSceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 1.0f;
-    guiSceneObject->mScale = glm::vec3(0.0004f);
+//    scene::TextSceneObjectData textData;
+//    textData.mFontName = game_constants::DEFAULT_FONT_NAME;
+//    textData.mText = "Health Points: 100";
+//    auto guiSceneObject = scene->CreateSceneObject(strutils::StringId("gui"));
+//    guiSceneObject->mShaderResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + game_constants::DEFAULT_FONT_SHADER_NAME);
+//    guiSceneObject->mSceneObjectTypeData = std::move(textData);
+//    guiSceneObject->mPosition = glm::vec3(0.0f, -0.155f, 1.0f);
+//    guiSceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 1.0f;
+//    guiSceneObject->mScale = glm::vec3(0.0004f);
     
-    mTestButton = std::make_unique<AnimatedButton>(glm::vec3(-0.3f, 0.0f, 1.0f), glm::vec3(0.0001f), game_constants::DEFAULT_FONT_NAME, "Test my limits, left and right :)", strutils::StringId("test_button"), [](){}, *scene);
+//    mTestButton = std::make_unique<AnimatedButton>(glm::vec3(-0.3f, 0.0f, 1.0f), glm::vec3(0.0001f), game_constants::DEFAULT_FONT_NAME, "Test my limits, left and right :)", strutils::StringId("test_button"), [](){}, *scene);
     
+    mCastBarController = std::make_unique<CastBarController>(scene);
+    mCastBarController->ShowCastBar(1.0f);
+
     mObjectAnimationController = std::make_unique<ObjectAnimationController>();
     mLocalPlayerId = 0;
 
@@ -386,7 +390,10 @@ void Game::Update(const float dtMillis)
         mMapResourceController->Update(mCurrentMap);
     }
     
-    mTestButton->Update(dtMillis);
+    if (mTestButton)
+    {
+        mTestButton->Update(dtMillis);
+    }
 }
 
 ///------------------------------------------------------------------------------------------------
@@ -445,7 +452,7 @@ void Game::CreateObject(const network::ObjectData& objectData)
         {
             case network::ObjectType::PLAYER:
             {
-                sceneObject->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + "game/char.png");
+                sceneObject->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + "game/anims/player_running/core.png");
                 sceneObject->mShaderResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT  + "player.vs");
                 sceneObject->mShaderBoolUniformValues[IS_TEXTURE_SHEET_UNIFORM_NAME] = true;
                 sceneObject->mShaderBoolUniformValues[strutils::StringId("is_local")] = objectData.objectId == mLocalPlayerId;

@@ -11,15 +11,15 @@
 ///------------------------------------------------------------------------------------------------
 
 #include <engine/utils/MathUtils.h>
-#include <engine/scene/Scene.h>
 #include <engine/utils/StringUtils.h>
+#include <engine/scene/SceneObject.h>
 #include <functional>
 #include <memory>
 #include <vector>
 
 ///------------------------------------------------------------------------------------------------
 
-namespace scene { struct SceneObject; }
+namespace scene { struct Scene; }
 
 ///------------------------------------------------------------------------------------------------
 
@@ -42,7 +42,7 @@ public:
         const std::string& textureFilename,
         const strutils::StringId& buttonName,
         std::function<void()> onPressCallback,
-        scene::Scene& scene,
+        std::shared_ptr<scene::Scene> scene,
         scene::SnapToEdgeBehavior snapToEdgeBehavior = scene::SnapToEdgeBehavior::NONE,
         const float snapToEdgeScaleOffsetFactor = 1.0f
     );
@@ -56,7 +56,7 @@ public:
         const std::string& text,
         const strutils::StringId& buttonName,
         std::function<void()> onPressCallback,
-        scene::Scene& scene,
+        std::shared_ptr<scene::Scene> scene,
         scene::SnapToEdgeBehavior snapToEdgeBehavior = scene::SnapToEdgeBehavior::NONE,
         const float snapToEdgeScaleOffsetFactor = 1.0f
     );
@@ -72,7 +72,7 @@ public:
         const std::string& text,
         const strutils::StringId& buttonName,
         std::function<void()> onPressCallback,
-        scene::Scene& scene,
+        std::shared_ptr<scene::Scene> scene,
         scene::SnapToEdgeBehavior snapToEdgeBehavior = scene::SnapToEdgeBehavior::NONE,
         const float snapToEdgeScaleOffsetFactor = 1.0f
     );
@@ -87,7 +87,7 @@ public:
         const std::string& text,
         const strutils::StringId& buttonName,
         std::function<void()> onPressCallback,
-        scene::Scene& scene,
+        std::shared_ptr<scene::Scene> scene,
         scene::SnapToEdgeBehavior snapToEdgeBehavior = scene::SnapToEdgeBehavior::NONE,
         const float snapToEdgeScaleOffsetFactor = 1.0f
     );
@@ -95,10 +95,10 @@ public:
     ~AnimatedButton();
     
     ButtonUpdateInteractionResult Update(const float dtMillis);
-    std::vector<std::shared_ptr<scene::SceneObject>> GetSceneObjects();
+    std::vector<std::shared_ptr<scene::SceneObject>>& GetSceneObjects();
     
 private:
-    scene::Scene& mScene;
+    std::shared_ptr<scene::Scene> mScene;
     std::vector<std::shared_ptr<scene::SceneObject>> mSceneObjects;
     std::function<void()> mOnPressCallback;
     bool mAnimating;

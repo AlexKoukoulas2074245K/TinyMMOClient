@@ -32,6 +32,7 @@ namespace network
 
 class ObjectAnimationController;
 class AnimatedButton;
+class CastBarController;
 class MapResourceController;
 class Game final
 {
@@ -66,6 +67,7 @@ private:
 private:
     network::objectId_t mLocalPlayerId;
     std::unique_ptr<AnimatedButton> mTestButton;
+    std::unique_ptr<CastBarController> mCastBarController;
     std::unique_ptr<ObjectAnimationController> mObjectAnimationController;
     std::unique_ptr<events::IListener> mMapChangeEventListener;
     std::unique_ptr<events::IListener> mMapSupersessionEventListener;

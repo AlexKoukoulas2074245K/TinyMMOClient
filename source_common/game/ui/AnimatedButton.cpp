@@ -5,7 +5,7 @@
 ///  Created by Alex Koukoulas on 02/11/2023                                                       
 ///------------------------------------------------------------------------------------------------
 
-#include <game/AnimatedButton.h>
+#include <game/ui/AnimatedButton.h>
 #include <engine/input/IInputStateManager.h>
 #include <engine/rendering/Animations.h>
 #include <engine/rendering/AnimationManager.h>
@@ -44,7 +44,7 @@ AnimatedButton::AnimatedButton
     const std::string& textureFilename,
     const strutils::StringId& buttonName,
     std::function<void()> onPressCallback,
-    scene::Scene& scene,
+    std::shared_ptr<scene::Scene> scene,
     scene::SnapToEdgeBehavior snapToEdgeBehavior /* = scene::SnapToEdgeBehavior::NONE */,
     const float snapToEdgeScaleOffsetFactor /* = 1.0f */
 )
@@ -52,7 +52,7 @@ AnimatedButton::AnimatedButton
     , mOnPressCallback(onPressCallback)
     , mAnimating(false)
 {
-    mSceneObjects.push_back(scene.CreateSceneObject(strutils::StringId(buttonName.GetString() + BASE_BUTTON_SCENE_OBJECT_NAME_POSTFIX)));
+    mSceneObjects.push_back(scene->CreateSceneObject(strutils::StringId(buttonName.GetString() + BASE_BUTTON_SCENE_OBJECT_NAME_POSTFIX)));
     
     mSceneObjects.back()->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + textureFilename);
     mSceneObjects.back()->mPosition = position;
@@ -71,7 +71,7 @@ AnimatedButton::AnimatedButton
     const std::string& text,
     const strutils::StringId& buttonName,
     std::function<void()> onPressCallback,
-    scene::Scene& scene,
+    std::shared_ptr<scene::Scene> scene,
     scene::SnapToEdgeBehavior snapToEdgeBehavior /* = scene::SnapToEdgeBehavior::NONE */,
     const float snapToEdgeScaleOffsetFactor /* = 1.0f */
 )
@@ -79,7 +79,7 @@ AnimatedButton::AnimatedButton
     , mOnPressCallback(onPressCallback)
     , mAnimating(false)
 {
-    mSceneObjects.push_back(scene.CreateSceneObject(strutils::StringId(buttonName.GetString() + BASE_BUTTON_SCENE_OBJECT_NAME_POSTFIX)));
+    mSceneObjects.push_back(scene->CreateSceneObject(strutils::StringId(buttonName.GetString() + BASE_BUTTON_SCENE_OBJECT_NAME_POSTFIX)));
     
     scene::TextSceneObjectData textData;
     textData.mFontName = fontName;
@@ -105,7 +105,7 @@ AnimatedButton::AnimatedButton
     const std::string& text,
     const strutils::StringId& buttonName,
     std::function<void()> onPressCallback,
-    scene::Scene& scene,
+    std::shared_ptr<scene::Scene> scene,
     scene::SnapToEdgeBehavior snapToEdgeBehavior /* = scene::SnapToEdgeBehavior::NONE */,
     const float snapToEdgeScaleOffsetFactor /* = 1.0f */
 )
@@ -113,7 +113,7 @@ AnimatedButton::AnimatedButton
     , mOnPressCallback(onPressCallback)
     , mAnimating(false)
 {
-    mSceneObjects.push_back(scene.CreateSceneObject(strutils::StringId(buttonName.GetString() + BASE_BUTTON_SCENE_OBJECT_NAME_POSTFIX)));
+    mSceneObjects.push_back(scene->CreateSceneObject(strutils::StringId(buttonName.GetString() + BASE_BUTTON_SCENE_OBJECT_NAME_POSTFIX)));
     
     mSceneObjects.back()->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + textureFilename);
     mSceneObjects.back()->mPosition = position;
@@ -121,7 +121,7 @@ AnimatedButton::AnimatedButton
     mSceneObjects.back()->mSnapToEdgeBehavior = snapToEdgeBehavior;
     mSceneObjects.back()->mSnapToEdgeScaleOffsetFactor = mSceneObjects.back()->mScale.x * snapToEdgeScaleOffsetFactor;
     
-    mSceneObjects.push_back(scene.CreateSceneObject(strutils::StringId(buttonName.GetString() + INNER_BUTTON_SCENE_OBJECT_NAME_POSTFIX)));
+    mSceneObjects.push_back(scene->CreateSceneObject(strutils::StringId(buttonName.GetString() + INNER_BUTTON_SCENE_OBJECT_NAME_POSTFIX)));
     
     scene::TextSceneObjectData textData;
     textData.mFontName = fontName;
@@ -156,7 +156,7 @@ AnimatedButton::AnimatedButton
     const std::string& text,
     const strutils::StringId& buttonName,
     std::function<void()> onPressCallback,
-    scene::Scene& scene,
+    std::shared_ptr<scene::Scene> scene,
     scene::SnapToEdgeBehavior snapToEdgeBehavior /* = scene::SnapToEdgeBehavior::NONE */,
     const float snapToEdgeScaleOffsetFactor /* = 1.0f */
 )
@@ -164,7 +164,7 @@ AnimatedButton::AnimatedButton
     , mOnPressCallback(onPressCallback)
     , mAnimating(false)
 {
-    mSceneObjects.push_back(scene.CreateSceneObject(strutils::StringId(buttonName.GetString() + BASE_BUTTON_SCENE_OBJECT_NAME_POSTFIX)));
+    mSceneObjects.push_back(scene->CreateSceneObject(strutils::StringId(buttonName.GetString() + BASE_BUTTON_SCENE_OBJECT_NAME_POSTFIX)));
     mSceneObjects.back()->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + textureFilename);
     mSceneObjects.back()->mPosition = texturePosition;
     mSceneObjects.back()->mScale = textureScale;
@@ -174,7 +174,7 @@ AnimatedButton::AnimatedButton
     auto textureSceneObjectRect = scene_object_utils::GetSceneObjectBoundingRect(*mSceneObjects.back());
     auto textureSceneObjectWidth = textureSceneObjectRect.topRight.x - textureSceneObjectRect.bottomLeft.x;
     
-    mSceneObjects.push_back(scene.CreateSceneObject(strutils::StringId(buttonName.GetString() + INNER_BUTTON_SCENE_OBJECT_NAME_POSTFIX)));
+    mSceneObjects.push_back(scene->CreateSceneObject(strutils::StringId(buttonName.GetString() + INNER_BUTTON_SCENE_OBJECT_NAME_POSTFIX)));
     
     scene::TextSceneObjectData textData;
     textData.mFontName = fontName;
@@ -228,7 +228,7 @@ ButtonUpdateInteractionResult AnimatedButton::Update(const float)
     ButtonUpdateInteractionResult interactionResult = ButtonUpdateInteractionResult::NOT_CLICKED;
     
     const auto& inputStateManager = CoreSystemsEngine::GetInstance().GetInputStateManager();
-    auto worldTouchPos = inputStateManager.VGetPointingPosInWorldSpace(mScene.GetCamera().GetViewMatrix(), mScene.GetCamera().GetProjMatrix());
+    auto worldTouchPos = inputStateManager.VGetPointingPosInWorldSpace(mScene->GetCamera().GetViewMatrix(), mScene->GetCamera().GetProjMatrix());
     
     auto baseSceneObject = mSceneObjects.front();
     auto sceneObjectRect = scene_object_utils::GetSceneObjectBoundingRect(*baseSceneObject);
@@ -253,6 +253,6 @@ ButtonUpdateInteractionResult AnimatedButton::Update(const float)
 
 ///------------------------------------------------------------------------------------------------
 
-std::vector<std::shared_ptr<scene::SceneObject>> AnimatedButton::GetSceneObjects() { return mSceneObjects; }
+std::vector<std::shared_ptr<scene::SceneObject>>& AnimatedButton::GetSceneObjects() { return mSceneObjects; }
 
 ///------------------------------------------------------------------------------------------------

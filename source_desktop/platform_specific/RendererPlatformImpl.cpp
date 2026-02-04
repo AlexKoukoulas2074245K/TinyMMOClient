@@ -128,6 +128,7 @@ public:
         currentShader->SetMatrix4fv(ROT_MATRIX_UNIFORM_NAME, rot);
         
         for (const auto& vec3Entry: mSceneObject.mShaderVec3UniformValues) currentShader->SetFloatVec3(vec3Entry.first, vec3Entry.second);
+        for (const auto& vec4Entry: mSceneObject.mShaderVec4UniformValues) currentShader->SetFloatVec4(vec4Entry.first, vec4Entry.second);
         for (const auto& floatEntry: mSceneObject.mShaderFloatUniformValues) currentShader->SetFloat(floatEntry.first, floatEntry.second);
         for (const auto& intEntry: mSceneObject.mShaderIntUniformValues) currentShader->SetInt(intEntry.first, intEntry.second);
         for (const auto& boolEntry: mSceneObject.mShaderBoolUniformValues) currentShader->SetBool(boolEntry.first, boolEntry.second);
@@ -217,6 +218,7 @@ public:
         currentShader->SetMatrix4fv(PROJ_MATRIX_UNIFORM_NAME, mCamera.GetProjMatrix());
         
         for (const auto& vec3Entry: mSceneObject.mShaderVec3UniformValues) currentShader->SetFloatVec3(vec3Entry.first, vec3Entry.second);
+        for (const auto& vec4Entry: mSceneObject.mShaderVec4UniformValues) currentShader->SetFloatVec4(vec4Entry.first, vec4Entry.second);
         for (const auto& floatEntry: mSceneObject.mShaderFloatUniformValues) currentShader->SetFloat(floatEntry.first, floatEntry.second);
         for (const auto& intEntry: mSceneObject.mShaderIntUniformValues) currentShader->SetInt(intEntry.first, intEntry.second);
         for (const auto& boolEntry: mSceneObject.mShaderBoolUniformValues) currentShader->SetBool(boolEntry.first, boolEntry.second);
@@ -713,6 +715,14 @@ void RendererPlatformImpl::CreateIMGuiWidgets()
                     ImGui::SliderFloat((uniformVec3Entry.first.GetString() + ".x").c_str(), &uniformVec3Entry.second.x, -1.0f, 1.0f);
                     ImGui::SliderFloat((uniformVec3Entry.first.GetString() + ".y").c_str(), &uniformVec3Entry.second.y, -1.0f, 1.0f);
                     ImGui::SliderFloat((uniformVec3Entry.first.GetString() + ".z").c_str(), &uniformVec3Entry.second.z, -1.0f, 1.0f);
+                }
+                ImGui::SeparatorText("Uniforms (vec4)");
+                for (auto& uniformVec4Entry: sceneObject->mShaderVec4UniformValues)
+                {
+                    ImGui::SliderFloat((uniformVec4Entry.first.GetString() + ".r").c_str(), &uniformVec4Entry.second.r, -1.0f, 1.0f);
+                    ImGui::SliderFloat((uniformVec4Entry.first.GetString() + ".g").c_str(), &uniformVec4Entry.second.g, -1.0f, 1.0f);
+                    ImGui::SliderFloat((uniformVec4Entry.first.GetString() + ".b").c_str(), &uniformVec4Entry.second.b, -1.0f, 1.0f);
+                    ImGui::SliderFloat((uniformVec4Entry.first.GetString() + ".a").c_str(), &uniformVec4Entry.second.a, -1.0f, 1.0f);
                 }
                 ImGui::PopID();
             }
