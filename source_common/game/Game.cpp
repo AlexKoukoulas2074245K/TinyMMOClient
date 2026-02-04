@@ -132,7 +132,7 @@ void Game::Init()
 //    mTestButton = std::make_unique<AnimatedButton>(glm::vec3(-0.3f, 0.0f, 1.0f), glm::vec3(0.0001f), game_constants::DEFAULT_FONT_NAME, "Test my limits, left and right :)", strutils::StringId("test_button"), [](){}, *scene);
     
     mCastBarController = std::make_unique<CastBarController>(scene);
-    mCastBarController->ShowCastBar(1.0f);
+    //mCastBarController->ShowCastBar(1.0f);
 
     mObjectAnimationController = std::make_unique<ObjectAnimationController>();
     mLocalPlayerId = 0;
@@ -229,7 +229,8 @@ void Game::Update(const float dtMillis)
                     DestroyObject(message->objectId);
                 } break;
                     
-                case network::MessageType::AttackMessage:
+                case network::MessageType::BeginAttackRequestMessage:
+                case network::MessageType::BeginAttackResponseMessage:
                 case network::MessageType::UNUSED:
                     break;
             }
@@ -249,34 +250,31 @@ void Game::Update(const float dtMillis)
 
         if (objectId == mLocalPlayerId)
         {
-            // Attacking overrides movement direction
-            bool hasAttacked = false;
             if (CoreSystemsEngine::GetInstance().GetInputStateManager().VButtonTapped(input::Button::MAIN_BUTTON))
             {
                 // Cooldown checks etc..
-                hasAttacked = true;
-                const auto& cam = systemsEngine.GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME)->GetCamera();
-                const auto& pointingPos = CoreSystemsEngine::GetInstance().GetInputStateManager().VGetPointingPosInWorldSpace(cam.GetViewMatrix(), cam.GetProjMatrix());
-                const auto& playerToPointingPos = glm::normalize(glm::vec3(pointingPos.x, pointingPos.y, objectWrapperData.mObjectData.position.z) - objectWrapperData.mObjectData.position);
-                const auto facingDirection = network::VecToFacingDirection(playerToPointingPos);
-                
-                mObjectAnimationController->UpdateObjectAnimation(rootSceneObject, glm::vec3(0.0f), dtMillis, facingDirection);
-                objectWrapperData.mObjectData.facingDirection = facingDirection;
-                
-                network::ObjectStateUpdateMessage stateUpdateMessage = {};
-                stateUpdateMessage.objectData = objectWrapperData.mObjectData;
-                
-                SendMessage(sServer, &stateUpdateMessage, sizeof(stateUpdateMessage), network::channels::RELIABLE);
-                
-                network::AttackMessage attackMessage = {};
-                attackMessage.attackerId = mLocalPlayerId;
-                attackMessage.attackType = network::AttackType::PROJECTILE;
-                attackMessage.projectileType = network::ProjectileType::FIREBALL;
-
-                SendMessage(sServer, &attackMessage, sizeof(attackMessage), network::channels::RELIABLE);
+//                const auto& cam = systemsEngine.GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME)->GetCamera();
+//                const auto& pointingPos = CoreSystemsEngine::GetInstance().GetInputStateManager().VGetPointingPosInWorldSpace(cam.GetViewMatrix(), cam.GetProjMatrix());
+//                const auto& playerToPointingPos = glm::normalize(glm::vec3(pointingPos.x, pointingPos.y, objectWrapperData.mObjectData.position.z) - objectWrapperData.mObjectData.position);
+//                const auto facingDirection = network::VecToFacingDirection(playerToPointingPos);
+//                
+//                objectWrapperData.mObjectData.currentState = network::ObjectState::BEGIN_MELEE;
+//                objectWrapperData.mObjectData.facingDirection = facingDirection;
+//                mObjectAnimationController->UpdateObjectAnimation(rootSceneObject, objectWrapperData.mObjectData.currentState, facingDirection, glm::vec3(0.0f), dtMillis);
+//                
+//                network::ObjectStateUpdateMessage stateUpdateMessage = {};
+//                stateUpdateMessage.objectData = objectWrapperData.mObjectData;
+//                
+//                SendMessage(sServer, &stateUpdateMessage, sizeof(stateUpdateMessage), network::channels::RELIABLE);
+//                
+//                network::BeginAttackRequestMessage attackRequestMessage = {};
+//                attackRequestMessage.attackerId = mLocalPlayerId;
+//                attackRequestMessage.attackType = network::AttackType::MELEE;
+//
+//                SendMessage(sServer, &attackRequestMessage, sizeof(attackRequestMessage), network::channels::RELIABLE);
             }
             
-            if (!hasAttacked)
+            if (objectWrapperData.mObjectData.currentState == network::ObjectState::IDLE || objectWrapperData.mObjectData.currentState == network::ObjectState::RUNNING)
             {
                 const auto& globalMapDataRepo = GlobalMapDataRepository::GetInstance();
                 const auto& currentMapDefinition = globalMapDataRepo.GetMapDefinition(mCurrentMap);
@@ -284,7 +282,7 @@ void Game::Update(const float dtMillis)
                 auto inputDirection = LocalPlayerInputController::GetMovementDirection();
                 auto velocity = glm::vec3(inputDirection.x, inputDirection.y, 0.0f) * objectWrapperData.mObjectData.speed * sDebugPlayerVelocityMultiplier * dtMillis;
                 
-                const auto& animationInfoResult = mObjectAnimationController->UpdateObjectAnimation(rootSceneObject, velocity, dtMillis, std::nullopt);
+                const auto& animationInfoResult = mObjectAnimationController->UpdateObjectAnimation(rootSceneObject, objectWrapperData.mObjectData.currentState, network::VecToFacingDirection(velocity), velocity, dtMillis);
                 
                 // Movement integration first horizontally
                 rootSceneObject->mPosition.x += velocity.x;
@@ -344,7 +342,7 @@ void Game::Update(const float dtMillis)
                 
                 objectWrapperData.mObjectData.position = rootSceneObject->mPosition;
                 objectWrapperData.mObjectData.velocity = velocity;
-                objectWrapperData.mObjectData.currentAnimation = network::AnimationType::RUNNING;
+                objectWrapperData.mObjectData.currentState = network::ObjectState::RUNNING;
                 objectWrapperData.mObjectData.facingDirection = animationInfoResult.mFacingDirection;
                 network::SetCurrentMap(objectWrapperData.mObjectData, mCurrentMap.GetString());
                 
@@ -366,7 +364,7 @@ void Game::Update(const float dtMillis)
             
             if (objectWrapperData.mObjectData.objectType != network::ObjectType::ATTACK || objectWrapperData.mObjectData.attackType != network::AttackType::PROJECTILE)
             {
-                mObjectAnimationController->UpdateObjectAnimation(rootSceneObject, objectWrapperData.mObjectData.velocity, dtMillis, objectWrapperData.mObjectData.facingDirection);
+                mObjectAnimationController->UpdateObjectAnimation(rootSceneObject, objectWrapperData.mObjectData.currentState, objectWrapperData.mObjectData.facingDirection, objectWrapperData.mObjectData.velocity, dtMillis);
             }
         }
         

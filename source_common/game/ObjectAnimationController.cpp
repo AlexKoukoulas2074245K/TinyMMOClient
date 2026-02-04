@@ -30,6 +30,39 @@ static const std::pair<glm::vec2, glm::vec2> ANIMATION_UV_MAP[5][3] =
 
 ///------------------------------------------------------------------------------------------------
 
+static inline int GetAnimationRowFromFacingDirection(const network::FacingDirection direction)
+{
+    switch (direction)
+    {
+        case network::FacingDirection::NORTH_WEST:
+        case network::FacingDirection::NORTH_EAST:
+            return 3;
+        
+        case network::FacingDirection::SOUTH_WEST:
+        case network::FacingDirection::SOUTH_EAST:
+            return 1;
+        
+        case network::FacingDirection::NORTH:
+            return 4;
+
+        case network::FacingDirection::SOUTH:
+            return 0;
+            
+        case network::FacingDirection::EAST:
+        case network::FacingDirection::WEST:
+            return 2;
+    }
+};
+
+static inline bool ShouldFlipAnimation(const network::FacingDirection direction)
+{
+    return direction == network::FacingDirection::NORTH_WEST ||
+           direction == network::FacingDirection::SOUTH_WEST ||
+           direction == network::FacingDirection::WEST;
+};
+
+///------------------------------------------------------------------------------------------------
+
 ObjectAnimationController::ObjectAnimationController()
 {
     events::EventSystem::GetInstance().RegisterForEvent<events::ObjectDestroyedEvent>(this, &ObjectAnimationController::OnObjectDestroyedEvent);
@@ -44,120 +77,65 @@ void ObjectAnimationController::OnObjectDestroyedEvent(const events::ObjectDestr
 
 ///------------------------------------------------------------------------------------------------
 
-const ObjectAnimationController::ObjectAnimationInfo& ObjectAnimationController::UpdateObjectAnimation(std::shared_ptr<scene::SceneObject> sceneObject, const glm::vec3& velocity, const float dtMillis, std::optional<network::FacingDirection> facingDirection)
+const ObjectAnimationController::ObjectAnimationInfo& ObjectAnimationController::UpdateObjectAnimation(std::shared_ptr<scene::SceneObject> sceneObject, const network::ObjectState objectState, const network::FacingDirection facingDirection, const glm::vec3& velocity, const float dtMillis)
 {
     if (!mObjectAnimationInfoMap.count(sceneObject->mName))
     {
         mObjectAnimationInfoMap[sceneObject->mName] = {};
     }
     
-    if (glm::length(velocity) <= 0.0f)
+    if (mObjectAnimationInfoMap[sceneObject->mName].mObjectState != objectState)
     {
-        mObjectAnimationInfoMap[sceneObject->mName].mFrameIndex = 1;
-    }
-    else
-    {
-        mObjectAnimationInfoMap[sceneObject->mName].mAnimationTimeAccum += dtMillis/1000.0f;
-        
-        float targetAnimationTime = ANIMATION_TIME_CONSTANT/glm::length(velocity);
-        if (mObjectAnimationInfoMap[sceneObject->mName].mAnimationTimeAccum > targetAnimationTime)
+        // Animation Change
+        switch (objectState)
         {
-            mObjectAnimationInfoMap[sceneObject->mName].mAnimationTimeAccum -= targetAnimationTime;
-            mObjectAnimationInfoMap[sceneObject->mName].mFrameIndex = (mObjectAnimationInfoMap[sceneObject->mName].mFrameIndex + 1) % 3;
-        }
-
-        // NE
-        if (velocity.x > 0.0f && velocity.y > 0.0f)
-        {
-            mObjectAnimationInfoMap[sceneObject->mName].mAnimationRow = 3;
-            mObjectAnimationInfoMap[sceneObject->mName].mFlippedAnimation = false;
-            mObjectAnimationInfoMap[sceneObject->mName].mFacingDirection = network::FacingDirection::NORTH_EAST;
-        }
-        // SE
-        else if (velocity.x > 0.0f && velocity.y < 0.0f)
-        {
-            mObjectAnimationInfoMap[sceneObject->mName].mAnimationRow = 1;
-            mObjectAnimationInfoMap[sceneObject->mName].mFlippedAnimation = false;
-            mObjectAnimationInfoMap[sceneObject->mName].mFacingDirection = network::FacingDirection::SOUTH_EAST;
-        }
-        // SW
-        else if (velocity.x < 0.0f && velocity.y < 0.0f)
-        {
-            mObjectAnimationInfoMap[sceneObject->mName].mAnimationRow = 1;
-            mObjectAnimationInfoMap[sceneObject->mName].mFlippedAnimation = true;
-            mObjectAnimationInfoMap[sceneObject->mName].mFacingDirection = network::FacingDirection::SOUTH_WEST;
-        }
-        // NW
-        else if (velocity.x < 0.0f && velocity.y > 0.0f)
-        {
-            mObjectAnimationInfoMap[sceneObject->mName].mAnimationRow = 3;
-            mObjectAnimationInfoMap[sceneObject->mName].mFlippedAnimation = true;
-            mObjectAnimationInfoMap[sceneObject->mName].mFacingDirection = network::FacingDirection::NORTH_WEST;
-        }
-        // W
-        else if (velocity.y > 0.0f)
-        {
-            mObjectAnimationInfoMap[sceneObject->mName].mAnimationRow = 4;
-            mObjectAnimationInfoMap[sceneObject->mName].mFlippedAnimation = false;
-            mObjectAnimationInfoMap[sceneObject->mName].mFacingDirection = network::FacingDirection::NORTH;
-        }
-        // S
-        else if (velocity.y < 0.0f)
-        {
-            mObjectAnimationInfoMap[sceneObject->mName].mAnimationRow = 0;
-            mObjectAnimationInfoMap[sceneObject->mName].mFlippedAnimation = false;
-            mObjectAnimationInfoMap[sceneObject->mName].mFacingDirection = network::FacingDirection::SOUTH;
-        }
-        // W
-        else if (velocity.x < 0.0f)
-        {
-            mObjectAnimationInfoMap[sceneObject->mName].mAnimationRow = 2;
-            mObjectAnimationInfoMap[sceneObject->mName].mFlippedAnimation = true;
-            mObjectAnimationInfoMap[sceneObject->mName].mFacingDirection = network::FacingDirection::WEST;
-        }
-        // E
-        else if (velocity.x > 0.0f)
-        {
-            mObjectAnimationInfoMap[sceneObject->mName].mAnimationRow = 2;
-            mObjectAnimationInfoMap[sceneObject->mName].mFlippedAnimation = false;
-            mObjectAnimationInfoMap[sceneObject->mName].mFacingDirection = network::FacingDirection::EAST;
+            case network::ObjectState::IDLE:
+            case network::ObjectState::RUNNING:
+            {
+                sceneObject->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "game/anims/player_running/core.png");
+            } break;
+            case network::ObjectState::BEGIN_MELEE:
+            case network::ObjectState::MELEE_ATTACK:
+            {
+                sceneObject->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "game/anims/player_melee_attack/core.png");
+            } break;
+            case network::ObjectState::CASTING:
+            {
+                sceneObject->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "game/anims/player_casting/core.png");
+            } break;
         }
     }
     
-    if (facingDirection.has_value())
+    mObjectAnimationInfoMap[sceneObject->mName].mObjectState = objectState;
+    mObjectAnimationInfoMap[sceneObject->mName].mFacingDirection = facingDirection;
+    
+    auto shouldProgressAnimation = objectState != network::ObjectState::BEGIN_MELEE;
+    if (!shouldProgressAnimation)
     {
-        auto facingDirectionToAnimationRow = [](const network::FacingDirection direction)
+        mObjectAnimationInfoMap[sceneObject->mName].mFrameIndex = 0;
+        mObjectAnimationInfoMap[sceneObject->mName].mAnimationRow = GetAnimationRowFromFacingDirection(facingDirection);
+        mObjectAnimationInfoMap[sceneObject->mName].mFlippedAnimation = ShouldFlipAnimation(facingDirection);
+    }
+    else
+    {
+        if (glm::length(velocity) <= 0.0f)
         {
-            switch (direction)
+            mObjectAnimationInfoMap[sceneObject->mName].mFrameIndex = 1;
+        }
+        else
+        {
+            mObjectAnimationInfoMap[sceneObject->mName].mAnimationTimeAccum += dtMillis/1000.0f;
+            
+            float targetAnimationTime = ANIMATION_TIME_CONSTANT/glm::length(velocity);
+            if (mObjectAnimationInfoMap[sceneObject->mName].mAnimationTimeAccum > targetAnimationTime)
             {
-                case network::FacingDirection::NORTH_WEST:
-                case network::FacingDirection::NORTH_EAST:
-                    return 3;
-                
-                case network::FacingDirection::SOUTH_WEST:
-                case network::FacingDirection::SOUTH_EAST:
-                    return 1;
-                
-                case network::FacingDirection::NORTH:
-                    return 4;
-
-                case network::FacingDirection::SOUTH:
-                    return 0;
-                    
-                case network::FacingDirection::EAST:
-                case network::FacingDirection::WEST:
-                    return 2;
+                mObjectAnimationInfoMap[sceneObject->mName].mAnimationTimeAccum -= targetAnimationTime;
+                mObjectAnimationInfoMap[sceneObject->mName].mFrameIndex = (mObjectAnimationInfoMap[sceneObject->mName].mFrameIndex + 1) % 3;
             }
-        };
-        auto shouldFlipAnimation = [](const network::FacingDirection direction)
-        {
-            return direction == network::FacingDirection::NORTH_WEST ||
-                   direction == network::FacingDirection::SOUTH_WEST ||
-                   direction == network::FacingDirection::WEST;
-        };
-        
-        mObjectAnimationInfoMap[sceneObject->mName].mAnimationRow = facingDirectionToAnimationRow(*facingDirection);
-        mObjectAnimationInfoMap[sceneObject->mName].mFlippedAnimation = shouldFlipAnimation(*facingDirection);
+            
+            mObjectAnimationInfoMap[sceneObject->mName].mAnimationRow = GetAnimationRowFromFacingDirection(facingDirection);
+            mObjectAnimationInfoMap[sceneObject->mName].mFlippedAnimation = ShouldFlipAnimation(facingDirection);
+        }
     }
     
     sceneObject->mShaderFloatUniformValues[MIN_U_UNIFORM_NAME] = ANIMATION_UV_MAP[mObjectAnimationInfoMap[sceneObject->mName].mAnimationRow][mObjectAnimationInfoMap[sceneObject->mName].mFrameIndex].first.x;
