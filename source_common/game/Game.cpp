@@ -55,6 +55,7 @@
 #elif defined(WINDOWS)
 #include <platform_utilities/WindowsUtils.h>
 #endif
+#include <iostream>
 
 ///------------------------------------------------------------------------------------------------
 
@@ -213,7 +214,6 @@ void Game::Update(const float dtMillis)
                 case network::MessageType::PlayerDisconnectedMessage:
                 {
                     auto* message = reinterpret_cast<network::PlayerDisconnectedMessage*>(event.packet->data);
-                    events::EventSystem::GetInstance().DispatchEvent<events::ObjectDestroyedEvent>(GetSceneObjectNameId(message->objectId));
                     DestroyObject(message->objectId);
                 } break;
                     
@@ -226,7 +226,6 @@ void Game::Update(const float dtMillis)
                 case network::MessageType::ObjectDestroyedMessage:
                 {
                     auto* message = reinterpret_cast<network::ObjectDestroyedMessage*>(event.packet->data);
-                    events::EventSystem::GetInstance().DispatchEvent<events::ObjectDestroyedEvent>(GetSceneObjectNameId(message->objectId));
                     DestroyObject(message->objectId);
                 } break;
                 
@@ -283,13 +282,13 @@ void Game::Update(const float dtMillis)
                 network::ObjectStateUpdateMessage stateUpdateMessage = {};
                 stateUpdateMessage.objectData = objectWrapperData.mObjectData;
                 
-                SendMessage(sServer, &stateUpdateMessage, sizeof(stateUpdateMessage), network::channels::RELIABLE);
+                network::SendMessage(sServer, &stateUpdateMessage, sizeof(stateUpdateMessage), network::channels::RELIABLE);
                 
                 network::BeginAttackRequestMessage attackRequestMessage = {};
                 attackRequestMessage.attackerId = mLocalPlayerId;
                 attackRequestMessage.attackType = network::AttackType::MELEE;
 
-                SendMessage(sServer, &attackRequestMessage, sizeof(attackRequestMessage), network::channels::RELIABLE);
+                network::SendMessage(sServer, &attackRequestMessage, sizeof(attackRequestMessage), network::channels::RELIABLE);
             }
             else if (objectWrapperData.mObjectData.objectState == network::ObjectState::BEGIN_MELEE)
             {
@@ -362,7 +361,7 @@ void Game::Update(const float dtMillis)
                     }
                     
                     // Rubberband out of any new solid tiles we land in after map change
-                    speculativeNavmapCoord = mCurrentNavmap->GetNavmapCoord(rootSceneObject->mPosition, currentMapDefinition.mMapPosition, game_constants::MAP_RENDERED_SCALE);
+                    speculativeNavmapCoord = mCurrentNavmap->GetNavmapCoord(rootSceneObject->mPosition, globalMapDataRepo.GetMapDefinition(mCurrentMap).mMapPosition, game_constants::MAP_RENDERED_SCALE);
                     if (mCurrentNavmap->GetNavmapTileAt(speculativeNavmapCoord) == network::NavmapTileType::SOLID)
                     {
                         rootSceneObject->mPosition -= velocity;
@@ -378,7 +377,7 @@ void Game::Update(const float dtMillis)
                 network::ObjectStateUpdateMessage stateUpdateMessage = {};
                 stateUpdateMessage.objectData = mLocalObjectWrappers[mLocalPlayerId].mObjectData;
                 
-                SendMessage(sServer, &stateUpdateMessage, sizeof(stateUpdateMessage), network::channels::UNRELIABLE);
+                network::SendMessage(sServer, &stateUpdateMessage, sizeof(stateUpdateMessage), network::channels::UNRELIABLE);
             }
         }
         else
@@ -468,6 +467,7 @@ void Game::CreateObject(const network::ObjectData& objectData)
 
 void Game::DestroyObject(const network::objectId_t objectId)
 {
+    events::EventSystem::GetInstance().DispatchEvent<events::ObjectDestroyedEvent>(GetSceneObjectNameId(objectId));
     auto& animationManager = CoreSystemsEngine::GetInstance().GetAnimationManager();
     for (auto sceneObject: mLocalObjectWrappers.at(objectId).mSceneObjects)
     {
