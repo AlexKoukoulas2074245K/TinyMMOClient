@@ -46,7 +46,6 @@ public:
     void WindowResize();
     void OnOneSecondElapsed();
     void CreateObject(const network::ObjectData& objectData);
-    void CreateObjectCollider(const network::ObjectData& objectData);
     void DestroyObject(const network::objectId_t objectId);
     void CreateMapSceneObjects(const strutils::StringId& mapName);
     void CreateDebugWidgets();

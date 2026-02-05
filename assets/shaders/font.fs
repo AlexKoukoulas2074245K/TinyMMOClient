@@ -9,7 +9,6 @@ in vec3 frag_unprojected_pos;
 in float frag_alpha;
 out vec4 frag_color;
 
-uniform float custom_alpha;
 uniform sampler2D tex;
 
 void main()

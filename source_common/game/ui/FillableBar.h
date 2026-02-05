@@ -40,7 +40,9 @@ public:
     
     void AddTextElement(const std::string& text, const glm::vec3& offset, const glm::vec3& scale, const strutils::StringId& name);
     void SetFillProgress(const float fillProgress);
-    
+    void SetColorFactor(const glm::vec4 colorFactor);
+    float& GetFillProgress();
+
     std::vector<std::shared_ptr<scene::SceneObject>>& GetSceneObjects();
     
 private:

@@ -6,6 +6,7 @@
 ///------------------------------------------------------------------------------------------------
 
 #include <engine/scene/Scene.h>
+#include <engine/rendering/CommonUniforms.h>
 #include <engine/resloading/MeshResource.h>
 #include <engine/resloading/ResourceLoadingService.h>
 
@@ -37,6 +38,7 @@ std::shared_ptr<SceneObject> Scene::CreateSceneObject(const strutils::StringId s
     auto newSceneObject = std::make_shared<SceneObject>();
     newSceneObject->mScene = this;
     newSceneObject->mName = sceneObjectName;
+    newSceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 1.0f;
     mSceneObjects.push_back(newSceneObject);
     return newSceneObject;
 }

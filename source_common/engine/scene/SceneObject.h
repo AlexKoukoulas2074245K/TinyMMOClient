@@ -131,7 +131,7 @@ struct SceneObject
     resources::ResourceId mEffectTextureResourceIds[EFFECT_TEXTURES_COUNT] = {};
     SnapToEdgeBehavior mSnapToEdgeBehavior = SnapToEdgeBehavior::NONE;
     float mSnapToEdgeScaleOffsetFactor = 0.0f;
-    bool mInvisible = false;
+    bool mInvisible = false; // Will not be rendered at all as opposed to custom_alpha being set to 0 (which will be rendered even though invisibly)
     bool mDeferredRendering = false;
 };
 

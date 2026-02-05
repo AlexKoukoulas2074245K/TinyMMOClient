@@ -253,7 +253,7 @@ void CoreSystemsEngine::Start(std::function<void()> clientInitFunction, std::fun
             mSystems->mSoundManager.ResumeAudio();
         }
         
-        if (mSystems->mInputStateManager.VButtonTapped(input::Button::SECONDARY_BUTTON))
+        if (mSystems->mInputStateManager.VButtonTapped(input::Button::MIDDLE_BUTTON))
         {
 #if defined(USE_IMGUI) && !defined(USE_EDITOR)
             freezeGame = !freezeGame;

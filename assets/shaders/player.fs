@@ -14,7 +14,6 @@ uniform vec3 point_light_position;
 uniform float point_light_power;
 uniform float custom_alpha;
 uniform bool affected_by_light;
-uniform bool is_local;
 out vec4 frag_color;
 
 void main()
@@ -24,11 +23,6 @@ void main()
     frag_color = texture(tex, vec2(final_uv_x, final_uv_y));
 
     if (frag_color.a < 0.1) discard;
-    
-    if (!is_local)
-    {
-        frag_color *= vec4(1.0f, 0.1f, 0.1f, 1.0f);
-    }
 
     if (affected_by_light)
     {

@@ -28,13 +28,9 @@ namespace game_constants
     inline const strutils::StringId DEFAULT_FONT_NAME = strutils::StringId("font");
     
     // Game Constants
-    //inline const float PLAYER_RUBBERBAND_SPEED = 0.002f;
     inline const strutils::StringId WORLD_SCENE_NAME = strutils::StringId("world");
     inline const strutils::StringId GUI_SCENE_NAME = strutils::StringId("gui");
-    inline const glm::vec3 PLAYER_NAMEPLATE_OFFSET = {0.01f, 0.065f, 0.0f};
     inline const float MAP_RENDERED_SCALE = 4.0f;
-
-    // Networking
 }
 
 ///------------------------------------------------------------------------------------------------

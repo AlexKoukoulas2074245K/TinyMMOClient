@@ -28,6 +28,7 @@ public:
         int mFrameIndex = 0;
         int mAnimationRow = 0;
         bool mFlippedAnimation = false;
+        bool mAnimationFinished = false;
         float mAnimationTimeAccum = 0.0f;
         network::FacingDirection mFacingDirection;
         network::ObjectState mObjectState;
@@ -38,7 +39,11 @@ public:
     
     void OnObjectDestroyedEvent(const events::ObjectDestroyedEvent& objectDestroyedEvent);
 
-    const ObjectAnimationInfo& UpdateObjectAnimation(std::shared_ptr<scene::SceneObject> sceneObject, const network::ObjectState objectState, const network::FacingDirection facingDirection, const glm::vec3& velocity, const float dtMillis);
+    const ObjectAnimationInfo& UpdateObjectAnimation(std::shared_ptr<scene::SceneObject> sceneObject, const network::ObjectType objectType, const network::ObjectState objectState, const network::FacingDirection facingDirection, const glm::vec3& velocity, const float dtMillis);
+    
+private:
+    void UpdateCharacterAnimation(std::shared_ptr<scene::SceneObject> sceneObject, const network::ObjectState objectState, const network::FacingDirection facingDirection, const glm::vec3& velocity, const float dtMillis);
+    void UpdateAttackAnimation(std::shared_ptr<scene::SceneObject> sceneObject, const network::FacingDirection facingDirection, const float dtMillis);
     
 private:
     std::unordered_map<strutils::StringId, ObjectAnimationInfo, strutils::StringIdHasher> mObjectAnimationInfoMap;

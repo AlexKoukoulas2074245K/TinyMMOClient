@@ -41,7 +41,6 @@ FillableBar::FillableBar
     mSceneObjects.back()->mEffectTextureResourceIds[0] = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + FILLABLE_BAR_PROGRESS_TEXTURE_FILE);
     mSceneObjects.back()->mPosition = position;
     mSceneObjects.back()->mScale = scale;
-    mSceneObjects.back()->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 1.0f;
     mSceneObjects.back()->mShaderFloatUniformValues[FILL_PROGRESS_UNIFORM_NAME] = fillProgress;
     mSceneObjects.back()->mShaderVec4UniformValues[COLOR_FACTOR_UNIFORM_NAME] = colorFactor;
 }
@@ -69,7 +68,6 @@ void FillableBar::AddTextElement(const std::string& text, const glm::vec3& offse
     textSceneObject->mSceneObjectTypeData = std::move(textData);
     textSceneObject->mPosition = mSceneObjects.front()->mPosition + offset;
     textSceneObject->mScale = scale;
-    textSceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 1.0f;
     mSceneObjects.push_back(textSceneObject);
 }
 
@@ -77,7 +75,21 @@ void FillableBar::AddTextElement(const std::string& text, const glm::vec3& offse
 
 void FillableBar::SetFillProgress(const float fillProgress)
 {
-    mSceneObjects.back()->mShaderFloatUniformValues[FILL_PROGRESS_UNIFORM_NAME] = fillProgress;
+    mSceneObjects.front()->mShaderFloatUniformValues[FILL_PROGRESS_UNIFORM_NAME] = fillProgress;
+}
+
+///------------------------------------------------------------------------------------------------
+
+void FillableBar::SetColorFactor(const glm::vec4 colorFactor)
+{
+    mSceneObjects.front()->mShaderVec4UniformValues[COLOR_FACTOR_UNIFORM_NAME] = colorFactor;
+}
+
+///------------------------------------------------------------------------------------------------
+
+float& FillableBar::GetFillProgress()
+{
+    return mSceneObjects.front()->mShaderFloatUniformValues[FILL_PROGRESS_UNIFORM_NAME];
 }
 
 ///------------------------------------------------------------------------------------------------

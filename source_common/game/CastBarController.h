@@ -25,10 +25,14 @@ public:
     
     void ShowCastBar(const float revealSecs);
     void HideCastBar(const float hideSecs);
+    void BeginCast(const float duration, std::function<void()> onCompleteCallback);
+    void CancelCast();
+    bool IsCastBarFilling() const;
 
 private:
     std::shared_ptr<scene::Scene> mScene;
-    std::unique_ptr<FillableBar> mCastBar;    
+    std::unique_ptr<FillableBar> mCastBar;
+    std::function<void()> mOnCompleteCallback;
 };
 
 ///------------------------------------------------------------------------------------------------

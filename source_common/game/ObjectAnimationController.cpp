@@ -15,7 +15,8 @@
 
 static const float UV_X_STEP = 0.3333f; // Assuming 3 columns
 static const float UV_Y_STEP = 0.2f;    // Assuming 5 rows
-static const float ANIMATION_TIME_CONSTANT = 0.000492f;
+static const float PLAYER_ANIMATION_TIME_CONSTANT = 0.000492f;
+static const float ATTACK_FRAME_ANIMATION_TIME_SECS = 0.05f;
 
 ///------------------------------------------------------------------------------------------------
 
@@ -77,13 +78,39 @@ void ObjectAnimationController::OnObjectDestroyedEvent(const events::ObjectDestr
 
 ///------------------------------------------------------------------------------------------------
 
-const ObjectAnimationController::ObjectAnimationInfo& ObjectAnimationController::UpdateObjectAnimation(std::shared_ptr<scene::SceneObject> sceneObject, const network::ObjectState objectState, const network::FacingDirection facingDirection, const glm::vec3& velocity, const float dtMillis)
+const ObjectAnimationController::ObjectAnimationInfo& ObjectAnimationController::UpdateObjectAnimation(std::shared_ptr<scene::SceneObject> sceneObject, const network::ObjectType objectType, const network::ObjectState objectState, const network::FacingDirection facingDirection, const glm::vec3& velocity, const float dtMillis)
 {
     if (!mObjectAnimationInfoMap.count(sceneObject->mName))
     {
         mObjectAnimationInfoMap[sceneObject->mName] = {};
     }
     
+    if (objectType == network::ObjectType::PLAYER)
+    {
+        UpdateCharacterAnimation(sceneObject, objectState, facingDirection, velocity, dtMillis);
+    }
+    else if (objectType == network::ObjectType::ATTACK)
+    {
+        UpdateAttackAnimation(sceneObject, facingDirection, dtMillis);
+    }
+    
+    sceneObject->mShaderFloatUniformValues[MIN_U_UNIFORM_NAME] = ANIMATION_UV_MAP[mObjectAnimationInfoMap[sceneObject->mName].mAnimationRow][mObjectAnimationInfoMap[sceneObject->mName].mFrameIndex].first.x;
+    sceneObject->mShaderFloatUniformValues[MIN_V_UNIFORM_NAME] = ANIMATION_UV_MAP[mObjectAnimationInfoMap[sceneObject->mName].mAnimationRow][mObjectAnimationInfoMap[sceneObject->mName].mFrameIndex].first.y;
+    sceneObject->mShaderFloatUniformValues[MAX_U_UNIFORM_NAME] = ANIMATION_UV_MAP[mObjectAnimationInfoMap[sceneObject->mName].mAnimationRow][mObjectAnimationInfoMap[sceneObject->mName].mFrameIndex].second.x;
+    sceneObject->mShaderFloatUniformValues[MAX_V_UNIFORM_NAME] = ANIMATION_UV_MAP[mObjectAnimationInfoMap[sceneObject->mName].mAnimationRow][mObjectAnimationInfoMap[sceneObject->mName].mFrameIndex].second.y;
+    
+    if (mObjectAnimationInfoMap[sceneObject->mName].mFlippedAnimation)
+    {
+        std::swap(sceneObject->mShaderFloatUniformValues[MIN_U_UNIFORM_NAME], sceneObject->mShaderFloatUniformValues[MAX_U_UNIFORM_NAME]);
+    }
+    
+    return mObjectAnimationInfoMap[sceneObject->mName];
+}
+
+///------------------------------------------------------------------------------------------------
+
+void ObjectAnimationController::UpdateCharacterAnimation(std::shared_ptr<scene::SceneObject> sceneObject, const network::ObjectState objectState, const network::FacingDirection facingDirection, const glm::vec3 &velocity, const float dtMillis)
+{
     if (mObjectAnimationInfoMap[sceneObject->mName].mObjectState != objectState)
     {
         // Animation Change
@@ -118,7 +145,7 @@ const ObjectAnimationController::ObjectAnimationInfo& ObjectAnimationController:
     }
     else
     {
-        if (glm::length(velocity) <= 0.0f)
+        if ((objectState == network::ObjectState::IDLE || objectState == network::ObjectState::RUNNING) && glm::length(velocity) <= 0.0f)
         {
             mObjectAnimationInfoMap[sceneObject->mName].mFrameIndex = 1;
         }
@@ -126,28 +153,55 @@ const ObjectAnimationController::ObjectAnimationInfo& ObjectAnimationController:
         {
             mObjectAnimationInfoMap[sceneObject->mName].mAnimationTimeAccum += dtMillis/1000.0f;
             
-            float targetAnimationTime = ANIMATION_TIME_CONSTANT/glm::length(velocity);
-            if (mObjectAnimationInfoMap[sceneObject->mName].mAnimationTimeAccum > targetAnimationTime)
+            if (objectState == network::ObjectState::MELEE_ATTACK)
             {
-                mObjectAnimationInfoMap[sceneObject->mName].mAnimationTimeAccum -= targetAnimationTime;
-                mObjectAnimationInfoMap[sceneObject->mName].mFrameIndex = (mObjectAnimationInfoMap[sceneObject->mName].mFrameIndex + 1) % 3;
+                if (mObjectAnimationInfoMap[sceneObject->mName].mAnimationTimeAccum > ATTACK_FRAME_ANIMATION_TIME_SECS)
+                {
+                    mObjectAnimationInfoMap[sceneObject->mName].mAnimationTimeAccum -= ATTACK_FRAME_ANIMATION_TIME_SECS;
+                    mObjectAnimationInfoMap[sceneObject->mName].mFrameIndex++;
+                    if (mObjectAnimationInfoMap[sceneObject->mName].mFrameIndex > 2)
+                    {
+                        mObjectAnimationInfoMap[sceneObject->mName].mFrameIndex = 2;
+                        mObjectAnimationInfoMap[sceneObject->mName].mAnimationFinished = true;
+                    }
+                }
+            }
+            else
+            {
+                float targetAnimationTime = PLAYER_ANIMATION_TIME_CONSTANT/glm::length(velocity);
+                if (mObjectAnimationInfoMap[sceneObject->mName].mAnimationTimeAccum > targetAnimationTime)
+                {
+                    mObjectAnimationInfoMap[sceneObject->mName].mAnimationTimeAccum -= targetAnimationTime;
+                    mObjectAnimationInfoMap[sceneObject->mName].mFrameIndex = (mObjectAnimationInfoMap[sceneObject->mName].mFrameIndex + 1) % 3;
+                }
             }
             
             mObjectAnimationInfoMap[sceneObject->mName].mAnimationRow = GetAnimationRowFromFacingDirection(facingDirection);
             mObjectAnimationInfoMap[sceneObject->mName].mFlippedAnimation = ShouldFlipAnimation(facingDirection);
         }
     }
-    
-    sceneObject->mShaderFloatUniformValues[MIN_U_UNIFORM_NAME] = ANIMATION_UV_MAP[mObjectAnimationInfoMap[sceneObject->mName].mAnimationRow][mObjectAnimationInfoMap[sceneObject->mName].mFrameIndex].first.x;
-    sceneObject->mShaderFloatUniformValues[MIN_V_UNIFORM_NAME] = ANIMATION_UV_MAP[mObjectAnimationInfoMap[sceneObject->mName].mAnimationRow][mObjectAnimationInfoMap[sceneObject->mName].mFrameIndex].first.y;
-    sceneObject->mShaderFloatUniformValues[MAX_U_UNIFORM_NAME] = ANIMATION_UV_MAP[mObjectAnimationInfoMap[sceneObject->mName].mAnimationRow][mObjectAnimationInfoMap[sceneObject->mName].mFrameIndex].second.x;
-    sceneObject->mShaderFloatUniformValues[MAX_V_UNIFORM_NAME] = ANIMATION_UV_MAP[mObjectAnimationInfoMap[sceneObject->mName].mAnimationRow][mObjectAnimationInfoMap[sceneObject->mName].mFrameIndex].second.y;
-    
-    if (mObjectAnimationInfoMap[sceneObject->mName].mFlippedAnimation)
-    {
-        sceneObject->mShaderFloatUniformValues[MIN_U_UNIFORM_NAME] *= -1.0f;
-        sceneObject->mShaderFloatUniformValues[MAX_U_UNIFORM_NAME] *= -1.0f;
-    }
-    
-    return mObjectAnimationInfoMap[sceneObject->mName];
 }
+
+///------------------------------------------------------------------------------------------------
+
+void ObjectAnimationController::UpdateAttackAnimation(std::shared_ptr<scene::SceneObject> sceneObject, const network::FacingDirection facingDirection, const float dtMillis)
+{
+    mObjectAnimationInfoMap[sceneObject->mName].mFacingDirection = facingDirection;
+    mObjectAnimationInfoMap[sceneObject->mName].mAnimationRow = GetAnimationRowFromFacingDirection(facingDirection);
+    mObjectAnimationInfoMap[sceneObject->mName].mFlippedAnimation = ShouldFlipAnimation(facingDirection);
+    
+    mObjectAnimationInfoMap[sceneObject->mName].mAnimationTimeAccum += dtMillis/1000.0f;
+    
+    if (mObjectAnimationInfoMap[sceneObject->mName].mAnimationTimeAccum > ATTACK_FRAME_ANIMATION_TIME_SECS)
+    {
+        mObjectAnimationInfoMap[sceneObject->mName].mAnimationTimeAccum -= ATTACK_FRAME_ANIMATION_TIME_SECS;
+        mObjectAnimationInfoMap[sceneObject->mName].mFrameIndex++;
+        if (mObjectAnimationInfoMap[sceneObject->mName].mFrameIndex > 2)
+        {
+            mObjectAnimationInfoMap[sceneObject->mName].mFrameIndex = 2;
+            mObjectAnimationInfoMap[sceneObject->mName].mAnimationFinished = true;
+        }
+    }
+}
+
+///------------------------------------------------------------------------------------------------

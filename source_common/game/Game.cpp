@@ -32,6 +32,8 @@
 #include <game/ui/AnimatedButton.h>
 #include <game/CastBarController.h>
 #include <game/Game.h>
+#include <game/GameCommon.h>
+#include <game/NetworkEntitySceneObjectFactory.h>
 #include <game/events/EventSystem.h>
 #include <game/LocalPlayerInputController.h>
 #include <game/ObjectAnimationController.h>
@@ -57,6 +59,7 @@
 ///------------------------------------------------------------------------------------------------
 
 static const strutils::StringId NAVMAP_DEBUG_SCENE_OBJECT_NAME = strutils::StringId("debug_navmap");
+static const float DESTROYED_OBJECT_FADE_OUT_TIME_SECS = 0.1f;
 
 ///------------------------------------------------------------------------------------------------
 
@@ -191,7 +194,6 @@ void Game::Update(const float dtMillis)
                     if (!mLocalObjectWrappers.contains(message->objectData.objectId))
                     {
                         CreateObject(message->objectData);
-                        CreateObjectCollider(message->objectData);
                     }
                     
                     // Update everything but local player's data (for now)
@@ -211,8 +213,7 @@ void Game::Update(const float dtMillis)
                 case network::MessageType::PlayerDisconnectedMessage:
                 {
                     auto* message = reinterpret_cast<network::PlayerDisconnectedMessage*>(event.packet->data);
-                    events::EventSystem::GetInstance().DispatchEvent<events::ObjectDestroyedEvent>(strutils::StringId("object-" + std::to_string(message->objectId)));
-
+                    events::EventSystem::GetInstance().DispatchEvent<events::ObjectDestroyedEvent>(GetSceneObjectNameId(message->objectId));
                     DestroyObject(message->objectId);
                 } break;
                     
@@ -220,17 +221,33 @@ void Game::Update(const float dtMillis)
                 {
                     auto* message = reinterpret_cast<network::ObjectCreatedMessage*>(event.packet->data);
                     CreateObject(message->objectData);
-                    CreateObjectCollider(message->objectData);
                 } break;
                 
                 case network::MessageType::ObjectDestroyedMessage:
                 {
                     auto* message = reinterpret_cast<network::ObjectDestroyedMessage*>(event.packet->data);
+                    events::EventSystem::GetInstance().DispatchEvent<events::ObjectDestroyedEvent>(GetSceneObjectNameId(message->objectId));
                     DestroyObject(message->objectId);
+                } break;
+                
+                case network::MessageType::BeginAttackResponseMessage:
+                {
+                    auto* message = reinterpret_cast<network::BeginAttackResponseMessage*>(event.packet->data);
+                    if (message->allowed)
+                    {
+                        mCastBarController->BeginCast(message->chargeDurationSecs, [this]()
+                        {
+                            mLocalObjectWrappers[mLocalPlayerId].mObjectData.objectState = network::ObjectState::MELEE_ATTACK;
+                        });
+                    }
+                    else
+                    {
+                        mLocalObjectWrappers[mLocalPlayerId].mObjectData.objectState = network::ObjectState::IDLE;
+                    }
                 } break;
                     
                 case network::MessageType::BeginAttackRequestMessage:
-                case network::MessageType::BeginAttackResponseMessage:
+                case network::MessageType::CancelAttackMessage:
                 case network::MessageType::UNUSED:
                     break;
             }
@@ -250,31 +267,43 @@ void Game::Update(const float dtMillis)
 
         if (objectId == mLocalPlayerId)
         {
-            if (CoreSystemsEngine::GetInstance().GetInputStateManager().VButtonTapped(input::Button::MAIN_BUTTON))
+            if (CoreSystemsEngine::GetInstance().GetInputStateManager().VButtonTapped(input::Button::SECONDARY_BUTTON) && objectWrapperData.mObjectData.objectState != network::ObjectState::BEGIN_MELEE &&
+                objectWrapperData.mObjectData.objectState != network::ObjectState::MELEE_ATTACK)
             {
                 // Cooldown checks etc..
-//                const auto& cam = systemsEngine.GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME)->GetCamera();
-//                const auto& pointingPos = CoreSystemsEngine::GetInstance().GetInputStateManager().VGetPointingPosInWorldSpace(cam.GetViewMatrix(), cam.GetProjMatrix());
-//                const auto& playerToPointingPos = glm::normalize(glm::vec3(pointingPos.x, pointingPos.y, objectWrapperData.mObjectData.position.z) - objectWrapperData.mObjectData.position);
-//                const auto facingDirection = network::VecToFacingDirection(playerToPointingPos);
-//                
-//                objectWrapperData.mObjectData.currentState = network::ObjectState::BEGIN_MELEE;
-//                objectWrapperData.mObjectData.facingDirection = facingDirection;
-//                mObjectAnimationController->UpdateObjectAnimation(rootSceneObject, objectWrapperData.mObjectData.currentState, facingDirection, glm::vec3(0.0f), dtMillis);
-//                
-//                network::ObjectStateUpdateMessage stateUpdateMessage = {};
-//                stateUpdateMessage.objectData = objectWrapperData.mObjectData;
-//                
-//                SendMessage(sServer, &stateUpdateMessage, sizeof(stateUpdateMessage), network::channels::RELIABLE);
-//                
-//                network::BeginAttackRequestMessage attackRequestMessage = {};
-//                attackRequestMessage.attackerId = mLocalPlayerId;
-//                attackRequestMessage.attackType = network::AttackType::MELEE;
-//
-//                SendMessage(sServer, &attackRequestMessage, sizeof(attackRequestMessage), network::channels::RELIABLE);
+                const auto& cam = systemsEngine.GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME)->GetCamera();
+                const auto& pointingPos = CoreSystemsEngine::GetInstance().GetInputStateManager().VGetPointingPosInWorldSpace(cam.GetViewMatrix(), cam.GetProjMatrix());
+                const auto& playerToPointingPos = glm::normalize(glm::vec3(pointingPos.x, pointingPos.y, objectWrapperData.mObjectData.position.z) - objectWrapperData.mObjectData.position);
+                const auto facingDirection = network::VecToFacingDirection(playerToPointingPos);
+                
+                objectWrapperData.mObjectData.objectState = network::ObjectState::BEGIN_MELEE;
+                objectWrapperData.mObjectData.facingDirection = facingDirection;
+                mObjectAnimationController->UpdateObjectAnimation(rootSceneObject, objectWrapperData.mObjectData.objectType, objectWrapperData.mObjectData.objectState, facingDirection, glm::vec3(0.0f), dtMillis);
+                
+                network::ObjectStateUpdateMessage stateUpdateMessage = {};
+                stateUpdateMessage.objectData = objectWrapperData.mObjectData;
+                
+                SendMessage(sServer, &stateUpdateMessage, sizeof(stateUpdateMessage), network::channels::RELIABLE);
+                
+                network::BeginAttackRequestMessage attackRequestMessage = {};
+                attackRequestMessage.attackerId = mLocalPlayerId;
+                attackRequestMessage.attackType = network::AttackType::MELEE;
+
+                SendMessage(sServer, &attackRequestMessage, sizeof(attackRequestMessage), network::channels::RELIABLE);
             }
-            
-            if (objectWrapperData.mObjectData.currentState == network::ObjectState::IDLE || objectWrapperData.mObjectData.currentState == network::ObjectState::RUNNING)
+            else if (objectWrapperData.mObjectData.objectState == network::ObjectState::BEGIN_MELEE)
+            {
+                mObjectAnimationController->UpdateObjectAnimation(rootSceneObject, objectWrapperData.mObjectData.objectType, objectWrapperData.mObjectData.objectState, objectWrapperData.mObjectData.facingDirection, glm::vec3(0.0f), dtMillis);
+            }
+            else if (objectWrapperData.mObjectData.objectState == network::ObjectState::MELEE_ATTACK)
+            {
+                const auto& animationInfoResult = mObjectAnimationController->UpdateObjectAnimation(rootSceneObject, objectWrapperData.mObjectData.objectType, objectWrapperData.mObjectData.objectState, objectWrapperData.mObjectData.facingDirection, glm::vec3(0.0f), dtMillis);
+                if (animationInfoResult.mAnimationFinished)
+                {
+                    objectWrapperData.mObjectData.objectState = network::ObjectState::IDLE;
+                }
+            }
+            else if (objectWrapperData.mObjectData.objectState == network::ObjectState::IDLE || objectWrapperData.mObjectData.objectState == network::ObjectState::RUNNING)
             {
                 const auto& globalMapDataRepo = GlobalMapDataRepository::GetInstance();
                 const auto& currentMapDefinition = globalMapDataRepo.GetMapDefinition(mCurrentMap);
@@ -282,7 +311,7 @@ void Game::Update(const float dtMillis)
                 auto inputDirection = LocalPlayerInputController::GetMovementDirection();
                 auto velocity = glm::vec3(inputDirection.x, inputDirection.y, 0.0f) * objectWrapperData.mObjectData.speed * sDebugPlayerVelocityMultiplier * dtMillis;
                 
-                const auto& animationInfoResult = mObjectAnimationController->UpdateObjectAnimation(rootSceneObject, objectWrapperData.mObjectData.currentState, network::VecToFacingDirection(velocity), velocity, dtMillis);
+                const auto& animationInfoResult = mObjectAnimationController->UpdateObjectAnimation(rootSceneObject, objectWrapperData.mObjectData.objectType, objectWrapperData.mObjectData.objectState, network::VecToFacingDirection(velocity), velocity, dtMillis);
                 
                 // Movement integration first horizontally
                 rootSceneObject->mPosition.x += velocity.x;
@@ -342,7 +371,7 @@ void Game::Update(const float dtMillis)
                 
                 objectWrapperData.mObjectData.position = rootSceneObject->mPosition;
                 objectWrapperData.mObjectData.velocity = velocity;
-                objectWrapperData.mObjectData.currentState = network::ObjectState::RUNNING;
+                objectWrapperData.mObjectData.objectState = network::ObjectState::RUNNING;
                 objectWrapperData.mObjectData.facingDirection = animationInfoResult.mFacingDirection;
                 network::SetCurrentMap(objectWrapperData.mObjectData, mCurrentMap.GetString());
                 
@@ -362,10 +391,7 @@ void Game::Update(const float dtMillis)
                 rootSceneObject->mPosition += velocity;
             }
             
-            if (objectWrapperData.mObjectData.objectType != network::ObjectType::ATTACK || objectWrapperData.mObjectData.attackType != network::AttackType::PROJECTILE)
-            {
-                mObjectAnimationController->UpdateObjectAnimation(rootSceneObject, objectWrapperData.mObjectData.currentState, objectWrapperData.mObjectData.facingDirection, objectWrapperData.mObjectData.velocity, dtMillis);
-            }
+            mObjectAnimationController->UpdateObjectAnimation(rootSceneObject, objectWrapperData.mObjectData.objectType, objectWrapperData.mObjectData.objectState, objectWrapperData.mObjectData.facingDirection, objectWrapperData.mObjectData.velocity, dtMillis);
         }
         
         for (auto otherSceneObject: objectWrapperData.mSceneObjects)
@@ -377,7 +403,7 @@ void Game::Update(const float dtMillis)
     enet_host_flush(sClient);
     
     // Camera updates
-    auto sceneObject = scene->FindSceneObject(strutils::StringId("object-" + std::to_string(mLocalPlayerId)));
+    auto sceneObject = scene->FindSceneObject(GetSceneObjectNameId(mLocalPlayerId));
     if (sceneObject)
     {
         scene->GetCamera().SetPosition(glm::vec3(sceneObject->mPosition.x, sceneObject->mPosition.y, scene->GetCamera().GetPosition().z));
@@ -433,94 +459,22 @@ void Game::CreateObject(const network::ObjectData& objectData)
     }
     
     mLocalObjectWrappers[objectData.objectId].mObjectData = objectData;
-
-    auto sceneObjectName = strutils::StringId("object-" + std::to_string(objectData.objectId));
-
-    auto sceneObject = CoreSystemsEngine::GetInstance().GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME)->FindSceneObject(sceneObjectName);
-    
-    if (sceneObject)
-    {
-        logging::Log(logging::LogType::WARNING, "Attempted to re-create pre-existing object %s", sceneObjectName.GetString().c_str());
-    }
-    else
-    {
-        sceneObject = CoreSystemsEngine::GetInstance().GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME)->CreateSceneObject(sceneObjectName);
-        mLocalObjectWrappers[objectData.objectId].mSceneObjects.push_back(sceneObject);
-        switch (objectData.objectType)
-        {
-            case network::ObjectType::PLAYER:
-            {
-                sceneObject->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + "game/anims/player_running/core.png");
-                sceneObject->mShaderResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT  + "player.vs");
-                sceneObject->mShaderBoolUniformValues[IS_TEXTURE_SHEET_UNIFORM_NAME] = true;
-                sceneObject->mShaderBoolUniformValues[strutils::StringId("is_local")] = objectData.objectId == mLocalPlayerId;
-                sceneObject->mPosition = glm::vec3(objectData.position.x, objectData.position.y, objectData.position.z);
-                sceneObject->mScale = glm::vec3(objectData.objectScale);
-            } break;
-            
-            case network::ObjectType::ATTACK:
-            {
-                if (objectData.attackType == network::AttackType::PROJECTILE && objectData.projectileType == network::ProjectileType::FIREBALL)
-                {
-                    sceneObject->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + "game/fireball_fx.png");
-                    sceneObject->mPosition = glm::vec3(objectData.position.x, objectData.position.y, objectData.position.z);
-                    sceneObject->mScale = glm::vec3(objectData.objectScale);
-                }
-                else
-                {
-                    assert(false);
-                }
-            } break;
-
-            case network::ObjectType::NPC:
-            case network::ObjectType::STATIC:
-            {
-                assert(false);
-            }
-        }
-    }
-}
-
-///------------------------------------------------------------------------------------------------
-
-void Game::CreateObjectCollider(const network::ObjectData& objectData)
-{
     mLocalObjectWrappers[objectData.objectId].mColliderData = objectData.colliderData;
-
-    // IF DEBUG
-    auto& systemsEngine = CoreSystemsEngine::GetInstance();
-    auto sceneObjectName = strutils::StringId("object-" + std::to_string(objectData.objectId) + "-collider");
-    auto sceneObject = systemsEngine.GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME)->CreateSceneObject(sceneObjectName);
     
-    switch (objectData.colliderData.colliderType)
-    {
-        case network::ColliderType::CIRCLE:
-        {
-            sceneObject->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "debug/debug_circle.png");
-        } break;
-        
-        case network::ColliderType::RECTANGLE:
-        {
-            
-        } break;
-    }
-
-    sceneObject->mScale = glm::vec3(objectData.colliderData.colliderRelativeDimentions.x, objectData.colliderData.colliderRelativeDimentions.y, 1.0f);
-    sceneObject->mScale *= mLocalObjectWrappers[objectData.objectId].mSceneObjects.front()->mScale;
-    sceneObject->mPosition = mLocalObjectWrappers[objectData.objectId].mObjectData.position;
-    sceneObject->mPosition.z = map_constants::TILE_NAVMAP_LAYER_Z;
-    sceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 0.5f;
-    sceneObject->mInvisible = !sShowColliders;
-    mLocalObjectWrappers[objectData.objectId].mSceneObjects.push_back(sceneObject);
+    NetworkEntitySceneObjectFactory::CreateSceneObjects(objectData, sShowColliders, mLocalObjectWrappers[objectData.objectId].mSceneObjects);
 }
 
 ///------------------------------------------------------------------------------------------------
 
 void Game::DestroyObject(const network::objectId_t objectId)
 {
+    auto& animationManager = CoreSystemsEngine::GetInstance().GetAnimationManager();
     for (auto sceneObject: mLocalObjectWrappers.at(objectId).mSceneObjects)
     {
-        CoreSystemsEngine::GetInstance().GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME)->RemoveSceneObject(sceneObject->mName);
+        animationManager.StartAnimation(std::make_unique<rendering::TweenAlphaAnimation>(sceneObject, 0.0f, DESTROYED_OBJECT_FADE_OUT_TIME_SECS), [sceneObject]()
+        {
+            CoreSystemsEngine::GetInstance().GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME)->RemoveSceneObject(sceneObject->mName);
+        });
     }
     mLocalObjectWrappers.erase(objectId);
 }
@@ -624,13 +578,14 @@ void Game::CreateDebugWidgets()
     ImGui::SeparatorText("Network Object Data");
     for (const auto& [objectId, objectWrapperData]: mLocalObjectWrappers)
     {
-        auto name = objectId == mLocalPlayerId ? std::string("localPlayer") : ("object-" + std::to_string(objectId));
+        auto name = objectId == mLocalPlayerId ? std::string("localPlayer") : GetSceneObjectName(objectId);
         if (ImGui::CollapsingHeader(name.c_str(), ImGuiTreeNodeFlags_None))
         {
             ImGui::PushID(name.c_str());
-            ImGui::Text("Object Type: %d", static_cast<int>(objectWrapperData.mObjectData.objectType));
+            ImGui::Text("Object Type: %s", network::GetObjectTypeString(objectWrapperData.mObjectData.objectType));
+            ImGui::Text("Object State: %s", network::GetObjectStateString(objectWrapperData.mObjectData.objectState));
+            ImGui::Text("Facing Direction: %s", network::GetFacingDirectionString(objectWrapperData.mObjectData.facingDirection));
             ImGui::Text("Current Map: %s", network::GetCurrentMapString(objectWrapperData.mObjectData).c_str());
-            ImGui::Text("Facing Direction: %d", static_cast<int>(objectWrapperData.mObjectData.facingDirection));
             
             const auto& globalMapDataRepo = GlobalMapDataRepository::GetInstance();
             const auto& mapName = strutils::StringId(network::GetCurrentMapString(objectWrapperData.mObjectData));

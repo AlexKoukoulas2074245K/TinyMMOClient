@@ -2,12 +2,20 @@
 ///  LocalPlayerInputController.cpp
 ///  TinyMMOClient                                                                                            
 ///                                                                                                
-///  Created by Alex  Koukoulas on 27/12/2025
+///  Created by Alex Koukoulas on 27/12/2025
 ///------------------------------------------------------------------------------------------------
 
 #include <game/LocalPlayerInputController.h>
 #include <engine/CoreSystemsEngine.h>
 #include <engine/input/IInputStateManager.h>
+
+///------------------------------------------------------------------------------------------------
+
+bool LocalPlayerInputController::IsAnyMovementKeysPressed()
+{
+    const auto& ism = CoreSystemsEngine::GetInstance().GetInputStateManager();
+    return ism.VKeyPressed(input::Key::W) || ism.VKeyPressed(input::Key::A) ||  ism.VKeyPressed(input::Key::S) || ism.VKeyPressed(input::Key::D);
+}
 
 ///------------------------------------------------------------------------------------------------
 

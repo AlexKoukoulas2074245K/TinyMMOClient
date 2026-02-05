@@ -1,29 +1,32 @@
 ///------------------------------------------------------------------------------------------------
-///  LocalPlayerInputController.h                                                                                          
-///  TinyMMOClient                                                                                            
+///  NetworkEntitySceneObjectFactory.h
+///  TinyMMOClient
 ///                                                                                                
-///  Created by Alex Koukoulas on 27/12/2025                                                       
+///  Created by Alex Koukoulas on 05/02/2026
 ///------------------------------------------------------------------------------------------------
 
-#ifndef LocalPlayerInputController_h
-#define LocalPlayerInputController_h
+#ifndef NetworkEntitySceneObjectFactory_h
+#define NetworkEntitySceneObjectFactory_h
 
 ///------------------------------------------------------------------------------------------------
 
 #include <engine/utils/MathUtils.h>
+#include <memory>
+#include <vector>
 
 ///------------------------------------------------------------------------------------------------
 
-class LocalPlayerInputController
+namespace network { struct ObjectData; }
+namespace scene { struct SceneObject; }
+class NetworkEntitySceneObjectFactory
 {
 public:
-    static bool IsAnyMovementKeysPressed();
-    static glm::vec2 GetMovementDirection();
+    static void CreateSceneObjects(const network::ObjectData& objectData, const bool collidersVisible, std::vector<std::shared_ptr<scene::SceneObject>>& sceneObjects);
     
 private:
-    LocalPlayerInputController(){};
+    NetworkEntitySceneObjectFactory(){};
 };
 
 ///------------------------------------------------------------------------------------------------
 
-#endif /* LocalPlayerInputController_h */
+#endif /* NetworkEntitySceneObjectFactory_h */
