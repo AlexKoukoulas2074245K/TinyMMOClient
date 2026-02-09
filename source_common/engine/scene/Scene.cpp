@@ -203,11 +203,28 @@ void Scene::RemoveAllSceneObjectsWithName(const strutils::StringId& sceneObjectN
 
 ///------------------------------------------------------------------------------------------------
 
-void Scene::RemoveAllSceneObjectsWithNameEndingIn(const std::string& sceneObjectNameEndingPattern)
+void Scene::RemoveAllSceneObjectsWithNameEndingIn(const std::string& sceneObjectNamePostfix)
 {
     for (auto iter = mSceneObjects.begin(); iter != mSceneObjects.end();)
     {
-        if (strutils::StringEndsWith((*iter)->mName.GetString(), sceneObjectNameEndingPattern))
+        if (strutils::StringEndsWith((*iter)->mName.GetString(), sceneObjectNamePostfix))
+        {
+            iter = mSceneObjects.erase(iter);
+        }
+        else
+        {
+            iter++;
+        }
+    }
+}
+
+///------------------------------------------------------------------------------------------------
+
+void Scene::RemoveAllSceneObjectsWithNameStartingWith(const std::string& sceneObjectNamePrefix)
+{
+    for (auto iter = mSceneObjects.begin(); iter != mSceneObjects.end();)
+    {
+        if (strutils::StringStartsWith((*iter)->mName.GetString(), sceneObjectNamePrefix))
         {
             iter = mSceneObjects.erase(iter);
         }

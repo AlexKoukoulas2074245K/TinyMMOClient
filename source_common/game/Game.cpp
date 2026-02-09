@@ -39,6 +39,7 @@
 #include <game/ObjectAnimationController.h>
 #include <imgui/imgui.h>
 #include <net_common/NetworkMessages.h>
+#include <net_common/NetworkQuadtree.h>
 #include <map/GlobalMapDataRepository.h>
 #include <map/MapConstants.h>
 #include <map/MapResourceController.h>
@@ -60,6 +61,7 @@
 ///------------------------------------------------------------------------------------------------
 
 static const strutils::StringId NAVMAP_DEBUG_SCENE_OBJECT_NAME = strutils::StringId("debug_navmap");
+static const std::string QUADTREE_DEBUG_SCENE_OBJECT_NAME_PREFIX = "debug_quadtree_";
 static const float DESTROYED_OBJECT_FADE_OUT_TIME_SECS = 0.1f;
 
 ///------------------------------------------------------------------------------------------------
@@ -89,6 +91,8 @@ static enet_uint32 sRTTAccum = 0;
 static enet_uint32 sRTTSampleCount = 0;
 static enet_uint32 sCurrentRTT = 0;
 static bool sShowColliders = false;
+static bool sShowQuadtree = false;
+static std::unique_ptr<network::NetworkQuadtree> sQuadtree;
 
 void Game::Init()
 {
@@ -106,6 +110,15 @@ void Game::Init()
     {
         const auto& mapResources = mMapResourceController->GetMapResources(event.mNewMapName);
         mCurrentNavmap = mapResources.mNavmap;
+        
+        const auto& globalMapDataRepo = GlobalMapDataRepository::GetInstance();
+        const auto& currentMapDefinition = globalMapDataRepo.GetMapDefinition(mCurrentMap);
+        
+        if (sQuadtree)
+        {
+            sQuadtree->Clear();
+        }
+        sQuadtree = std::make_unique<network::NetworkQuadtree>(glm::vec3(currentMapDefinition.mMapPosition.x * game_constants::MAP_RENDERED_SCALE, currentMapDefinition.mMapPosition.y * game_constants::MAP_RENDERED_SCALE, map_constants::TILE_NAVMAP_LAYER_Z), glm::vec3(currentMapDefinition.mMapDimensions.x * game_constants::MAP_RENDERED_SCALE, currentMapDefinition.mMapDimensions.y * game_constants::MAP_RENDERED_SCALE, 1.0f));
     });
   
     mMapSupersessionEventListener = eventSystem.RegisterForEvent<events::MapSupersessionEvent>([=](const events::MapSupersessionEvent& event)
@@ -202,6 +215,8 @@ void Game::Update(const float dtMillis)
                     {
                         mLocalObjectWrappers[message->objectData.objectId].mObjectData = message->objectData;
                     }
+                    
+                    assert(math::Abs(mLocalObjectWrappers[message->objectData.objectId].mSceneObjects.front()->mScale.x - message->objectData.objectScale) < 0.0001f);
                 } break;
                 
                 case network::MessageType::PlayerConnectedMessage:
@@ -257,7 +272,11 @@ void Game::Update(const float dtMillis)
     
     auto& systemsEngine = CoreSystemsEngine::GetInstance();
     auto scene = systemsEngine.GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME);
-    
+    if (sQuadtree)
+    {
+        sQuadtree->Clear();
+    }
+
     for (auto& [objectId, objectWrapperData]: mLocalObjectWrappers)
     {
         auto rootSceneObject = objectWrapperData.mSceneObjects.front();
@@ -358,7 +377,7 @@ void Game::Update(const float dtMillis)
                     {
                         HideDebugNavmap();
                         ShowDebugNavmap();
-                    }
+                    }                    
                     
                     // Rubberband out of any new solid tiles we land in after map change
                     speculativeNavmapCoord = mCurrentNavmap->GetNavmapCoord(rootSceneObject->mPosition, globalMapDataRepo.GetMapDefinition(mCurrentMap).mMapPosition, game_constants::MAP_RENDERED_SCALE);
@@ -397,8 +416,43 @@ void Game::Update(const float dtMillis)
         {
             otherSceneObject->mPosition = glm::vec3(rootSceneObject->mPosition.x, rootSceneObject->mPosition.y, otherSceneObject->mPosition.z);
         }
+        
+        if (network::GetCurrentMapString(objectWrapperData.mObjectData) == mCurrentMap.GetString())
+        {
+            glm::vec3 colliderDimensions(objectWrapperData.mObjectData.colliderData.colliderRelativeDimentions.x * objectWrapperData.mObjectData.objectScale, objectWrapperData.mObjectData.colliderData.colliderRelativeDimentions.y * objectWrapperData.mObjectData.objectScale, 1.0f);
+            sQuadtree->InsertObject(objectWrapperData.mObjectData.objectId, objectWrapperData.mObjectData.position, colliderDimensions);
+        }
     }
+    
+    if (sQuadtree)
+    {
+        auto collisionCandidates = sQuadtree->GetCollisionCandidates(mLocalObjectWrappers[mLocalPlayerId].mObjectData);
+        for (auto& [objectId, objectWrapperData]: mLocalObjectWrappers)
+        {
+            auto rootSceneObject = objectWrapperData.mSceneObjects.front();
+            rootSceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 1.0f;
+            
+            
+            if (std::find(collisionCandidates.cbegin(), collisionCandidates.cend(), objectId) != collisionCandidates.cend())
+            {
+                mLocalObjectWrappers.at(objectId).mSceneObjects.front()->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 0.4f;
+            }
+        }
 
+        scene->RemoveAllSceneObjectsWithNameStartingWith(QUADTREE_DEBUG_SCENE_OBJECT_NAME_PREFIX);
+        auto debugRects = sQuadtree->GetDebugRenderRectangles();
+        for (int i = 0; i < debugRects.size(); ++i)
+        {
+            auto quadtreeSceneObject = scene->CreateSceneObject(strutils::StringId(QUADTREE_DEBUG_SCENE_OBJECT_NAME_PREFIX + std::to_string(i)));
+            quadtreeSceneObject->mPosition = debugRects[i].first;
+            quadtreeSceneObject->mScale = debugRects[i].second;
+            quadtreeSceneObject->mTextureResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "debug/debug_quadtree.png");
+            quadtreeSceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 1.0f;
+            quadtreeSceneObject->mInvisible = !sShowQuadtree;
+        }
+    }
+    
+    
     enet_host_flush(sClient);
     
     // Camera updates
@@ -450,6 +504,16 @@ void Game::CreateObject(const network::ObjectData& objectData)
         mCurrentMap = strutils::StringId(network::GetCurrentMapString(objectData));
         mMapResourceController = std::make_unique<MapResourceController>(mCurrentMap);
         mCurrentNavmap = mMapResourceController->GetMapResources(mCurrentMap).mNavmap;
+        
+        const auto& globalMapDataRepo = GlobalMapDataRepository::GetInstance();
+        const auto& currentMapDefinition = globalMapDataRepo.GetMapDefinition(mCurrentMap);
+        
+        if (sQuadtree)
+        {
+            sQuadtree->Clear();
+        }
+        sQuadtree = std::make_unique<network::NetworkQuadtree>(glm::vec3(currentMapDefinition.mMapPosition.x * game_constants::MAP_RENDERED_SCALE, currentMapDefinition.mMapPosition.y * game_constants::MAP_RENDERED_SCALE, map_constants::TILE_NAVMAP_LAYER_Z), glm::vec3(currentMapDefinition.mMapDimensions.x * game_constants::MAP_RENDERED_SCALE, currentMapDefinition.mMapDimensions.y * game_constants::MAP_RENDERED_SCALE, 1.0f));
+        
         auto loadedMapResources = mMapResourceController->GetAllLoadedMapResources();
         for (const auto& mapResources: loadedMapResources)
         {
@@ -600,6 +664,12 @@ void Game::CreateDebugWidgets()
                 ImGui::Text("Navmap Type: %s", network::GetNavmapTileTypeName(currentNavmapTileType));
             }
             
+            if (sQuadtree)
+            {
+                glm::vec3 colliderDimensions(objectWrapperData.mObjectData.colliderData.colliderRelativeDimentions.x * objectWrapperData.mObjectData.objectScale, objectWrapperData.mObjectData.colliderData.colliderRelativeDimentions.y * objectWrapperData.mObjectData.objectScale, 1.0f);
+                ImGui::Text("Quadtree Pos: %s", sQuadtree->GetFullMatchedQuadrantPositionString(objectWrapperData.mObjectData.position, colliderDimensions).c_str());
+            }
+            
             ImGui::PopID();
         }
     }
@@ -624,7 +694,11 @@ void Game::CreateDebugWidgets()
             }
         }
     }
-    
+
+    ImGui::Text("Show Quadtree: ");
+    ImGui::SameLine();
+    ImGui::Checkbox("###", &sShowQuadtree);
+
     if (mMapResourceController)
     {
         ImGui::SeparatorText("LoadedMaps");

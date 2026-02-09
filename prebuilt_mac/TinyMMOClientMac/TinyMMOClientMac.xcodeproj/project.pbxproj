@@ -12,6 +12,7 @@
 		00AA26FEC0D0668DE3C4B9CF /* PlaceTileCommand.h in Sources */ = {isa = PBXBuildFile; fileRef = 78BB20C2667D073C1F6425B5 /* PlaceTileCommand.h */; };
 		0118CE0544990425D47F3A12 /* ShaderResource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB4F4B243BF9EE66291B3910 /* ShaderResource.cpp */; };
 		01E37545A4AD82A45B4F15C4 /* NavmapTileTypeFloodFillCommand.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3E8723343A9345A2B42B52DA /* NavmapTileTypeFloodFillCommand.cpp */; };
+		01EBA6737DB5A6C8AFD8ADD9 /* NetworkQuadtree.inc in Sources */ = {isa = PBXBuildFile; fileRef = 76192933812124070EA94F80 /* NetworkQuadtree.inc */; };
 		02E7DF925FD7370A12023A23 /* Camera.h in Sources */ = {isa = PBXBuildFile; fileRef = 70EE9661089211DACFF22288 /* Camera.h */; };
 		03B28C98FAB2D3C8F86DF546 /* IInputStateManager.h in Sources */ = {isa = PBXBuildFile; fileRef = D099CB93E6198C3BE5F73FDE /* IInputStateManager.h */; };
 		0B19950EE3ADDE1721BB9ADA /* ObjectAnimationController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B5E6F0D1307253CFDDD9805 /* ObjectAnimationController.cpp */; };
@@ -20,6 +21,7 @@
 		0F9DAA5651FBB6D2711EC1A9 /* AnimatedButton.h in Sources */ = {isa = PBXBuildFile; fileRef = EA18C4482CF72349564AA66D /* AnimatedButton.h */; };
 		11BC5AE71B0746EBCFDEEB37 /* GameCommon.h in Sources */ = {isa = PBXBuildFile; fileRef = C7BD259FFC7FF7A8D8AB7691 /* GameCommon.h */; };
 		120CF200D56449CFC3BD99AF /* AppleSoundUtils.h in Sources */ = {isa = PBXBuildFile; fileRef = D8216CC78F9B7DEB0BEC7678 /* AppleSoundUtils.h */; };
+		12352CBA812D852CFC2E3170 /* NetworkQuadtree.h in Sources */ = {isa = PBXBuildFile; fileRef = CD58499C4DFCFE4442D2F21E /* NetworkQuadtree.h */; };
 		1245FE302D596926AB6DF879 /* NetworkMessages.h in Sources */ = {isa = PBXBuildFile; fileRef = DFC34F8592BEA1C75C5FDA48 /* NetworkMessages.h */; };
 		14FCA40E922F02FAC79C4983 /* GameCommon.h in Sources */ = {isa = PBXBuildFile; fileRef = C7BD259FFC7FF7A8D8AB7691 /* GameCommon.h */; };
 		16092693C24E8507EFDFBB70 /* Editor.h in Sources */ = {isa = PBXBuildFile; fileRef = AB2400E817D39628656BEFF1 /* Editor.h */; };
@@ -440,6 +442,8 @@
 		B5C774E0AD01FCF847C354D4 /* IEditorCommand.h in Sources */ = {isa = PBXBuildFile; fileRef = 2EAD05F146251AF3CB46F31A /* IEditorCommand.h */; };
 		B6D53143F3EB9D75D4D2E438 /* FloodFillCommand.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1B6820930081243A02139983 /* FloodFillCommand.cpp */; };
 		B888F9E922D728F18B1F61FA /* EditorUtils.h in Sources */ = {isa = PBXBuildFile; fileRef = 8B2FAF8AA036DDC5591F880B /* EditorUtils.h */; };
+		BB7A8A457BCC3FB731BED735 /* NetworkQuadtree.inc in Sources */ = {isa = PBXBuildFile; fileRef = 76192933812124070EA94F80 /* NetworkQuadtree.inc */; };
+		BC664656D203AED7C83DA5F8 /* NetworkQuadtree.inc in Sources */ = {isa = PBXBuildFile; fileRef = 76192933812124070EA94F80 /* NetworkQuadtree.inc */; };
 		BC81826A579566F5CA5790E9 /* BaseDataFileDeserializer.h in Sources */ = {isa = PBXBuildFile; fileRef = 8D6E209DDF4F577F8C87C6A0 /* BaseDataFileDeserializer.h */; };
 		BD43AFA7713BE8684E4A8ACA /* ShaderLoader.h in Sources */ = {isa = PBXBuildFile; fileRef = 642B84557417F85C19410FDE /* ShaderLoader.h */; };
 		BE6917AF2A437E9ABB02FDCB /* Navmap.h in Sources */ = {isa = PBXBuildFile; fileRef = 925C86DC2958FAB8EADF1C0F /* Navmap.h */; };
@@ -462,6 +466,7 @@
 		CCE13A87F90CB8EB69073CD1 /* FileUtils.h in Sources */ = {isa = PBXBuildFile; fileRef = 0D09AB023B7A329D725F2F2F /* FileUtils.h */; };
 		CDD63EAB3403A6F70F9EE6F7 /* NetworkEntitySceneObjectFactory.h in Sources */ = {isa = PBXBuildFile; fileRef = EFCD5AE87412EC082B8E9FAC /* NetworkEntitySceneObjectFactory.h */; };
 		CDE612C365A4F0EAE74D2542 /* LocalPlayerInputController.h in Sources */ = {isa = PBXBuildFile; fileRef = 7BC4A40B354A0E76D40FBB15 /* LocalPlayerInputController.h */; };
+		D0D436848C93F66C925996B9 /* NetworkQuadtree.h in Sources */ = {isa = PBXBuildFile; fileRef = CD58499C4DFCFE4442D2F21E /* NetworkQuadtree.h */; };
 		D0E195A4C826B47F52BF4585 /* PlaceTileCommand.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0478D42E22A0C865D7F54E05 /* PlaceTileCommand.cpp */; };
 		D21664D760A3220A78231910 /* Logging.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3BF946C1B449BB4FE7DF288A /* Logging.cpp */; };
 		D2D1522C0EC4B4083378622D /* NavmapTileTypeFloodFillCommand.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3E8723343A9345A2B42B52DA /* NavmapTileTypeFloodFillCommand.cpp */; };
@@ -483,6 +488,7 @@
 		EB260157021BAEBC7EC82B4C /* NetworkCommon.h in Sources */ = {isa = PBXBuildFile; fileRef = 001CE6A7EB6E3DB35E9F7BDC /* NetworkCommon.h */; };
 		EB479C93C5F132D99BFB4C3A /* Navmap.h in Sources */ = {isa = PBXBuildFile; fileRef = 925C86DC2958FAB8EADF1C0F /* Navmap.h */; };
 		EBAAD63C2C9D30771BB8CD7C /* MapConstants.h in Sources */ = {isa = PBXBuildFile; fileRef = E0BC495776CFD93A861F9235 /* MapConstants.h */; };
+		F01CB31EB0D7069C996711C7 /* NetworkQuadtree.h in Sources */ = {isa = PBXBuildFile; fileRef = CD58499C4DFCFE4442D2F21E /* NetworkQuadtree.h */; };
 		F01DDCE30B7B20953E17A5C1 /* FloodFillCommand.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1B6820930081243A02139983 /* FloodFillCommand.cpp */; };
 		F0A5A8059A9CAFA63A853D37 /* LocalPlayerInputController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B1438D1408BE048FE78171E /* LocalPlayerInputController.cpp */; };
 		F18AAC5C65473D98DE7F108E /* PlaceTileCommand.h in Sources */ = {isa = PBXBuildFile; fileRef = 78BB20C2667D073C1F6425B5 /* PlaceTileCommand.h */; };
@@ -597,6 +603,7 @@
 		6ED72C556E9BAFEE4FEF3914 /* CastBarController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CastBarController.h; path = CastBarController.h; sourceTree = "<group>"; };
 		70EE9661089211DACFF22288 /* Camera.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = Camera.h; sourceTree = "<group>"; };
 		7264D2100D46983584D6209F /* AnimatedButton.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = AnimatedButton.cpp; path = AnimatedButton.cpp; sourceTree = "<group>"; };
+		76192933812124070EA94F80 /* NetworkQuadtree.inc */ = {isa = PBXFileReference; includeInIndex = 1; name = NetworkQuadtree.inc; path = NetworkQuadtree.inc; sourceTree = "<group>"; };
 		78BB20C2667D073C1F6425B5 /* PlaceTileCommand.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = PlaceTileCommand.h; sourceTree = "<group>"; };
 		7961514C3AA5315045E54E7E /* PlatformMacros.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = PlatformMacros.h; sourceTree = "<group>"; };
 		7AC3E452BAA560B6D8B1349E /* SoundManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = SoundManager.h; sourceTree = "<group>"; };
@@ -708,6 +715,7 @@
 		BBB10B4588C780AFBD24FF91 /* PlaceNavmapTileTypeCommand.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = PlaceNavmapTileTypeCommand.cpp; sourceTree = "<group>"; };
 		C7BD259FFC7FF7A8D8AB7691 /* GameCommon.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = GameCommon.h; path = GameCommon.h; sourceTree = "<group>"; };
 		CAEF02928D06B177B1091C5F /* ImageSurfaceResource.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = ImageSurfaceResource.h; sourceTree = "<group>"; };
+		CD58499C4DFCFE4442D2F21E /* NetworkQuadtree.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = NetworkQuadtree.h; path = NetworkQuadtree.h; sourceTree = "<group>"; };
 		CF33F7C72612B80A9AB49895 /* InputStateManagerPlatformImpl.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = InputStateManagerPlatformImpl.cpp; sourceTree = "<group>"; };
 		D099CB93E6198C3BE5F73FDE /* IInputStateManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = IInputStateManager.h; sourceTree = "<group>"; };
 		D64C3227BB47CA8611283D51 /* wglew.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = wglew.h; sourceTree = "<group>"; };
@@ -1295,6 +1303,8 @@
 				D69EC97B0CE7E31CCBB20FE5 /* NetworkMessages.inc */,
 				001CE6A7EB6E3DB35E9F7BDC /* NetworkCommon.h */,
 				925C86DC2958FAB8EADF1C0F /* Navmap.h */,
+				CD58499C4DFCFE4442D2F21E /* NetworkQuadtree.h */,
+				76192933812124070EA94F80 /* NetworkQuadtree.inc */,
 			);
 			path = net_common;
 			sourceTree = "<group>";
@@ -1624,6 +1634,8 @@
 				11BC5AE71B0746EBCFDEEB37 /* GameCommon.h in Sources */,
 				7589E20EA54476E01FEA8EEB /* NetworkEntitySceneObjectFactory.cpp in Sources */,
 				2214C76D3E673692840C0C79 /* NetworkEntitySceneObjectFactory.h in Sources */,
+				D0D436848C93F66C925996B9 /* NetworkQuadtree.h in Sources */,
+				BC664656D203AED7C83DA5F8 /* NetworkQuadtree.inc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1765,6 +1777,8 @@
 				14FCA40E922F02FAC79C4983 /* GameCommon.h in Sources */,
 				8E38C057251D8B6F6A1C692B /* NetworkEntitySceneObjectFactory.cpp in Sources */,
 				931F3AA8656430A01CAD6464 /* NetworkEntitySceneObjectFactory.h in Sources */,
+				F01CB31EB0D7069C996711C7 /* NetworkQuadtree.h in Sources */,
+				01EBA6737DB5A6C8AFD8ADD9 /* NetworkQuadtree.inc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1906,6 +1920,8 @@
 				263469B27FFBE9BFC2AAD3CB /* GameCommon.h in Sources */,
 				FDC9515325B45941798790ED /* NetworkEntitySceneObjectFactory.cpp in Sources */,
 				CDD63EAB3403A6F70F9EE6F7 /* NetworkEntitySceneObjectFactory.h in Sources */,
+				12352CBA812D852CFC2E3170 /* NetworkQuadtree.h in Sources */,
+				BB7A8A457BCC3FB731BED735 /* NetworkQuadtree.inc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -698,9 +698,9 @@ void Editor::CreateDebugWidgets()
         ImGui::SameLine();
         if (ImGui::Button("  Save  "))
         {
-            if (strlen(sMapNameBuffer) == 0 || std::string(sMapNameBuffer) == ".json")
+            if (strlen(sMapNameBuffer) == 0 || std::string(sMapNameBuffer) == ".json" || !strutils::StringEndsWith(".json", std::string(sMapNameBuffer)))
             {
-                ospopups::ShowInfoMessageBox(ospopups::MessageBoxType::ERROR, "A name for the map must be specified");
+                ospopups::ShowInfoMessageBox(ospopups::MessageBoxType::ERROR, "A correct name (ending in .json) for the map must be specified");
             }
             else
             {
