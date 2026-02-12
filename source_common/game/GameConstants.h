@@ -30,7 +30,6 @@ namespace game_constants
     // Game Constants
     inline const strutils::StringId WORLD_SCENE_NAME = strutils::StringId("world");
     inline const strutils::StringId GUI_SCENE_NAME = strutils::StringId("gui");
-    inline const float MAP_RENDERED_SCALE = 4.0f;
 }
 
 ///------------------------------------------------------------------------------------------------
