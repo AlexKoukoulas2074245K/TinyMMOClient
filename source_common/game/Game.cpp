@@ -60,6 +60,7 @@
 ///------------------------------------------------------------------------------------------------
 
 static const strutils::StringId NAVMAP_DEBUG_SCENE_OBJECT_NAME = strutils::StringId("debug_navmap");
+static const strutils::StringId MAP_DEBUG_GRID_UNIFORM_NAME = strutils::StringId("debug_grid");
 static const std::string QUADTREE_DEBUG_SCENE_OBJECT_NAME_PREFIX = "debug_quadtree_";
 static const float DESTROYED_OBJECT_FADE_OUT_TIME_SECS = 0.1f;
 
@@ -91,6 +92,7 @@ static enet_uint32 sRTTSampleCount = 0;
 static enet_uint32 sCurrentRTT = 0;
 static bool sShowColliders = false;
 static bool sShowQuadtree = false;
+static bool sShowDebugGrid = false;
 static float sRequestQuadtreeTimer = 1.0f;
 
 void Game::Init()
@@ -540,6 +542,7 @@ void Game::CreateMapSceneObjects(const strutils::StringId& mapName)
     mapBottomLayer->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + "world_map.vs");
     mapBottomLayer->mShaderFloatUniformValues[strutils::StringId("map_width")] = mapDefinition.mMapDimensions.x + map_constants::MAP_RENDERING_SEAMS_BIAS;
     mapBottomLayer->mShaderFloatUniformValues[strutils::StringId("map_height")] = mapDefinition.mMapDimensions.y + map_constants::MAP_RENDERING_SEAMS_BIAS;
+    mapBottomLayer->mShaderBoolUniformValues[MAP_DEBUG_GRID_UNIFORM_NAME] = sShowDebugGrid;
     
     auto mapTopLayer = scene->CreateSceneObject(strutils::StringId(mapDefinition.mMapName.GetString()  + "_top"));
     mapTopLayer->mPosition.x = mapDefinition.mMapPosition.x * network::MAP_GAME_SCALE;
@@ -550,6 +553,7 @@ void Game::CreateMapSceneObjects(const strutils::StringId& mapName)
     mapTopLayer->mShaderResourceId = systemsEngine.GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT + "world_map.vs");
     mapTopLayer->mShaderFloatUniformValues[strutils::StringId("map_width")] = mapDefinition.mMapDimensions.x + map_constants::MAP_RENDERING_SEAMS_BIAS;
     mapTopLayer->mShaderFloatUniformValues[strutils::StringId("map_height")] = mapDefinition.mMapDimensions.y + map_constants::MAP_RENDERING_SEAMS_BIAS;
+    mapTopLayer->mShaderBoolUniformValues[MAP_DEBUG_GRID_UNIFORM_NAME] = sShowDebugGrid;
 }
 
 ///------------------------------------------------------------------------------------------------
@@ -646,11 +650,12 @@ void Game::CreateDebugWidgets()
     ImGui::End();
     
     static bool sShowNavmap = false;
+
     ImGui::Begin("Map", nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
     ImGui::Text("Current Map: %s", mCurrentMap.GetString().c_str());
     ImGui::Text("Show Navmap: ");
     ImGui::SameLine();
-    if (ImGui::Checkbox("##", &sShowNavmap))
+    if (ImGui::Checkbox("debug_navmap", &sShowNavmap))
     {
         if (mMapResourceController)
         {
@@ -667,8 +672,22 @@ void Game::CreateDebugWidgets()
 
     ImGui::Text("Show Quadtree: ");
     ImGui::SameLine();
-    ImGui::Checkbox("###", &sShowQuadtree);
+    ImGui::Checkbox("debug_quadtree", &sShowQuadtree);
 
+    ImGui::Text("Show Debug Grid: ");
+    ImGui::SameLine();
+    if (ImGui::Checkbox("debug_grid", &sShowDebugGrid))
+    {
+        auto& systemsEngine = CoreSystemsEngine::GetInstance();
+        auto scene = systemsEngine.GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME);
+        
+        auto bottomLayerSceneObjects = scene->FindSceneObjectsWhoseNameEndsWith("_bottom");
+        auto topLayerSceneObjects = scene->FindSceneObjectsWhoseNameEndsWith("_top");
+        
+        for (auto so: bottomLayerSceneObjects) so->mShaderBoolUniformValues[MAP_DEBUG_GRID_UNIFORM_NAME] = sShowDebugGrid;
+        for (auto so: topLayerSceneObjects) so->mShaderBoolUniformValues[MAP_DEBUG_GRID_UNIFORM_NAME] = sShowDebugGrid;
+    }
+    
     if (mMapResourceController)
     {
         ImGui::SeparatorText("LoadedMaps");

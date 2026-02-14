@@ -40,7 +40,16 @@ void NetworkEntitySceneObjectFactory::CreateSceneObjects(const network::ObjectDa
             case network::ObjectType::PLAYER:
             {
                 sceneObject->mTextureResourceId = resService.LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + "game/anims/player_running/core.png");
-                sceneObject->mShaderResourceId = resService.LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT  + "player.vs");
+                sceneObject->mShaderResourceId = resService.LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT  + "character.vs");
+                sceneObject->mShaderBoolUniformValues[IS_TEXTURE_SHEET_UNIFORM_NAME] = true;
+                sceneObject->mPosition = glm::vec3(objectData.position.x, objectData.position.y, objectData.position.z);
+                sceneObject->mScale = glm::vec3(objectData.objectScale);
+            } break;
+                
+            case network::ObjectType::NPC:
+            {
+                sceneObject->mTextureResourceId = resService.LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT  + "game/anims/rat_running/core.png");
+                sceneObject->mShaderResourceId = resService.LoadResource(resources::ResourceLoadingService::RES_SHADERS_ROOT  + "character.vs");
                 sceneObject->mShaderBoolUniformValues[IS_TEXTURE_SHEET_UNIFORM_NAME] = true;
                 sceneObject->mPosition = glm::vec3(objectData.position.x, objectData.position.y, objectData.position.z);
                 sceneObject->mScale = glm::vec3(objectData.objectScale);
@@ -63,7 +72,6 @@ void NetworkEntitySceneObjectFactory::CreateSceneObjects(const network::ObjectDa
                 }
             } break;
 
-            case network::ObjectType::NPC:
             case network::ObjectType::STATIC:
             {
                 assert(false);

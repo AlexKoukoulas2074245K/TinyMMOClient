@@ -42,7 +42,7 @@ public:
     const ObjectAnimationInfo& UpdateObjectAnimation(std::shared_ptr<scene::SceneObject> sceneObject, const network::ObjectType objectType, const network::ObjectState objectState, const network::FacingDirection facingDirection, const glm::vec3& velocity, const float dtMillis);
     
 private:
-    void UpdateCharacterAnimation(std::shared_ptr<scene::SceneObject> sceneObject, const network::ObjectState objectState, const network::FacingDirection facingDirection, const glm::vec3& velocity, const float dtMillis);
+    void UpdateCharacterAnimation(std::shared_ptr<scene::SceneObject> sceneObject, const network::ObjectType objectType, const network::ObjectState objectState, const network::FacingDirection facingDirection, const glm::vec3& velocity, const float dtMillis);
     void UpdateAttackAnimation(std::shared_ptr<scene::SceneObject> sceneObject, const network::FacingDirection facingDirection, const float dtMillis);
     
 private:

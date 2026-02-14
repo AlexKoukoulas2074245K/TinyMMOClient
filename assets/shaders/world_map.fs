@@ -13,6 +13,7 @@ uniform sampler2D tex;
 uniform float custom_alpha;
 uniform float map_width;
 uniform float map_height;
+uniform bool debug_grid;
 out vec4 frag_color;
 
 const float MAP_SEAM_OFFSET_X = 0.0f;
@@ -44,6 +45,15 @@ void main()
         {
             frag_color = texelFetch(tex, ivec2(final_uv_x * MAP_TEXTURE_SIZE, final_uv_y * MAP_TEXTURE_SIZE), 0);
         }
+    }
+    
+    if (debug_grid)
+    {
+        vec2 grid_uv = vec2(final_uv_x * 64.0f, final_uv_y * 64.0f);
+        vec2 cell = abs(fract(grid_uv) - 0.5f);
+        float lineWidth = 0.02f;
+        float line = smoothstep(0.5f - lineWidth, 0.5f, max(cell.x, cell.y));
+        frag_color = mix(frag_color, vec4(vec3(1.0f - line), line), line);
     }
     
     if (frag_color.a < 0.1) discard;

@@ -101,7 +101,7 @@ public:
     void StartWorker()
     {
         mThread = std::thread([&]
-                              {
+        {
             while(true)
             {
                 using namespace std::chrono_literals;

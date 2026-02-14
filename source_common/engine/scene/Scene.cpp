@@ -73,6 +73,22 @@ std::vector<std::shared_ptr<SceneObject>> Scene::FindSceneObjectsWhoseNameStarts
 
 ///------------------------------------------------------------------------------------------------
 
+std::vector<std::shared_ptr<SceneObject>> Scene::FindSceneObjectsWhoseNameEndsWith(const std::string& sceneObjectNamePostfix) const
+{
+    std::vector<std::shared_ptr<SceneObject>> result;
+    for (auto& sceneObject: mSceneObjects)
+    {
+        if (strutils::StringEndsWith(sceneObject->mName.GetString(), sceneObjectNamePostfix))
+        {
+            result.emplace_back(sceneObject);
+        }
+    }
+    
+    return result;
+}
+
+///------------------------------------------------------------------------------------------------
+
 void Scene::RecalculatePositionOfEdgeSnappingSceneObject(std::shared_ptr<SceneObject> sceneObject, const math::Frustum& cameraFrustum)
 {
     static const float positionIncrements = 0.0001f;

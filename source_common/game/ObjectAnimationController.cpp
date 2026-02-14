@@ -85,9 +85,9 @@ const ObjectAnimationController::ObjectAnimationInfo& ObjectAnimationController:
         mObjectAnimationInfoMap[sceneObject->mName] = {};
     }
     
-    if (objectType == network::ObjectType::PLAYER)
+    if (objectType == network::ObjectType::PLAYER || objectType == network::ObjectType::NPC)
     {
-        UpdateCharacterAnimation(sceneObject, objectState, facingDirection, velocity, dtMillis);
+        UpdateCharacterAnimation(sceneObject, objectType, objectState, facingDirection, velocity, dtMillis);
     }
     else if (objectType == network::ObjectType::ATTACK)
     {
@@ -109,7 +109,7 @@ const ObjectAnimationController::ObjectAnimationInfo& ObjectAnimationController:
 
 ///------------------------------------------------------------------------------------------------
 
-void ObjectAnimationController::UpdateCharacterAnimation(std::shared_ptr<scene::SceneObject> sceneObject, const network::ObjectState objectState, const network::FacingDirection facingDirection, const glm::vec3 &velocity, const float dtMillis)
+void ObjectAnimationController::UpdateCharacterAnimation(std::shared_ptr<scene::SceneObject> sceneObject, const network::ObjectType objectType, const network::ObjectState objectState, const network::FacingDirection facingDirection, const glm::vec3 &velocity, const float dtMillis)
 {
     if (mObjectAnimationInfoMap[sceneObject->mName].mObjectState != objectState)
     {
@@ -119,16 +119,51 @@ void ObjectAnimationController::UpdateCharacterAnimation(std::shared_ptr<scene::
             case network::ObjectState::IDLE:
             case network::ObjectState::RUNNING:
             {
-                sceneObject->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "game/anims/player_running/core.png");
+                switch (objectType)
+                {
+                    case network::ObjectType::PLAYER:
+                    {
+                        sceneObject->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "game/anims/player_running/core.png");
+                    } break;
+                        
+                    case network::ObjectType::NPC:
+                    {
+                        sceneObject->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "game/anims/rat_running/core.png");
+                    } break;
+                        
+                    default: assert(false);
+                }
+                
             } break;
             case network::ObjectState::BEGIN_MELEE:
             case network::ObjectState::MELEE_ATTACK:
             {
-                sceneObject->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "game/anims/player_melee_attack/core.png");
+                switch (objectType)
+                {
+                    case network::ObjectType::PLAYER:
+                    {
+                        sceneObject->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "game/anims/player_melee_attack/core.png");
+                    } break;
+                        
+                    case network::ObjectType::NPC:
+                    {
+                        sceneObject->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "game/anims/rat_melee_attack/core.png");
+                    } break;
+                        
+                    default: assert(false);
+                }
+
             } break;
             case network::ObjectState::CASTING:
             {
-                sceneObject->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "game/anims/player_casting/core.png");
+                switch (objectType)
+                {
+                    case network::ObjectType::PLAYER:
+                    {
+                        sceneObject->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "game/anims/player_casting/core.png");
+                    } break;
+                    default: assert(false);
+                }
             } break;
         }
     }
