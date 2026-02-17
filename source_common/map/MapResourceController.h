@@ -13,6 +13,7 @@
 #include <engine/resloading/ResourceLoadingService.h>
 #include <memory>
 #include <mutex>
+#include <net_common/NetworkCommon.h>
 #include <net_common/Navmap.h>
 #include <unordered_map>
 

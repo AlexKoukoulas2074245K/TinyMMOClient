@@ -699,7 +699,7 @@ void Editor::CreateDebugWidgets()
         ImGui::SameLine();
         if (ImGui::Button("  Save  "))
         {
-            if (strlen(sMapNameBuffer) == 0 || std::string(sMapNameBuffer) == ".json" || !strutils::StringEndsWith(".json", std::string(sMapNameBuffer)))
+            if (strlen(sMapNameBuffer) == 0 || std::string(sMapNameBuffer) == ".json" || !strutils::StringEndsWith(std::string(sMapNameBuffer), ".json"))
             {
                 ospopups::ShowInfoMessageBox(ospopups::MessageBoxType::ERROR, "A correct name (ending in .json) for the map must be specified");
             }
@@ -871,7 +871,7 @@ void Editor::CreateDebugWidgets()
                     rendering::ExportPixelsToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + mapName + "/" + mapName + "_top_layer.png", &topLayerPixels[0], map_constants::CLIENT_WORLD_MAP_IMAGE_SIZE);
                     
                     // Render map navmap texture
-                    unsigned char navmapPixels[map_constants::CLIENT_NAVMAP_IMAGE_SIZE * map_constants::CLIENT_NAVMAP_IMAGE_SIZE * 4] = { 0 };
+                    unsigned char navmapPixels[network::NAVMAP_SIZE * network::NAVMAP_SIZE * 4] = { 0 };
                     
                     for (auto y = 0; y < mGridRows; ++y)
                     {
@@ -881,21 +881,21 @@ void Editor::CreateDebugWidgets()
                             
                             auto navmapTileTypeColor = network::GetColorFromNavmapTileType(static_cast<network::NavmapTileType>(navmapTileSceneObject->mShaderIntUniformValues.at(TILE_NAVMAP_TILE_TYPE_UNIFORM_NAME)));
                             
-                            for (auto tileImageY = 0; tileImageY < map_constants::CLIENT_NAVMAP_IMAGE_SIZE/64; ++tileImageY)
+                            for (auto tileImageY = 0; tileImageY < network::NAVMAP_SIZE/64; ++tileImageY)
                             {
-                                for (auto tileImageX = 0; tileImageX < map_constants::CLIENT_NAVMAP_IMAGE_SIZE/64; ++tileImageX)
+                                for (auto tileImageX = 0; tileImageX < network::NAVMAP_SIZE/64; ++tileImageX)
                                 {
-                                    navmapPixels[(((y + rowOffset) * 2 + (oddHeight ? 1 : 0) + tileImageY) * map_constants::CLIENT_NAVMAP_IMAGE_SIZE * 4) + ((x + colOffset) * 2 + (oddWidth ? 1 : 0) + tileImageX) * 4 + 0] = navmapTileTypeColor.r;
-                                    navmapPixels[(((y + rowOffset) * 2 + (oddHeight ? 1 : 0) + tileImageY) * map_constants::CLIENT_NAVMAP_IMAGE_SIZE * 4) + ((x + colOffset) * 2 + (oddWidth ? 1 : 0) + tileImageX) * 4 + 1] = navmapTileTypeColor.g;
-                                    navmapPixels[(((y + rowOffset) * 2 + (oddHeight ? 1 : 0) + tileImageY) * map_constants::CLIENT_NAVMAP_IMAGE_SIZE * 4) + ((x + colOffset) * 2 + (oddWidth ? 1 : 0) + tileImageX) * 4 + 2] = navmapTileTypeColor.b;
-                                    navmapPixels[(((y + rowOffset) * 2 + (oddHeight ? 1 : 0) + tileImageY) * map_constants::CLIENT_NAVMAP_IMAGE_SIZE * 4) + ((x + colOffset) * 2 + (oddWidth ? 1 : 0) + tileImageX) * 4 + 3] = navmapTileTypeColor.a;
+                                    navmapPixels[(((y + rowOffset) + (oddHeight ? 1 : 0) + tileImageY) * network::NAVMAP_SIZE * 4) + ((x + colOffset) + (oddWidth ? 1 : 0) + tileImageX) * 4 + 0] = navmapTileTypeColor.r;
+                                    navmapPixels[(((y + rowOffset) + (oddHeight ? 1 : 0) + tileImageY) * network::NAVMAP_SIZE * 4) + ((x + colOffset) + (oddWidth ? 1 : 0) + tileImageX) * 4 + 1] = navmapTileTypeColor.g;
+                                    navmapPixels[(((y + rowOffset) + (oddHeight ? 1 : 0) + tileImageY) * network::NAVMAP_SIZE * 4) + ((x + colOffset) + (oddWidth ? 1 : 0) + tileImageX) * 4 + 2] = navmapTileTypeColor.b;
+                                    navmapPixels[(((y + rowOffset) + (oddHeight ? 1 : 0) + tileImageY) * network::NAVMAP_SIZE * 4) + ((x + colOffset) + (oddWidth ? 1 : 0) + tileImageX) * 4 + 3] = navmapTileTypeColor.a;
                                 }
                             }
                         }
                     }
                     
-                    rendering::ExportPixelsToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + mapName + "/" + mapName + "_navmap.png", navmapPixels, map_constants::CLIENT_NAVMAP_IMAGE_SIZE);
-                    rendering::ExportPixelsToPNG(NON_SANDBOXED_NET_ASSETS_NAVMAPS_FOLDER + mapName + "_navmap.png", navmapPixels, map_constants::CLIENT_NAVMAP_IMAGE_SIZE);
+                    rendering::ExportPixelsToPNG(NON_SANDBOXED_MAP_TEXTURES_FOLDER + mapName + "/" + mapName + "_navmap.png", navmapPixels, network::NAVMAP_SIZE);
+                    rendering::ExportPixelsToPNG(NON_SANDBOXED_NET_ASSETS_NAVMAPS_FOLDER + mapName + "_navmap.png", navmapPixels, network::NAVMAP_SIZE);
                     
                     logging::Log(logging::LogType::ERROR, "Successfully saved %s", (NON_SANDBOXED_MAPS_FOLDER + std::string(sMapNameBuffer)).c_str());
                     

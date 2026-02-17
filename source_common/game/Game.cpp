@@ -577,7 +577,7 @@ void Game::ShowDebugNavmap()
     GLuint glTextureId; int mode;
     rendering::CreateGLTextureFromSurface(navmapSurface, glTextureId, mode, true);
     
-    navmapSceneObject->mTextureResourceId = systemsEngine.GetResourceLoadingService().AddDynamicallyCreatedTextureResourceId(NAVMAP_DEBUG_SCENE_OBJECT_NAME.GetString(), glTextureId, map_constants::CLIENT_NAVMAP_IMAGE_SIZE, map_constants::CLIENT_NAVMAP_IMAGE_SIZE);
+    navmapSceneObject->mTextureResourceId = systemsEngine.GetResourceLoadingService().AddDynamicallyCreatedTextureResourceId(NAVMAP_DEBUG_SCENE_OBJECT_NAME.GetString(), glTextureId, network::NAVMAP_SIZE, network::NAVMAP_SIZE);
     navmapSceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 0.6f;
 }
 
@@ -640,7 +640,7 @@ void Game::CreateDebugWidgets()
                 auto currentNavmapCoords = navmap->GetNavmapCoord(objectWrapperData.mSceneObjects.front()->mPosition, mapDefinition.mMapPosition, network::MAP_GAME_SCALE);
                 auto currentNavmapTileType = navmap->GetNavmapTileAt(currentNavmapCoords);
                 
-                ImGui::Text("Navmap Tile: x:%d, y:%d", currentNavmapCoords.y, currentNavmapCoords.x);
+                ImGui::Text("Navmap Tile: x:%d, y:%d", currentNavmapCoords.x, currentNavmapCoords.y);
                 ImGui::Text("Navmap Type: %s", network::GetNavmapTileTypeName(currentNavmapTileType));
             }
             

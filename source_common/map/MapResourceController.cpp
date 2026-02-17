@@ -26,7 +26,7 @@ static constexpr int MAX_MAP_LOADING_RECURSE_LEVEL = 2;
 static std::shared_ptr<network::Navmap> CreateNavmap(resources::ResourceId navmapImageResourceId)
 {
     auto surface = CoreSystemsEngine::GetInstance().GetResourceLoadingService().GetResource<resources::ImageSurfaceResource>(navmapImageResourceId).GetSurface();
-    return std::make_shared<network::Navmap>(static_cast<unsigned char*>(surface->pixels), map_constants::CLIENT_NAVMAP_IMAGE_SIZE);
+    return std::make_shared<network::Navmap>(static_cast<unsigned char*>(surface->pixels), network::NAVMAP_SIZE);
 }
 
 ///------------------------------------------------------------------------------------------------
