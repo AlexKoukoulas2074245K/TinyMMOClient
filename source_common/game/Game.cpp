@@ -243,7 +243,7 @@ void Game::Update(const float dtMillis)
                     {
                         auto pathSceneObject = scene->CreateSceneObject(strutils::StringId(PATH_DEBUG_SCENE_OBJECT_NAME_PREFIX + std::to_string(message->objectId) + "_" + std::to_string(i)));
                         pathSceneObject->mPosition = message->pathData.debugPathPositions[i];
-                        pathSceneObject->mScale = glm::vec3(network::MAP_TILE_SIZE/10.0f);
+                        pathSceneObject->mScale = glm::vec3(network::MAP_TILE_SIZE/10.0f) * glm::vec3(i + 1);
                         pathSceneObject->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "debug/debug_circle.png");
                         pathSceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 1.0f;
                         pathSceneObject->mInvisible = !sShowObjectPaths;

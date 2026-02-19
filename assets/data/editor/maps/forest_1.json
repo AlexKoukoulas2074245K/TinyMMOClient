@@ -319,7 +319,7 @@
                     "plt": "tileset"
                 },
                 {
-                    "crd": "0,1",
+                    "crd": "1,0",
                     "plt": "tileset"
                 },
                 {
@@ -381,77 +381,11 @@
                     "plt": "tileset"
                 },
                 {
-                    "crd": "0,1",
+                    "crd": "1,0",
                     "plt": "tileset"
                 },
                 {
-                    "crd": "0,1",
-                    "plt": "tileset"
-                },
-                {
-                    "crd": "0,1",
-                    "plt": "tileset"
-                },
-                {
-                    "crd": "0,1",
-                    "plt": "tileset"
-                },
-                {
-                    "crd": "0,1",
-                    "plt": "tileset"
-                },
-                {
-                    "crd": "0,0",
-                    "plt": "tileset"
-                },
-                {
-                    "crd": "0,2",
-                    "plt": "tileset"
-                }
-            ],
-            [
-                {
-                    "crd": "0,2",
-                    "plt": "tileset"
-                },
-                {
-                    "crd": "0,0",
-                    "plt": "tileset"
-                },
-                {
-                    "crd": "0,1",
-                    "plt": "tileset"
-                },
-                {
-                    "crd": "0,1",
-                    "plt": "tileset"
-                },
-                {
-                    "crd": "0,1",
-                    "plt": "tileset"
-                },
-                {
-                    "crd": "0,1",
-                    "plt": "tileset"
-                },
-                {
-                    "crd": "0,1",
-                    "plt": "tileset"
-                },
-                {
-                    "crd": "0,1",
-                    "plt": "tileset"
-                },
-                {
-                    "crd": "0,1",
-                    "plt": "tileset"
-                },
-                {
-                    "crd": "0,1",
-                    "plt": "tileset"
-                },
-                {
-                    "crd": "0,1",
+                    "crd": "1,0",
                     "plt": "tileset"
                 },
                 {
@@ -509,11 +443,11 @@
                     "plt": "tileset"
                 },
                 {
-                    "crd": "0,1",
+                    "crd": "1,0",
                     "plt": "tileset"
                 },
                 {
-                    "crd": "0,1",
+                    "crd": "1,0",
                     "plt": "tileset"
                 },
                 {
@@ -571,11 +505,11 @@
                     "plt": "tileset"
                 },
                 {
-                    "crd": "0,1",
+                    "crd": "1,0",
                     "plt": "tileset"
                 },
                 {
-                    "crd": "0,1",
+                    "crd": "1,0",
                     "plt": "tileset"
                 },
                 {
@@ -637,7 +571,73 @@
                     "plt": "tileset"
                 },
                 {
+                    "crd": "1,0",
+                    "plt": "tileset"
+                },
+                {
                     "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                }
+            ],
+            [
+                {
+                    "crd": "0,2",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "0,1",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "1,0",
+                    "plt": "tileset"
+                },
+                {
+                    "crd": "1,0",
                     "plt": "tileset"
                 },
                 {
@@ -1303,7 +1303,7 @@
                     "nvt": 0
                 },
                 {
-                    "nvt": 0
+                    "nvt": 1
                 },
                 {
                     "nvt": 0
@@ -1350,10 +1350,10 @@
                     "nvt": 0
                 },
                 {
-                    "nvt": 0
+                    "nvt": 1
                 },
                 {
-                    "nvt": 0
+                    "nvt": 1
                 },
                 {
                     "nvt": 0
@@ -1397,10 +1397,10 @@
                     "nvt": 0
                 },
                 {
-                    "nvt": 0
+                    "nvt": 1
                 },
                 {
-                    "nvt": 0
+                    "nvt": 1
                 },
                 {
                     "nvt": 0
@@ -1444,60 +1444,10 @@
                     "nvt": 0
                 },
                 {
-                    "nvt": 0
-                },
-                {
-                    "nvt": 0
-                },
-                {
-                    "nvt": 0
-                },
-                {
-                    "nvt": 0
-                },
-                {
-                    "nvt": 0
-                },
-                {
-                    "nvt": 0
-                },
-                {
-                    "nvt": 0
-                },
-                {
-                    "nvt": 0
-                },
-                {
-                    "nvt": 1
-                }
-            ],
-            [
-                {
                     "nvt": 1
                 },
                 {
-                    "nvt": 0
-                },
-                {
-                    "nvt": 0
-                },
-                {
-                    "nvt": 0
-                },
-                {
-                    "nvt": 0
-                },
-                {
-                    "nvt": 0
-                },
-                {
-                    "nvt": 0
-                },
-                {
-                    "nvt": 0
-                },
-                {
-                    "nvt": 0
+                    "nvt": 1
                 },
                 {
                     "nvt": 0
@@ -1544,7 +1494,57 @@
                     "nvt": 0
                 },
                 {
+                    "nvt": 1
+                },
+                {
                     "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 1
+                }
+            ],
+            [
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 0
+                },
+                {
+                    "nvt": 1
+                },
+                {
+                    "nvt": 1
                 },
                 {
                     "nvt": 0
