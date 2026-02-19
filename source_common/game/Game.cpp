@@ -62,6 +62,7 @@
 static const strutils::StringId NAVMAP_DEBUG_SCENE_OBJECT_NAME = strutils::StringId("debug_navmap");
 static const strutils::StringId MAP_DEBUG_GRID_UNIFORM_NAME = strutils::StringId("debug_grid");
 static const std::string QUADTREE_DEBUG_SCENE_OBJECT_NAME_PREFIX = "debug_quadtree_";
+static const std::string PATH_DEBUG_SCENE_OBJECT_NAME_PREFIX = "debug_path_";
 static const float DESTROYED_OBJECT_FADE_OUT_TIME_SECS = 0.1f;
 
 ///------------------------------------------------------------------------------------------------
@@ -93,7 +94,9 @@ static enet_uint32 sCurrentRTT = 0;
 static bool sShowColliders = false;
 static bool sShowQuadtree = false;
 static bool sShowDebugGrid = false;
+static bool sShowObjectPaths = false;
 static float sRequestQuadtreeTimer = 1.0f;
+static float sRequestObjectPathTimer = 0.1f;
 
 void Game::Init()
 {
@@ -229,6 +232,24 @@ void Game::Update(const float dtMillis)
                     }
                 } break;
                     
+                case network::MessageType::DebugGetObjectPathResponseMessage:
+                {
+                    auto* message = reinterpret_cast<network::DebugGetObjectPathResponseMessage*>(event.packet->data);
+                    
+                    auto scene = CoreSystemsEngine::GetInstance().GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME);
+                    
+                    scene->RemoveAllSceneObjectsWithNameStartingWith(PATH_DEBUG_SCENE_OBJECT_NAME_PREFIX);
+                    for (int i = 0; i < message->pathData.debugPathPositionsCount; ++i)
+                    {
+                        auto pathSceneObject = scene->CreateSceneObject(strutils::StringId(PATH_DEBUG_SCENE_OBJECT_NAME_PREFIX + std::to_string(message->objectId) + "_" + std::to_string(i)));
+                        pathSceneObject->mPosition = message->pathData.debugPathPositions[i];
+                        pathSceneObject->mScale = glm::vec3(network::MAP_TILE_SIZE/10.0f);
+                        pathSceneObject->mTextureResourceId = CoreSystemsEngine::GetInstance().GetResourceLoadingService().LoadResource(resources::ResourceLoadingService::RES_TEXTURES_ROOT + "debug/debug_circle.png");
+                        pathSceneObject->mShaderFloatUniformValues[CUSTOM_ALPHA_UNIFORM_NAME] = 1.0f;
+                        pathSceneObject->mInvisible = !sShowObjectPaths;
+                    }
+                } break;
+                    
                 case network::MessageType::PlayerConnectedMessage:
                 {
                     auto* message = reinterpret_cast<network::PlayerConnectedMessage*>(event.packet->data);
@@ -273,6 +294,7 @@ void Game::Update(const float dtMillis)
                 case network::MessageType::BeginAttackRequestMessage:
                 case network::MessageType::CancelAttackMessage:
                 case network::MessageType::DebugGetQuadtreeRequestMessage:
+                case network::MessageType::DebugGetObjectPathRequestMessage:
                 case network::MessageType::UNUSED:
                     break;
             }
@@ -438,6 +460,29 @@ void Game::Update(const float dtMillis)
     else
     {
         scene->RemoveAllSceneObjectsWithNameStartingWith(QUADTREE_DEBUG_SCENE_OBJECT_NAME_PREFIX);
+    }
+    
+    if (sShowObjectPaths)
+    {
+        sRequestObjectPathTimer -= dtMillis/1000.0f;
+        if (sRequestObjectPathTimer < 0)
+        {
+            sRequestObjectPathTimer = 0.1f;
+            network::DebugGetObjectPathRequestMessage requestPathDataMessage = {};
+            
+            for (auto& [objectId, objectWrapperData]: mLocalObjectWrappers)
+            {
+                if (objectWrapperData.mObjectData.objectType == network::ObjectType::NPC)
+                {
+                    requestPathDataMessage.objectId = objectId;
+                    network::SendMessage(sServer, &requestPathDataMessage, sizeof(requestPathDataMessage), network::channels::UNRELIABLE);
+                }
+            }
+        }
+    }
+    else
+    {
+        scene->RemoveAllSceneObjectsWithNameStartingWith(PATH_DEBUG_SCENE_OBJECT_NAME_PREFIX);
     }
     
     enet_host_flush(sClient);
@@ -629,8 +674,16 @@ void Game::CreateDebugWidgets()
             ImGui::Text("Object Type: %s", network::GetObjectTypeString(objectWrapperData.mObjectData.objectType));
             ImGui::Text("Object State: %s", network::GetObjectStateString(objectWrapperData.mObjectData.objectState));
             ImGui::Text("Facing Direction: %s", network::GetFacingDirectionString(objectWrapperData.mObjectData.facingDirection));
+            ImGui::Text("Object Faction: %s", network::GetObjectFactionString(objectWrapperData.mObjectData.objectFaction));
+            ImGui::Text("Attack Type: %s", network::GetAttackTypeString(objectWrapperData.mObjectData.attackType));
+            ImGui::Text("Projectile Type: %s", network::GetProjectileTypeString(objectWrapperData.mObjectData.projectileType));
             ImGui::Text("Current Map: %s", network::GetCurrentMapString(objectWrapperData.mObjectData).c_str());
-            
+            ImGui::Text("Object Speed: %.4f", objectWrapperData.mObjectData.speed);
+            ImGui::Text("Object Scale: %.4f", objectWrapperData.mObjectData.objectScale);
+            ImGui::Text("Action Timer: %.4f", objectWrapperData.mObjectData.actionTimer);
+            ImGui::Text("Object position: %.4f, %.4f, %.4f", objectWrapperData.mObjectData.position.x, objectWrapperData.mObjectData.position.y, objectWrapperData.mObjectData.position.z);
+            ImGui::Text("Object velocity: %.4f, %.4f, %.4f", objectWrapperData.mObjectData.velocity.x, objectWrapperData.mObjectData.velocity.y, objectWrapperData.mObjectData.velocity.z);
+            ImGui::Text("Object Speed: %.4f", objectWrapperData.mObjectData.speed);
             const auto& globalMapDataRepo = GlobalMapDataRepository::GetInstance();
             const auto& mapName = strutils::StringId(network::GetCurrentMapString(objectWrapperData.mObjectData));
             if (mMapResourceController && mMapResourceController->GetAllLoadedMapResources().contains(mapName) && mMapResourceController->GetAllLoadedMapResources().at(mapName).mMapResourcesState == MapResourcesState::LOADED)
@@ -653,9 +706,7 @@ void Game::CreateDebugWidgets()
 
     ImGui::Begin("Map", nullptr, GLOBAL_IMGUI_WINDOW_FLAGS);
     ImGui::Text("Current Map: %s", mCurrentMap.GetString().c_str());
-    ImGui::Text("Show Navmap: ");
-    ImGui::SameLine();
-    if (ImGui::Checkbox("debug_navmap", &sShowNavmap))
+    if (ImGui::Checkbox("Show Navmap", &sShowNavmap))
     {
         if (mMapResourceController)
         {
@@ -670,13 +721,10 @@ void Game::CreateDebugWidgets()
         }
     }
 
-    ImGui::Text("Show Quadtree: ");
-    ImGui::SameLine();
-    ImGui::Checkbox("debug_quadtree", &sShowQuadtree);
-
-    ImGui::Text("Show Debug Grid: ");
-    ImGui::SameLine();
-    if (ImGui::Checkbox("debug_grid", &sShowDebugGrid))
+    ImGui::Checkbox("Show Quadtree", &sShowQuadtree);
+    ImGui::Checkbox("Show Object Paths", &sShowObjectPaths);
+    
+    if (ImGui::Checkbox("Show Grid", &sShowDebugGrid))
     {
         auto& systemsEngine = CoreSystemsEngine::GetInstance();
         auto scene = systemsEngine.GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME);
