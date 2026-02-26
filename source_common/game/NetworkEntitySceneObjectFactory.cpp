@@ -95,7 +95,7 @@ void NetworkEntitySceneObjectFactory::CreateSceneObjects(const network::ObjectDa
             } break;
         }
 
-        colliderSceneObject->mScale = glm::vec3(objectData.colliderData.colliderRelativeDimentions.x, objectData.colliderData.colliderRelativeDimentions.y, 1.0f);
+        colliderSceneObject->mScale = glm::vec3(objectData.colliderData.colliderRelativeDimensions.x, objectData.colliderData.colliderRelativeDimensions.y, 1.0f);
         colliderSceneObject->mScale *= sceneObjects.front()->mScale;
         colliderSceneObject->mPosition = objectData.position;
         colliderSceneObject->mPosition.z = map_constants::TILE_NAVMAP_LAYER_Z;

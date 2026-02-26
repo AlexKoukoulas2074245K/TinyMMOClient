@@ -17,6 +17,7 @@ static const float UV_X_STEP = 0.3333f; // Assuming 3 columns
 static const float UV_Y_STEP = 0.2f;    // Assuming 5 rows
 static const float PLAYER_ANIMATION_TIME_CONSTANT = 0.000492f;
 static const float ATTACK_FRAME_ANIMATION_TIME_SECS = 0.05f;
+static const float NPC_FRAME_ANIMATION_TIME_SECS = 0.15f;
 
 ///------------------------------------------------------------------------------------------------
 
@@ -78,6 +79,16 @@ void ObjectAnimationController::OnObjectDestroyedEvent(const events::ObjectDestr
 
 ///------------------------------------------------------------------------------------------------
 
+void ObjectAnimationController::OnNPCAttack(const strutils::StringId& npcNameId)
+{
+    if (mObjectAnimationInfoMap.contains(npcNameId))
+    {
+        mObjectAnimationInfoMap.at(npcNameId).mFrameIndex = 0;
+    }
+}
+
+///------------------------------------------------------------------------------------------------
+
 const ObjectAnimationController::ObjectAnimationInfo& ObjectAnimationController::UpdateObjectAnimation(std::shared_ptr<scene::SceneObject> sceneObject, const network::ObjectType objectType, const network::ObjectState objectState, const network::FacingDirection facingDirection, const glm::vec3& velocity, const float dtMillis)
 {
     if (!mObjectAnimationInfoMap.count(sceneObject->mName))
@@ -135,9 +146,11 @@ void ObjectAnimationController::UpdateCharacterAnimation(std::shared_ptr<scene::
                 }
                 
             } break;
+                
             case network::ObjectState::BEGIN_MELEE:
             case network::ObjectState::MELEE_ATTACK:
             {
+                mObjectAnimationInfoMap[sceneObject->mName].mFrameIndex = 0;
                 switch (objectType)
                 {
                     case network::ObjectType::PLAYER:
@@ -190,9 +203,10 @@ void ObjectAnimationController::UpdateCharacterAnimation(std::shared_ptr<scene::
             
             if (objectState == network::ObjectState::MELEE_ATTACK)
             {
-                if (mObjectAnimationInfoMap[sceneObject->mName].mAnimationTimeAccum > ATTACK_FRAME_ANIMATION_TIME_SECS)
+                float targetAnimationDuration = objectType == network::ObjectType::NPC ? NPC_FRAME_ANIMATION_TIME_SECS : ATTACK_FRAME_ANIMATION_TIME_SECS;
+                if (mObjectAnimationInfoMap[sceneObject->mName].mAnimationTimeAccum > targetAnimationDuration)
                 {
-                    mObjectAnimationInfoMap[sceneObject->mName].mAnimationTimeAccum -= ATTACK_FRAME_ANIMATION_TIME_SECS;
+                    mObjectAnimationInfoMap[sceneObject->mName].mAnimationTimeAccum -= targetAnimationDuration;
                     mObjectAnimationInfoMap[sceneObject->mName].mFrameIndex++;
                     if (mObjectAnimationInfoMap[sceneObject->mName].mFrameIndex > 2)
                     {

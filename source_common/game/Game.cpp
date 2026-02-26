@@ -238,7 +238,8 @@ void Game::Update(const float dtMillis)
                     
                     auto scene = CoreSystemsEngine::GetInstance().GetSceneManager().FindScene(game_constants::WORLD_SCENE_NAME);
                     
-                    scene->RemoveAllSceneObjectsWithNameStartingWith(PATH_DEBUG_SCENE_OBJECT_NAME_PREFIX);
+                    scene->RemoveAllSceneObjectsWithNameStartingWith(PATH_DEBUG_SCENE_OBJECT_NAME_PREFIX + std::to_string(message->objectId));
+                    
                     for (int i = 0; i < message->pathData.debugPathPositionsCount; ++i)
                     {
                         auto pathSceneObject = scene->CreateSceneObject(strutils::StringId(PATH_DEBUG_SCENE_OBJECT_NAME_PREFIX + std::to_string(message->objectId) + "_" + std::to_string(i)));
@@ -290,7 +291,13 @@ void Game::Update(const float dtMillis)
                         mLocalObjectWrappers[mLocalPlayerId].mObjectData.objectState = network::ObjectState::IDLE;
                     }
                 } break;
-                    
+                
+                case network::MessageType::NPCAttackMessage:
+                {
+                    auto* message = reinterpret_cast<network::NPCAttackMessage*>(event.packet->data);
+                    mObjectAnimationController->OnNPCAttack(GetSceneObjectNameId(message->attackerId));
+                } break;
+                
                 case network::MessageType::BeginAttackRequestMessage:
                 case network::MessageType::CancelAttackMessage:
                 case network::MessageType::DebugGetQuadtreeRequestMessage:
@@ -545,7 +552,6 @@ void Game::CreateObject(const network::ObjectData& objectData)
     }
     
     mLocalObjectWrappers[objectData.objectId].mObjectData = objectData;
-    mLocalObjectWrappers[objectData.objectId].mColliderData = objectData.colliderData;
     
     NetworkEntitySceneObjectFactory::CreateSceneObjects(objectData, sShowColliders, mLocalObjectWrappers[objectData.objectId].mSceneObjects);
 }

@@ -59,7 +59,6 @@ private:
     {
         // Anim(equipment) layers
         network::ObjectData mObjectData;
-        network::ObjectColliderData mColliderData;
         std::vector<std::shared_ptr<scene::SceneObject>> mSceneObjects;
     };
 
