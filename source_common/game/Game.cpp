@@ -97,6 +97,8 @@ static bool sShowDebugGrid = false;
 static bool sShowObjectPaths = false;
 static float sRequestQuadtreeTimer = 1.0f;
 static float sRequestObjectPathTimer = 0.1f;
+static float sSeparatorDistance = 0.04f;
+static float sSeparatorWeight = 0.5f;
 
 void Game::Init()
 {
@@ -302,6 +304,7 @@ void Game::Update(const float dtMillis)
                 case network::MessageType::CancelAttackMessage:
                 case network::MessageType::DebugGetQuadtreeRequestMessage:
                 case network::MessageType::DebugGetObjectPathRequestMessage:
+                case network::MessageType::DebugSetSwarmParams:
                 case network::MessageType::UNUSED:
                     break;
             }
@@ -669,6 +672,18 @@ void Game::CreateDebugWidgets()
         }
         // Toggle SO invisibility of colliders in object wrappers
     }
+    ImGui::SeparatorText("Swarm Params");
+    bool sSendSwarmParams = ImGui::SliderFloat("Sep Dist", &sSeparatorDistance, 0.01f, 0.07f);
+    sSendSwarmParams |= ImGui::SliderFloat("Sep Weight", &sSeparatorWeight, 0.0f, 10.0f);
+    
+    if (sSendSwarmParams)
+    {
+        network::DebugSetSwarmParams message = {};
+        message.separationDistance = sSeparatorDistance;
+        message.separationWeight = sSeparatorWeight;
+        network::SendMessage(sServer, &message, sizeof(message), network::channels::RELIABLE);
+    }
+    
     
     ImGui::SeparatorText("Network Object Data");
     for (const auto& [objectId, objectWrapperData]: mLocalObjectWrappers)

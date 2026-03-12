@@ -227,7 +227,16 @@ void SceneManager::SortSceneObjects(std::shared_ptr<Scene> scene)
     auto& sceneObjects = scene->GetSceneObjects();
     std::sort(sceneObjects.begin(), sceneObjects.end(), [&](const std::shared_ptr<scene::SceneObject>& lhs, const std::shared_ptr<scene::SceneObject>& rhs)
     {
-        return lhs->mPosition.z < rhs->mPosition.z;
+        const float lz = lhs->mPosition.z;
+        const float rz = rhs->mPosition.z;
+
+        if (std::isnan(lz)) return false;
+        if (std::isnan(rz)) return true;
+
+        if (lz != rz)
+            return lz < rz;
+
+        return lhs->mName.GetString() < rhs->mName.GetString();
     });
 }
 
